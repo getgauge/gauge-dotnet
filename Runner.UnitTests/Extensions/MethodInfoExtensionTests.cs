@@ -17,44 +17,55 @@
 
 using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Runner.Extensions;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests.Extensions
 {
-    internal class MethodInfoExtensionTests
+    public class MethodInfoExtensionTests
     {
         [Step("Foo")]
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Foo()
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
         [Step("Bar")]
         [ContinueOnFailure]
+#pragma warning disable xUnit1013 // Public method should be marked as test
+#pragma warning disable RECS0154 // Parameter is never used
         public void Bar(string bar)
+#pragma warning restore RECS0154 // Parameter is never used
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
 
         [ContinueOnFailure]
+#pragma warning disable RECS0154 // Parameter is never used
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Baz(string bar)
+#pragma warning restore xUnit1013 // Public method should be marked as test
+#pragma warning restore RECS0154 // Parameter is never used
         {
         }
 
-        [Test]
-        [TestCase("Foo", "Gauge.CSharp.Runner.UnitTests.Extensions.MethodInfoExtensionTests.Foo")]
-        [TestCase("Bar", "Gauge.CSharp.Runner.UnitTests.Extensions.MethodInfoExtensionTests.Bar-Stringbar")]
+        [Theory]
+        [InlineData("Foo", "Gauge.CSharp.Runner.UnitTests.Extensions.MethodInfoExtensionTests.Foo")]
+        [InlineData("Bar", "Gauge.CSharp.Runner.UnitTests.Extensions.MethodInfoExtensionTests.Bar-Stringbar")]
         public void ShouldGetFullyQualifiedName(string methodName, string expectedMethodId)
         {
-            Assert.AreEqual(expectedMethodId, GetType().GetMethod(methodName).FullyQuallifiedName());
+            Assert.Equal(expectedMethodId, GetType().GetMethod(methodName).FullyQuallifiedName());
         }
 
-        [Test]
-        [TestCase("Foo", false)]
-        [TestCase("Bar", true)]
-        [TestCase("Baz", false, Description = "Recoverable is true only when method is a Step")]
+        [Theory]
+        [InlineData("Foo", false)]
+        [InlineData("Bar", true)]
+        // [InlineData("Baz", false, Description = "Recoverable is true only when method is a Step")]
+        [InlineData("Baz", false)]
         public void ShouldGetRecoverable(string methodName, bool expectedRecoverable)
         {
-            Assert.AreEqual(expectedRecoverable, GetType().GetMethod(methodName).IsRecoverableStep());
+            Assert.Equal(expectedRecoverable, GetType().GetMethod(methodName).IsRecoverableStep());
         }
     }
 }

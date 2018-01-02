@@ -18,15 +18,13 @@
 using Gauge.CSharp.Runner.Models;
 using Gauge.Messages;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
-    [TestFixture]
     public class ValidateProcessorTests
     {
-        [SetUp]
-        public void Setup()
+        public ValidateProcessorTests()
         {
             var mockMethodScanner = new Mock<IMethodScanner>();
             _mockStepRegistry = new Mock<IStepRegistry>();
@@ -38,7 +36,7 @@ namespace Gauge.CSharp.Runner.UnitTests
         private MessageProcessorFactory _messageProcessorFactory;
         private Mock<IStepRegistry> _mockStepRegistry;
 
-        [Test]
+        [Fact]
         public void ShouldGetErrorResponseForStepValidateRequestWhenMultipleStepImplFound()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StepValidateRequest);
@@ -58,14 +56,14 @@ namespace Gauge.CSharp.Runner.UnitTests
 
             var response = messageProcessor.Process(message);
 
-            Assert.AreEqual(false, response.StepValidateResponse.IsValid);
-            Assert.AreEqual(StepValidateResponse.Types.ErrorType.DuplicateStepImplementation,
+            Assert.False(response.StepValidateResponse.IsValid);
+            Assert.Equal(StepValidateResponse.Types.ErrorType.DuplicateStepImplementation,
                 response.StepValidateResponse.ErrorType);
-            Assert.AreEqual("Multiple step implementations found for : step_text_1",
+            Assert.Equal("Multiple step implementations found for : step_text_1",
                 response.StepValidateResponse.ErrorMessage);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetErrorResponseForStepValidateRequestWhennNoImplFound()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StepValidateRequest);
@@ -83,15 +81,15 @@ namespace Gauge.CSharp.Runner.UnitTests
 
             var response = messageProcessor.Process(message);
 
-            Assert.AreEqual(false, response.StepValidateResponse.IsValid);
-            Assert.AreEqual(StepValidateResponse.Types.ErrorType.StepImplementationNotFound,
+            Assert.False(response.StepValidateResponse.IsValid);
+            Assert.Equal(StepValidateResponse.Types.ErrorType.StepImplementationNotFound,
                 response.StepValidateResponse.ErrorType);
-            StringAssert.Contains("No implementation found for : step_text_1.",
+            Assert.Contains("No implementation found for : step_text_1.",
                 response.StepValidateResponse.ErrorMessage);
         }
 
 
-        [Test]
+        [Fact]
         public void ShouldGetVaildResponseForStepValidateRequest()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StepValidateRequest);
@@ -111,7 +109,7 @@ namespace Gauge.CSharp.Runner.UnitTests
 
             var response = messageProcessor.Process(message);
 
-            Assert.AreEqual(true, response.StepValidateResponse.IsValid);
+            Assert.True(response.StepValidateResponse.IsValid);
         }
     }
 }

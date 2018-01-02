@@ -22,7 +22,7 @@ using System.Linq;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.Messages;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.IntegrationTests
 {
@@ -30,8 +30,7 @@ namespace Gauge.CSharp.Runner.IntegrationTests
     {
         private readonly string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
 
-        [SetUp]
-        public void Setup()
+        public RefactorProcessorTests()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _testProjectPath);
 
@@ -39,12 +38,12 @@ namespace Gauge.CSharp.Runner.IntegrationTests
                 Path.Combine(_testProjectPath, "RefactoringSample_copy.cs"), true);
         }
 
-        [Test]
+        [Fact]
         public void ShouldAddParameters()
         {
             const string parameterizedStepText = "Refactoring Say <what> to <who>";
             const string stepValue = "Refactoring Say {} to {}";
-            var sandbox = SandboxBuilder.Build();
+            var sandbox = new Sandbox();
             var gaugeMethod = sandbox.GetStepMethods()
                 .First(method =>
                     method.Name ==
@@ -86,11 +85,10 @@ namespace Gauge.CSharp.Runner.IntegrationTests
 
             var refactorProcessor = new RefactorProcessor(stepRegistry, sandbox);
             var result = refactorProcessor.Process(message);
-            Assert.IsTrue(result.RefactorResponse.Success);
+            Assert.True(result.RefactorResponse.Success);
         }
 
-        [TearDown]
-        public void TearDown()
+        ~RefactorProcessorTests()
         {
             var sourceFileName = Path.Combine(_testProjectPath, "RefactoringSample_copy.cs");
             File.Copy(sourceFileName, Path.Combine(_testProjectPath, "RefactoringSample.cs"), true);

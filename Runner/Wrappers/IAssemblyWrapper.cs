@@ -22,6 +22,5 @@ namespace Gauge.CSharp.Runner.Wrappers
     public interface IAssemblyWrapper
     {
         Assembly LoadFrom(string location);
-        Assembly ReflectionOnlyLoadFrom(string path);
     }
 }

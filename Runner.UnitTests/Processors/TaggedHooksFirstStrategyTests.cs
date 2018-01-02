@@ -22,49 +22,57 @@ using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Runner.Extensions;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
 {
-    [TestFixture]
     public class TaggedHooksFirstStrategyTests
     {
-        [SetUp]
-        public void Setup()
+        public TaggedHooksFirstStrategyTests()
         {
             _hookMethods = new HashSet<HookMethod>
             {
-                new HookMethod("AfterScenario", GetType().GetMethod("Foo"), typeof(Step).Assembly),
-                new HookMethod("AfterScenario", GetType().GetMethod("Bar"), typeof(Step).Assembly),
-                new HookMethod("AfterScenario", GetType().GetMethod("Zed"), typeof(Step).Assembly),
-                new HookMethod("AfterScenario", GetType().GetMethod("Blah"), typeof(Step).Assembly),
-                new HookMethod("AfterScenario", GetType().GetMethod("Baz"), typeof(Step).Assembly)
+                new HookMethod(typeof(AfterScenario), GetType().GetMethod("Foo")),
+                new HookMethod(typeof(AfterScenario), GetType().GetMethod("Bar")),
+                new HookMethod(typeof(AfterScenario), GetType().GetMethod("Zed")),
+                new HookMethod(typeof(AfterScenario), GetType().GetMethod("Blah")),
+                new HookMethod(typeof(AfterScenario), GetType().GetMethod("Baz"))
             };
         }
 
         [AfterScenario("Foo")]
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Foo()
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
         [AfterScenario("Bar", "Baz")]
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Bar()
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
         [AfterScenario("Foo", "Baz")]
         [TagAggregationBehaviour(TagAggregation.Or)]
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Baz()
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
         [AfterScenario]
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Blah()
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
         [AfterScenario]
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Zed()
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
@@ -81,7 +89,7 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         private HashSet<HookMethod> _hookMethods;
 
 
-        [Test]
+        [Fact]
         public void ShouldFetchTaggedHooksInSortedOrder()
         {
             var untaggedHooks = new[] {"Blah", "Zed"}.Select(s => GetType().GetMethod(s).FullyQuallifiedName());
@@ -90,10 +98,10 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
                 .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToArray();
             var actual = new ArraySegment<string>(applicableHooks, 2, untaggedHooks.Count());
 
-            Assert.AreEqual(untaggedHooks, actual);
+            Assert.Equal(untaggedHooks, actual);
         }
 
-        [Test]
+        [Fact]
         public void ShouldFetchUntaggedHooksAfterTaggedHooks()
         {
             var taggedHooks = new[] {"Baz", "Foo"};
@@ -103,18 +111,18 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             var applicableHooks = new TaggedHooksFirstStrategy()
                 .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToList();
 
-            Assert.AreEqual(expected, applicableHooks);
+            Assert.Equal(expected, applicableHooks);
         }
 
 
-        [Test]
+        [Fact]
         public void ShouldFetchUntaggedHooksInSortedOrder()
         {
             var applicableHooks = new TaggedHooksFirstStrategy()
                 .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToList();
 
-            Assert.That(applicableHooks[0], Is.EqualTo(GetType().GetMethod("Baz").FullyQuallifiedName()));
-            Assert.That(applicableHooks[1], Is.EqualTo(GetType().GetMethod("Foo").FullyQuallifiedName()));
+            Assert.Equal(applicableHooks[0], GetType().GetMethod("Baz").FullyQuallifiedName());
+            Assert.Equal(applicableHooks[1], GetType().GetMethod("Foo").FullyQuallifiedName());
         }
     }
 }

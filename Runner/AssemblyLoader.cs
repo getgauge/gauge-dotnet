@@ -17,10 +17,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using Gauge.CSharp.Runner.Exceptions;
+using Gauge.CSharp.Lib;
 using Gauge.CSharp.Runner.Wrappers;
 using NLog;
 
@@ -30,63 +29,10 @@ namespace Gauge.CSharp.Runner
     {
         private const string GaugeLibAssembleName = "Gauge.CSharp.Lib";
         private readonly IAssemblyWrapper _assemblyWrapper;
-        private readonly IFileWrapper _fileWrapper;
-        private readonly Version _minimumLibversion = new Version("0.6.0");
-        private Assembly _targetLibAssembly;
 
-        public AssemblyLoader(string runnerBasePath, IAssemblyWrapper assemblyWrapper, IFileWrapper fileWrapper,
-            IEnumerable<string> assemblyLocations)
+        public AssemblyLoader(IAssemblyWrapper assemblyWrapper, IEnumerable<string> assemblyLocations)
         {
-            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
-            {
-                var logger = LogManager.GetLogger("AssemblyLoader");
-                logger.Debug("Loading {0}", args.Name);
-                try
-                {
-                    var assemblyName = args.Name.Split(',').FirstOrDefault();
-                    var gaugeBinDir = AssemblyLocater.GetGaugeBinDir();
-
-                    var probePath = Path.GetFullPath(Path.Combine(gaugeBinDir, string.Format("{0}.dll", assemblyName)));
-                    if (File.Exists(probePath)) return Assembly.LoadFrom(probePath);
-
-                    probePath = Path.GetFullPath(Path.Combine(runnerBasePath, string.Format("{0}.dll", assemblyName)));
-
-                    if (File.Exists(probePath)) return Assembly.LoadFrom(probePath);
-
-                    var executingAssembly = Assembly.GetExecutingAssembly();
-                    return executingAssembly.GetName().Name == assemblyName ? executingAssembly : null;
-                }
-                catch (Exception e)
-                {
-                    logger.Error(e);
-                    return null;
-                }
-            };
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += (sender, args) =>
-            {
-                var logger = LogManager.GetLogger("AssemblyLoader");
-                logger.Debug("Reflection only Loading {0}", args.Name);
-                try
-                {
-                    var assemblyName = args.Name.Split(',').FirstOrDefault();
-                    var gaugeBinDir = AssemblyLocater.GetGaugeBinDir();
-
-                    var probePath = Path.GetFullPath(Path.Combine(gaugeBinDir, string.Format("{0}.dll", assemblyName)));
-                    if (File.Exists(probePath)) return Assembly.ReflectionOnlyLoadFrom(probePath);
-
-                    probePath = Path.GetFullPath(Path.Combine(runnerBasePath, string.Format("{0}.dll", assemblyName)));
-
-                    return File.Exists(probePath) ? Assembly.ReflectionOnlyLoadFrom(probePath) : null;
-                }
-                catch (Exception e)
-                {
-                    logger.Error(e);
-                    return null;
-                }
-            };
             _assemblyWrapper = assemblyWrapper;
-            _fileWrapper = fileWrapper;
-            LoadTargetLibAssembly();
             AssembliesReferencingGaugeLib = new List<Assembly>();
             ScreengrabberTypes = new List<Type>();
             ClassInstanceManagerTypes = new List<Type>();
@@ -94,24 +40,19 @@ namespace Gauge.CSharp.Runner
                 ScanAndLoad(location);
         }
 
-        public AssemblyLoader(string runnerBasePath, IEnumerable<string> assemblyLocations)
-            : this(runnerBasePath, new AssemblyWrapper(), new FileWrapper(), assemblyLocations)
+        public AssemblyLoader(IEnumerable<string> assemblyLocations)
+            : this(new AssemblyWrapper(), assemblyLocations)
         {
         }
 
-        public AssemblyLoader(string runnerBasePath)
-            : this(runnerBasePath, new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies())
+        public AssemblyLoader()
+            : this(new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies())
         {
         }
 
         public List<Assembly> AssembliesReferencingGaugeLib { get; }
         public List<Type> ScreengrabberTypes { get; }
         public List<Type> ClassInstanceManagerTypes { get; }
-
-        public Assembly GetTargetLibAssembly()
-        {
-            return _targetLibAssembly;
-        }
 
         public List<MethodInfo> GetMethods(string annotation)
         {
@@ -129,8 +70,7 @@ namespace Gauge.CSharp.Runner
             Assembly assembly;
             try
             {
-                // Load assembly for reflection only to avoid exceptions when referenced assemblyLocations cannot be found
-                assembly = _assemblyWrapper.ReflectionOnlyLoadFrom(path);
+                assembly = _assemblyWrapper.LoadFrom(path);
             }
             catch
             {
@@ -168,14 +108,14 @@ namespace Gauge.CSharp.Runner
         private void ScanForScreengrabber(IEnumerable<Type> types)
         {
             var implementingTypes = types.Where(type =>
-                type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.IScreenGrabber"));
+                type.GetInterfaces().Any(t => t.FullName == typeof(IScreenGrabber).FullName));
             ScreengrabberTypes.AddRange(implementingTypes);
         }
 
         private void ScanForInstanceManager(IEnumerable<Type> types)
         {
             var implementingTypes = types.Where(type =>
-                type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.IClassInstanceManager"));
+                type.GetInterfaces().Any(t => t.FullName == typeof(IClassInstanceManager).FullName));
             ClassInstanceManagerTypes.AddRange(implementingTypes);
         }
 
@@ -191,25 +131,6 @@ namespace Gauge.CSharp.Runner
                     .Warn("Could not scan all types in assembly {0}", assembly.CodeBase);
                 return e.Types.Where(type => type != null);
             }
-        }
-
-        private void LoadTargetLibAssembly()
-        {
-            var targetLibLocation = Path.GetFullPath(Path.Combine(AssemblyLocater.GetGaugeBinDir(),
-                string.Concat(GaugeLibAssembleName, ".dll")));
-            var logger = LogManager.GetLogger("AssemblyLoader");
-            if (!_fileWrapper.Exists(targetLibLocation))
-            {
-                var message = string.Format("Unable to locate Gauge Lib at: {0}", targetLibLocation);
-                logger.Error(message);
-                throw new FileNotFoundException(message);
-            }
-            _targetLibAssembly = _assemblyWrapper.LoadFrom(targetLibLocation);
-            var targetLibVersion = _targetLibAssembly.GetName().Version;
-            if (targetLibVersion <= _minimumLibversion)
-                throw new GaugeLibVersionMismatchException(targetLibVersion, _minimumLibversion);
-
-            logger.Debug("Target Lib loaded : {0}, from {1}", _targetLibAssembly.FullName, _targetLibAssembly.Location);
         }
     }
 }

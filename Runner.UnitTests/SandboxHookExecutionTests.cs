@@ -26,18 +26,17 @@ using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.CSharp.Runner.Wrappers;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
     public class SandboxHookExecutionTests
     {
-        private static readonly IEnumerable<string> HookTypes = Hooks.Keys;
+        public static readonly IEnumerable<object[]> HookTypes = Hooks.Keys.Cast<object[]>();
         private IList<string> _applicableTags;
         private string _gaugeProjectRootEnv;
         private HashSet<IHookMethod> _hookMethods;
         private Mock<IAssemblyLoader> _mockAssemblyLoader;
-        private Mock<IFileWrapper> _mockFileWrapper;
         private Mock<IHookRegistry> _mockHookRegistry;
         private Mock<IHooksStrategy> _mockStrategy;
 
@@ -59,8 +58,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             }
         }
 
-        [SetUp]
-        public void Setup()
+        public SandboxHookExecutionTests()
         {
             _gaugeProjectRootEnv = Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT");
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
@@ -72,20 +70,18 @@ namespace Gauge.CSharp.Runner.UnitTests
                 .Returns(new List<Type> {typeof(DefaultScreenGrabber)});
             _mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerTypes)
                 .Returns(new List<Type> {typeof(DefaultClassInstanceManager)});
-            _mockAssemblyLoader.Setup(loader => loader.GetTargetLibAssembly()).Returns(GetType().Assembly);
             _mockHookRegistry = new Mock<IHookRegistry>();
             var mockHookMethod = new Mock<IHookMethod>();
             mockHookMethod.Setup(method => method.Method).Returns("DummyHook");
             _hookMethods = new HashSet<IHookMethod> {mockHookMethod.Object};
-            _mockFileWrapper = new Mock<IFileWrapper>();
             _mockStrategy = new Mock<IHooksStrategy>();
             _applicableTags = Enumerable.Empty<string>().ToList();
             _mockStrategy.Setup(strategy => strategy.GetApplicableHooks(_applicableTags, _hookMethods))
                 .Returns(new[] {"DummyHook"});
         }
 
-        [Test]
-        [TestCaseSource("HookTypes")]
+        [Theory]
+        [MemberData(nameof(HookTypes))]
         public void ShouldExecuteHook(string hookType)
         {
             var expression = Hooks[hookType];
@@ -93,15 +89,15 @@ namespace Gauge.CSharp.Runner.UnitTests
                 .Returns(GetType().GetMethod("DummyHook"));
             _mockHookRegistry.Setup(expression).Returns(_hookMethods).Verifiable();
 
-            var sandbox = new Sandbox(_mockAssemblyLoader.Object, _mockHookRegistry.Object, _mockFileWrapper.Object);
+            var sandbox = new Sandbox(_mockAssemblyLoader.Object, _mockHookRegistry.Object);
             var executionResult = sandbox.ExecuteHooks(hookType, _mockStrategy.Object, _applicableTags);
 
-            Assert.IsTrue(executionResult.Success);
+            Assert.True(executionResult.Success);
             _mockHookRegistry.VerifyAll();
         }
 
-        [Test]
-        [TestCaseSource("HookTypes")]
+        [Theory]
+        [MemberData(nameof(HookTypes))]
         public void ShouldExecuteHookAndReportFailureOnException(string hookType)
         {
             var expression = Hooks[hookType];
@@ -109,24 +105,27 @@ namespace Gauge.CSharp.Runner.UnitTests
                 .Returns(GetType().GetMethod("DummyHookThrowsException"));
             _mockHookRegistry.Setup(expression).Returns(_hookMethods).Verifiable();
 
-            var sandbox = new Sandbox(_mockAssemblyLoader.Object, _mockHookRegistry.Object, _mockFileWrapper.Object);
+            var sandbox = new Sandbox(_mockAssemblyLoader.Object, _mockHookRegistry.Object);
             var executionResult = sandbox.ExecuteHooks(hookType, _mockStrategy.Object, _applicableTags);
 
             Assert.False(executionResult.Success);
-            Assert.AreEqual("foo", executionResult.ExceptionMessage);
+            Assert.Equal("foo", executionResult.ExceptionMessage);
         }
 
-        [TearDown]
-        public void TearDown()
+        ~SandboxHookExecutionTests()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _gaugeProjectRootEnv);
         }
 
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void DummyHook()
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void DummyHookThrowsException()
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
             throw new Exception("foo");
         }

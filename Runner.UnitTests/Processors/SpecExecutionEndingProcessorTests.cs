@@ -18,19 +18,19 @@
 using System.Linq;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.Messages;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
 {
-    internal class SpecExecutionEndingProcessorTests
+    public class SpecExecutionEndingProcessorTests
     {
-        [Test]
+        [Fact]
         public void ShouldExtendFromTaggedHooksFirstExecutionProcessor()
         {
             AssertEx.InheritsFrom<TaggedHooksFirstExecutionProcessor, SpecExecutionEndingProcessor>();
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetTagListFromExecutionInfo()
         {
             var specInfo = new SpecInfo
@@ -58,8 +58,8 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             var tags = AssertEx.ExecuteProtectedMethod<SpecExecutionEndingProcessor>("GetApplicableTags", message)
                 .ToList();
 
-            Assert.IsNotEmpty(tags);
-            Assert.AreEqual(1, tags.Count);
+            Assert.NotEmpty(tags);
+            Assert.Single(tags);
             Assert.Contains("foo", tags);
         }
     }

@@ -24,14 +24,17 @@ using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.Messages;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
 {
-    [TestFixture]
     public class ExecuteStepProcessorTests
     {
+#pragma warning disable RECS0154 // Parameter is never used
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Foo(string param)
+#pragma warning restore xUnit1013 // Public method should be marked as test
+#pragma warning restore RECS0154 // Parameter is never used
         {
         }
 
@@ -53,7 +56,7 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             return true;
         }
 
-        [Test]
+        [Fact]
         public void ShouldProcessExecuteStepRequest()
         {
             const string parsedStepText = "Foo";
@@ -90,9 +93,9 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             Assert.False(response.ExecutionStatusResponse.ExecutionResult.Failed);
         }
 
-        [Test]
-        [TestCase(Parameter.Types.ParameterType.Table)]
-        [TestCase(Parameter.Types.ParameterType.SpecialTable)]
+        [Theory]
+        [InlineData(Parameter.Types.ParameterType.Table)]
+        [InlineData(Parameter.Types.ParameterType.SpecialTable)]
         public void ShouldProcessExecuteStepRequestForTableParam(Parameter.Types.ParameterType parameterType)
         {
             const string parsedStepText = "Foo";
@@ -143,7 +146,7 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             Assert.False(response.ExecutionStatusResponse.ExecutionResult.Failed);
         }
 
-        [Test]
+        [Fact]
         public void ShouldReportArgumentMismatch()
         {
             const string parsedStepText = "Foo";
@@ -167,11 +170,11 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
                 new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object).Process(request);
 
             Assert.True(response.ExecutionStatusResponse.ExecutionResult.Failed);
-            Assert.AreEqual(response.ExecutionStatusResponse.ExecutionResult.ErrorMessage,
-                "Argument length mismatch for Foo. Actual Count: 0, Expected Count: 1");
+            Assert.Equal("Argument length mismatch for Foo. Actual Count: 0, Expected Count: 1", 
+                response.ExecutionStatusResponse.ExecutionResult.ErrorMessage);
         }
 
-        [Test]
+        [Fact]
         public void ShouldReportMissingStep()
         {
             const string parsedStepText = "Foo";
@@ -193,8 +196,8 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
                 new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object).Process(request);
 
             Assert.True(response.ExecutionStatusResponse.ExecutionResult.Failed);
-            Assert.AreEqual(response.ExecutionStatusResponse.ExecutionResult.ErrorMessage,
-                "Step Implementation not found");
+            Assert.Equal("Step Implementation not found", 
+                response.ExecutionStatusResponse.ExecutionResult.ErrorMessage);
         }
     }
 }

@@ -22,49 +22,57 @@ using Gauge.CSharp.Runner.Extensions;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.CSharp.Runner.UnitTests.Processors.Stubs;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
 {
-    [TestFixture]
     public class HookExecutionProcessorTests
     {
-        [SetUp]
-        public void Setup()
+        public HookExecutionProcessorTests()
         {
             _hookMethods = new List<IHookMethod>
             {
-                new HookMethod("BeforeScenario", GetType().GetMethod("Foo"), typeof(Step).Assembly),
-                new HookMethod("BeforeScenario", GetType().GetMethod("Bar"), typeof(Step).Assembly),
-                new HookMethod("BeforeScenario", GetType().GetMethod("Baz"), typeof(Step).Assembly),
-                new HookMethod("BeforeScenario", GetType().GetMethod("Blah"), typeof(Step).Assembly)
+                new HookMethod(typeof(BeforeScenario), GetType().GetMethod("Foo")),
+                new HookMethod(typeof(BeforeScenario), GetType().GetMethod("Bar")),
+                new HookMethod(typeof(BeforeScenario), GetType().GetMethod("Baz")),
+                new HookMethod(typeof(BeforeScenario), GetType().GetMethod("Blah"))
             };
         }
 
         [BeforeScenario("Foo")]
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Foo()
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
         [BeforeScenario("Bar", "Baz")]
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Bar()
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
         [BeforeScenario("Foo", "Baz")]
         [TagAggregationBehaviour(TagAggregation.Or)]
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Baz()
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
         [BeforeScenario]
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Blah()
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
         [BeforeSpec]
         [BeforeScenario]
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void MultiHook()
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
@@ -80,112 +88,112 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
 
         private IList<IHookMethod> _hookMethods;
 
-        [Test]
+        [Fact]
         public void ShouldAllowMultipleHooksInaMethod()
         {
             var expected = GetType().GetMethod("MultiHook").FullyQuallifiedName();
             var beforeScenarioHook =
-                new HookMethod("BeforeScenario", GetType().GetMethod("MultiHook"), typeof(Step).Assembly);
-            Assert.AreEqual(expected, beforeScenarioHook.Method);
+                new HookMethod(typeof(BeforeScenario), GetType().GetMethod("MultiHook"));
+            Assert.Equal(expected, beforeScenarioHook.Method);
 
-            var beforeSpecHook = new HookMethod("BeforeSpec", GetType().GetMethod("MultiHook"), typeof(Step).Assembly);
-            Assert.AreEqual(expected, beforeSpecHook.Method);
+            var beforeSpecHook = new HookMethod(typeof(BeforeSpec), GetType().GetMethod("MultiHook"));
+            Assert.Equal(expected, beforeSpecHook.Method);
         }
 
-        [Test]
+        [Fact]
         public void ShouldFetchAHooksWithSpecifiedTagsWhenDoingAnd()
         {
             var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> {"Baz", "Bar"}, _hookMethods)
                 .ToList();
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.AreEqual(2, applicableHooks.Count);
+            Assert.NotNull(applicableHooks);
+            Assert.Equal(2, applicableHooks.Count);
             Assert.Contains(GetType().GetMethod("Bar").FullyQuallifiedName(), applicableHooks);
             Assert.Contains(GetType().GetMethod("Baz").FullyQuallifiedName(), applicableHooks);
         }
 
-        [Test]
+        [Fact]
         public void ShouldFetchAHooksWithSpecifiedTagsWhenDoingOr()
         {
             var applicableHooks =
                 new HooksStrategy().GetTaggedHooks(new List<string> {"Baz", "Foo"}, _hookMethods).ToList();
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.AreEqual(2, applicableHooks.Count);
+            Assert.NotNull(applicableHooks);
+            Assert.Equal(2, applicableHooks.Count);
             Assert.Contains(GetType().GetMethod("Foo").FullyQuallifiedName(), applicableHooks);
             Assert.Contains(GetType().GetMethod("Baz").FullyQuallifiedName(), applicableHooks);
         }
 
-        [Test]
+        [Fact]
         public void ShouldFetchAllHooksWhenNoTagsSpecified()
         {
             var applicableHooks = new HooksStrategy().GetApplicableHooks(new List<string>(), _hookMethods);
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.AreEqual(1, applicableHooks.Count());
+            Assert.NotNull(applicableHooks);
+            Assert.Single(applicableHooks);
         }
 
-        [Test]
+        [Fact]
         public void ShouldFetchAllHooksWithSpecifiedTags()
         {
             var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> {"Foo"}, _hookMethods).ToList();
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.AreEqual(2, applicableHooks.Count);
+            Assert.NotNull(applicableHooks);
+            Assert.Equal(2, applicableHooks.Count);
             Assert.Contains(GetType().GetMethod("Foo").FullyQuallifiedName(), applicableHooks);
             Assert.Contains(GetType().GetMethod("Baz").FullyQuallifiedName(), applicableHooks);
         }
 
-        [Test]
+        [Fact]
         public void ShouldFetchAllHooksWithSpecifiedTagsWhenDoingAnd()
         {
             var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> {"Bar"}, _hookMethods);
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.IsEmpty(applicableHooks);
+            Assert.NotNull(applicableHooks);
+            Assert.Empty(applicableHooks);
         }
 
-        [Test]
+        [Fact]
         public void ShouldFetchAnyHooksWithSpecifiedTagsWhenDoingOr()
         {
             var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> {"Baz"}, _hookMethods).ToList();
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.AreEqual(1, applicableHooks.Count);
+            Assert.NotNull(applicableHooks);
+            Assert.Single(applicableHooks);
             Assert.Contains(GetType().GetMethod("Baz").FullyQuallifiedName(), applicableHooks);
         }
 
-        [Test]
+        [Fact]
         public void ShouldNotFetchAnyTaggedHooksWhenTagsAreASuperSet()
         {
             var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> {"Bar", "Blah"}, _hookMethods);
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.IsEmpty(applicableHooks);
+            Assert.NotNull(applicableHooks);
+            Assert.Empty(applicableHooks);
         }
 
-        [Test]
+        [Fact]
         public void ShouldUseDefaultHooksStrategy()
         {
             var hooksStrategy = new TestHooksExecutionProcessor().GetHooksStrategy();
 
-            Assert.IsInstanceOf<HooksStrategy>(hooksStrategy);
+            Assert.IsAssignableFrom<HooksStrategy>(hooksStrategy);
         }
 
-        [Test]
+        [Fact]
         public void ShouldUseTaggedHooksFirstStrategy()
         {
             var hooksStrategy = new TestTaggedHooksFirstExecutionProcessor().GetHooksStrategy();
 
-            Assert.IsInstanceOf<TaggedHooksFirstStrategy>(hooksStrategy);
+            Assert.IsAssignableFrom<TaggedHooksFirstStrategy>(hooksStrategy);
         }
 
-        [Test]
+        [Fact]
         public void ShouldUseUntaggedHooksFirstStrategy()
         {
             var hooksStrategy = new TestUntaggedHooksFirstExecutionProcessor().GetHooksStrategy();
 
-            Assert.IsInstanceOf<UntaggedHooksFirstStrategy>(hooksStrategy);
+            Assert.IsAssignableFrom<UntaggedHooksFirstStrategy>(hooksStrategy);
         }
     }
 }

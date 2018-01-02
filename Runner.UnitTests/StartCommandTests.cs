@@ -18,17 +18,15 @@
 using System;
 using System.IO;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
-    [TestFixture]
-    internal class StartCommandTests
+    public class StartCommandTests
     {
         private readonly string TempPath = Path.GetTempPath();
 
-        [SetUp]
-        public void Setup()
+        public StartCommandTests()
         {
             _mockGaugeListener = new Mock<IGaugeListener>();
             _mockGaugeProjectBuilder = new Mock<IGaugeProjectBuilder>();
@@ -36,8 +34,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             _startCommand = new StartCommand(() => _mockGaugeListener.Object, () => _mockGaugeProjectBuilder.Object);
         }
 
-        [TearDown]
-        public void TearDown()
+        ~StartCommandTests()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
             Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", null);
@@ -47,7 +44,7 @@ namespace Gauge.CSharp.Runner.UnitTests
         private Mock<IGaugeProjectBuilder> _mockGaugeProjectBuilder;
         private StartCommand _startCommand;
 
-        [Test]
+        [Fact]
         public void ShouldInvokeProjectBuild()
         {
             _startCommand.Execute();
@@ -55,7 +52,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             _mockGaugeProjectBuilder.Verify(builder => builder.BuildTargetGaugeProject(), Times.Once);
         }
 
-        [Test]
+        [Fact]
         public void ShouldNotBuildWhenCustomBuildPathIsSet()
         {
             Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", "GAUGE_CUSTOM_BUILD_PATH");
@@ -64,7 +61,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             _mockGaugeProjectBuilder.Verify(builder => builder.BuildTargetGaugeProject(), Times.Never);
         }
 
-        [Test]
+        [Fact]
         public void ShouldNotPollForMessagesWhenBuildFails()
         {
             _mockGaugeProjectBuilder.Setup(builder => builder.BuildTargetGaugeProject()).Returns(false);
@@ -74,7 +71,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             _mockGaugeListener.Verify(listener => listener.PollForMessages(), Times.Never);
         }
 
-        [Test]
+        [Fact]
         public void ShouldPollForMessagesWhenBuildPasses()
         {
             _mockGaugeProjectBuilder.Setup(builder => builder.BuildTargetGaugeProject()).Returns(true);
@@ -84,7 +81,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             _mockGaugeListener.Verify(listener => listener.PollForMessages(), Times.Once);
         }
 
-        [Test]
+        [Fact]
         public void ShouldPollForMessagesWhenCustomBuildPathIsSet()
         {
             Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", "GAUGE_CUSTOM_BUILD_PATH");
@@ -93,13 +90,12 @@ namespace Gauge.CSharp.Runner.UnitTests
             _mockGaugeListener.Verify(listener => listener.PollForMessages(), Times.Once);
         }
 
-        [Test]
-        [Platform(Exclude = "Mono", Reason = "*nix tmp path is confusing, has /private/var prefix, causin this to fail.")]
+        [Fact]
         public void ShouldRunProcessInProjectRoot()
         {
             var actual = Environment.CurrentDirectory.TrimEnd(Path.DirectorySeparatorChar);
             var expected = TempPath.TrimEnd(Path.DirectorySeparatorChar);
-            Assert.That(actual, Is.SamePath(expected));
+            Assert.Equal(actual, expected);
         }
     }
 }

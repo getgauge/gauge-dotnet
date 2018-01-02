@@ -18,19 +18,19 @@
 using System.Linq;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.Messages;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
 {
-    internal class ScenarioExecutionEndingProcessorTests
+    public class ScenarioExecutionEndingProcessorTests
     {
-        [Test]
+        [Fact]
         public void ShouldExtendFromTaggedHooksFirstExecutionProcessor()
         {
             AssertEx.InheritsFrom<TaggedHooksFirstExecutionProcessor, ScenarioExecutionEndingProcessor>();
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetTagListFromSpecAndScenario()
         {
             var specInfo = new SpecInfo
@@ -65,13 +65,13 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             var tags = AssertEx.ExecuteProtectedMethod<ScenarioExecutionEndingProcessor>("GetApplicableTags", message)
                 .ToList();
 
-            Assert.IsNotEmpty(tags);
-            Assert.AreEqual(2, tags.Count);
+            Assert.NotEmpty(tags);
+            Assert.Equal(2, tags.Count);
             Assert.Contains("foo", tags);
             Assert.Contains("bar", tags);
         }
 
-        [Test]
+        [Fact]
         public void ShouldNotGetDuplicateTags()
         {
             var specInfo = new SpecInfo
@@ -106,8 +106,8 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             var tags = AssertEx.ExecuteProtectedMethod<ScenarioExecutionEndingProcessor>("GetApplicableTags", message)
                 .ToList();
 
-            Assert.IsNotEmpty(tags);
-            Assert.AreEqual(1, tags.Count);
+            Assert.NotEmpty(tags);
+            Assert.Single(tags);
             Assert.Contains("foo", tags);
         }
     }

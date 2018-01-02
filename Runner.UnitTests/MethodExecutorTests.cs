@@ -24,27 +24,24 @@ using Gauge.CSharp.Core;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
-    [TestFixture]
     public class MethodExecutorTests
     {
-        [SetUp]
-        public void Setup()
+        public MethodExecutorTests()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT",
                 Directory.GetDirectoryRoot(Assembly.GetExecutingAssembly().Location));
         }
 
-        [TearDown]
-        public void TearDown()
+        ~MethodExecutorTests()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
 
-        [Test]
+        [Fact]
         public void ShouldExecuteHooks()
         {
             var mockSandBox = new Mock<ISandbox>();
@@ -59,7 +56,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             mockSandBox.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void ShouldExecuteHooksAndNotTakeScreenshotOnFailureWhenDisabled()
         {
             var mockSandBox = new Mock<ISandbox>();
@@ -85,7 +82,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", screenshotEnabled);
         }
 
-        [Test]
+        [Fact]
         public void ShouldExecuteMethod()
         {
             var mockSandBox = new Mock<ISandbox>();
@@ -102,7 +99,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             Assert.True(executionResult.ExecutionTime > 0);
         }
 
-        [Test]
+        [Fact]
         public void ShouldNotTakeScreenShotWhenDisabled()
         {
             var mockSandBox = new Mock<ISandbox>();
@@ -126,8 +123,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", screenshotEnabled);
         }
 
-        [Test]
-        [Ignore("Screenshots are not available in CI - to use Gauge_screenshot instead")]
+        [Fact(Skip="Screenshots are not available in CI - to use Gauge_screenshot instead")]
         public void ShouldTakeScreenShotOnFailedExecution()
         {
             var mockSandBox = new Mock<ISandbox>();
@@ -142,7 +138,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             Assert.True(executionResult.ScreenShot.Length > 0);
         }
 
-        [Test]
+        [Fact]
         public void ShouldTakeScreenShotUsingCustomScreenShotMethod()
         {
             var mockSandBox = new Mock<ISandbox>();
@@ -168,7 +164,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             mockSandBox.VerifyAll();
             Assert.True(executionResult.Failed);
             Assert.True(executionResult.ScreenShot != null);
-            Assert.AreEqual(2, executionResult.ScreenShot.Length);
+            Assert.Equal(2, executionResult.ScreenShot.Length);
         }
     }
 }

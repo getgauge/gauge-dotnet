@@ -27,29 +27,22 @@ namespace Gauge.CSharp.Runner.Models
     [Serializable]
     public class HookMethod : IHookMethod
     {
-        public HookMethod(string hookType, MethodInfo methodInfo, Assembly targetLibAssembly)
+        public HookMethod(Type hookType, MethodInfo methodInfo)
         {
             Method = methodInfo.FullyQuallifiedName();
             FilterTags = Enumerable.Empty<string>();
-            var targetHookType = targetLibAssembly.GetType(string.Format("Gauge.CSharp.Lib.Attribute.{0}", hookType));
-            var filteredHookType = targetLibAssembly.GetType("Gauge.CSharp.Lib.Attribute.FilteredHookAttribute");
 
-            if (!targetHookType.IsSubclassOf(filteredHookType))
+            if (!hookType.IsSubclassOf(typeof(FilteredHookAttribute)))
                 return;
 
-            dynamic filteredHookAttribute = methodInfo.GetCustomAttribute(targetHookType);
+            FilteredHookAttribute filteredHookAttribute = methodInfo.GetCustomAttribute(hookType) as FilteredHookAttribute;
             if (filteredHookAttribute == null) return;
 
             FilterTags = filteredHookAttribute.FilterTags;
-            var targetTagBehaviourType =
-                targetLibAssembly.GetType("Gauge.CSharp.Lib.Attribute.TagAggregationBehaviourAttribute");
-            dynamic tagAggregationBehaviourAttribute = methodInfo.GetCustomAttribute(targetTagBehaviourType);
+            var targetTagBehaviourType = typeof(TagAggregationBehaviourAttribute);
+            TagAggregationBehaviourAttribute tagAggregationBehaviourAttribute = methodInfo.GetCustomAttribute(targetTagBehaviourType) as TagAggregationBehaviourAttribute;
 
-            var setTagAggregation = TagAggregation.And;
-            if (!ReferenceEquals(tagAggregationBehaviourAttribute, null))
-                setTagAggregation = Enum.Parse(typeof(TagAggregation),
-                    tagAggregationBehaviourAttribute.TagAggregation.ToString());
-            TagAggregation = setTagAggregation;
+            TagAggregation = tagAggregationBehaviourAttribute is null ? tagAggregationBehaviourAttribute.TagAggregation : TagAggregation.And;
         }
 
         public TagAggregation TagAggregation { get; }

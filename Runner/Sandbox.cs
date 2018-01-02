@@ -23,40 +23,35 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using Gauge.CSharp.Lib;
+using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Runner.Converters;
 using Gauge.CSharp.Runner.Extensions;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
-using Gauge.CSharp.Runner.Wrappers;
 using NLog;
 
 namespace Gauge.CSharp.Runner
 {
     [Serializable]
-    public class Sandbox : MarshalByRefObject, ISandbox
+    public class Sandbox : ISandbox
     {
         private readonly IAssemblyLoader _assemblyLoader;
-        private readonly IFileWrapper _fileWrapper;
 
-        private readonly Assembly _libAssembly;
-
-        private dynamic _classInstanceManager;
+        private IClassInstanceManager _classInstanceManager;
 
         private IHookRegistry _hookRegistry;
 
-        public Sandbox(IAssemblyLoader assemblyLoader, IHookRegistry hookRegistry, IFileWrapper fileWrapper)
+        public Sandbox(IAssemblyLoader assemblyLoader, IHookRegistry hookRegistry)
         {
             LogConfiguration.Initialize();
             _assemblyLoader = assemblyLoader;
             _hookRegistry = hookRegistry;
-            _fileWrapper = fileWrapper;
-            _libAssembly = _assemblyLoader.GetTargetLibAssembly();
-            SetAppConfigIfExists();
             ScanCustomScreenGrabber();
             LoadClassInstanceManager();
         }
 
-        public Sandbox(string runnerBasePath) : this(new AssemblyLoader(runnerBasePath), null, new FileWrapper())
+        public Sandbox() : this(new AssemblyLoader(), null)
         {
         }
 
@@ -103,11 +98,9 @@ namespace Gauge.CSharp.Runner
             return executionResult;
         }
 
-        public string TargetLibAssemblyVersion => FileVersionInfo.GetVersionInfo(_libAssembly.Location).ProductVersion;
-
         public List<GaugeMethod> GetStepMethods()
         {
-            var infos = _assemblyLoader.GetMethods("Gauge.CSharp.Lib.Attribute.Step");
+            var infos = _assemblyLoader.GetMethods(typeof(Step).FullName);
             MethodMap = new Dictionary<string, MethodInfo>();
             foreach (var info in infos)
             {
@@ -135,29 +128,35 @@ namespace Gauge.CSharp.Runner
 
         public void InitializeDataStore(string dataStoreType)
         {
-            var remoteDataStoreType = _libAssembly.GetType("Gauge.CSharp.Lib.DataStoreFactory");
-            var dataStoreGetter = remoteDataStoreType.GetMethod(string.Format("Initialize{0}DataStore", dataStoreType));
-            if (dataStoreGetter != null)
-                dataStoreGetter.Invoke(null, null);
+            switch (dataStoreType)
+            {
+                case "Suite":
+                    DataStoreFactory.InitializeSuiteDataStore();
+                    break;
+                case "Spec":
+                    DataStoreFactory.InitializeSpecDataStore();
+                    break;
+                case "Scenario":
+                    DataStoreFactory.InitializeScenarioDataStore();
+                    break;
+            }
         }
 
         public IEnumerable<string> GetStepTexts(GaugeMethod gaugeMethod)
         {
-            const string fullStepName = "Gauge.CSharp.Lib.Attribute.Step";
             var stepMethod = MethodMap[gaugeMethod.Name];
-            dynamic step = stepMethod.GetCustomAttributes()
-                .FirstOrDefault(a => a.GetType().FullName.Equals(fullStepName));
-            return step.Names;
+            Step step = stepMethod.GetCustomAttributes<Step>().FirstOrDefault();
+            return step?.Names;
         }
 
         public bool TryScreenCapture(out byte[] screenShotBytes)
         {
             try
             {
-                var screenCaptureMethod = ScreenGrabberType.GetMethod("TakeScreenShot");
                 var instance = Activator.CreateInstance(ScreenGrabberType);
                 if (instance != null)
                 {
+                    var screenCaptureMethod = ScreenGrabberType.GetMethod("TakeScreenShot");
                     screenShotBytes = screenCaptureMethod.Invoke(instance, null) as byte[];
                     return true;
                 }
@@ -178,10 +177,7 @@ namespace Gauge.CSharp.Runner
 
         public IEnumerable<string> GetAllPendingMessages()
         {
-            var targetMessageCollectorType = _libAssembly.GetType("Gauge.CSharp.Lib.MessageCollector");
-            var targetMethod = targetMessageCollectorType.GetMethod("GetAllPendingMessages",
-                BindingFlags.Static | BindingFlags.Public);
-            return targetMethod.Invoke(null, null) as IEnumerable<string>;
+            return MessageCollector.GetAllPendingMessages();
         }
 
         public void StartExecutionScope(string tag)
@@ -233,16 +229,11 @@ namespace Gauge.CSharp.Runner
 
         private object GetTable(string jsonString)
         {
-            var serializer = new DataContractJsonSerializer(_libAssembly.GetType("Gauge.CSharp.Lib.Table"));
+            var serializer = new DataContractJsonSerializer(typeof(Table));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(jsonString)))
             {
                 return serializer.ReadObject(ms);
             }
-        }
-
-        public override object InitializeLifetimeService()
-        {
-            return null;
         }
 
         [DebuggerHidden]
@@ -297,23 +288,6 @@ namespace Gauge.CSharp.Runner
             }
         }
 
-        private void SetAppConfigIfExists()
-        {
-            var targetAssembly = _assemblyLoader.AssembliesReferencingGaugeLib.FirstOrDefault();
-            if (targetAssembly == null) return;
-
-            var configFile = string.Format("{0}.config", targetAssembly.Location);
-            if (!_fileWrapper.Exists(configFile)) return;
-
-            if (Type.GetType("Mono.Runtime") != null)
-            {
-                LogManager.GetLogger("Sandbox")
-                    .Warn("Located {0}, but cannot load config dynamically in Mono. Skipping..", configFile);
-                return;
-            }
-            AppDomain.CurrentDomain.SetData("APP_CONFIG_FILE", configFile);
-        }
-
         private void ScanCustomScreenGrabber()
         {
             ScreenGrabberType = _assemblyLoader.ScreengrabberTypes.FirstOrDefault();
@@ -325,10 +299,8 @@ namespace Gauge.CSharp.Runner
             else
             {
                 logger.Debug("No implementation of IScreenGrabber found. Using DefaultScreenGrabber");
-                ScreenGrabberType = _libAssembly.GetType("Gauge.CSharp.Lib.DefaultScreenGrabber");
+                ScreenGrabberType = typeof(DefaultScreenGrabber);
             }
-            ScreenGrabberType = ScreenGrabberType ??
-                                Assembly.GetExecutingAssembly().GetType("Gauge.CSharp.Lib.DefaultScreenGrabber");
         }
 
         private void Execute(MethodBase method, params object[] parameters)
@@ -350,23 +322,12 @@ namespace Gauge.CSharp.Runner
             var instanceManagerType = _assemblyLoader.ClassInstanceManagerTypes.FirstOrDefault();
 
             var logger = LogManager.GetLogger("Sandbox");
-            if (instanceManagerType == null)
-            {
-                logger.Debug("Loading default ClassInstanceManager");
-                _classInstanceManager = _libAssembly.CreateInstance("Gauge.CSharp.Lib.DefaultClassInstanceManager");
-            }
-            else
+            if (instanceManagerType != null)
             {
                 logger.Debug("Loading : {0}", instanceManagerType.FullName);
-                _classInstanceManager = Activator.CreateInstance(instanceManagerType);
+                _classInstanceManager = Activator.CreateInstance(instanceManagerType) as IClassInstanceManager;
             }
-
-            _classInstanceManager = _classInstanceManager ??
-                                    Activator.CreateInstance(AppDomain.CurrentDomain,
-                                        Assembly.GetExecutingAssembly()
-                                            .GetReferencedAssemblies()
-                                            .First(name => name.Name == "Gauge.CSharp.Lib")
-                                            .Name, "Gauge.CSharp.Lib.DefaultClassInstanceManager").Unwrap();
+            _classInstanceManager = _classInstanceManager ?? new DefaultClassInstanceManager();
             logger.Debug("Loaded Instance Manager of Type:" + _classInstanceManager.GetType().FullName);
             _classInstanceManager.Initialize(_assemblyLoader.AssembliesReferencingGaugeLib);
         }

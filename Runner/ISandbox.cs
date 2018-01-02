@@ -24,11 +24,6 @@ namespace Gauge.CSharp.Runner
 {
     public interface ISandbox
     {
-        // Used only from tests.
-        // Don't return Assembly here! assembly instance returned on sandbox side 
-        // would be replaced by assembly instance on runner side, thus making any asserts on it useless.
-        string TargetLibAssemblyVersion { get; }
-
         ExecutionResult ExecuteMethod(GaugeMethod gaugeMethod, params string[] args);
         bool TryScreenCapture(out byte[] screenShotBytes);
         List<GaugeMethod> GetStepMethods();

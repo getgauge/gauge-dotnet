@@ -20,9 +20,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Gauge.CSharp.Runner.Models;
-using Gauge.CSharp.Runner.Wrappers;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
@@ -31,14 +30,13 @@ namespace Gauge.CSharp.Runner.UnitTests
         private static readonly string[] Messages = {"Foo", "bar"};
         private string _gaugeProjectRootEnv;
 
-        [SetUp]
-        public void Setup()
+        public SandboxMessageCollectorTests()
         {
             _gaugeProjectRootEnv = Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT");
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
         }
 
-        [Test]
+        [Fact]
         public void ShouldInitializeDatastore()
         {
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
@@ -48,19 +46,15 @@ namespace Gauge.CSharp.Runner.UnitTests
                 .Returns(new List<Assembly> {mockAssembly.Object});
             mockAssemblyLoader.Setup(loader => loader.ScreengrabberTypes).Returns(new List<Type>());
             mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerTypes).Returns(new List<Type>());
-            mockLibAssembly.Setup(assembly => assembly.GetType("Gauge.CSharp.Lib.MessageCollector")).Returns(GetType());
-            mockAssemblyLoader.Setup(loader => loader.GetTargetLibAssembly()).Returns(mockLibAssembly.Object);
             var mockHookRegistry = new Mock<IHookRegistry>();
-            var mockFileWrapper = new Mock<IFileWrapper>();
-            var sandbox = new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object, mockFileWrapper.Object);
+            var sandbox = new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object);
 
             var pendingMessages = sandbox.GetAllPendingMessages();
 
-            Assert.AreEqual(Messages, pendingMessages);
+            Assert.Equal(Messages, pendingMessages);
         }
 
-        [TearDown]
-        public void TearDown()
+        ~SandboxMessageCollectorTests()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _gaugeProjectRootEnv);
         }

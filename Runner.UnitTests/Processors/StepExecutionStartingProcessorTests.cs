@@ -22,19 +22,19 @@ using Gauge.CSharp.Runner.Processors;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.Messages;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
 {
-    internal class StepExecutionStartingProcessorTests
+    public class StepExecutionStartingProcessorTests
     {
-        [Test]
+        [Fact]
         public void ShouldExtendFromHooksExecutionProcessor()
         {
             AssertEx.InheritsFrom<UntaggedHooksFirstExecutionProcessor, StepExecutionStartingProcessor>();
         }
 
-        [Test]
+        [Fact]
         public void ShouldClearExistingGaugeMessages()
         {
             var methodExecutor = new Mock<IMethodExecutor>();
@@ -65,7 +65,7 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             methodExecutor.Verify(executor => executor.GetAllPendingMessages(), Times.Once);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetTagListFromScenarioAndSpec()
         {
             var specInfo = new SpecInfo
@@ -99,13 +99,13 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             };
             var tags = AssertEx.ExecuteProtectedMethod<StepExecutionStartingProcessor>("GetApplicableTags", message)
                 .ToList();
-            Assert.IsNotEmpty(tags);
-            Assert.AreEqual(2, tags.Count);
+            Assert.NotEmpty(tags);
+            Assert.Equal(2, tags.Count);
             Assert.Contains("foo", tags);
             Assert.Contains("bar", tags);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetTagListFromScenarioAndSpecAndIgnoreDuplicates()
         {
             var specInfo = new SpecInfo
@@ -139,8 +139,8 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             };
             var tags = AssertEx.ExecuteProtectedMethod<StepExecutionStartingProcessor>("GetApplicableTags", message)
                 .ToList();
-            Assert.IsNotEmpty(tags);
-            Assert.AreEqual(1, tags.Count);
+            Assert.NotEmpty(tags);
+            Assert.Single(tags);
             Assert.Contains("foo", tags);
         }
     }

@@ -22,7 +22,7 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using Gauge.CSharp.Lib;
 using Gauge.CSharp.Lib.Attribute;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.IntegrationTests
 {
@@ -30,17 +30,15 @@ namespace Gauge.CSharp.Runner.IntegrationTests
     {
         private readonly string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
 
-        [SetUp]
-        public void Setup()
+        public IntegrationTestsBase()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _testProjectPath);
         }
 
         public static void AssertRunnerDomainDidNotLoadUsersAssembly()
         {
-            Assert.AreNotEqual("0.6.999",
-                FileVersionInfo.GetVersionInfo(typeof(AfterScenario).Assembly.Location).ProductVersion,
-                "Runner's test domain should not load the Gauge.CSharp.Lib assembly with 0.6.999 version");
+            Assert.NotEqual("0.6.999",
+                FileVersionInfo.GetVersionInfo(typeof(AfterScenario).Assembly.Location).ProductVersion);
             // 0.6.999 version should be only loaded in sandbox. 
             // Runner should have its own version, the one we just built in this project
         }
@@ -55,8 +53,7 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             }
         }
 
-        [TearDown]
-        public void TearDown()
+        ~IntegrationTestsBase()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
             AssertRunnerDomainDidNotLoadUsersAssembly();

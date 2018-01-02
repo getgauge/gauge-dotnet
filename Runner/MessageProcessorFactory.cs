@@ -29,7 +29,7 @@ namespace Gauge.CSharp.Runner
         private readonly IMethodScanner _stepScanner;
         private Dictionary<Message.Types.MessageType, IMessageProcessor> _messageProcessorsDictionary;
 
-        public MessageProcessorFactory() : this(SandboxBuilder.Build())
+        public MessageProcessorFactory() : this(new Sandbox())
         {
         }
 

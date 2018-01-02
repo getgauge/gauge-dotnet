@@ -19,15 +19,13 @@ using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.Messages;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
-    [TestFixture]
     public class MessageProcessorFactoryTests
     {
-        [SetUp]
-        public void Setup()
+        public MessageProcessorFactoryTests()
         {
             var mockMethodScanner = new Mock<IMethodScanner>();
             var mockStepRegistry = new Mock<IStepRegistry>();
@@ -38,129 +36,129 @@ namespace Gauge.CSharp.Runner.UnitTests
 
         private MessageProcessorFactory _messageProcessorFactory;
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForExecuteStep()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.ExecuteStep);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(ExecuteStepProcessor));
+            Assert.IsType<ExecuteStepProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForExecutionEnding()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.ExecutionEnding);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(ExecutionEndingProcessor));
+            Assert.IsType<ExecutionEndingProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForExecutionStarting()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.ExecutionStarting);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(ExecutionStartingProcessor));
+            Assert.IsType<ExecutionStartingProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForKillProcessRequest()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.KillProcessRequest);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(KillProcessProcessor));
+            Assert.IsType<KillProcessProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForScenarioDataStoreInitRequest()
         {
             var messageProcessor =
                 _messageProcessorFactory.GetProcessor(Message.Types.MessageType.ScenarioDataStoreInit);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(ScenarioDataStoreInitProcessor));
+            Assert.IsType<ScenarioDataStoreInitProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForScenarioExecutionEnding()
         {
             var messageProcessor =
                 _messageProcessorFactory.GetProcessor(Message.Types.MessageType.ScenarioExecutionEnding);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(ScenarioExecutionEndingProcessor));
+            Assert.IsType<ScenarioExecutionEndingProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForScenarioExecutionStarting()
         {
             var messageProcessor =
                 _messageProcessorFactory.GetProcessor(Message.Types.MessageType.ScenarioExecutionStarting);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(ScenarioExecutionStartingProcessor));
+            Assert.IsType<ScenarioExecutionStartingProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForSpecDataStoreInitRequest()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.SpecDataStoreInit);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(SpecDataStoreInitProcessor));
+            Assert.IsType<SpecDataStoreInitProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForSpecExecutionEnding()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.SpecExecutionEnding);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(SpecExecutionEndingProcessor));
+            Assert.IsType<SpecExecutionEndingProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForSpecExecutionStarting()
         {
             var messageProcessor =
                 _messageProcessorFactory.GetProcessor(Message.Types.MessageType.SpecExecutionStarting);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(SpecExecutionStartingProcessor));
+            Assert.IsType<SpecExecutionStartingProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForStepExecutionEnding()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StepExecutionEnding);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(StepExecutionEndingProcessor));
+            Assert.IsType<StepExecutionEndingProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForStepExecutionStarting()
         {
             var messageProcessor =
                 _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StepExecutionStarting);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(StepExecutionStartingProcessor));
+            Assert.IsType<StepExecutionStartingProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForStepNamesRequest()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StepNamesRequest);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(StepNamesProcessor));
+            Assert.IsType<StepNamesProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForStepValidateRequest()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StepValidateRequest);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(StepValidationProcessor));
+            Assert.IsType<StepValidationProcessor>(messageProcessor);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetProcessorForSuiteDataStoreInitRequest()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.SuiteDataStoreInit);
 
-            Assert.AreEqual(messageProcessor.GetType(), typeof(SuiteDataStoreInitProcessor));
+            Assert.IsType<SuiteDataStoreInitProcessor>(messageProcessor);
         }
     }
 }

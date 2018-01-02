@@ -17,14 +17,13 @@
 
 using Gauge.CSharp.Runner.Processors;
 using Gauge.Messages;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
 {
-    [TestFixture]
     public class DefaultProcessorTests
     {
-        [Test]
+        [Fact]
         public void ShouldProcessMessage()
         {
             var request = new Message
@@ -36,9 +35,9 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             var response = new DefaultProcessor().Process(request);
             var executionStatusResponse = response.ExecutionStatusResponse;
 
-            Assert.AreEqual(response.MessageId, 20);
-            Assert.AreEqual(response.MessageType, Message.Types.MessageType.ExecutionStatusResponse);
-            Assert.AreEqual(executionStatusResponse.ExecutionResult.ExecutionTime, 0);
+            Assert.Equal(20, response.MessageId);
+            Assert.Equal(Message.Types.MessageType.ExecutionStatusResponse, response.MessageType);
+            Assert.Equal(0, executionStatusResponse.ExecutionResult.ExecutionTime);
         }
     }
 }

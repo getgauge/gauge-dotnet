@@ -25,10 +25,5 @@ namespace Gauge.CSharp.Runner.Wrappers
         {
             return Assembly.LoadFrom(location);
         }
-
-        public Assembly ReflectionOnlyLoadFrom(string path)
-        {
-            return Assembly.ReflectionOnlyLoadFrom(path);
-        }
     }
 }

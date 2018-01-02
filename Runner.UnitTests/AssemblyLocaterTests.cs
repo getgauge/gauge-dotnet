@@ -21,21 +21,18 @@ using System.Linq;
 using Gauge.CSharp.Core;
 using Gauge.CSharp.Runner.Wrappers;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
-    [TestFixture]
-    internal class AssemblyLocaterTests
+    public class AssemblyLocaterTests
     {
-        [SetUp]
-        public void Setup()
+        public AssemblyLocaterTests()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
         }
 
-        [TearDown]
-        public void TearDown()
+        ~AssemblyLocaterTests()
         {
             Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", null);
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
@@ -44,7 +41,7 @@ namespace Gauge.CSharp.Runner.UnitTests
         private readonly Mock<IDirectoryWrapper> _mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
         private readonly Mock<IFileWrapper> _mockFileWrapper = new Mock<IFileWrapper>();
 
-        [Test]
+        [Fact]
         public void ShouldAddAssembliesFromMultipleLocations()
         {
             Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo.dll, foo/");
@@ -61,10 +58,10 @@ namespace Gauge.CSharp.Runner.UnitTests
 
             var assemblies = assemblyLocater.GetAllAssemblies();
 
-            Assert.AreEqual(expectedAssemblies, assemblies);
+            Assert.Equal(expectedAssemblies, assemblies);
         }
 
-        [Test]
+        [Fact]
         public void ShouldAddAssembliyFromGaugeAdditionalLibFile()
         {
             Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo.dll");
@@ -76,10 +73,10 @@ namespace Gauge.CSharp.Runner.UnitTests
             var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
 
             var assemblies = assemblyLocater.GetAllAssemblies();
-            Assert.AreEqual(expectedAssemblies, assemblies);
+            Assert.Equal(expectedAssemblies, assemblies);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetAssembliesFromGaugeAdditionalLibsEnvVar()
         {
             Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo/");
@@ -95,10 +92,10 @@ namespace Gauge.CSharp.Runner.UnitTests
             var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
 
             var assemblies = assemblyLocater.GetAllAssemblies();
-            Assert.AreEqual(expectedAssemblies, assemblies);
+            Assert.Equal(expectedAssemblies, assemblies);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetAssembliesFromGaugeBin()
         {
             var expectedAssemblies = new[] {"fooAssemblyLocation", "barAssemblyLocation"};
@@ -109,10 +106,10 @@ namespace Gauge.CSharp.Runner.UnitTests
 
             var assemblies = assemblyLocater.GetAllAssemblies();
 
-            Assert.AreEqual(expectedAssemblies, assemblies);
+            Assert.Equal(expectedAssemblies, assemblies);
         }
 
-        [Test]
+        [Fact]
         public void ShouldNotAddAssembliesFromInvalidFile()
         {
             Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo.dll");
@@ -124,10 +121,10 @@ namespace Gauge.CSharp.Runner.UnitTests
             var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
 
             var assemblies = assemblyLocater.GetAllAssemblies();
-            Assert.IsEmpty(assemblies);
+            Assert.Empty(assemblies);
         }
 
-        [Test]
+        [Fact]
         public void ShoulNotdAddAssembliesFromInvalidDirectory()
         {
             Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo/");
@@ -139,7 +136,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
 
             var assemblies = assemblyLocater.GetAllAssemblies();
-            Assert.IsEmpty(assemblies);
+            Assert.Empty(assemblies);
         }
     }
 }

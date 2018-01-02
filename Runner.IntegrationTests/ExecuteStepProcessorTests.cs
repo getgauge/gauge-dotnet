@@ -21,18 +21,18 @@ using System.Text;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.Messages;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.IntegrationTests
 {
     public class ExecuteStepProcessorTests : IntegrationTestsBase
     {
-        [Test]
+        [Fact]
         public void ShouldExecuteMethodFromRequest()
         {
             const string parameterizedStepText = "Step that takes a table {}";
             const string stepText = "Step that takes a table <table>";
-            var sandbox = SandboxBuilder.Build();
+            var sandbox = new Sandbox();
             var gaugeMethod = sandbox.GetStepMethods()
                 .First(method => method.Name == "IntegrationTestSample.StepImplementation.ReadTable-Tabletable");
             var scannedSteps = new List<KeyValuePair<string, GaugeMethod>>
@@ -82,16 +82,16 @@ namespace Gauge.CSharp.Runner.IntegrationTests
 
             AssertRunnerDomainDidNotLoadUsersAssembly();
             var protoExecutionResult = result.ExecutionStatusResponse.ExecutionResult;
-            Assert.IsNotNull(protoExecutionResult);
-            Assert.IsFalse(protoExecutionResult.Failed);
+            Assert.NotNull(protoExecutionResult);
+            Assert.False(protoExecutionResult.Failed);
         }
 
-        [Test]
+        [Fact]
         public void ShouldCaptureScreenshotOnFailure()
         {
             const string parameterizedStepText = "I throw a serializable exception";
             const string stepText = "I throw a serializable exception";
-            var sandbox = SandboxBuilder.Build();
+            var sandbox = new Sandbox();
             var gaugeMethod = sandbox.GetStepMethods()
                 .First(method => method.Name == "IntegrationTestSample.StepImplementation.ThrowSerializableException");
             var scannedSteps = new List<KeyValuePair<string, GaugeMethod>>
@@ -117,9 +117,9 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             var result = executeStepProcessor.Process(message);
             var protoExecutionResult = result.ExecutionStatusResponse.ExecutionResult;
 
-            Assert.IsNotNull(protoExecutionResult);
-            Assert.IsTrue(protoExecutionResult.Failed);
-            Assert.AreEqual(Encoding.UTF8.GetString(protoExecutionResult.ScreenShot.ToByteArray()), "ScreenShot");
+            Assert.NotNull(protoExecutionResult);
+            Assert.True(protoExecutionResult.Failed);
+            Assert.Equal("ScreenShot", Encoding.UTF8.GetString(protoExecutionResult.ScreenShot.ToByteArray()));
         }
     }
 }

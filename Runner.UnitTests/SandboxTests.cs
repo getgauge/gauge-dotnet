@@ -22,9 +22,8 @@ using System.Reflection;
 using System.Text;
 using Gauge.CSharp.Lib;
 using Gauge.CSharp.Runner.Models;
-using Gauge.CSharp.Runner.Wrappers;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
@@ -36,38 +35,13 @@ namespace Gauge.CSharp.Runner.UnitTests
     {
         private string _gaugeProjectRootEnv;
 
-        [SetUp]
-        public void Setup()
+        public SandboxTests()
         {
             _gaugeProjectRootEnv = Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT");
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
         }
 
-        [Test]
-        [Platform(Exclude = "Mono", Reason = "Appdomain Config load is not supported in Mono")]
-        public void ShouldLoadAppConfigFromTargetLocation()
-        {
-            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockAssembly = new Mock<TestAssembly>();
-            var someTmpLocationDll = Path.GetFullPath("/some/tmp/location.dll");
-            mockAssembly.Setup(assembly => assembly.Location).Returns(someTmpLocationDll);
-            mockAssemblyLoader.Setup(loader => loader.AssembliesReferencingGaugeLib)
-                .Returns(new List<Assembly> {mockAssembly.Object});
-            mockAssemblyLoader.Setup(loader => loader.ScreengrabberTypes).Returns(new List<Type>());
-            mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerTypes)
-                .Returns(new List<Type> {typeof(DefaultClassInstanceManager)});
-            mockAssemblyLoader.Setup(loader => loader.GetTargetLibAssembly()).Returns(GetType().Assembly);
-            var mockHookRegistry = new Mock<IHookRegistry>();
-            var mockFileWrapper = new Mock<IFileWrapper>();
-            var expectedConfigLocation = string.Format("{0}.config", someTmpLocationDll);
-            mockFileWrapper.Setup(wrapper => wrapper.Exists(expectedConfigLocation)).Returns(true);
-
-            new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object, mockFileWrapper.Object);
-
-            Assert.AreEqual(expectedConfigLocation, AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
-        }
-
-        [Test]
+        [Fact]
         public void ShouldLoadScreenGrabber()
         {
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
@@ -78,19 +52,17 @@ namespace Gauge.CSharp.Runner.UnitTests
                 .Returns(new List<Type> {typeof(TestScreenGrabber)});
             mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerTypes)
                 .Returns(new List<Type> {typeof(DefaultClassInstanceManager)});
-            mockAssemblyLoader.Setup(loader => loader.GetTargetLibAssembly()).Returns(GetType().Assembly);
             var mockHookRegistry = new Mock<IHookRegistry>();
-            var mockFileWrapper = new Mock<IFileWrapper>();
 
-            var sandbox = new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object, mockFileWrapper.Object);
+            var sandbox = new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object);
             byte[] screenshot;
             var tryScreenCapture = sandbox.TryScreenCapture(out screenshot);
 
-            Assert.IsTrue(tryScreenCapture);
-            Assert.AreEqual("TestScreenGrabber", Encoding.UTF8.GetString(screenshot));
+            Assert.True(tryScreenCapture);
+            Assert.Equal("TestScreenGrabber", Encoding.UTF8.GetString(screenshot));
         }
 
-        [Test]
+        [Fact]
         public void ShouldLoadClassInstanceManager()
         {
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
@@ -103,17 +75,14 @@ namespace Gauge.CSharp.Runner.UnitTests
                 .Returns(new List<Type> {typeof(DefaultScreenGrabber)});
             mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerTypes)
                 .Returns(new List<Type> {typeof(TestClassInstanceManager)});
-            mockAssemblyLoader.Setup(loader => loader.GetTargetLibAssembly()).Returns(GetType().Assembly);
             var mockHookRegistry = new Mock<IHookRegistry>();
-            var mockFileWrapper = new Mock<IFileWrapper>();
 
-            new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object, mockFileWrapper.Object);
+            new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object);
 
-            Assert.IsTrue(assemblyLoaded, "Mock Assembly was not initialized by TestClassInstanceManager");
+            Assert.True(assemblyLoaded, "Mock Assembly was not initialized by TestClassInstanceManager");
         }
 
-        [TearDown]
-        public void TearDown()
+        ~SandboxTests()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _gaugeProjectRootEnv);
         }

@@ -4,15 +4,13 @@ using System.IO;
 using System.Linq;
 using Moq;
 using NuGet;
-using NUnit.Framework;
+using Xunit;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
-    [TestFixture]
-    internal class SetupCommandTests
+    public class SetupCommandTests
     {
-        [SetUp]
-        public void Setup()
+        public SetupCommandTests()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
             _packageRepositoryFactory = new Mock<IPackageRepositoryFactory>();
@@ -26,8 +24,7 @@ namespace Gauge.CSharp.Runner.UnitTests
                 .Returns(packageRepository.Object);
         }
 
-        [TearDown]
-        public void TearDown()
+        ~SetupCommandTests()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
@@ -35,7 +32,7 @@ namespace Gauge.CSharp.Runner.UnitTests
         private const string Version = "0.5.2";
         private Mock<IPackageRepositoryFactory> _packageRepositoryFactory;
 
-        [Test]
+        [Fact]
         public void ShouldFetchMaxLibVersionOnlyOnce()
         {
             var setupCommand = new SetupCommand(_packageRepositoryFactory.Object);
@@ -43,7 +40,7 @@ namespace Gauge.CSharp.Runner.UnitTests
 
             maxLibVersion = setupCommand.MaxLibVersion; // call again, just for fun!
 
-            Assert.AreEqual(Version, maxLibVersion.ToString());
+            Assert.Equal(Version, maxLibVersion.ToString());
             _packageRepositoryFactory.Verify(factory => factory.CreateRepository(SetupCommand.NugetEndpoint),
                 Times.Once);
         }

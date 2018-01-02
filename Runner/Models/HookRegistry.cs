@@ -29,7 +29,6 @@ namespace Gauge.CSharp.Runner.Models
         private readonly IDictionary<string, HashSet<IHookMethod>> _hooks;
 
         private readonly IDictionary<string, MethodInfo> _methodMap = new Dictionary<string, MethodInfo>();
-        private readonly Assembly _targetLibAssembly;
 
         public HookRegistry(IAssemblyLoader assemblyLoader)
         {
@@ -45,7 +44,6 @@ namespace Gauge.CSharp.Runner.Models
                 {"AfterStep", new HashSet<IHookMethod>()}
             };
 
-            _targetLibAssembly = assemblyLoader.GetTargetLibAssembly();
             foreach (var type in _hooks.Keys)
                 AddHookOfType(type, assemblyLoader.GetMethods(string.Format("Gauge.CSharp.Lib.Attribute.{0}", type)));
         }
@@ -79,7 +77,7 @@ namespace Gauge.CSharp.Runner.Models
                 if (!_methodMap.ContainsKey(fullyQuallifiedName))
                     _methodMap.Add(fullyQuallifiedName, methodInfo);
             }
-            _hooks[hookType].UnionWith(hooks.Select(info => new HookMethod(hookType, info, _targetLibAssembly)));
+            _hooks[hookType].UnionWith(hooks.Select(info => new HookMethod(Assembly.GetExecutingAssembly().GetType(string.Format("Gauge.CSharp.Lib.Attribute.{0}", hookType)), info)));
         }
     }
 }
