@@ -24,7 +24,6 @@ using System.Reflection;
 using Gauge.CSharp.Lib;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
-using Gauge.CSharp.Runner.Wrappers;
 using Moq;
 using Xunit;
 
@@ -32,7 +31,7 @@ namespace Gauge.CSharp.Runner.UnitTests
 {
     public class SandboxHookExecutionTests
     {
-        public static readonly IEnumerable<object[]> HookTypes = Hooks.Keys.Cast<object[]>();
+        public static readonly IEnumerable<object[]> HookTypes = Hooks.Keys.Select(x => new object[] { x });
         private IList<string> _applicableTags;
         private string _gaugeProjectRootEnv;
         private HashSet<IHookMethod> _hookMethods;

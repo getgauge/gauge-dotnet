@@ -67,16 +67,7 @@ namespace Gauge.CSharp.Runner
         {
             var logger = LogManager.GetLogger("AssemblyLoader");
             logger.Debug("Loading assembly from : {0}", path);
-            Assembly assembly;
-            try
-            {
-                assembly = _assemblyWrapper.LoadFrom(path);
-            }
-            catch
-            {
-                logger.Warn("Failed to scan assembly {0}", path);
-                return;
-            }
+            Assembly assembly = _assemblyWrapper.LoadFrom(path);
 
             var isReferencingGaugeLib = assembly.GetReferencedAssemblies()
                 .Select(name => name.Name)

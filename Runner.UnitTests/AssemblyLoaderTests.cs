@@ -100,6 +100,7 @@ namespace Gauge.CSharp.Runner.UnitTests
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TmpLocation);
             var mockAssemblyWrapper = new Mock<IAssemblyWrapper>();
+            mockAssemblyWrapper.Setup(aw => aw.LoadFrom(TmpLocation)).Throws<FileNotFoundException>();
 
             Assert.Throws<FileNotFoundException>(() =>
                 new AssemblyLoader(mockAssemblyWrapper.Object, new[] { TmpLocation }));

@@ -33,7 +33,9 @@ namespace Gauge.CSharp.Runner.UnitTests
         {
             get
             {
-                yield return new[] { "Scenario", "Suite", "Spec" };
+                yield return new object[] { "Scenario" };
+                yield return new object[] { "Suite" };
+                yield return new object[] { "Spec" };
             }
         }
 

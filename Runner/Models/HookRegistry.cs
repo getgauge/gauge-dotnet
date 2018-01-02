@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Runner.Extensions;
 
 namespace Gauge.CSharp.Runner.Models
@@ -77,7 +78,35 @@ namespace Gauge.CSharp.Runner.Models
                 if (!_methodMap.ContainsKey(fullyQuallifiedName))
                     _methodMap.Add(fullyQuallifiedName, methodInfo);
             }
-            _hooks[hookType].UnionWith(hooks.Select(info => new HookMethod(Assembly.GetExecutingAssembly().GetType(string.Format("Gauge.CSharp.Lib.Attribute.{0}", hookType)), info)));
+            Type hook = null;
+            switch (hookType)
+            {
+                case "BeforeSuite":
+                    hook = typeof(BeforeSuite);
+                    break;
+                case "BeforeSpec":
+                    hook = typeof(BeforeSpec);
+                    break;
+                case "BeforeScenario":
+                    hook = typeof(BeforeScenario);
+                    break;
+                case "BeforeStep":
+                    hook = typeof(BeforeStep);
+                    break;
+                case "AfterStep":
+                    hook = typeof(AfterStep);
+                    break;
+                case "AfterScenario":
+                    hook = typeof(AfterScenario);
+                    break;
+                case "AfterSpec":
+                    hook = typeof(AfterSpec);
+                    break;
+                case "AfterSuite":
+                    hook = typeof(AfterSuite);
+                    break;
+            }
+            _hooks[hookType].UnionWith(hooks.Select(info => new HookMethod(hook, info)));
         }
     }
 }

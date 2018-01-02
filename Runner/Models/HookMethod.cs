@@ -42,7 +42,7 @@ namespace Gauge.CSharp.Runner.Models
             var targetTagBehaviourType = typeof(TagAggregationBehaviourAttribute);
             TagAggregationBehaviourAttribute tagAggregationBehaviourAttribute = methodInfo.GetCustomAttribute(targetTagBehaviourType) as TagAggregationBehaviourAttribute;
 
-            TagAggregation = tagAggregationBehaviourAttribute is null ? tagAggregationBehaviourAttribute.TagAggregation : TagAggregation.And;
+            TagAggregation = tagAggregationBehaviourAttribute != null ? tagAggregationBehaviourAttribute.TagAggregation : TagAggregation.And;
         }
 
         public TagAggregation TagAggregation { get; }

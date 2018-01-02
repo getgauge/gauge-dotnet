@@ -37,7 +37,7 @@ namespace Gauge.CSharp.Runner.UnitTests
         public void ShouldGetSetupPhaseExecutorForInit()
         {
             var command = GaugeCommandFactory.GetExecutor("--init");
-            Assert.IsType<SetupCommand>(command.GetType());
+            Assert.IsType<SetupCommand>(command);
         }
 
         [Fact]
