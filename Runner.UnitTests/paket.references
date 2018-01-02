@@ -1,0 +1,8 @@
+Gauge.CSharp.Lib
+Google.Protobuf
+Microsoft.Web.Xdt
+
+group Test
+  Moq
+  NUnit
+  NUnit.Runners

@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Runner.NetStandard20</PackageId>
+    <Authors>The Gauge Team</Authors>
+    <Version>0.0.1</Version>
+    <Company>ThoughtWorks Inc.</Company>
+    <Product>Gauge</Product>
+    <Description>C# runner for Gauge. https://gauge.org</Description>
+    <Copyright>"Copyright © ThoughtWorks Inc 2017"</Copyright>
+    <PackageLicenseUrl>https://github.com/getgauge/gauge-csharp-dotnetcore/blob/master/COPYING</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/getgauge/gauge-csharp-dotnetcore</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/getgauge/gauge-csharp/master/logo-64x64.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/getgauge/gauge-csharp-dotnetcore</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Gauge.CSharp.Core" Version="0.2.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="1.1.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="2.6.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.6.1" />
+    <PackageReference Include="Microsoft.DotNet.Analyzers.Compatibility" Version="0.1.2-alpha" />
+    <PackageReference Include="NLog" Version="4.4.12" />
+    <PackageReference Include="NuGet.Core" Version="2.14.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+</Project>
