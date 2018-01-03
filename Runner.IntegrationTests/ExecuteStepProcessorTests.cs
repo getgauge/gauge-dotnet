@@ -21,13 +21,13 @@ using System.Text;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.Messages;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.IntegrationTests
 {
     public class ExecuteStepProcessorTests : IntegrationTestsBase
     {
-        [Fact]
+        [Test]
         public void ShouldExecuteMethodFromRequest()
         {
             const string parameterizedStepText = "Step that takes a table {}";
@@ -82,11 +82,11 @@ namespace Gauge.CSharp.Runner.IntegrationTests
 
             AssertRunnerDomainDidNotLoadUsersAssembly();
             var protoExecutionResult = result.ExecutionStatusResponse.ExecutionResult;
-            Assert.NotNull(protoExecutionResult);
-            Assert.False(protoExecutionResult.Failed);
+            Assert.IsNotNull(protoExecutionResult);
+            Assert.IsFalse(protoExecutionResult.Failed);
         }
 
-        [Fact]
+        [Test]
         public void ShouldCaptureScreenshotOnFailure()
         {
             const string parameterizedStepText = "I throw a serializable exception";
@@ -117,9 +117,9 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             var result = executeStepProcessor.Process(message);
             var protoExecutionResult = result.ExecutionStatusResponse.ExecutionResult;
 
-            Assert.NotNull(protoExecutionResult);
-            Assert.True(protoExecutionResult.Failed);
-            Assert.Equal("ScreenShot", Encoding.UTF8.GetString(protoExecutionResult.ScreenShot.ToByteArray()));
+            Assert.IsNotNull(protoExecutionResult);
+            Assert.IsTrue(protoExecutionResult.Failed);
+            Assert.AreEqual(Encoding.UTF8.GetString(protoExecutionResult.ScreenShot.ToByteArray()), "ScreenShot");
         }
     }
 }

@@ -18,106 +18,87 @@
 using System;
 using System.IO;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
-    public class StartCommandTests
+    [TestFixture]
+    internal class StartCommandTests
     {
         private readonly string TempPath = Path.GetTempPath();
-        private Mock<IGaugeListener> _mockGaugeListener;
-        private Mock<IGaugeProjectBuilder> _mockGaugeProjectBuilder;
-        private StartCommand _startCommand;
 
-        [Fact]
-        public void ShouldInvokeProjectBuild()
+        [SetUp]
+        public void Setup()
         {
             _mockGaugeListener = new Mock<IGaugeListener>();
             _mockGaugeProjectBuilder = new Mock<IGaugeProjectBuilder>();
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TempPath);
             _startCommand = new StartCommand(() => _mockGaugeListener.Object, () => _mockGaugeProjectBuilder.Object);
-
-            _startCommand.Execute();
-
-            _mockGaugeProjectBuilder.Verify(builder => builder.BuildTargetGaugeProject(), Times.Once);
-
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
 
-        [Fact]
-        public void ShouldNotBuildWhenCustomBuildPathIsSet()
+        [TearDown]
+        public void TearDown()
         {
-            _mockGaugeListener = new Mock<IGaugeListener>();
-            _mockGaugeProjectBuilder = new Mock<IGaugeProjectBuilder>();
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TempPath);
-            _startCommand = new StartCommand(() => _mockGaugeListener.Object, () => _mockGaugeProjectBuilder.Object);
-            Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", "GAUGE_CUSTOM_BUILD_PATH");
-
-            _startCommand.Execute();
-
-            _mockGaugeProjectBuilder.Verify(builder => builder.BuildTargetGaugeProject(), Times.Never);
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
             Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", null);
         }
 
-        [Fact]
+        private Mock<IGaugeListener> _mockGaugeListener;
+        private Mock<IGaugeProjectBuilder> _mockGaugeProjectBuilder;
+        private StartCommand _startCommand;
+
+        [Test]
+        public void ShouldInvokeProjectBuild()
+        {
+            _startCommand.Execute();
+
+            _mockGaugeProjectBuilder.Verify(builder => builder.BuildTargetGaugeProject(), Times.Once);
+        }
+
+        [Test]
+        public void ShouldNotBuildWhenCustomBuildPathIsSet()
+        {
+            Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", "GAUGE_CUSTOM_BUILD_PATH");
+            _startCommand.Execute();
+
+            _mockGaugeProjectBuilder.Verify(builder => builder.BuildTargetGaugeProject(), Times.Never);
+        }
+
+        [Test]
         public void ShouldNotPollForMessagesWhenBuildFails()
         {
-            _mockGaugeListener = new Mock<IGaugeListener>();
-            _mockGaugeProjectBuilder = new Mock<IGaugeProjectBuilder>();
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TempPath);
-            _startCommand = new StartCommand(() => _mockGaugeListener.Object, () => _mockGaugeProjectBuilder.Object);
             _mockGaugeProjectBuilder.Setup(builder => builder.BuildTargetGaugeProject()).Returns(false);
 
             _startCommand.Execute();
 
             _mockGaugeListener.Verify(listener => listener.PollForMessages(), Times.Never);
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
 
-        [Fact]
+        [Test]
         public void ShouldPollForMessagesWhenBuildPasses()
         {
-            _mockGaugeListener = new Mock<IGaugeListener>();
-            _mockGaugeProjectBuilder = new Mock<IGaugeProjectBuilder>();
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TempPath);
-            _startCommand = new StartCommand(() => _mockGaugeListener.Object, () => _mockGaugeProjectBuilder.Object);
             _mockGaugeProjectBuilder.Setup(builder => builder.BuildTargetGaugeProject()).Returns(true);
 
             _startCommand.Execute();
 
             _mockGaugeListener.Verify(listener => listener.PollForMessages(), Times.Once);
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
 
-        [Fact]
+        [Test]
         public void ShouldPollForMessagesWhenCustomBuildPathIsSet()
         {
-            _mockGaugeListener = new Mock<IGaugeListener>();
-            _mockGaugeProjectBuilder = new Mock<IGaugeProjectBuilder>();
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TempPath);
-            _startCommand = new StartCommand(() => _mockGaugeListener.Object, () => _mockGaugeProjectBuilder.Object);
             Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", "GAUGE_CUSTOM_BUILD_PATH");
-
             _startCommand.Execute();
 
             _mockGaugeListener.Verify(listener => listener.PollForMessages(), Times.Once);
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
 
-        [Fact]
+        [Test]
         public void ShouldRunProcessInProjectRoot()
         {
-            _mockGaugeListener = new Mock<IGaugeListener>();
-            _mockGaugeProjectBuilder = new Mock<IGaugeProjectBuilder>();
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TempPath);
-            _startCommand = new StartCommand(() => _mockGaugeListener.Object, () => _mockGaugeProjectBuilder.Object);
-            var expected = TempPath.TrimEnd(Path.DirectorySeparatorChar);
-
             var actual = Environment.CurrentDirectory.TrimEnd(Path.DirectorySeparatorChar);
-
-            Assert.Equal(actual, expected);
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
+            var expected = TempPath.TrimEnd(Path.DirectorySeparatorChar);
+            Assert.That(actual, Is.SamePath(expected));
         }
     }
 }

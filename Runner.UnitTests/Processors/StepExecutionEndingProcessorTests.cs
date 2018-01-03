@@ -23,11 +23,11 @@ using Gauge.CSharp.Runner.Processors;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.Messages;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
 {
-    public class StepExecutionEndingProcessorTests
+    internal class StepExecutionEndingProcessorTests
     {
         private readonly IEnumerable<string> _pendingMessages = new List<string> {"Foo", "Bar"};
         private Mock<IMethodExecutor> _mockMethodExecutor;
@@ -35,17 +35,15 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         private Message _request;
         private StepExecutionEndingProcessor _stepExecutionEndingProcessor;
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Foo()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
-        public StepExecutionEndingProcessorTests()
+        [SetUp]
+        public void Setup()
         {
             var mockHookRegistry = new Mock<IHookRegistry>();
             var mockSandbox = new Mock<ISandbox>();
-            mockSandbox.Setup(sandbox => sandbox.GetAllPendingMessages()).Returns(_pendingMessages);
             var hooks = new HashSet<IHookMethod>
             {
                 new HookMethod(typeof(BeforeSpec), GetType().GetMethod("Foo"))
@@ -79,25 +77,25 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             _stepExecutionEndingProcessor = new StepExecutionEndingProcessor(_mockMethodExecutor.Object);
         }
 
-        [Fact]
+        [Test]
         public void ShouldExtendFromHooksExecutionProcessor()
         {
             AssertEx.InheritsFrom<TaggedHooksFirstExecutionProcessor, StepExecutionEndingProcessor>();
         }
 
-        [Fact]
+        [Test]
         public void ShouldReadPendingMessages()
         {
             var response = _stepExecutionEndingProcessor.Process(_request);
 
             Assert.True(response.ExecutionStatusResponse != null);
             Assert.True(response.ExecutionStatusResponse.ExecutionResult != null);
-            Assert.Equal(2, response.ExecutionStatusResponse.ExecutionResult.Message.Count);
+            Assert.AreEqual(2, response.ExecutionStatusResponse.ExecutionResult.Message.Count);
             foreach (var pendingMessage in _pendingMessages)
                 Assert.Contains(pendingMessage, response.ExecutionStatusResponse.ExecutionResult.Message.ToList());
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetTagListFromScenarioAndSpec()
         {
             var specInfo = new SpecInfo
@@ -130,13 +128,13 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             };
             var tags = AssertEx.ExecuteProtectedMethod<StepExecutionEndingProcessor>("GetApplicableTags", message)
                 .ToList();
-            Assert.NotEmpty(tags);
-            Assert.Equal(2, tags.Count);
+            Assert.IsNotEmpty(tags);
+            Assert.AreEqual(2, tags.Count);
             Assert.Contains("foo", tags);
             Assert.Contains("bar", tags);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetTagListFromScenarioAndSpecAndIgnoreDuplicates()
         {
             var specInfo = new SpecInfo
@@ -169,8 +167,8 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             };
             var tags = AssertEx.ExecuteProtectedMethod<StepExecutionEndingProcessor>("GetApplicableTags", message)
                 .ToList();
-            Assert.NotEmpty(tags);
-            Assert.Single(tags);
+            Assert.IsNotEmpty(tags);
+            Assert.AreEqual(1, tags.Count);
             Assert.Contains("foo", tags);
         }
     }

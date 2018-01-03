@@ -1,0 +1,38 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v2.0",
+    "signature": "edd3401a1a130f514330583f2d8070a22de1d87b"
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v2.0": {
+      "IntegrationTestSample/1.0.0": {
+        "dependencies": {
+          "Gauge.CSharp.Lib": "0.6.0"
+        },
+        "runtime": {
+          "IntegrationTestSample.dll": {}
+        }
+      },
+      "Gauge.CSharp.Lib/0.6.0": {
+        "runtime": {
+          "lib/net45/Gauge.CSharp.Lib.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "IntegrationTestSample/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Gauge.CSharp.Lib/0.6.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-DJOIIdUCZ80f+SLd7sk15s2rtZwHgROgqhDb9ZhTiyv9b/8vXlI1xKbfhc0u0ID6IA7vIxLaSXQs+2cUzqIcWg==",
+      "path": "gauge.csharp.lib/0.6.0",
+      "hashPath": "gauge.csharp.lib.0.6.0.nupkg.sha512"
+    }
+  }
+}

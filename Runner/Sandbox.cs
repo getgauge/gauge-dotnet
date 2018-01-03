@@ -175,11 +175,6 @@ namespace Gauge.CSharp.Runner
             _classInstanceManager.ClearCache();
         }
 
-        public IEnumerable<string> GetAllPendingMessages()
-        {
-            return MessageCollector.GetAllPendingMessages();
-        }
-
         public void StartExecutionScope(string tag)
         {
             _classInstanceManager.StartScope(tag);

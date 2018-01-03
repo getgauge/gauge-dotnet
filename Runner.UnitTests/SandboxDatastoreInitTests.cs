@@ -20,8 +20,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Gauge.CSharp.Runner.Models;
+using Gauge.CSharp.Runner.Wrappers;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
@@ -29,15 +30,7 @@ namespace Gauge.CSharp.Runner.UnitTests
     {
         private string _gaugeProjectRootEnv;
 
-        public static IEnumerable<object[]> DataStores
-        {
-            get
-            {
-                yield return new object[] { "Scenario" };
-                yield return new object[] { "Suite" };
-                yield return new object[] { "Spec" };
-            }
-        }
+        private static string[] DataStores => new[] {"Scenario", "Suite", "Spec"};
 
         // Can't mock Type using Moq.
         // Something like this does not work"
@@ -48,55 +41,50 @@ namespace Gauge.CSharp.Runner.UnitTests
         // Everymethod invoke sets a global value, that can be asserted on.
         private static string InitializedDataStore { get; set; }
 
-        public SandboxDatastoreInitTests()
+        [SetUp]
+        public void Setup()
         {
             _gaugeProjectRootEnv = Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT");
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
         }
 
-        [Theory]
-        [MemberData(nameof(DataStores))]
+        [Test]
+        [TestCaseSource("DataStores")]
         public void ShouldInitializeDatastore(string dataStoreType)
         {
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockAssembly = new Mock<TestAssembly>();
-            var mockLibAssembly = new Mock<TestAssembly>();
             mockAssemblyLoader.Setup(loader => loader.AssembliesReferencingGaugeLib)
                 .Returns(new List<Assembly> {mockAssembly.Object});
             mockAssemblyLoader.Setup(loader => loader.ScreengrabberTypes).Returns(new List<Type>());
             mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerTypes).Returns(new List<Type>());
-            mockLibAssembly.Setup(assembly => assembly.GetType("Gauge.CSharp.Lib.DataStoreFactory")).Returns(GetType());
             var mockHookRegistry = new Mock<IHookRegistry>();
+            var mockFileWrapper = new Mock<IFileWrapper>();
             var sandbox = new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object);
             InitializedDataStore = string.Empty;
 
             sandbox.InitializeDataStore(dataStoreType);
 
-            Assert.Equal(InitializedDataStore, dataStoreType);
+            Assert.AreEqual(InitializedDataStore, dataStoreType);
         }
 
-        ~SandboxDatastoreInitTests()
+        [TearDown]
+        public void TearDown()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _gaugeProjectRootEnv);
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public static void InitializeScenarioDataStore()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
             InitializedDataStore = "Scenario";
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public static void InitializeSpecDataStore()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
             InitializedDataStore = "Spec";
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public static void InitializeSuiteDataStore()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
             InitializedDataStore = "Suite";
         }

@@ -17,34 +17,37 @@
 
 using System;
 using System.IO;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
+    [TestFixture]
     public class GaugeCommandFactoryTests
     {
-        public GaugeCommandFactoryTests()
+        [SetUp]
+        public void Setup()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
         }
 
-        ~GaugeCommandFactoryTests()
+        [TearDown]
+        public void TearDown()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetSetupPhaseExecutorForInit()
         {
             var command = GaugeCommandFactory.GetExecutor("--init");
-            Assert.IsType<SetupCommand>(command);
+            Assert.AreEqual(command.GetType(), typeof(SetupCommand));
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetStartPhaseExecutorByDefault()
         {
             var command = GaugeCommandFactory.GetExecutor(default(string));
-            Assert.IsType<StartCommand>(command);
+            Assert.AreEqual(command.GetType(), typeof(StartCommand));
         }
     }
 }

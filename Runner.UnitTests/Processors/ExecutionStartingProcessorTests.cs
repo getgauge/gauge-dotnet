@@ -22,13 +22,15 @@ using Gauge.CSharp.Runner.Processors;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.Messages;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
 {
+    [TestFixture]
     public class ExecutionStartingProcessorTests
     {
-        public ExecutionStartingProcessorTests()
+        [SetUp]
+        public void Setup()
         {
             var mockHookRegistry = new Mock<IHookRegistry>();
 
@@ -61,13 +63,11 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         private Mock<IMethodExecutor> _mockMethodExecutor;
         private ProtoExecutionResult _protoExecutionResult;
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Foo()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
-        [Fact]
+        [Test]
         public void ShouldExtendFromHooksExecutionProcessor()
         {
             AssertEx.InheritsFrom<HookExecutionProcessor, ExecutionStartingProcessor>();
@@ -75,7 +75,7 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             AssertEx.DoesNotInheritsFrom<UntaggedHooksFirstExecutionProcessor, ExecutionStartingProcessor>();
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetEmptyTagListByDefault()
         {
             var specInfo = new SpecInfo
@@ -108,10 +108,10 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             };
 
             var tags = AssertEx.ExecuteProtectedMethod<ExecutionStartingProcessor>("GetApplicableTags", message);
-            Assert.Empty(tags);
+            Assert.IsEmpty(tags);
         }
 
-        [Fact]
+        [Test]
         public void ShouldProcessHooks()
         {
             _executionStartingProcessor.Process(_request);

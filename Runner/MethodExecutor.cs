@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Gauge.CSharp.Core;
+using Gauge.CSharp.Lib;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.Messages;
@@ -91,11 +92,6 @@ namespace Gauge.CSharp.Runner
         public void ClearCache()
         {
             _sandbox.ClearObjectCache();
-        }
-
-        public IEnumerable<string> GetAllPendingMessages()
-        {
-            return _sandbox.GetAllPendingMessages();
         }
 
         private ByteString TakeScreenshot()

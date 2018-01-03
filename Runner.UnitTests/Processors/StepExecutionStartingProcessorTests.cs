@@ -17,24 +17,25 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Gauge.CSharp.Lib;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.Messages;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
 {
-    public class StepExecutionStartingProcessorTests
+    internal class StepExecutionStartingProcessorTests
     {
-        [Fact]
+        [Test]
         public void ShouldExtendFromHooksExecutionProcessor()
         {
             AssertEx.InheritsFrom<UntaggedHooksFirstExecutionProcessor, StepExecutionStartingProcessor>();
         }
 
-        [Fact]
+        [Test]
         public void ShouldClearExistingGaugeMessages()
         {
             var methodExecutor = new Mock<IMethodExecutor>();
@@ -62,10 +63,10 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
 
             new StepExecutionStartingProcessor(methodExecutor.Object).Process(request);
 
-            methodExecutor.Verify(executor => executor.GetAllPendingMessages(), Times.Once);
+            Assert.IsEmpty(MessageCollector.GetAllPendingMessages());
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetTagListFromScenarioAndSpec()
         {
             var specInfo = new SpecInfo
@@ -99,13 +100,13 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             };
             var tags = AssertEx.ExecuteProtectedMethod<StepExecutionStartingProcessor>("GetApplicableTags", message)
                 .ToList();
-            Assert.NotEmpty(tags);
-            Assert.Equal(2, tags.Count);
+            Assert.IsNotEmpty(tags);
+            Assert.AreEqual(2, tags.Count);
             Assert.Contains("foo", tags);
             Assert.Contains("bar", tags);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetTagListFromScenarioAndSpecAndIgnoreDuplicates()
         {
             var specInfo = new SpecInfo
@@ -139,8 +140,8 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             };
             var tags = AssertEx.ExecuteProtectedMethod<StepExecutionStartingProcessor>("GetApplicableTags", message)
                 .ToList();
-            Assert.NotEmpty(tags);
-            Assert.Single(tags);
+            Assert.IsNotEmpty(tags);
+            Assert.AreEqual(1, tags.Count);
             Assert.Contains("foo", tags);
         }
     }

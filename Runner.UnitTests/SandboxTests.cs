@@ -22,8 +22,9 @@ using System.Reflection;
 using System.Text;
 using Gauge.CSharp.Lib;
 using Gauge.CSharp.Runner.Models;
+using Gauge.CSharp.Runner.Wrappers;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
@@ -35,13 +36,14 @@ namespace Gauge.CSharp.Runner.UnitTests
     {
         private string _gaugeProjectRootEnv;
 
-        public SandboxTests()
+        [SetUp]
+        public void Setup()
         {
             _gaugeProjectRootEnv = Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT");
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
         }
 
-        [Fact]
+        [Test]
         public void ShouldLoadScreenGrabber()
         {
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
@@ -53,16 +55,17 @@ namespace Gauge.CSharp.Runner.UnitTests
             mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerTypes)
                 .Returns(new List<Type> {typeof(DefaultClassInstanceManager)});
             var mockHookRegistry = new Mock<IHookRegistry>();
+            var mockFileWrapper = new Mock<IFileWrapper>();
 
             var sandbox = new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object);
             byte[] screenshot;
             var tryScreenCapture = sandbox.TryScreenCapture(out screenshot);
 
-            Assert.True(tryScreenCapture);
-            Assert.Equal("TestScreenGrabber", Encoding.UTF8.GetString(screenshot));
+            Assert.IsTrue(tryScreenCapture);
+            Assert.AreEqual("TestScreenGrabber", Encoding.UTF8.GetString(screenshot));
         }
 
-        [Fact]
+        [Test]
         public void ShouldLoadClassInstanceManager()
         {
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
@@ -79,10 +82,11 @@ namespace Gauge.CSharp.Runner.UnitTests
 
             new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object);
 
-            Assert.True(assemblyLoaded, "Mock Assembly was not initialized by TestClassInstanceManager");
+            Assert.IsTrue(assemblyLoaded, "Mock Assembly was not initialized by TestClassInstanceManager");
         }
 
-        ~SandboxTests()
+        [TearDown]
+        public void TearDown()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _gaugeProjectRootEnv);
         }

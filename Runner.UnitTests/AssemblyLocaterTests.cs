@@ -21,20 +21,32 @@ using System.Linq;
 using Gauge.CSharp.Core;
 using Gauge.CSharp.Runner.Wrappers;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
-    public class AssemblyLocaterTests
+    [TestFixture]
+    internal class AssemblyLocaterTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", null);
+            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
+        }
 
         private readonly Mock<IDirectoryWrapper> _mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
         private readonly Mock<IFileWrapper> _mockFileWrapper = new Mock<IFileWrapper>();
 
-        [Fact]
+        [Test]
         public void ShouldAddAssembliesFromMultipleLocations()
         {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
             Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo.dll, foo/");
             var expectedAssemblies = new[] {Path.GetFullPath("foo.dll"), "fooAssemblyLocation", "barAssemblyLocation"};
             _mockDirectoryWrapper.Setup(wrapper => wrapper.Exists(Path.GetFullPath("foo/"))).Returns(true);
@@ -49,16 +61,12 @@ namespace Gauge.CSharp.Runner.UnitTests
 
             var assemblies = assemblyLocater.GetAllAssemblies();
 
-            Assert.Equal(expectedAssemblies, assemblies);
-
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", null);
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
+            Assert.AreEqual(expectedAssemblies, assemblies);
         }
 
-        [Fact]
-        public void ShouldAddAssemblyFromGaugeAdditionalLibFile()
+        [Test]
+        public void ShouldAddAssembliyFromGaugeAdditionalLibFile()
         {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
             Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo.dll");
             var expectedAssemblies = new[] {Path.GetFullPath("foo.dll")};
             _mockDirectoryWrapper.Setup(wrapper =>
@@ -68,16 +76,12 @@ namespace Gauge.CSharp.Runner.UnitTests
             var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
 
             var assemblies = assemblyLocater.GetAllAssemblies();
-
-            Assert.Equal(expectedAssemblies, assemblies);
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", null);
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
+            Assert.AreEqual(expectedAssemblies, assemblies);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetAssembliesFromGaugeAdditionalLibsEnvVar()
         {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
             Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo/");
             var expectedAssemblies = new[] {"fooAssemblyLocation", "barAssemblyLocation"};
             _mockDirectoryWrapper.Setup(wrapper => wrapper.Exists(Path.GetFullPath("foo/"))).Returns(true);
@@ -91,16 +95,12 @@ namespace Gauge.CSharp.Runner.UnitTests
             var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
 
             var assemblies = assemblyLocater.GetAllAssemblies();
-
-            Assert.Equal(expectedAssemblies, assemblies);
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", null);
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
+            Assert.AreEqual(expectedAssemblies, assemblies);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetAssembliesFromGaugeBin()
         {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
             var expectedAssemblies = new[] {"fooAssemblyLocation", "barAssemblyLocation"};
             _mockDirectoryWrapper.Setup(wrapper =>
                     wrapper.EnumerateFiles(Utils.GetGaugeBinDir(), "*.dll", SearchOption.TopDirectoryOnly))
@@ -109,16 +109,12 @@ namespace Gauge.CSharp.Runner.UnitTests
 
             var assemblies = assemblyLocater.GetAllAssemblies();
 
-            Assert.Equal(expectedAssemblies, assemblies);
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", null);
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
-
+            Assert.AreEqual(expectedAssemblies, assemblies);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotAddAssembliesFromInvalidFile()
         {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
             Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo.dll");
             _mockFileWrapper.Setup(wrapper => wrapper.Exists(Path.GetFullPath("foo.dll"))).Returns(false);
             _mockDirectoryWrapper.Setup(wrapper =>
@@ -128,16 +124,12 @@ namespace Gauge.CSharp.Runner.UnitTests
             var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
 
             var assemblies = assemblyLocater.GetAllAssemblies();
-
-            Assert.Empty(assemblies);
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", null);
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
+            Assert.IsEmpty(assemblies);
         }
 
-        [Fact]
+        [Test]
         public void ShoulNotdAddAssembliesFromInvalidDirectory()
         {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
             Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo/");
             _mockDirectoryWrapper.Setup(wrapper => wrapper.Exists(Path.GetFullPath("foo/"))).Returns(false);
             _mockDirectoryWrapper.Setup(wrapper =>
@@ -147,10 +139,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
 
             var assemblies = assemblyLocater.GetAllAssemblies();
-
-            Assert.Empty(assemblies);
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", null);
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
+            Assert.IsEmpty(assemblies);
         }
     }
 }

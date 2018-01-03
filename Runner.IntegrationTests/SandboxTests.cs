@@ -18,13 +18,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Gauge.CSharp.Lib;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.IntegrationTests
 {
+    [TestFixture]
     public class SandboxTests : IntegrationTestsBase
     {
-        [Fact]
+        [Test]
         public void RecoverableIsTrueOnExceptionThrownWhenContinueOnFailure()
         {
             var sandbox = new Sandbox();
@@ -34,11 +35,11 @@ namespace Gauge.CSharp.Runner.IntegrationTests
 
             var executionResult = sandbox.ExecuteMethod(gaugeMethod);
 
-            Assert.False(executionResult.Success);
-            Assert.True(executionResult.Recoverable);
+            Assert.IsFalse(executionResult.Success);
+            Assert.IsTrue(executionResult.Recoverable);
         }
 
-        [Fact]
+        [Test]
         public void ShouldCreateTableFromTargetType()
         {
             var sandbox = new Sandbox();
@@ -54,7 +55,7 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             Assert.True(executionResult.Success);
         }
 
-        [Fact]
+        [Test]
         public void ShouldExecuteMethodAndReturnResult()
         {
             var sandbox = new Sandbox();
@@ -67,17 +68,17 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             Assert.True(executionResult.Success);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetAllStepMethods()
         {
             var sandbox = new Sandbox();
             AssertRunnerDomainDidNotLoadUsersAssembly();
             var stepMethods = sandbox.GetStepMethods();
 
-            Assert.Equal(12, stepMethods.Count);
+            Assert.AreEqual(12, stepMethods.Count);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetAllStepTexts()
         {
             var sandbox = new Sandbox();
@@ -94,7 +95,7 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             }.ForEach(s => Assert.Contains(s, stepTexts));
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetPendingMessages()
         {
             var sandbox = new Sandbox();
@@ -104,12 +105,12 @@ namespace Gauge.CSharp.Runner.IntegrationTests
                     "IntegrationTestSample.StepImplementation.SaySomething-StringwhatStringwho") == 0);
 
             sandbox.ExecuteMethod(gaugeMethod, "hello", "world");
-            var pendingMessages = sandbox.GetAllPendingMessages().ToList();
+            var pendingMessages = MessageCollector.GetAllPendingMessages();
 
             Assert.Contains("hello, world!", pendingMessages);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetStacktraceForAggregateException()
         {
             var sandbox = new Sandbox();
@@ -119,12 +120,12 @@ namespace Gauge.CSharp.Runner.IntegrationTests
 
             var executionResult = sandbox.ExecuteMethod(gaugeMethod);
 
-            Assert.False(executionResult.Success);
-            Assert.Contains("First Exception", executionResult.StackTrace);
-            Assert.Contains("Second Exception", executionResult.StackTrace);
+            Assert.AreEqual(false, executionResult.Success);
+            Assert.True(executionResult.StackTrace.Contains("First Exception"));
+            Assert.True(executionResult.StackTrace.Contains("Second Exception"));
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetStepTextsForMethod()
         {
             var sandbox = new Sandbox();
@@ -138,7 +139,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             Assert.Contains("and an alias", stepTexts);
         }
 
-        [Fact]
+
+        [Test]
         public void ShouldNotLoadTargetLibAssemblyInRunnersDomain()
         {
             new Sandbox();
@@ -149,7 +151,7 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             AssertRunnerDomainDidNotLoadUsersAssembly();
         }
 
-        [Fact]
+        [Test]
         public void SuccessIsFalseOnSerializableExceptionThrown()
         {
             const string expectedMessage = "I am a custom serializable exception";
@@ -162,12 +164,12 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             var executionResult = sandbox.ExecuteMethod(gaugeMethod);
 
             Assert.False(executionResult.Success);
-            Assert.Equal(expectedMessage, executionResult.ExceptionMessage);
-            Assert.Contains("IntegrationTestSample.StepImplementation.ThrowSerializableException",
+            Assert.AreEqual(expectedMessage, executionResult.ExceptionMessage);
+            StringAssert.Contains("IntegrationTestSample.StepImplementation.ThrowSerializableException",
                 executionResult.StackTrace);
         }
 
-        [Fact]
+        [Test]
         public void SuccessIsFalseOnUnserializableExceptionThrown()
         {
             const string expectedMessage = "I am a custom exception";
@@ -180,8 +182,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
 
             var executionResult = sandbox.ExecuteMethod(gaugeMethod);
             Assert.False(executionResult.Success);
-            Assert.Equal(expectedMessage, executionResult.ExceptionMessage);
-            Assert.Contains("IntegrationTestSample.StepImplementation.ThrowUnserializableException",
+            Assert.AreEqual(expectedMessage, executionResult.ExceptionMessage);
+            StringAssert.Contains("IntegrationTestSample.StepImplementation.ThrowUnserializableException",
                 executionResult.StackTrace);
         }
     }

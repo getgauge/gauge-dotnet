@@ -17,6 +17,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Gauge.CSharp.Lib;
 using Gauge.Messages;
 
 namespace Gauge.CSharp.Runner.Processors
@@ -38,7 +39,7 @@ namespace Gauge.CSharp.Runner.Processors
         protected override ProtoExecutionResult ExecuteHooks(Message request)
         {
             // Just need to clear the messages, but Gauge.CSharp.Lib v0.5.2 does not have MessageCollector.Clear()
-            MethodExecutor.GetAllPendingMessages();
+            MessageCollector.GetAllPendingMessages();
             return base.ExecuteHooks(request);
         }
 

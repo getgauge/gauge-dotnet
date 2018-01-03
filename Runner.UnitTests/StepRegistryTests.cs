@@ -18,25 +18,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using Gauge.CSharp.Runner.Models;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
+    [TestFixture]
     public class StepRegistryTests
     {
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Foo()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Bar()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
-        [Fact]
+        [Test]
         public void ShouldContainMethodForStepDefined()
         {
             var methods = new[]
@@ -50,7 +47,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             Assert.True(stepRegistry.ContainsStep("Bar"));
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetAliasWhenExists()
         {
             var methods = new[]
@@ -66,7 +63,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             Assert.True(stepRegistry.HasAlias("FooAlias"));
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetAllSteps()
         {
             var methods = new[]
@@ -77,12 +74,12 @@ namespace Gauge.CSharp.Runner.UnitTests
             var stepRegistry = new StepRegistry(methods, null, null);
             var allSteps = stepRegistry.AllSteps().ToList();
 
-            Assert.Equal(2, allSteps.Count);
-            Assert.Contains("Foo", allSteps);
-            Assert.Contains("Bar", allSteps);
+            Assert.AreEqual(allSteps.Count, 2);
+            Assert.True(allSteps.Contains("Foo"));
+            Assert.True(allSteps.Contains("Bar"));
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetEmptyStepTextForInvalidParameterizedStepText()
         {
             var methods = new[]
@@ -94,10 +91,10 @@ namespace Gauge.CSharp.Runner.UnitTests
 
             var stepRegistry = new StepRegistry(methods, stepTextMap, null);
 
-            Assert.Equal(stepRegistry.GetStepText("random"), string.Empty);
+            Assert.AreEqual(stepRegistry.GetStepText("random"), string.Empty);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetMethodForStep()
         {
             var methods = new[]
@@ -108,10 +105,10 @@ namespace Gauge.CSharp.Runner.UnitTests
             var stepRegistry = new StepRegistry(methods, null, null);
             var method = stepRegistry.MethodFor("Foo");
 
-            Assert.Equal("Foo", method.Name);
+            Assert.AreEqual(method.Name, "Foo");
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetStepTextFromParameterizedStepText()
         {
             var methods = new[]
@@ -123,10 +120,10 @@ namespace Gauge.CSharp.Runner.UnitTests
 
             var stepRegistry = new StepRegistry(methods, stepTextMap, null);
 
-            Assert.Equal("Foo", stepRegistry.GetStepText("foo_parameterized"));
+            Assert.AreEqual(stepRegistry.GetStepText("foo_parameterized"), "Foo");
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotHaveAliasWhenSingleStepTextIsDefined()
         {
             var methods = new[]

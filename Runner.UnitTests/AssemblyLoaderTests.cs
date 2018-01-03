@@ -22,15 +22,16 @@ using Gauge.CSharp.Lib;
 using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Runner.Wrappers;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
+    [TestFixture]
     public class AssemblyLoaderTests
     {
-        public AssemblyLoaderTests()
+        [SetUp]
+        public void Setup()
         {
-            var libPath = Path.GetFullPath(Path.Combine(TmpLocation, "gauge-bin", "Gauge.CSharp.Lib.dll"));
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TmpLocation);
             var thisType = GetType();
             var assemblyLocation = thisType.Assembly.Location;
@@ -46,21 +47,20 @@ namespace Gauge.CSharp.Runner.UnitTests
                 .Returns(_mockInstanceManagerType.Object);
             _mockAssembly.Setup(assembly => assembly.GetReferencedAssemblies())
                 .Returns(new[] {new AssemblyName("Gauge.CSharp.Lib")});
-            _mockAssemblyWrapper.Setup(wrapper => wrapper.LoadFrom(libPath)).Returns(typeof(Step).Assembly)
-                .Verifiable();
+            _mockAssemblyWrapper.Setup(wrapper => wrapper.LoadFrom(assemblyLocation))
+                .Returns(_mockAssembly.Object);
             _mockAssemblyWrapper.Setup(wrapper => wrapper.LoadFrom(assemblyLocation)).Returns(_mockAssembly.Object);
-            _assemblyLoader = new AssemblyLoader(_mockAssemblyWrapper.Object, new[] { assemblyLocation });
+            _assemblyLoader = new AssemblyLoader(_mockAssemblyWrapper.Object, new[] {assemblyLocation});
         }
 
-        ~AssemblyLoaderTests()
+        [TearDown]
+        public void TearDown()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
 
         [Step("Foo text")]
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void DummyStepMethod()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
@@ -71,39 +71,38 @@ namespace Gauge.CSharp.Runner.UnitTests
         private Mock<Type> _mockInstanceManagerType;
         private const string TmpLocation = "/tmp/location";
 
-        [Fact]
+        [Test]
         public void ShouldGetAssemblyReferencingGaugeLib()
         {
             Assert.Contains(_mockAssembly.Object, _assemblyLoader.AssembliesReferencingGaugeLib);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetClassInstanceManagerTypes()
         {
             Assert.Contains(_mockInstanceManagerType.Object, _assemblyLoader.ClassInstanceManagerTypes);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetMethodsForGaugeAttribute()
         {
             Assert.Contains(_stepMethod, _assemblyLoader.GetMethods("Gauge.CSharp.Lib.Attribute.Step"));
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetTargetAssembly()
         {
             _mockAssemblyWrapper.VerifyAll();
         }
 
-        [Fact]
+        [Test]
         public void ShouldThrowExceptionWhenLibAssemblyNotFound()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TmpLocation);
             var mockAssemblyWrapper = new Mock<IAssemblyWrapper>();
-            mockAssemblyWrapper.Setup(aw => aw.LoadFrom(TmpLocation)).Throws<FileNotFoundException>();
-
+            mockAssemblyWrapper.Setup(x => x.LoadFrom(TmpLocation)).Throws<FileNotFoundException>();
             Assert.Throws<FileNotFoundException>(() =>
-                new AssemblyLoader(mockAssemblyWrapper.Object, new[] { TmpLocation }));
+                new AssemblyLoader(mockAssemblyWrapper.Object, new[] {TmpLocation}));
         }
     }
 }

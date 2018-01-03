@@ -18,10 +18,11 @@
 using System.Linq;
 using Gauge.CSharp.Runner.Converters;
 using Gauge.Messages;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests.Converter
 {
+    [TestFixture]
     public class StringParamConverterTests
     {
         private class TestTypeConversion
@@ -43,7 +44,7 @@ namespace Gauge.CSharp.Runner.UnitTests.Converter
             }
         }
 
-        [Fact]
+        [Test]
         public void ShouldConvertFromParameterToString()
         {
             const string expected = "Foo";
@@ -55,47 +56,47 @@ namespace Gauge.CSharp.Runner.UnitTests.Converter
 
             var actual = new StringParamConverter().Convert(parameter);
 
-            Assert.Equal(expected, actual);
+            Assert.AreEqual(expected, actual);
         }
 
-        [Fact]
+        [Test]
         public void ShouldTryToConvertStringParameterToBool()
         {
             var type = new TestTypeConversion().GetType();
             var method = type.GetMethod("Bool");
 
             var getParams = StringParamConverter.TryConvertParams(method, new object[] {"false"});
-            Assert.Equal(typeof(bool), getParams.First().GetType());
+            Assert.AreEqual(typeof(bool), getParams.First().GetType());
         }
 
-        [Fact]
+        [Test]
         public void ShouldTryToConvertStringParameterToFloat()
         {
             var type = new TestTypeConversion().GetType();
             var method = type.GetMethod("Float");
 
             var getParams = StringParamConverter.TryConvertParams(method, new object[] {"3.1412"});
-            Assert.Equal(typeof(float), getParams.First().GetType());
+            Assert.AreEqual(typeof(float), getParams.First().GetType());
         }
 
-        [Fact]
+        [Test]
         public void ShouldTryToConvertStringParameterToInt()
         {
             var type = new TestTypeConversion().GetType();
             var method = type.GetMethod("Int");
 
             var getParams = StringParamConverter.TryConvertParams(method, new object[] {"1"});
-            Assert.Equal(typeof(int), getParams.First().GetType());
+            Assert.AreEqual(typeof(int), getParams.First().GetType());
         }
 
-        [Fact]
+        [Test]
         public void ShouldTryToConvertStringParameterToString()
         {
             var type = new TestTypeConversion().GetType();
             var method = type.GetMethod("Int");
 
             var getParams = StringParamConverter.TryConvertParams(method, new object[] {"hahaha"});
-            Assert.Equal(typeof(string), getParams.First().GetType());
+            Assert.AreEqual(typeof(string), getParams.First().GetType());
         }
     }
 }

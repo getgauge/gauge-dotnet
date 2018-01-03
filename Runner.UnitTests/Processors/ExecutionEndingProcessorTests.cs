@@ -22,17 +22,18 @@ using Gauge.CSharp.Runner.Processors;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.Messages;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
 {
+    [TestFixture]
     public class ExecutionEndingProcessorTests
     {
-        public ExecutionEndingProcessorTests()
+        [SetUp]
+        public void Setup()
         {
             var mockHookRegistry = new Mock<IHookRegistry>();
             var mockSandbox = new Mock<ISandbox>();
-            mockSandbox.Setup(sandbox => sandbox.GetAllPendingMessages()).Returns(_pendingMessages);
             var hooks = new HashSet<IHookMethod>
             {
                 new HookMethod(typeof(BeforeSpec), GetType().GetMethod("Foo"))
@@ -72,13 +73,11 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         private ProtoExecutionResult _protoExecutionResult;
         private readonly IEnumerable<string> _pendingMessages = new List<string> {"Foo", "Bar"};
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Foo()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
-        [Fact]
+        [Test]
         public void ShouldExtendFromHooksExecutionProcessor()
         {
             AssertEx.InheritsFrom<HookExecutionProcessor, ExecutionEndingProcessor>();
@@ -86,28 +85,28 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             AssertEx.DoesNotInheritsFrom<UntaggedHooksFirstExecutionProcessor, ExecutionEndingProcessor>();
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetEmptyTagListByDefault()
         {
             var tags = AssertEx.ExecuteProtectedMethod<ExecutionEndingProcessor>("GetApplicableTags", _request);
-            Assert.Empty(tags);
+            Assert.IsEmpty(tags);
         }
 
-        [Fact]
+        [Test]
         public void ShouldProcessHooks()
         {
             _executionEndingProcessor.Process(_request);
             _mockMethodExecutor.VerifyAll();
         }
 
-        [Fact]
+        [Test]
         public void ShouldWrapInMessage()
         {
             var message = _executionEndingProcessor.Process(_request);
 
-            Assert.Equal(_request.MessageId, message.MessageId);
-            Assert.Equal(Message.Types.MessageType.ExecutionStatusResponse, message.MessageType);
-            Assert.Equal(_protoExecutionResult, message.ExecutionStatusResponse.ExecutionResult);
+            Assert.AreEqual(_request.MessageId, message.MessageId);
+            Assert.AreEqual(Message.Types.MessageType.ExecutionStatusResponse, message.MessageType);
+            Assert.AreEqual(_protoExecutionResult, message.ExecutionStatusResponse.ExecutionResult);
         }
     }
 }

@@ -16,26 +16,27 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using Gauge.CSharp.Runner.Extensions;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
+    [TestFixture]
     public class CSharpIdentifierTests
     {
-        [InlineData("With Spaces", "WithSpaces", true)]
-        [InlineData("Special*chars%!", "SpecialChars", true)]
-        [InlineData("   begins with whitespace", "BeginsWithWhitespace", true)]
-        [InlineData("ends with whitespace   ", "EndsWithWhitespace", true)]
-        [InlineData("class", "Class", true)]
-        [InlineData("class", "@class", false)]
-        [InlineData("int", "Int", true)]
-        [InlineData("abstract", "Abstract", true)]
-        [InlineData("foo", "foo", true)]
-        [InlineData("foo", "foo", false)]
-        [Theory]
+        [TestCase("With Spaces", "WithSpaces", true)]
+        [TestCase("Special*chars%!", "SpecialChars", true)]
+        [TestCase("   begins with whitespace", "BeginsWithWhitespace", true)]
+        [TestCase("ends with whitespace   ", "EndsWithWhitespace", true)]
+        [TestCase("class", "Class", true)]
+        [TestCase("class", "@class", false)]
+        [TestCase("int", "Int", true)]
+        [TestCase("abstract", "Abstract", true)]
+        [TestCase("foo", "foo", true)]
+        [TestCase("foo", "foo", false)]
+        [Test]
         public void GeneratesValidIdentifiers(string input, string expected, bool camelCase)
         {
-            Assert.Equal(expected, input.ToValidCSharpIdentifier(camelCase));
+            Assert.AreEqual(expected, input.ToValidCSharpIdentifier(camelCase));
         }
     }
 }

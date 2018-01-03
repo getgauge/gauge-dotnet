@@ -22,13 +22,15 @@ using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Runner.Extensions;
 using Gauge.CSharp.Runner.Models;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
+    [TestFixture]
     public class HookRegistryTests
     {
-        public HookRegistryTests()
+        [SetUp]
+        public void Setup()
         {
             _mockAssemblyScanner = new Mock<IAssemblyLoader>();
             var types = new[]
@@ -44,51 +46,35 @@ namespace Gauge.CSharp.Runner.UnitTests
             _hookRegistry = new HookRegistry(_mockAssemblyScanner.Object);
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void BeforeSuiteHook()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void AfterSuiteHook()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void BeforeSpecHook()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void AfterSpecHook()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void BeforeScenarioHook()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void AfterScenarioHook()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void BeforeStepHook()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void AfterStepHook()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
@@ -96,76 +82,76 @@ namespace Gauge.CSharp.Runner.UnitTests
         private HookRegistry _hookRegistry;
         private Mock<IAssemblyLoader> _mockAssemblyScanner;
 
-        [Fact]
+        [Test]
         public void ShoulddGetAfterScenarioHook()
         {
             var expectedMethods = new[] {GetType().GetMethod("AfterScenarioHook").FullyQuallifiedName()};
             var hooks = _hookRegistry.AfterScenarioHooks.Select(mi => mi.Method);
 
-            Assert.Equal(expectedMethods, hooks);
+            Assert.AreEqual(expectedMethods, hooks);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetAfterSpecHook()
         {
             var expectedMethods = new[] {GetType().GetMethod("AfterSpecHook").FullyQuallifiedName()};
             var hooks = _hookRegistry.AfterSpecHooks.Select(mi => mi.Method);
 
-            Assert.Equal(expectedMethods, hooks);
+            Assert.AreEqual(expectedMethods, hooks);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetAfterStepHook()
         {
             var expectedMethods = new[] {GetType().GetMethod("AfterStepHook").FullyQuallifiedName()};
             var hooks = _hookRegistry.AfterStepHooks.Select(mi => mi.Method);
 
-            Assert.Equal(expectedMethods, hooks);
+            Assert.AreEqual(expectedMethods, hooks);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetAfterSuiteHook()
         {
             var expectedMethods = new[] {GetType().GetMethod("AfterSuiteHook").FullyQuallifiedName()};
             var hooks = _hookRegistry.AfterSuiteHooks.Select(mi => mi.Method);
 
-            Assert.Equal(expectedMethods, hooks);
+            Assert.AreEqual(expectedMethods, hooks);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetBeforeScenarioHook()
         {
             var expectedMethods = new[] {GetType().GetMethod("BeforeScenarioHook").FullyQuallifiedName()};
             var hooks = _hookRegistry.BeforeScenarioHooks.Select(mi => mi.Method);
 
-            Assert.Equal(expectedMethods, hooks);
+            Assert.AreEqual(expectedMethods, hooks);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetBeforeSpecHook()
         {
             var expectedMethods = new[] {GetType().GetMethod("BeforeSpecHook").FullyQuallifiedName()};
             var hooks = _hookRegistry.BeforeSpecHooks.Select(mi => mi.Method);
 
-            Assert.Equal(expectedMethods, hooks);
+            Assert.AreEqual(expectedMethods, hooks);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetBeforeStepHook()
         {
             var expectedMethods = new[] {GetType().GetMethod("BeforeStepHook").FullyQuallifiedName()};
             var hooks = _hookRegistry.BeforeStepHooks.Select(mi => mi.Method);
 
-            Assert.Equal(expectedMethods, hooks);
+            Assert.AreEqual(expectedMethods, hooks);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetBeforeSuiteHook()
         {
             var expectedMethods = new[] {GetType().GetMethod("BeforeSuiteHook").FullyQuallifiedName()};
             var hooks = _hookRegistry.BeforeSuiteHooks.Select(mi => mi.Method);
 
-            Assert.Equal(expectedMethods, hooks);
+            Assert.AreEqual(expectedMethods, hooks);
         }
     }
 }

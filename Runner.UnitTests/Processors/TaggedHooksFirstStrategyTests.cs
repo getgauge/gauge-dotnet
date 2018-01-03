@@ -22,13 +22,15 @@ using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Runner.Extensions;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
 {
+    [TestFixture]
     public class TaggedHooksFirstStrategyTests
     {
-        public TaggedHooksFirstStrategyTests()
+        [SetUp]
+        public void Setup()
         {
             _hookMethods = new HashSet<HookMethod>
             {
@@ -36,43 +38,33 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
                 new HookMethod(typeof(AfterScenario), GetType().GetMethod("Bar")),
                 new HookMethod(typeof(AfterScenario), GetType().GetMethod("Zed")),
                 new HookMethod(typeof(AfterScenario), GetType().GetMethod("Blah")),
-                new HookMethod(typeof(AfterScenario), GetType().GetMethod("Baz"))
+                new HookMethod(typeof(AfterScenario), GetType().GetMethod("Baz")),
             };
         }
 
         [AfterScenario("Foo")]
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Foo()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
         [AfterScenario("Bar", "Baz")]
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Bar()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
         [AfterScenario("Foo", "Baz")]
         [TagAggregationBehaviour(TagAggregation.Or)]
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Baz()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
         [AfterScenario]
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Blah()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
         [AfterScenario]
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Zed()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
@@ -89,7 +81,7 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         private HashSet<HookMethod> _hookMethods;
 
 
-        [Fact]
+        [Test]
         public void ShouldFetchTaggedHooksInSortedOrder()
         {
             var untaggedHooks = new[] {"Blah", "Zed"}.Select(s => GetType().GetMethod(s).FullyQuallifiedName());
@@ -98,10 +90,10 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
                 .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToArray();
             var actual = new ArraySegment<string>(applicableHooks, 2, untaggedHooks.Count());
 
-            Assert.Equal(untaggedHooks, actual);
+            Assert.AreEqual(untaggedHooks, actual);
         }
 
-        [Fact]
+        [Test]
         public void ShouldFetchUntaggedHooksAfterTaggedHooks()
         {
             var taggedHooks = new[] {"Baz", "Foo"};
@@ -111,18 +103,18 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             var applicableHooks = new TaggedHooksFirstStrategy()
                 .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToList();
 
-            Assert.Equal(expected, applicableHooks);
+            Assert.AreEqual(expected, applicableHooks);
         }
 
 
-        [Fact]
+        [Test]
         public void ShouldFetchUntaggedHooksInSortedOrder()
         {
             var applicableHooks = new TaggedHooksFirstStrategy()
                 .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToList();
 
-            Assert.Equal(applicableHooks[0], GetType().GetMethod("Baz").FullyQuallifiedName());
-            Assert.Equal(applicableHooks[1], GetType().GetMethod("Foo").FullyQuallifiedName());
+            Assert.That(applicableHooks[0], Is.EqualTo(GetType().GetMethod("Baz").FullyQuallifiedName()));
+            Assert.That(applicableHooks[1], Is.EqualTo(GetType().GetMethod("Foo").FullyQuallifiedName()));
         }
     }
 }

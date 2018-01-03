@@ -24,14 +24,15 @@ using System.Reflection;
 using Gauge.CSharp.Lib;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
+using Gauge.CSharp.Runner.Wrappers;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
     public class SandboxHookExecutionTests
     {
-        public static readonly IEnumerable<object[]> HookTypes = Hooks.Keys.Select(x => new object[] { x });
+        private static readonly IEnumerable<string> HookTypes = Hooks.Keys;
         private IList<string> _applicableTags;
         private string _gaugeProjectRootEnv;
         private HashSet<IHookMethod> _hookMethods;
@@ -57,7 +58,8 @@ namespace Gauge.CSharp.Runner.UnitTests
             }
         }
 
-        public SandboxHookExecutionTests()
+        [SetUp]
+        public void Setup()
         {
             _gaugeProjectRootEnv = Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT");
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
@@ -79,8 +81,8 @@ namespace Gauge.CSharp.Runner.UnitTests
                 .Returns(new[] {"DummyHook"});
         }
 
-        [Theory]
-        [MemberData(nameof(HookTypes))]
+        [Test]
+        [TestCaseSource("HookTypes")]
         public void ShouldExecuteHook(string hookType)
         {
             var expression = Hooks[hookType];
@@ -91,12 +93,12 @@ namespace Gauge.CSharp.Runner.UnitTests
             var sandbox = new Sandbox(_mockAssemblyLoader.Object, _mockHookRegistry.Object);
             var executionResult = sandbox.ExecuteHooks(hookType, _mockStrategy.Object, _applicableTags);
 
-            Assert.True(executionResult.Success);
+            Assert.IsTrue(executionResult.Success);
             _mockHookRegistry.VerifyAll();
         }
 
-        [Theory]
-        [MemberData(nameof(HookTypes))]
+        [Test]
+        [TestCaseSource("HookTypes")]
         public void ShouldExecuteHookAndReportFailureOnException(string hookType)
         {
             var expression = Hooks[hookType];
@@ -108,23 +110,20 @@ namespace Gauge.CSharp.Runner.UnitTests
             var executionResult = sandbox.ExecuteHooks(hookType, _mockStrategy.Object, _applicableTags);
 
             Assert.False(executionResult.Success);
-            Assert.Equal("foo", executionResult.ExceptionMessage);
+            Assert.AreEqual("foo", executionResult.ExceptionMessage);
         }
 
-        ~SandboxHookExecutionTests()
+        [TearDown]
+        public void TearDown()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _gaugeProjectRootEnv);
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void DummyHook()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
         }
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void DummyHookThrowsException()
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
             throw new Exception("foo");
         }
