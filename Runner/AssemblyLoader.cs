@@ -56,9 +56,9 @@ namespace Gauge.CSharp.Runner
 
         public List<MethodInfo> GetMethods(string annotation)
         {
-            Func<MethodInfo, bool> methodFilter = info => info.GetCustomAttributes()
+            bool methodFilter(MethodInfo info) => info.GetCustomAttributes()
                 .Any(a => a.GetType().FullName.Equals(annotation));
-            Func<Type, IEnumerable<MethodInfo>> methodSelector = t => t.GetMethods().Where(methodFilter);
+            IEnumerable<MethodInfo> methodSelector(Type t) => t.GetMethods().Where(methodFilter);
             return AssembliesReferencingGaugeLib.SelectMany(assembly => assembly.GetTypes().SelectMany(methodSelector))
                 .ToList();
         }

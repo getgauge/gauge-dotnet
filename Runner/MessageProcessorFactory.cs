@@ -87,9 +87,9 @@ namespace Gauge.CSharp.Runner
                 {Message.Types.MessageType.KillProcessRequest, new KillProcessProcessor()},
                 {Message.Types.MessageType.StepNamesRequest, new StepNamesProcessor(_stepScanner)},
                 {Message.Types.MessageType.StepValidateRequest, new StepValidationProcessor(stepRegistry)},
-                {Message.Types.MessageType.ScenarioDataStoreInit, new ScenarioDataStoreInitProcessor(_sandbox)},
-                {Message.Types.MessageType.SpecDataStoreInit, new SpecDataStoreInitProcessor(_sandbox)},
-                {Message.Types.MessageType.SuiteDataStoreInit, new SuiteDataStoreInitProcessor(_sandbox)},
+                {Message.Types.MessageType.ScenarioDataStoreInit, new ScenarioDataStoreInitProcessor()},
+                {Message.Types.MessageType.SpecDataStoreInit, new SpecDataStoreInitProcessor()},
+                {Message.Types.MessageType.SuiteDataStoreInit, new SuiteDataStoreInitProcessor()},
                 {Message.Types.MessageType.StepNameRequest, new StepNameProcessor(stepRegistry)},
                 {Message.Types.MessageType.RefactorRequest, new RefactorProcessor(stepRegistry, _sandbox)}
             };

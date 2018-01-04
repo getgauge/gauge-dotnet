@@ -45,10 +45,10 @@ namespace Gauge.CSharp.Runner.Processors
             try
             {
                 var gaugeMethod = GetGaugeMethod(request.RefactorRequest.OldStepValue);
-                var filesChanged = _sandbox.Refactor(gaugeMethod, parameterPositions, newStep.Parameters.ToList(),
+                var changedFile = _sandbox.Refactor(gaugeMethod, parameterPositions, newStep.Parameters.ToList(),
                     newStepValue);
                 response.Success = true;
-                response.FilesChanged.Add(filesChanged.First());
+                response.FilesChanged.Add(changedFile);
             }
             catch (AggregateException ex)
             {

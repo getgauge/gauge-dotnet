@@ -127,14 +127,18 @@ namespace Gauge.CSharp.Runner.UnitTests
         }
 
         [Test]
-        [Ignore("Screenshots are not available in CI - to use Gauge_screenshot instead")]
         public void ShouldTakeScreenShotOnFailedExecution()
         {
             var mockSandBox = new Mock<ISandbox>();
             var gaugeMethod = new GaugeMethod {Name = "ShouldExecuteMethod", ParameterCount = 1};
-            mockSandBox.Setup(sandbox => sandbox.ExecuteMethod(gaugeMethod, "Bar")).Throws<Exception>();
+            var args = new[] { "Bar", "String" };
+            mockSandBox.Setup(sandbox => sandbox.ExecuteMethod(gaugeMethod, args)).Returns(new ExecutionResult {
+                Success = false,
+                ExceptionMessage = "error",
+                StackTrace = "stacktrace"
+            });
 
-            var executionResult = new MethodExecutor(mockSandBox.Object).Execute(gaugeMethod, "Bar", "String");
+            var executionResult = new MethodExecutor(mockSandBox.Object).Execute(gaugeMethod, args);
 
             mockSandBox.VerifyAll();
             Assert.True(executionResult.Failed);

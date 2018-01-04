@@ -126,22 +126,6 @@ namespace Gauge.CSharp.Runner
             return GetStepMethods().SelectMany(GetStepTexts).ToList();
         }
 
-        public void InitializeDataStore(string dataStoreType)
-        {
-            switch (dataStoreType)
-            {
-                case "Suite":
-                    DataStoreFactory.InitializeSuiteDataStore();
-                    break;
-                case "Spec":
-                    DataStoreFactory.InitializeSpecDataStore();
-                    break;
-                case "Scenario":
-                    DataStoreFactory.InitializeScenarioDataStore();
-                    break;
-            }
-        }
-
         public IEnumerable<string> GetStepTexts(GaugeMethod gaugeMethod)
         {
             var stepMethod = MethodMap[gaugeMethod.Name];
@@ -215,7 +199,7 @@ namespace Gauge.CSharp.Runner
             return executionResult;
         }
 
-        public IEnumerable<string> Refactor(GaugeMethod methodInfo, IList<Tuple<int, int>> parameterPositions,
+        public string Refactor(GaugeMethod methodInfo, IList<Tuple<int, int>> parameterPositions,
             IList<string> parametersList, string newStepValue)
         {
             return RefactorHelper.Refactor(MethodMap[methodInfo.Name], parameterPositions, parametersList,

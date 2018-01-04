@@ -75,7 +75,7 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             AssertRunnerDomainDidNotLoadUsersAssembly();
             var stepMethods = sandbox.GetStepMethods();
 
-            Assert.AreEqual(12, stepMethods.Count);
+            Assert.AreEqual(13, stepMethods.Count);
         }
 
         [Test]
@@ -90,6 +90,7 @@ namespace Gauge.CSharp.Runner.IntegrationTests
                 "A context step which gets executed before every scenario",
                 "Step that takes a table <table>",
                 "Refactoring Say <what> to <who>",
+                "Refactoring 1 Say <what> to <who>",
                 "Refactoring A context step which gets executed before every scenario",
                 "Refactoring Step that takes a table <table>"
             }.ForEach(s => Assert.Contains(s, stepTexts));

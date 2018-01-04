@@ -36,19 +36,19 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _testProjectPath);
 
             File.Copy(Path.Combine(_testProjectPath, "RefactoringSample.cs"),
-                Path.Combine(_testProjectPath, "RefactoringSample_copy.cs"), true);
+                Path.Combine(_testProjectPath, "RefactoringSample.copy1"), true);
         }
 
         [Test]
         public void ShouldAddParameters()
         {
-            const string parameterizedStepText = "Refactoring Say <what> to <who>";
-            const string stepValue = "Refactoring Say {} to {}";
+            const string parameterizedStepText = "Refactoring 1 Say <what> to <who>";
+            const string stepValue = "Refactoring 1 Say {} to {}";
             var sandbox = new Sandbox();
             var gaugeMethod = sandbox.GetStepMethods()
                 .First(method =>
                     method.Name ==
-                    "IntegrationTestSample.RefactoringSample.RefactoringSaySomething-StringwhatStringwho");
+                    "IntegrationTestSample.RefactoringSample.RefactoringSaySomething1-StringwhatStringwho");
             var scannedSteps =
                 new List<KeyValuePair<string, GaugeMethod>>
                 {
@@ -71,8 +71,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
                     },
                     NewStepValue = new ProtoStepValue
                     {
-                        StepValue = "Refactoring Say {} to {} at {}",
-                        ParameterizedStepValue = "Refactoring Say <what> to <who> at <when>",
+                        StepValue = "Refactoring 1 Say {} to {} at {}",
+                        ParameterizedStepValue = "Refactoring 1 Say <what> to <who> at <when>",
                         Parameters = {"who", "what", "when"}
                     },
                     ParamPositions =
@@ -92,7 +92,7 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [TearDown]
         public void TearDown()
         {
-            var sourceFileName = Path.Combine(_testProjectPath, "RefactoringSample_copy.cs");
+            var sourceFileName = Path.Combine(_testProjectPath, "RefactoringSample.copy1");
             File.Copy(sourceFileName, Path.Combine(_testProjectPath, "RefactoringSample.cs"), true);
             File.Delete(sourceFileName);
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);

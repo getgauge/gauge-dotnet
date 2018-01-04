@@ -20,15 +20,10 @@ using System;
 namespace Gauge.CSharp.Runner.Models
 {
     [Serializable]
-    public class GaugeMethod : MarshalByRefObject
+    public class GaugeMethod
     {
         public string Name { get; set; }
         public int ParameterCount { get; set; }
         public bool ContinueOnFailure { get; set; }
-
-        public override object InitializeLifetimeService()
-        {
-            return null;
-        }
     }
 }

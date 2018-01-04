@@ -15,13 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using Gauge.CSharp.Lib;
+using Gauge.Messages;
+
 namespace Gauge.CSharp.Runner.Processors
 {
-    public class SpecDataStoreInitProcessor : DataStoreInitProcessor
+    public class SpecDataStoreInitProcessor : IMessageProcessor
     {
-        public SpecDataStoreInitProcessor(ISandbox sandbox) : base(sandbox)
+        public Message Process(Message request)
         {
-            DataStoreType = "Spec";
+            DataStoreFactory.InitializeSpecDataStore();
+            return new DefaultProcessor().Process(request);
         }
     }
 }

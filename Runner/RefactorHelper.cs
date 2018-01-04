@@ -16,15 +16,12 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Gauge.CSharp.Lib.Attribute;
-using Gauge.CSharp.Runner.Exceptions;
 using Gauge.CSharp.Runner.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -32,31 +29,15 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Gauge.CSharp.Runner
 {
-    public class RefactorHelper
+    public static class RefactorHelper
     {
-        public static IEnumerable<string> Refactor(MethodInfo method, IList<Tuple<int, int>> parameterPositions,
+        public static string Refactor(MethodInfo method, IList<Tuple<int, int>> parameterPositions,
             IList<string> parameters, string newStepValue)
         {
-            var projectFile = Directory.EnumerateFiles(Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT"),
-                "*.csproj", SearchOption.AllDirectories).FirstOrDefault();
+            var classFiles = Directory.EnumerateFiles(Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT"),
+                "*.cs", SearchOption.AllDirectories);
 
-            if (projectFile == null)
-                throw new NotAValidGaugeProjectException();
-
-            var document = XDocument.Load(projectFile);
-
-            XNamespace ns = "http://schemas.microsoft.com/developer/msbuild/2003";
-
-            var classFiles = document.Descendants(ns + "Project")
-                .Where(t => t.Attribute("ToolsVersion") != null)
-                .Elements(ns + "ItemGroup")
-                .Elements(ns + "Compile")
-                .Where(r => r.Attribute("Include") != null)
-                .Select(r => Path.GetFullPath(Path.Combine(Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT"), r
-                    .Attribute("Include").Value
-                    .Replace('\\', Path.DirectorySeparatorChar))));
-
-            var filesChanged = new ConcurrentBag<string>();
+            var changedFile = "";
 
             Parallel.ForEach(classFiles, (f, state) =>
             {
@@ -89,10 +70,10 @@ namespace Gauge.CSharp.Runner
                     var replaceNode = root.ReplaceNode(methodDeclarationSyntax, declarationSyntax);
 
                     File.WriteAllText(f, replaceNode.ToFullString());
-                    filesChanged.Add(f);
+                    changedFile = f;
                 }
             });
-            return filesChanged;
+            return changedFile;
         }
 
         private static ParameterListSyntax ReplaceParameters(MethodDeclarationSyntax methodDeclarationSyntax,

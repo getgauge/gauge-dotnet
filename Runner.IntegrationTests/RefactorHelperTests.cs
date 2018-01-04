@@ -35,13 +35,13 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _testProjectPath);
 
             File.Copy(Path.Combine(_testProjectPath, "RefactoringSample.cs"),
-                Path.Combine(_testProjectPath, "RefactoringSample_copy.cs"), true);
+                Path.Combine(_testProjectPath, "RefactoringSample.copy"), true);
         }
 
         [TearDown]
         public void TearDown()
         {
-            var sourceFileName = Path.Combine(_testProjectPath, "RefactoringSample_copy.cs");
+            var sourceFileName = Path.Combine(_testProjectPath, "RefactoringSample.copy");
             File.Copy(sourceFileName, Path.Combine(_testProjectPath, "RefactoringSample.cs"), true);
             File.Delete(sourceFileName);
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
@@ -97,9 +97,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
 
             var parameterPositions = new[]
                 {new Tuple<int, int>(0, 0), new Tuple<int, int>(1, 1), new Tuple<int, int>(-1, 2)};
-            var filesChanged = sandbox.Refactor(gaugeMethod, parameterPositions, new List<string> {"what", "who", "where"}, newStepValue);
+            sandbox.Refactor(gaugeMethod, parameterPositions, new List<string> {"what", "who", "where"}, newStepValue);
 
-            Assert.AreEqual(1, filesChanged.Count());
             AssertStepAttributeWithTextExists(gaugeMethod.Name, newStepValue);
             AssertParametersExist(gaugeMethod.Name, new[] {"what", "who", "where"});
         }
@@ -142,11 +141,10 @@ namespace Gauge.CSharp.Runner.IntegrationTests
                 info.Name == "IntegrationTestSample.RefactoringSample.RefactoringContext");
             var expectedPath = Path.GetFullPath(Path.Combine(_testProjectPath, "RefactoringSample.cs"));
 
-            var filesChanged =
+            var changedFile =
                 sandbox.Refactor(gaugeMethod, new List<Tuple<int, int>>(), new List<string>(), "foo").ToList();
 
-            Assert.AreEqual(1, filesChanged.Count);
-            Assert.AreEqual(expectedPath, filesChanged.First());
+            Assert.AreEqual(expectedPath, changedFile);
         }
 
         [Test]

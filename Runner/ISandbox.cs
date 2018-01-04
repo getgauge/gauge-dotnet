@@ -27,7 +27,6 @@ namespace Gauge.CSharp.Runner
         ExecutionResult ExecuteMethod(GaugeMethod gaugeMethod, params string[] args);
         bool TryScreenCapture(out byte[] screenShotBytes);
         List<GaugeMethod> GetStepMethods();
-        void InitializeDataStore(string dataStoreType);
         IEnumerable<string> GetStepTexts(GaugeMethod gaugeMethod);
         List<string> GetAllStepTexts();
         void ClearObjectCache();
@@ -35,7 +34,7 @@ namespace Gauge.CSharp.Runner
         void CloseExectionScope();
         ExecutionResult ExecuteHooks(string hookType, IHooksStrategy strategy, IList<string> applicableTags);
 
-        IEnumerable<string> Refactor(GaugeMethod methodInfo, IList<Tuple<int, int>> parameterPositions,
+        string Refactor(GaugeMethod methodInfo, IList<Tuple<int, int>> parameterPositions,
             IList<string> parametersList, string newStepValue);
     }
 }
