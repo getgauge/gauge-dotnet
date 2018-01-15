@@ -16,11 +16,8 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text;
-using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Wrappers;
 using Moq;
 using NUnit.Framework;
@@ -42,20 +39,22 @@ namespace Gauge.CSharp.Runner.UnitTests
         public void ShouldLoadScreenGrabber()
         {
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockAssembly = new Mock<Assembly>();
-            mockAssemblyLoader.Setup(loader => loader.AssembliesReferencingGaugeLib)
-                .Returns(new List<Assembly> {mockAssembly.Object});
+            var mockScreenGrabberType = new Mock<Type>();
             mockAssemblyLoader.Setup(loader => loader.ScreengrabberType)
-                .Returns(typeof(TestScreenGrabber));
-            mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerType);
-            var mockHookRegistry = new Mock<IHookRegistry>();
-            var mockFileWrapper = new Mock<IFileWrapper>();
+                .Returns(mockScreenGrabberType.Object);
             var mockActivatorWrapper = new Mock<IActivatorWrapper>();
-            var mockTypeWrapper = new Mock<IReflectionWrapper>();
-            var sandbox = new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object, mockActivatorWrapper.Object, mockTypeWrapper.Object);
+            var mockScreenGrabber = new Mock<object>();
+            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
+            mockReflectionWrapper.Setup(x => x.InvokeMethod(mockScreenGrabberType.Object, mockScreenGrabber.Object, "TakeScreenShot"))
+                .Returns(Encoding.UTF8.GetBytes("TestScreenGrabber"));
+            mockActivatorWrapper.Setup(x => x.CreateInstance(mockScreenGrabberType.Object))
+                .Returns(mockScreenGrabber.Object)
+                .Verifiable();
+            var sandbox = new Sandbox(mockAssemblyLoader.Object, null, mockActivatorWrapper.Object, mockReflectionWrapper.Object);
             byte[] screenshot;
             var tryScreenCapture = sandbox.TryScreenCapture(out screenshot);
 
+            mockActivatorWrapper.VerifyAll();
             Assert.IsTrue(tryScreenCapture);
             Assert.AreEqual("TestScreenGrabber", Encoding.UTF8.GetString(screenshot));
         }
@@ -64,65 +63,24 @@ namespace Gauge.CSharp.Runner.UnitTests
         public void ShouldLoadClassInstanceManager()
         {
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var assemblyLoaded = false;
-            var mockAssembly = new Mock<Assembly>();
-            mockAssembly.Setup(assembly => assembly.FullName).Callback(() => assemblyLoaded = true);
-            mockAssemblyLoader.Setup(loader => loader.AssembliesReferencingGaugeLib)
-                .Returns(new List<Assembly> {mockAssembly.Object});
-            mockAssemblyLoader.Setup(loader => loader.ScreengrabberType);
+            var mockInstanceManagerType = new Mock<Type>();
             mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerType)
-                .Returns(typeof(TestClassInstanceManager));
-            var mockHookRegistry = new Mock<IHookRegistry>();
+                .Returns(mockInstanceManagerType.Object);
             var activatorWrapper = new Mock<IActivatorWrapper>();
+            var mockInstanceManager = new Mock<object>();
+            activatorWrapper.Setup(x => x.CreateInstance(mockInstanceManagerType.Object))
+                .Returns(mockInstanceManager.Object)
+                .Verifiable();
             var mockTypeWrapper = new Mock<IReflectionWrapper>();
-            new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object, activatorWrapper.Object, mockTypeWrapper.Object);
+            var sandbox = new Sandbox(mockAssemblyLoader.Object, null, activatorWrapper.Object, mockTypeWrapper.Object);
 
-            Assert.IsTrue(assemblyLoaded, "Mock Assembly was not initialized by TestClassInstanceManager");
+            activatorWrapper.VerifyAll();
         }
 
         [TearDown]
         public void TearDown()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _gaugeProjectRootEnv);
-        }
-
-        public class TestClassInstanceManager
-        {
-            public void Initialize(List<Assembly> assemblies)
-            {
-                foreach (var assembly in assemblies)
-                {
-                    var fullName = assembly.FullName;
-                }
-            }
-
-            public object Get(Type declaringType)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void StartScope(string tag)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void CloseScope()
-            {
-                throw new NotImplementedException();
-            }
-
-            public void ClearCache()
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        private class TestScreenGrabber
-        {
-            public byte[] TakeScreenShot()
-            {
-                return Encoding.UTF8.GetBytes("TestScreenGrabber");
-            }
         }
     }
 }

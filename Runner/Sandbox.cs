@@ -37,7 +37,7 @@ namespace Gauge.CSharp.Runner
     {
         private readonly IAssemblyLoader _assemblyLoader;
 
-        private dynamic _classInstanceManager;
+        private object _classInstanceManager;
 
         private IHookRegistry _hookRegistry;
         private readonly IActivatorWrapper activatorWrapper;
@@ -138,8 +138,7 @@ namespace Gauge.CSharp.Runner
                 var instance = activatorWrapper.CreateInstance(_assemblyLoader.ScreengrabberType);
                 if (instance != null)
                 {
-                    var screenCaptureMethod = reflectionWrapper.GetMethod(_assemblyLoader.ScreengrabberType, "TakeScreenShot");
-                    screenShotBytes = reflectionWrapper.Invoke(screenCaptureMethod, instance, null) as byte[];
+                    screenShotBytes = reflectionWrapper.InvokeMethod(_assemblyLoader.ScreengrabberType, instance, "TakeScreenShot") as byte[];
                     return true;
                 }
             }
@@ -154,17 +153,17 @@ namespace Gauge.CSharp.Runner
 
         public void ClearObjectCache()
         {
-            _classInstanceManager.ClearCache();
+            reflectionWrapper.InvokeMethod(instanceManagerType, _classInstanceManager, "ClearCache");
         }
 
         public void StartExecutionScope(string tag)
         {
-            _classInstanceManager.StartScope(tag);
+            reflectionWrapper.InvokeMethod(instanceManagerType, _classInstanceManager, "StartScope", tag);
         }
 
         public void CloseExectionScope()
         {
-            _classInstanceManager.CloseScope();
+            reflectionWrapper.InvokeMethod(instanceManagerType, _classInstanceManager, "CloseScope");
         }
 
         [DebuggerStepperBoundary]
@@ -268,8 +267,7 @@ namespace Gauge.CSharp.Runner
         private void Execute(MethodInfo method, params object[] parameters)
         {
             var typeToLoad = method.DeclaringType;
-            var getMethod = reflectionWrapper.GetMethod(instanceManagerType, "Get");
-            var instance = reflectionWrapper.Invoke(getMethod, _classInstanceManager, new[] { typeToLoad });
+            var instance = reflectionWrapper.InvokeMethod(instanceManagerType, _classInstanceManager, "Get", typeToLoad );
             var logger = LogManager.GetLogger("Sandbox");
             if (instance == null)
             {
@@ -287,8 +285,7 @@ namespace Gauge.CSharp.Runner
                 var logger = LogManager.GetLogger("Sandbox");
                 _classInstanceManager = activatorWrapper.CreateInstance(instanceManagerType);
                 logger.Debug("Loaded Instance Manager of Type:" + _classInstanceManager.GetType().FullName);
-                var initMethod = reflectionWrapper.GetMethod(instanceManagerType, "Initialize");
-                reflectionWrapper.Invoke(initMethod, _classInstanceManager, new[] { _assemblyLoader.AssembliesReferencingGaugeLib });
+                reflectionWrapper.InvokeMethod(instanceManagerType, _classInstanceManager, "Initialize", new[] { _assemblyLoader.AssembliesReferencingGaugeLib });
             }
         }
     }

@@ -31,15 +31,19 @@ namespace Gauge.CSharp.Runner
                 case "--init":
                     return new SetupCommand();
                 default:
-                    using (var apiConnection = new GaugeApiConnection(new TcpClientWrapper(Utils.GaugeApiPort)))
+                    return new StartCommand(() =>
                     {
-                        var assemblyLoader = new AssemblyLoader();
-                        var activatorWrapper = new ActivatorWrapper();
-                        var sandBox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, new ReflectionWrapper());
-                        var methodScanner = new MethodScanner(apiConnection, sandBox);
-                        var messageProcessorFactory = new MessageProcessorFactory(methodScanner, sandBox, assemblyLoader, activatorWrapper, new TableFormatter(assemblyLoader, activatorWrapper));
-                        return new StartCommand(() => new GaugeListener(messageProcessorFactory), () => new GaugeProjectBuilder());
-                    }
+                        using (var apiConnection = new GaugeApiConnection(new TcpClientWrapper(Utils.GaugeApiPort)))
+                        {
+                            var assemblyLoader = new AssemblyLoader();
+                            var activatorWrapper = new ActivatorWrapper();
+                            var sandBox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, new ReflectionWrapper());
+                            var methodScanner = new MethodScanner(apiConnection, sandBox);
+                            var messageProcessorFactory = new MessageProcessorFactory(methodScanner, sandBox, assemblyLoader, activatorWrapper, new TableFormatter(assemblyLoader, activatorWrapper));
+                            return new GaugeListener(messageProcessorFactory);
+                        }
+                    },
+                    () => new GaugeProjectBuilder());
             }
         }
     }

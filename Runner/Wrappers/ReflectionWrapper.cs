@@ -31,5 +31,11 @@ namespace Gauge.CSharp.Runner.Wrappers
         {
             return method.Invoke(obj, args);
         }
+
+        public object InvokeMethod(Type type, object instance, string methodName, params object[] args)
+        {
+            var method = GetMethod(type, methodName);
+            return Invoke(method, instance, args);
+        }
     }
 }

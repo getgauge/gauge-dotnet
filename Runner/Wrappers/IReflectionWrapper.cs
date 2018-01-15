@@ -24,5 +24,6 @@ namespace Gauge.CSharp.Runner.Wrappers
     {
         MethodInfo GetMethod(Type type, string methodName);
         object Invoke(MethodInfo method, object obj, params object[] args);
+        object InvokeMethod(Type type, object instance, string methodName, params object[] args);
     }
 }
