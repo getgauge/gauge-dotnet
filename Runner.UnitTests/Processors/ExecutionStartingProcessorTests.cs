@@ -34,9 +34,10 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         {
             var mockHookRegistry = new Mock<IHookRegistry>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
             var mockMethod = new MockMethodBuilder(mockAssemblyLoader)
-                .WithName("Foo").Build();
+                .WithName("Foo")
+                .WithFilteredHook(LibType.BeforeSpec)
+                .Build();
 
             var hooks = new HashSet<IHookMethod>
             {
