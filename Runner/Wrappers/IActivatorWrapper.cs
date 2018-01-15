@@ -15,16 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using Gauge.CSharp.Runner.Strategy;
+using System;
 
-namespace Gauge.CSharp.Runner.Processors
+namespace Runner.Wrappers
 {
-    public abstract class UntaggedHooksFirstExecutionProcessor : HookExecutionProcessor
+    public interface IActivatorWrapper
     {
-        protected UntaggedHooksFirstExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader)
-            : base(methodExecutor, assemblyLoader)
-        {
-            Strategy = new UntaggedHooksFirstStrategy();
-        }
+        object CreateInstance(Type t);
     }
 }

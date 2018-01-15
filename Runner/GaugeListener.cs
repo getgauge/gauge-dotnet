@@ -28,10 +28,6 @@ namespace Gauge.CSharp.Runner
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly MessageProcessorFactory _messageProcessorFactory;
 
-        public GaugeListener() : this(new MessageProcessorFactory())
-        {
-        }
-
         public GaugeListener(MessageProcessorFactory messageProcessorFactory)
         {
             _messageProcessorFactory = messageProcessorFactory;

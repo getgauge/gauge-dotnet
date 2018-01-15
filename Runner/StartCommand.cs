@@ -31,10 +31,6 @@ namespace Gauge.CSharp.Runner
         private readonly Func<IGaugeListener> _gaugeListener;
         private readonly Func<IGaugeProjectBuilder> _projectBuilder;
 
-        public StartCommand() : this(() => new GaugeListener(), () => new GaugeProjectBuilder())
-        {
-        }
-
         public StartCommand(Func<IGaugeListener> gaugeListener, Func<IGaugeProjectBuilder> projectBuilder)
         {
             Environment.CurrentDirectory = Utils.GaugeProjectRoot;

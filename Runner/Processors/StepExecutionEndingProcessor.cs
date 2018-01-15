@@ -17,15 +17,14 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Gauge.CSharp.Lib;
 using Gauge.Messages;
 
 namespace Gauge.CSharp.Runner.Processors
 {
     public class StepExecutionEndingProcessor : TaggedHooksFirstExecutionProcessor
     {
-        public StepExecutionEndingProcessor(IMethodExecutor methodExecutor)
-            : base(methodExecutor)
+        public StepExecutionEndingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader)
+            : base(methodExecutor, assemblyLoader)
         {
         }
 
@@ -34,7 +33,7 @@ namespace Gauge.CSharp.Runner.Processors
         protected override ProtoExecutionResult ExecuteHooks(Message request)
         {
             var protoExecutionResult = base.ExecuteHooks(request);
-            var allPendingMessages = MessageCollector.GetAllPendingMessages().Where(m => m != null);
+            var allPendingMessages = GetAllPendingMessages().Where(m => m != null);
             protoExecutionResult.Message.AddRange(allPendingMessages);
             return protoExecutionResult;
         }

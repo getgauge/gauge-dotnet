@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
-using Gauge.CSharp.Lib;
 using Gauge.CSharp.Runner.Models;
 using Gauge.Messages;
 
@@ -30,11 +30,13 @@ namespace Gauge.CSharp.Runner.Processors
     {
         private readonly IMethodExecutor _methodExecutor;
         private readonly IStepRegistry _stepRegistry;
+        private readonly IAssemblyLoader _assemblyLoader;
 
-        public ExecuteStepProcessor(IStepRegistry stepRegistry, IMethodExecutor methodExecutor)
+        public ExecuteStepProcessor(IStepRegistry stepRegistry, IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader)
         {
             _stepRegistry = stepRegistry;
             _methodExecutor = methodExecutor;
+            _assemblyLoader = assemblyLoader;
         }
 
         [DebuggerHidden]
@@ -71,10 +73,11 @@ namespace Gauge.CSharp.Runner.Processors
 
         private string GetTableData(ProtoTable table)
         {
-            var table1 = new Table(table.Headers.Cells.ToList());
+            Type tableType = _assemblyLoader.GetLibType(LibType.Table);
+            dynamic table1 = Activator.CreateInstance(tableType, table.Headers.Cells.ToList());
             foreach (var protoTableRow in table.Rows)
                 table1.AddRow(protoTableRow.Cells.ToList());
-            var serializer = new DataContractJsonSerializer(typeof(Table));
+            var serializer = new DataContractJsonSerializer(tableType);
             using (var memoryStream = new MemoryStream())
             {
                 serializer.WriteObject(memoryStream, table1);

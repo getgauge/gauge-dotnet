@@ -16,7 +16,6 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Collections.Generic;
-using Gauge.CSharp.Core;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.Messages;
@@ -28,28 +27,15 @@ namespace Gauge.CSharp.Runner
         private readonly ISandbox _sandbox;
         private readonly IMethodScanner _stepScanner;
         private Dictionary<Message.Types.MessageType, IMessageProcessor> _messageProcessorsDictionary;
+        private readonly IAssemblyLoader _assemblyLoader;
 
-        public MessageProcessorFactory() : this(new Sandbox())
+        public MessageProcessorFactory(IMethodScanner stepScanner, ISandbox sandbox, IAssemblyLoader assemblyLoader)
         {
-        }
-
-        public MessageProcessorFactory(ISandbox sandbox)
-        {
-            _sandbox = sandbox;
-            using (var apiConnection = new GaugeApiConnection(new TcpClientWrapper(Utils.GaugeApiPort)))
-            {
-                _stepScanner = new MethodScanner(apiConnection, _sandbox);
-                InitializeProcessors(_stepScanner);
-            }
-        }
-
-        public MessageProcessorFactory(IMethodScanner stepScanner, ISandbox sandbox)
-        {
+            _assemblyLoader = assemblyLoader;
             _stepScanner = stepScanner;
             _sandbox = sandbox;
             InitializeProcessors(stepScanner);
         }
-
         public IMessageProcessor GetProcessor(Message.Types.MessageType messageType)
         {
             return _messageProcessorsDictionary.ContainsKey(messageType)
@@ -63,33 +49,33 @@ namespace Gauge.CSharp.Runner
             var methodExecutor = new MethodExecutor(_sandbox);
             var messageHandlers = new Dictionary<Message.Types.MessageType, IMessageProcessor>
             {
-                {Message.Types.MessageType.ExecutionStarting, new ExecutionStartingProcessor(methodExecutor)},
-                {Message.Types.MessageType.ExecutionEnding, new ExecutionEndingProcessor(methodExecutor)},
+                {Message.Types.MessageType.ExecutionStarting, new ExecutionStartingProcessor(methodExecutor, _assemblyLoader)},
+                {Message.Types.MessageType.ExecutionEnding, new ExecutionEndingProcessor(methodExecutor, _assemblyLoader)},
                 {
                     Message.Types.MessageType.SpecExecutionStarting,
-                    new SpecExecutionStartingProcessor(methodExecutor, _sandbox)
+                    new SpecExecutionStartingProcessor(methodExecutor, _sandbox, _assemblyLoader)
                 },
                 {
                     Message.Types.MessageType.SpecExecutionEnding,
-                    new SpecExecutionEndingProcessor(methodExecutor, _sandbox)
+                    new SpecExecutionEndingProcessor(methodExecutor, _sandbox, _assemblyLoader)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionStarting,
-                    new ScenarioExecutionStartingProcessor(methodExecutor, _sandbox)
+                    new ScenarioExecutionStartingProcessor(methodExecutor, _sandbox, _assemblyLoader)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionEnding,
-                    new ScenarioExecutionEndingProcessor(methodExecutor, _sandbox)
+                    new ScenarioExecutionEndingProcessor(methodExecutor, _sandbox, _assemblyLoader)
                 },
-                {Message.Types.MessageType.StepExecutionStarting, new StepExecutionStartingProcessor(methodExecutor)},
-                {Message.Types.MessageType.StepExecutionEnding, new StepExecutionEndingProcessor(methodExecutor)},
-                {Message.Types.MessageType.ExecuteStep, new ExecuteStepProcessor(stepRegistry, methodExecutor)},
+                {Message.Types.MessageType.StepExecutionStarting, new StepExecutionStartingProcessor(methodExecutor, _assemblyLoader)},
+                {Message.Types.MessageType.StepExecutionEnding, new StepExecutionEndingProcessor(methodExecutor, _assemblyLoader)},
+                {Message.Types.MessageType.ExecuteStep, new ExecuteStepProcessor(stepRegistry, methodExecutor, _assemblyLoader)},
                 {Message.Types.MessageType.KillProcessRequest, new KillProcessProcessor()},
                 {Message.Types.MessageType.StepNamesRequest, new StepNamesProcessor(_stepScanner)},
                 {Message.Types.MessageType.StepValidateRequest, new StepValidationProcessor(stepRegistry)},
-                {Message.Types.MessageType.ScenarioDataStoreInit, new ScenarioDataStoreInitProcessor()},
-                {Message.Types.MessageType.SpecDataStoreInit, new SpecDataStoreInitProcessor()},
-                {Message.Types.MessageType.SuiteDataStoreInit, new SuiteDataStoreInitProcessor()},
+                {Message.Types.MessageType.ScenarioDataStoreInit, new ScenarioDataStoreInitProcessor(_assemblyLoader)},
+                {Message.Types.MessageType.SpecDataStoreInit, new SpecDataStoreInitProcessor(_assemblyLoader)},
+                {Message.Types.MessageType.SuiteDataStoreInit, new SuiteDataStoreInitProcessor(_assemblyLoader)},
                 {Message.Types.MessageType.StepNameRequest, new StepNameProcessor(stepRegistry)},
                 {Message.Types.MessageType.RefactorRequest, new RefactorProcessor(stepRegistry, _sandbox)}
             };

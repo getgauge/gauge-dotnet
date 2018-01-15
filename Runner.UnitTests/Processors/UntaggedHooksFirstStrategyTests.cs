@@ -17,10 +17,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Runner.Extensions;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
+using Gauge.CSharp.Runner.UnitTests.Helpers;
+using Moq;
 using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
@@ -31,41 +32,55 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         [SetUp]
         public void Setup()
         {
-            _hookMethods = new HashSet<HookMethod>
+            IHookMethod Create(string name, int aggregation=0, params string[] tags)
             {
-                new HookMethod(typeof(AfterScenario), GetType().GetMethod("Foo")),
-                new HookMethod(typeof(AfterScenario), GetType().GetMethod("Bar")),
-                new HookMethod(typeof(AfterScenario), GetType().GetMethod("Zed")),
-                new HookMethod(typeof(AfterScenario), GetType().GetMethod("Blah")),
-                new HookMethod(typeof(AfterScenario), GetType().GetMethod("Baz")),
+                var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+                var method = new MockMethodBuilder(mockAssemblyLoader)
+                    .WithName("Foo")
+                    .WithTagAggregation(aggregation)
+                    .WithFilteredHook(LibType.AfterScenario, tags)
+                    .Build();
+
+                return new HookMethod(LibType.AfterScenario, method, mockAssemblyLoader.Object);
+            }
+
+
+            _hookMethods = new HashSet<IHookMethod>
+            {
+                Create("Foo", 0, "Foo"),
+                Create("Bar", 0, "Bar", "Baz"),
+                Create("Zed", 1, "Foo", "Baz"),
+                Create("Blah"),
+                Create("Baz"),
             };
         }
 
-        [AfterScenario("Foo")]
-        public void Foo()
-        {
-        }
 
-        [AfterScenario("Bar", "Baz")]
-        public void Bar()
-        {
-        }
+        //[AfterScenario("Foo")]
+        //public void Foo()
+        //{
+        //}
 
-        [AfterScenario("Foo", "Baz")]
-        [TagAggregationBehaviour(TagAggregation.Or)]
-        public void Baz()
-        {
-        }
+        //[AfterScenario("Bar", "Baz")]
+        //public void Bar()
+        //{
+        //}
 
-        [AfterScenario]
-        public void Blah()
-        {
-        }
+        //[AfterScenario()]
+        //[TagAggregationBehaviour(TagAggregation.Or)]
+        //public void Baz()
+        //{
+        //}
 
-        [AfterScenario]
-        public void Zed()
-        {
-        }
+        //[AfterScenario]
+        //public void Blah()
+        //{
+        //}
+
+        //[AfterScenario]
+        //public void Zed()
+        //{
+        //}
 
         /*
          * untagged hooks are executed for all.
@@ -77,7 +92,7 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
          * Foo, Baz | Baz
          * After hooks should execute tagged hooks prior to untagged
          */
-        private HashSet<HookMethod> _hookMethods;
+        private HashSet<IHookMethod> _hookMethods;
 
         [Test]
         public void ShouldFetchTaggedHooksAfterUntaggedHooks()

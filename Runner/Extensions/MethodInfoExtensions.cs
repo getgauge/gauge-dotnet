@@ -36,13 +36,13 @@ namespace Gauge.CSharp.Runner.Extensions
                 : string.Format("{0}.{1}{2}", info.DeclaringType.FullName, info.Name, parameterText);
         }
 
-        public static bool IsRecoverableStep(this MethodInfo info)
+        public static bool IsRecoverableStep(this MethodInfo info, IAssemblyLoader assemblyLoader)
         {
-            var customAttributes = info.GetCustomAttributes().ToList();
-            return customAttributes.Any(attribute =>
-                       attribute.GetType().FullName == "Gauge.CSharp.Lib.Attribute.Step") &&
-                   customAttributes.Any(attribute =>
-                       attribute.GetType().FullName == "Gauge.CSharp.Lib.Attribute.ContinueOnFailure");
+            var stepType = assemblyLoader.GetLibType(LibType.Step);
+            var continueOnFailureType = assemblyLoader.GetLibType(LibType.ContinueOnFailure);
+            var customAttributes = info.GetCustomAttributes(false).ToList();
+            return customAttributes.Any(stepType.IsInstanceOfType)
+                       && customAttributes.Any(continueOnFailureType.IsInstanceOfType);
         }
     }
 }

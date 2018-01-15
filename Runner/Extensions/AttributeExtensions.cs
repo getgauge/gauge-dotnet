@@ -16,7 +16,6 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Linq;
-using Gauge.CSharp.Lib.Attribute;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -32,7 +31,7 @@ namespace Gauge.CSharp.Runner.Extensions
         public static AttributeSyntax GetStepAttribute(this SeparatedSyntaxList<AttributeSyntax> list)
         {
             return list.FirstOrDefault(argumentSyntax =>
-                string.CompareOrdinal(argumentSyntax.ToFullString(), typeof(Step).ToString()) > 0);
+                string.CompareOrdinal(argumentSyntax.ToFullString(), LibType.Step.FullName()) > 0);
         }
     }
 }

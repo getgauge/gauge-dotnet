@@ -23,7 +23,8 @@ namespace Gauge.CSharp.Runner.Processors
 {
     public class ExecutionEndingProcessor : HookExecutionProcessor
     {
-        public ExecutionEndingProcessor(IMethodExecutor methodExecutor) : base(methodExecutor)
+        public ExecutionEndingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader) 
+            : base(methodExecutor, assemblyLoader)
         {
         }
 

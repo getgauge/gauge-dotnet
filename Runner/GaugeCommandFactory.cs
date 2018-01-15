@@ -15,6 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using Gauge.CSharp.Core;
+using Gauge.CSharp.Runner.Models;
+using Gauge.CSharp.Runner.Wrappers;
+using Runner.Wrappers;
+
 namespace Gauge.CSharp.Runner
 {
     public class GaugeCommandFactory
@@ -26,7 +31,14 @@ namespace Gauge.CSharp.Runner
                 case "--init":
                     return new SetupCommand();
                 default:
-                    return new StartCommand();
+                    using (var apiConnection = new GaugeApiConnection(new TcpClientWrapper(Utils.GaugeApiPort)))
+                    {
+                        var assemblyLoader = new AssemblyLoader();
+                        var sandBox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
+                        var methodScanner = new MethodScanner(apiConnection, sandBox);
+                        var messageProcessorFactory = new MessageProcessorFactory(methodScanner, sandBox, assemblyLoader);
+                        return new StartCommand(() => new GaugeListener(messageProcessorFactory), () => new GaugeProjectBuilder());
+                    }
             }
         }
     }

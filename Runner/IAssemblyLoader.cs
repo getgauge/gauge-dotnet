@@ -24,8 +24,9 @@ namespace Gauge.CSharp.Runner
     public interface IAssemblyLoader
     {
         List<Assembly> AssembliesReferencingGaugeLib { get; }
-        List<Type> ScreengrabberTypes { get; }
-        List<Type> ClassInstanceManagerTypes { get; }
-        List<MethodInfo> GetMethods(string annotation);
+        Type ScreengrabberType { get; }
+        Type ClassInstanceManagerType { get; }
+        IEnumerable<MethodInfo> GetMethods(LibType type);
+        Type GetLibType(LibType type);
     }
 }

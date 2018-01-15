@@ -20,8 +20,10 @@ using System.Linq;
 using System.Text;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
+using Gauge.CSharp.Runner.Wrappers;
 using Gauge.Messages;
 using NUnit.Framework;
+using Runner.Wrappers;
 
 namespace Gauge.CSharp.Runner.IntegrationTests
 {
@@ -32,7 +34,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         {
             const string parameterizedStepText = "Step that takes a table {}";
             const string stepText = "Step that takes a table <table>";
-            var sandbox = new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
             var gaugeMethod = sandbox.GetStepMethods()
                 .First(method => method.Name == "IntegrationTestSample.StepImplementation.ReadTable-Tabletable");
             var scannedSteps = new List<KeyValuePair<string, GaugeMethod>>
@@ -43,7 +46,7 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             var stepTextMap = new Dictionary<string, string> {{parameterizedStepText, stepText}};
             var stepRegistry = new StepRegistry(scannedSteps, stepTextMap, aliases);
 
-            var executeStepProcessor = new ExecuteStepProcessor(stepRegistry, new MethodExecutor(sandbox));
+            var executeStepProcessor = new ExecuteStepProcessor(stepRegistry, new MethodExecutor(sandbox), assemblyLoader);
 
             var protoTable = new ProtoTable
             {
@@ -91,7 +94,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         {
             const string parameterizedStepText = "I throw a serializable exception";
             const string stepText = "I throw a serializable exception";
-            var sandbox = new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
             var gaugeMethod = sandbox.GetStepMethods()
                 .First(method => method.Name == "IntegrationTestSample.StepImplementation.ThrowSerializableException");
             var scannedSteps = new List<KeyValuePair<string, GaugeMethod>>
@@ -102,7 +106,7 @@ namespace Gauge.CSharp.Runner.IntegrationTests
             var stepTextMap = new Dictionary<string, string> {{parameterizedStepText, stepText}};
             var stepRegistry = new StepRegistry(scannedSteps, stepTextMap, aliases);
 
-            var executeStepProcessor = new ExecuteStepProcessor(stepRegistry, new MethodExecutor(sandbox));
+            var executeStepProcessor = new ExecuteStepProcessor(stepRegistry, new MethodExecutor(sandbox), assemblyLoader);
 
             var message = new Message
             {

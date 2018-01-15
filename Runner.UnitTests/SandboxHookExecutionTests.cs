@@ -21,12 +21,12 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Gauge.CSharp.Lib;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.CSharp.Runner.Wrappers;
 using Moq;
 using NUnit.Framework;
+using Runner.Wrappers;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
@@ -37,8 +37,12 @@ namespace Gauge.CSharp.Runner.UnitTests
         private string _gaugeProjectRootEnv;
         private HashSet<IHookMethod> _hookMethods;
         private Mock<IAssemblyLoader> _mockAssemblyLoader;
+        private Mock<IReflectionWrapper> reflectionWrapper;
         private Mock<IHookRegistry> _mockHookRegistry;
         private Mock<IHooksStrategy> _mockStrategy;
+        private Mock<IActivatorWrapper> activatorWrapper;
+        private Mock<Type> instanceManagerType;
+        private Mock<object> mockInstanceManager;
 
         private static Dictionary<string, Expression<Func<IHookRegistry, HashSet<IHookMethod>>>> Hooks
         {
@@ -64,15 +68,28 @@ namespace Gauge.CSharp.Runner.UnitTests
             _gaugeProjectRootEnv = Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT");
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
             _mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockAssembly = new Mock<TestAssembly>();
+            var mockAssembly = new Mock<Assembly>();
             _mockAssemblyLoader.Setup(loader => loader.AssembliesReferencingGaugeLib)
                 .Returns(new List<Assembly> {mockAssembly.Object});
-            _mockAssemblyLoader.Setup(loader => loader.ScreengrabberTypes)
-                .Returns(new List<Type> {typeof(DefaultScreenGrabber)});
-            _mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerTypes)
-                .Returns(new List<Type> {typeof(DefaultClassInstanceManager)});
+            _mockAssemblyLoader.Setup(loader => loader.ScreengrabberType);
+
+            instanceManagerType = new Mock<Type>();
+            mockInstanceManager = new Mock<object>();
+            var mockInitMethod = new Mock<MethodInfo>();
+            _mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerType)
+                .Returns(instanceManagerType.Object);
+
+            activatorWrapper = new Mock<IActivatorWrapper>();
+            activatorWrapper.Setup(x => x.CreateInstance(instanceManagerType.Object))
+                .Returns(mockInstanceManager.Object);
+
+            reflectionWrapper = new Mock<IReflectionWrapper>();
+            reflectionWrapper.Setup(x => x.GetMethod(instanceManagerType.Object, "Initialize"))
+                .Returns(mockInitMethod.Object);
+            reflectionWrapper.Setup(x => x.Invoke(mockInitMethod.Object, mockInstanceManager.Object, It.IsAny<object[]>()));
             _mockHookRegistry = new Mock<IHookRegistry>();
             var mockHookMethod = new Mock<IHookMethod>();
+            var mockHookMethodType = new Mock<Type>();
             mockHookMethod.Setup(method => method.Method).Returns("DummyHook");
             _hookMethods = new HashSet<IHookMethod> {mockHookMethod.Object};
             _mockStrategy = new Mock<IHooksStrategy>();
@@ -85,16 +102,32 @@ namespace Gauge.CSharp.Runner.UnitTests
         [TestCaseSource("HookTypes")]
         public void ShouldExecuteHook(string hookType)
         {
+            const string MethodName = "DummyHook";
+            var mockType = new Mock<Type>();
+            var mockInstance = new Mock<object>();
+            var mockHookMethod = new Mock<MethodInfo>();
+            var mockGetInstanceMethod = new Mock<MethodInfo>();            
+            mockHookMethod.Setup(x => x.DeclaringType).Returns(mockType.Object);
+
+            reflectionWrapper.Setup(x => x.GetMethod(instanceManagerType.Object, "Get"))
+                .Returns(mockGetInstanceMethod.Object);
+            reflectionWrapper.Setup(x => x.Invoke(mockGetInstanceMethod.Object, mockInstanceManager.Object, mockType.Object))
+                .Returns(mockInstance.Object);
+
+            reflectionWrapper.Setup(x => x.Invoke(mockHookMethod.Object, mockInstance.Object, new object[] { }))
+                .Verifiable();
+
             var expression = Hooks[hookType];
-            _mockHookRegistry.Setup(registry => registry.MethodFor("DummyHook"))
-                .Returns(GetType().GetMethod("DummyHook"));
+            _mockHookRegistry.Setup(registry => registry.MethodFor(MethodName))
+                .Returns(mockHookMethod.Object);
             _mockHookRegistry.Setup(expression).Returns(_hookMethods).Verifiable();
 
-            var sandbox = new Sandbox(_mockAssemblyLoader.Object, _mockHookRegistry.Object);
+            var sandbox = new Sandbox(_mockAssemblyLoader.Object, _mockHookRegistry.Object, activatorWrapper.Object, reflectionWrapper.Object);
             var executionResult = sandbox.ExecuteHooks(hookType, _mockStrategy.Object, _applicableTags);
 
-            Assert.IsTrue(executionResult.Success);
+            Assert.IsTrue(executionResult.Success, executionResult.ExceptionMessage);
             _mockHookRegistry.VerifyAll();
+            reflectionWrapper.VerifyAll();
         }
 
         [Test]
@@ -106,7 +139,7 @@ namespace Gauge.CSharp.Runner.UnitTests
                 .Returns(GetType().GetMethod("DummyHookThrowsException"));
             _mockHookRegistry.Setup(expression).Returns(_hookMethods).Verifiable();
 
-            var sandbox = new Sandbox(_mockAssemblyLoader.Object, _mockHookRegistry.Object);
+            var sandbox = new Sandbox(_mockAssemblyLoader.Object, _mockHookRegistry.Object, activatorWrapper.Object, reflectionWrapper.Object);
             var executionResult = sandbox.ExecuteHooks(hookType, _mockStrategy.Object, _applicableTags);
 
             Assert.False(executionResult.Success);

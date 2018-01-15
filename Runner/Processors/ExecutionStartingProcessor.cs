@@ -24,7 +24,8 @@ namespace Gauge.CSharp.Runner.Processors
 {
     public class ExecutionStartingProcessor : HookExecutionProcessor
     {
-        public ExecutionStartingProcessor(IMethodExecutor methodExecutor) : base(methodExecutor)
+        public ExecutionStartingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader) 
+            : base(methodExecutor, assemblyLoader)
         {
         }
 

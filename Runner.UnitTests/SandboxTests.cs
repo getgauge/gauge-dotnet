@@ -20,18 +20,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Gauge.CSharp.Lib;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Wrappers;
 using Moq;
 using NUnit.Framework;
+using Runner.Wrappers;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {
-    public class TestAssembly : Assembly
-    {
-    }
-
     public class SandboxTests
     {
         private string _gaugeProjectRootEnv;
@@ -47,17 +43,17 @@ namespace Gauge.CSharp.Runner.UnitTests
         public void ShouldLoadScreenGrabber()
         {
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockAssembly = new Mock<TestAssembly>();
+            var mockAssembly = new Mock<Assembly>();
             mockAssemblyLoader.Setup(loader => loader.AssembliesReferencingGaugeLib)
                 .Returns(new List<Assembly> {mockAssembly.Object});
-            mockAssemblyLoader.Setup(loader => loader.ScreengrabberTypes)
-                .Returns(new List<Type> {typeof(TestScreenGrabber)});
-            mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerTypes)
-                .Returns(new List<Type> {typeof(DefaultClassInstanceManager)});
+            mockAssemblyLoader.Setup(loader => loader.ScreengrabberType)
+                .Returns(typeof(TestScreenGrabber));
+            mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerType);
             var mockHookRegistry = new Mock<IHookRegistry>();
             var mockFileWrapper = new Mock<IFileWrapper>();
-
-            var sandbox = new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object);
+            var mockActivatorWrapper = new Mock<IActivatorWrapper>();
+            var mockTypeWrapper = new Mock<IReflectionWrapper>();
+            var sandbox = new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object, mockActivatorWrapper.Object, mockTypeWrapper.Object);
             byte[] screenshot;
             var tryScreenCapture = sandbox.TryScreenCapture(out screenshot);
 
@@ -70,17 +66,17 @@ namespace Gauge.CSharp.Runner.UnitTests
         {
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var assemblyLoaded = false;
-            var mockAssembly = new Mock<TestAssembly>();
+            var mockAssembly = new Mock<Assembly>();
             mockAssembly.Setup(assembly => assembly.FullName).Callback(() => assemblyLoaded = true);
             mockAssemblyLoader.Setup(loader => loader.AssembliesReferencingGaugeLib)
                 .Returns(new List<Assembly> {mockAssembly.Object});
-            mockAssemblyLoader.Setup(loader => loader.ScreengrabberTypes)
-                .Returns(new List<Type> {typeof(DefaultScreenGrabber)});
-            mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerTypes)
-                .Returns(new List<Type> {typeof(TestClassInstanceManager)});
+            mockAssemblyLoader.Setup(loader => loader.ScreengrabberType);
+            mockAssemblyLoader.Setup(loader => loader.ClassInstanceManagerType)
+                .Returns(typeof(TestClassInstanceManager));
             var mockHookRegistry = new Mock<IHookRegistry>();
-
-            new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object);
+            var activatorWrapper = new Mock<IActivatorWrapper>();
+            var mockTypeWrapper = new Mock<IReflectionWrapper>();
+            new Sandbox(mockAssemblyLoader.Object, mockHookRegistry.Object, activatorWrapper.Object, mockTypeWrapper.Object);
 
             Assert.IsTrue(assemblyLoaded, "Mock Assembly was not initialized by TestClassInstanceManager");
         }
@@ -91,7 +87,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _gaugeProjectRootEnv);
         }
 
-        public class TestClassInstanceManager : IClassInstanceManager
+        public class TestClassInstanceManager
         {
             public void Initialize(List<Assembly> assemblies)
             {
@@ -122,7 +118,7 @@ namespace Gauge.CSharp.Runner.UnitTests
             }
         }
 
-        private class TestScreenGrabber : IScreenGrabber
+        private class TestScreenGrabber
         {
             public byte[] TakeScreenShot()
             {

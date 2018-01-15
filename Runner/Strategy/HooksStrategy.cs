@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Runner.Models;
 
 namespace Gauge.CSharp.Runner.Strategy
@@ -32,8 +31,9 @@ namespace Gauge.CSharp.Runner.Strategy
             return from hookMethod in hooks.ToList()
                 where hookMethod.FilterTags != null
                 where
-                    hookMethod.TagAggregation == TagAggregation.Or && hookMethod.FilterTags.Intersect(tagsList).Any() ||
-                    hookMethod.TagAggregation == TagAggregation.And && hookMethod.FilterTags.All(tagsList.Contains)
+                    // TagAggregation.And=0, Or=1
+                    hookMethod.TagAggregation == 1 && hookMethod.FilterTags.Intersect(tagsList).Any() ||
+                    hookMethod.TagAggregation == 0 && hookMethod.FilterTags.All(tagsList.Contains)
                 orderby hookMethod.Method
                 select hookMethod.Method;
         }

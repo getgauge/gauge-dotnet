@@ -18,7 +18,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Gauge.CSharp.Lib;
+using Gauge.CSharp.Runner.Models;
+using Gauge.CSharp.Runner.Wrappers;
 using NUnit.Framework;
+using Runner.Wrappers;
 
 namespace Gauge.CSharp.Runner.IntegrationTests
 {
@@ -28,7 +31,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void RecoverableIsTrueOnExceptionThrownWhenContinueOnFailure()
         {
-            var sandbox = new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
             var stepMethods = sandbox.GetStepMethods();
             var gaugeMethod = stepMethods.First(info =>
                 string.CompareOrdinal(info.Name, "IntegrationTestSample.StepImplementation.ContinueOnFailure") == 0);
@@ -42,7 +46,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void ShouldCreateTableFromTargetType()
         {
-            var sandbox = new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
             var stepMethods = sandbox.GetStepMethods();
             var gaugeMethod = stepMethods.First(info =>
                 string.CompareOrdinal(info.Name, "IntegrationTestSample.StepImplementation.ReadTable-Tabletable") == 0);
@@ -58,7 +63,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void ShouldExecuteMethodAndReturnResult()
         {
-            var sandbox = new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
             var stepMethods = sandbox.GetStepMethods();
             AssertRunnerDomainDidNotLoadUsersAssembly();
             var gaugeMethod = stepMethods.First(info =>
@@ -71,7 +77,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void ShouldGetAllStepMethods()
         {
-            var sandbox = new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
             AssertRunnerDomainDidNotLoadUsersAssembly();
             var stepMethods = sandbox.GetStepMethods();
 
@@ -81,7 +88,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void ShouldGetAllStepTexts()
         {
-            var sandbox = new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
             var stepTexts = sandbox.GetAllStepTexts().ToList();
 
             new List<string>
@@ -99,7 +107,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void ShouldGetPendingMessages()
         {
-            var sandbox = new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
             var stepMethods = sandbox.GetStepMethods();
             var gaugeMethod = stepMethods.First(info =>
                 string.CompareOrdinal(info.Name,
@@ -114,7 +123,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void ShouldGetStacktraceForAggregateException()
         {
-            var sandbox = new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
             var stepMethods = sandbox.GetStepMethods();
             var gaugeMethod = stepMethods.First(info =>
                 string.CompareOrdinal(info.Name, "IntegrationTestSample.StepImplementation.AsyncExeption") == 0);
@@ -129,7 +139,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void ShouldGetStepTextsForMethod()
         {
-            var sandbox = new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
             var stepMethods = sandbox.GetStepMethods();
             var gaugeMethod = stepMethods.First(info =>
                 string.CompareOrdinal(info.Name, "IntegrationTestSample.StepImplementation.StepWithAliases") == 0);
@@ -144,7 +155,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void ShouldNotLoadTargetLibAssemblyInRunnersDomain()
         {
-            new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
 
             // The sample project uses a special version of Gauge Lib, versioned 0.0.0 for testing.
             // The actual Gauge CSharp runner uses a different version of Lib 
@@ -156,7 +168,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         public void SuccessIsFalseOnSerializableExceptionThrown()
         {
             const string expectedMessage = "I am a custom serializable exception";
-            var sandbox = new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
             var stepMethods = sandbox.GetStepMethods();
             var gaugeMethod = stepMethods.First(info =>
                 string.CompareOrdinal(info.Name,
@@ -174,7 +187,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         public void SuccessIsFalseOnUnserializableExceptionThrown()
         {
             const string expectedMessage = "I am a custom exception";
-            var sandbox = new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
             var stepMethods = sandbox.GetStepMethods();
             AssertRunnerDomainDidNotLoadUsersAssembly();
             var gaugeMethod = stepMethods.First(info =>

@@ -21,8 +21,10 @@ using System.IO;
 using System.Linq;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
+using Gauge.CSharp.Runner.Wrappers;
 using Gauge.Messages;
 using NUnit.Framework;
+using Runner.Wrappers;
 
 namespace Gauge.CSharp.Runner.IntegrationTests
 {
@@ -44,7 +46,8 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         {
             const string parameterizedStepText = "Refactoring 1 Say <what> to <who>";
             const string stepValue = "Refactoring 1 Say {} to {}";
-            var sandbox = new Sandbox();
+            var assemblyLoader = new AssemblyLoader();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
             var gaugeMethod = sandbox.GetStepMethods()
                 .First(method =>
                     method.Name ==

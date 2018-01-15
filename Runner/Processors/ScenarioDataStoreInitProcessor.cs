@@ -15,17 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using Gauge.CSharp.Lib;
-using Gauge.Messages;
-
 namespace Gauge.CSharp.Runner.Processors
 {
-    public class ScenarioDataStoreInitProcessor : IMessageProcessor
+
+    public class ScenarioDataStoreInitProcessor : DataStoreInitProcessorBase
     {
-        public Message Process(Message request)
+        public ScenarioDataStoreInitProcessor(IAssemblyLoader assemblyLoader) : base(assemblyLoader, DataStoreType.Scenario)
         {
-            DataStoreFactory.InitializeScenarioDataStore();
-            return new DefaultProcessor().Process(request);
         }
     }
 }

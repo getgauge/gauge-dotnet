@@ -15,9 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Gauge.CSharp.Core;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.Messages;
@@ -30,10 +32,12 @@ namespace Gauge.CSharp.Runner.Processors
         protected const string SuiteLevel = "suite";
         protected const string SpecLevel = "spec";
         protected const string ScenarioLevel = "scenario";
+        private readonly Type _messageCollectorType;
         protected readonly IMethodExecutor MethodExecutor;
 
-        protected HookExecutionProcessor(IMethodExecutor methodExecutor)
+        protected HookExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader)
         {
+            _messageCollectorType = assemblyLoader.GetLibType(LibType.MessageCollector); 
             MethodExecutor = methodExecutor;
             Strategy = new HooksStrategy();
         }
@@ -70,6 +74,21 @@ namespace Gauge.CSharp.Runner.Processors
         protected virtual List<string> GetApplicableTags(Message request)
         {
             return Enumerable.Empty<string>().ToList();
+        }
+
+        public virtual IEnumerable<string> GetAllPendingMessages()
+        {
+            var targetMethod = _messageCollectorType.GetMethod("GetAllPendingMessages",
+               BindingFlags.Static | BindingFlags.Public);
+            return targetMethod.Invoke(null, null) as IEnumerable<string>;
+        }
+
+
+        public virtual void ClearAllPendingMessages()
+        {
+            var targetMethod = _messageCollectorType.GetMethod("Clear",
+               BindingFlags.Static | BindingFlags.Public);
+            targetMethod.Invoke(null, null);
         }
     }
 }

@@ -15,16 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using Gauge.CSharp.Runner.Strategy;
+using System;
+using Gauge.Messages;
 
 namespace Gauge.CSharp.Runner.Processors
 {
-    public abstract class UntaggedHooksFirstExecutionProcessor : HookExecutionProcessor
+    public abstract class DataStoreInitProcessorBase : IMessageProcessor
     {
-        protected UntaggedHooksFirstExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader)
-            : base(methodExecutor, assemblyLoader)
+        private readonly Type _dataStoreFactoryType;
+        private DataStoreType _dataStoreType;
+
+        protected DataStoreInitProcessorBase(IAssemblyLoader assemblyLoader, DataStoreType scenario)
         {
-            Strategy = new UntaggedHooksFirstStrategy();
+            _dataStoreType = scenario;
+            _dataStoreFactoryType = assemblyLoader.GetLibType(LibType.DataStoreFactory);
+        }
+
+        public Message Process(Message request)
+        {
+            var initMethod = _dataStoreFactoryType.GetMethod($"Initialize{_dataStoreType}DataStore");
+            initMethod.Invoke(null, null);
+            return new DefaultProcessor().Process(request);
         }
     }
 }

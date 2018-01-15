@@ -24,7 +24,7 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors.Stubs
 {
     public class TestHooksExecutionProcessor : HookExecutionProcessor
     {
-        public TestHooksExecutionProcessor() : base(null)
+        public TestHooksExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader) : base(methodExecutor, assemblyLoader)
         {
         }
 

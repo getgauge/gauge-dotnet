@@ -18,7 +18,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Gauge.CSharp.Core;
-using Gauge.CSharp.Lib;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.Messages;
@@ -67,26 +66,26 @@ namespace Gauge.CSharp.Runner
         public ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags)
         {
             var stopwatch = Stopwatch.StartNew();
-            var builder = new ProtoExecutionResult
+            var result = new ProtoExecutionResult
             {
                 Failed = false
             };
             var executionResult = _sandbox.ExecuteHooks(hookType, strategy, applicableTags);
 
-            builder.ExecutionTime = stopwatch.ElapsedMilliseconds;
+            result.ExecutionTime = stopwatch.ElapsedMilliseconds;
             if (!executionResult.Success)
             {
                 var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
-                builder.Failed = true;
+                result.Failed = true;
                 var isScreenShotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
                 if (isScreenShotEnabled == null || isScreenShotEnabled.ToLower() != "false")
-                    builder.ScreenShot = TakeScreenshot();
-                builder.ErrorMessage = executionResult.ExceptionMessage;
-                builder.StackTrace = executionResult.StackTrace;
-                builder.RecoverableError = executionResult.Recoverable;
-                builder.ExecutionTime = elapsedMilliseconds;
+                    result.ScreenShot = TakeScreenshot();
+                result.ErrorMessage = executionResult.ExceptionMessage;
+                result.StackTrace = executionResult.StackTrace;
+                result.RecoverableError = executionResult.Recoverable;
+                result.ExecutionTime = elapsedMilliseconds;
             }
-            return builder;
+            return result;
         }
 
         public void ClearCache()

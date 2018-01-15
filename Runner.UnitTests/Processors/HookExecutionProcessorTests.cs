@@ -15,80 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Gauge.CSharp.Runner.Extensions;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
+using Gauge.CSharp.Runner.UnitTests.Helpers;
 using Gauge.CSharp.Runner.UnitTests.Processors.Stubs;
 using Moq;
 using NUnit.Framework;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors
 {
-    class GaugeMethodBuilder
-    {
-        private class TestFilteredHook
-        {
-            public string[] FilterTags { get; set; }
-        }
-
-        private class TestTagAggregation
-        {
-            public int TagAggregation { get; set; }
-        }
-
-        public static MethodInfo GetMockHookMethod(Mock<IAssemblyLoader> mockAssemblyLoader, LibType[] hooks, string name, Dictionary<string, string> methodParams, string[] tags, int? aggregation, bool filtered = true)
-        {
-            var mockMethod = new Mock<MethodInfo>();
-            var mockFilteredHook = new Mock<Type>();
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.FilteredHookAttribute)).Returns(filtered ? mockFilteredHook.Object : null);
-
-            var mockHookType = new Mock<Type>();
-            var methodAttributes = new List<object>();
-            mockHookType.Setup(x => x.IsSubclassOf(mockFilteredHook.Object)).Returns(true);
-            var hookAttribute = new TestFilteredHook{ FilterTags = tags };
-            mockHookType.Setup(x => x.IsInstanceOfType(It.IsAny<TestFilteredHook>())).Returns(true);
-            foreach (var hook in hooks)
-            {
-                mockAssemblyLoader.Setup(a => a.GetLibType(hook)).Returns(mockHookType.Object);
-            }
-
-            methodAttributes.Add(hookAttribute);
-
-            var mockTagAggregationBehaviourType = new Mock<Type>();
-            if (aggregation.HasValue)
-            {
-                var aggregationAttribute = new TestTagAggregation{ TagAggregation = aggregation.Value };
-                methodAttributes.Add(aggregationAttribute);
-            }
-            mockTagAggregationBehaviourType.Setup(x => x.IsInstanceOfType(It.IsAny<TestTagAggregation>())).Returns(true);
-            mockAssemblyLoader.Setup(a => a.GetLibType(LibType.TagAggregationBehaviourAttribute)).Returns(mockTagAggregationBehaviourType.Object);
-            mockMethod.Setup(x => x.GetParameters()).Returns(GetParameters(methodParams));
-            mockMethod.Setup(x => x.DeclaringType).Returns(default(Type));
-            mockMethod.Setup(x => x.GetCustomAttributes(false)).Returns(methodAttributes.ToArray());
-            mockMethod.Setup(x => x.Name).Returns(name);
-            return mockMethod.Object;
-        }
-
-        static ParameterInfo[] GetParameters(Dictionary<string, string> methodParams)
-        {
-            if (methodParams is null)
-                return Enumerable.Empty<ParameterInfo>().ToArray();
-            return methodParams.Select(p =>
-            {
-                var pInfo = new Mock<ParameterInfo>();
-                var pType = new Mock<Type>();
-                pType.Setup(x => x.Name).Returns(p.Key);
-                pInfo.Setup(x => x.ParameterType).Returns(pType.Object);
-                pInfo.Setup(x => x.Name).Returns(p.Value);
-                return pInfo.Object;
-            }).ToArray();
-        }
-    }
-
     [TestFixture]
     public class HookExecutionProcessorTests
     {
@@ -98,10 +37,23 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         {
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
 
-            mockFooMethod = GaugeMethodBuilder.GetMockHookMethod(mockAssemblyLoader, new[] { LibType.BeforeScenario }, "FooMethod", null, new[] { "Foo" }, null);
-            mockBarMethod = GaugeMethodBuilder.GetMockHookMethod(mockAssemblyLoader, new[] { LibType.BeforeScenario }, "BarMethod", null, new[] { "Bar", "Baz" }, null);
-            mockBazMethod = GaugeMethodBuilder.GetMockHookMethod(mockAssemblyLoader, new[] { LibType.BeforeScenario }, "BazMethod", null, new[] { "Foo", "Baz" }, 1);
-            mockBlahMethod = GaugeMethodBuilder.GetMockHookMethod(mockAssemblyLoader, new[] { LibType.BeforeScenario }, "BlahMethod", null, null, null); 
+            mockFooMethod = new MockMethodBuilder(mockAssemblyLoader)
+                .WithName("FooMethod")
+                .WithFilteredHook(LibType.BeforeScenario, "Foo")
+                .Build();
+            mockBarMethod = new MockMethodBuilder(mockAssemblyLoader)
+                .WithName("BarMethod")
+                .WithFilteredHook(LibType.BeforeScenario, "Bar", "Baz")
+                .Build();
+            mockBazMethod = new MockMethodBuilder(mockAssemblyLoader)
+                .WithName("BazMethod")
+                .WithFilteredHook(LibType.BeforeScenario, "Foo", "Baz")
+                .WithTagAggregation(1)
+                .Build();
+            mockBlahMethod = new MockMethodBuilder(mockAssemblyLoader)
+                .WithName("BlahMethod")
+                .WithFilteredHook(LibType.BeforeScenario)
+                .Build();
 
             _hookMethods = new List<IHookMethod>
             {
@@ -154,7 +106,11 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         public void ShouldAllowMultipleHooksInaMethod()
         {
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockMethod = GaugeMethodBuilder.GetMockHookMethod(mockAssemblyLoader, new[] { LibType.BeforeScenario, LibType.BeforeSpec }, "MultipleHookMethod", null, null, null);
+            var mockMethod = new MockMethodBuilder(mockAssemblyLoader)
+                .WithName("MultipleHookMethod")
+                .WithFilteredHook(LibType.BeforeScenario)
+                .WithFilteredHook(LibType.BeforeSpec)
+                .Build();
 
 
             var beforeScenarioHook = new HookMethod(LibType.BeforeScenario, mockMethod, mockAssemblyLoader.Object);

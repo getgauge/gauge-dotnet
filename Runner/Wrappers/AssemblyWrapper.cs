@@ -21,6 +21,11 @@ namespace Gauge.CSharp.Runner.Wrappers
 {
     internal class AssemblyWrapper : IAssemblyWrapper
     {
+        public Assembly[] GetCurrentDomainAssemblies()
+        {
+            return System.AppDomain.CurrentDomain.GetAssemblies();
+        }
+
         public Assembly LoadFrom(string location)
         {
             return Assembly.LoadFrom(location);

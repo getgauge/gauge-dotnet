@@ -25,9 +25,8 @@ namespace Gauge.CSharp.Runner.Processors
     {
         private readonly ISandbox _sandbox;
 
-
-        public ScenarioExecutionStartingProcessor(IMethodExecutor methodExecutor, ISandbox sandbox)
-            : base(methodExecutor)
+        public ScenarioExecutionStartingProcessor(IMethodExecutor methodExecutor, ISandbox sandbox, IAssemblyLoader assemblyLoader)
+            : base(methodExecutor, assemblyLoader)
         {
             _sandbox = sandbox;
         }

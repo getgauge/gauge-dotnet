@@ -15,46 +15,94 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Runner.Extensions;
+using Gauge.CSharp.Runner.UnitTests.Helpers;
+using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace Gauge.CSharp.Runner.UnitTests.Extensions
 {
     internal class MethodInfoExtensionTests
     {
-        [Step("Foo")]
-        public void Foo()
-        {
-        }
+        //[Step("Foo")]
+        //public void Foo()
+        //{
+        //}
 
-        [Step("Bar")]
-        [ContinueOnFailure]
-        public void Bar(string bar)
-        {
-        }
+        //[Step("Bar")]
+        //[ContinueOnFailure]
+        //public void Bar(string bar)
+        //{
+        //}
 
+        //[ContinueOnFailure]
+        //public void Baz(string bar)
+        //{
+        //}
 
-        [ContinueOnFailure]
-        public void Baz(string bar)
+        [Test]
+        public void ShouldGetFullyQualifiedName()
         {
+            var assemblyLoader = new Mock<IAssemblyLoader>();
+            var fooMethod = new MockMethodBuilder(assemblyLoader)
+                .WithName("Foo")
+                .WithStep("Foo")
+                .Build();
+
+            Assert.AreEqual("My.Test.Type.Foo", fooMethod.FullyQuallifiedName());
         }
 
         [Test]
-        [TestCase("Foo", "Gauge.CSharp.Runner.UnitTests.Extensions.MethodInfoExtensionTests.Foo")]
-        [TestCase("Bar", "Gauge.CSharp.Runner.UnitTests.Extensions.MethodInfoExtensionTests.Bar-Stringbar")]
-        public void ShouldGetFullyQualifiedName(string methodName, string expectedMethodId)
+        public void ShouldGetFullyQualifiedNameWithParams()
         {
-            Assert.AreEqual(expectedMethodId, GetType().GetMethod(methodName).FullyQuallifiedName());
+            var assemblyLoader = new Mock<IAssemblyLoader>();
+            var barMethod = new MockMethodBuilder(assemblyLoader)
+                .WithName("Bar")
+                .WithStep("Bar")
+                .WithContinueOnFailure()
+                .WithParameters(new KeyValuePair<string, string>("string", "Bar"))
+                .Build();
+
+            Assert.AreEqual("My.Test.Type.Bar-Stringbar", barMethod.FullyQuallifiedName());
+        }
+        [Test]
+        public void ShouldNotBeRecoverable()
+        {
+            var assemblyLoader = new Mock<IAssemblyLoader>();
+            var fooMethod = new MockMethodBuilder(assemblyLoader)
+                .WithName("Foo")
+                .WithStep("Foo")
+                .Build();
+
+            Assert.False(fooMethod.IsRecoverableStep(assemblyLoader.Object));
         }
 
         [Test]
-        [TestCase("Foo", false)]
-        [TestCase("Bar", true)]
-        [TestCase("Baz", false, Description = "Recoverable is true only when method is a Step")]
-        public void ShouldGetRecoverable(string methodName, bool expectedRecoverable)
+        public void ShouldBeRecoverableWhenContinueOnFailure()
         {
-            Assert.AreEqual(expectedRecoverable, GetType().GetMethod(methodName).IsRecoverableStep());
+            var assemblyLoader = new Mock<IAssemblyLoader>();
+            var barMethod = new MockMethodBuilder(assemblyLoader)
+                .WithName("Bar")
+                .WithStep("Bar")
+                .WithContinueOnFailure()
+                .WithParameters(new KeyValuePair<string, string>("string", "Bar"))
+                .Build();
+
+            Assert.True(barMethod.IsRecoverableStep(assemblyLoader.Object));
+        }
+
+        [Test]
+        public void ShouldNotBeRecoverableWhenContinueOnFailureOnNonStep()
+        {
+            var assemblyLoader = new Mock<IAssemblyLoader>();
+            var bazMethod = new MockMethodBuilder(assemblyLoader)
+                .WithName("Baz")
+                .WithContinueOnFailure()
+                .WithParameters(new KeyValuePair<string, string>("string", "Bar"))
+                .Build();
+
+            Assert.False(bazMethod.IsRecoverableStep(assemblyLoader.Object), "Recoverable is true only when method is a Step");
         }
     }
 }

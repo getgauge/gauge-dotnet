@@ -25,8 +25,8 @@ namespace Gauge.CSharp.Runner.Processors
     {
         private readonly ISandbox _sandbox;
 
-        public SpecExecutionEndingProcessor(IMethodExecutor methodExecutor, ISandbox sandbox)
-            : base(methodExecutor)
+        public SpecExecutionEndingProcessor(IMethodExecutor methodExecutor, ISandbox sandbox, IAssemblyLoader assemblyLoader)
+            : base(methodExecutor, assemblyLoader)
         {
             _sandbox = sandbox;
         }

@@ -21,7 +21,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Runner.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -50,7 +49,7 @@ namespace Gauge.CSharp.Runner
                     where string.CompareOrdinal(node.Identifier.ValueText, method.Name) == 0
                           && string.CompareOrdinal(classDef.Identifier.ValueText, method.DeclaringType.Name) == 0
                           && attributeSyntaxes.Any(syntax =>
-                              string.CompareOrdinal(syntax.ToFullString(), typeof(Step).ToString()) > 0)
+                              string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
                     select node;
 
                 if (!stepMethods.Any()) return;

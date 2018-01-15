@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Runner.Extensions;
 
 namespace Gauge.CSharp.Runner.Models
@@ -27,28 +26,36 @@ namespace Gauge.CSharp.Runner.Models
     [Serializable]
     public class HookMethod : IHookMethod
     {
-        public HookMethod(Type hookType, MethodInfo methodInfo)
+        public HookMethod(LibType hookType, MethodInfo methodInfo, IAssemblyLoader assemblyLoader)
         {
             Method = methodInfo.FullyQuallifiedName();
             FilterTags = Enumerable.Empty<string>();
 
-            if (!hookType.IsSubclassOf(typeof(FilteredHookAttribute)))
+            var type = assemblyLoader.GetLibType(hookType);
+            if (!type.IsSubclassOf(assemblyLoader.GetLibType(LibType.FilteredHookAttribute)))
                 return;
-
-            FilteredHookAttribute filteredHookAttribute = methodInfo.GetCustomAttribute(hookType) as FilteredHookAttribute;
+            var customAttributes = methodInfo.GetCustomAttributes(false);
+            var filteredHookAttribute = customAttributes.FirstOrDefault(type.IsInstanceOfType);
             if (filteredHookAttribute == null) return;
 
-            FilterTags = filteredHookAttribute.FilterTags;
-            var targetTagBehaviourType = typeof(TagAggregationBehaviourAttribute);
-            TagAggregationBehaviourAttribute tagAggregationBehaviourAttribute = methodInfo.GetCustomAttribute(targetTagBehaviourType) as TagAggregationBehaviourAttribute;
+            FilterTags = (string[])GetPropValue(filteredHookAttribute, "FilterTags");
 
-            TagAggregation = tagAggregationBehaviourAttribute != null ? tagAggregationBehaviourAttribute.TagAggregation : TagAggregation.And;
+            var targetTagBehaviourType = assemblyLoader.GetLibType(LibType.TagAggregationBehaviourAttribute);
+            dynamic tagAggregationBehaviourAttribute = customAttributes.FirstOrDefault(targetTagBehaviourType.IsInstanceOfType);
+
+            if (tagAggregationBehaviourAttribute != null)
+                TagAggregation = GetPropValue(tagAggregationBehaviourAttribute, "TagAggregation");
         }
 
-        public TagAggregation TagAggregation { get; }
+        public int TagAggregation { get; }
 
         public IEnumerable<string> FilterTags { get; }
 
         public string Method { get; }
+
+        private static object GetPropValue(object src, string propName)
+        {
+            return src.GetType().GetProperty(propName).GetValue(src, null);
+        }
     }
 }

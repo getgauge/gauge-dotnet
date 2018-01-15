@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Text;
-using Gauge.CSharp.Lib;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.Messages;
@@ -33,24 +32,6 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
     {
         public void Foo(string param)
         {
-        }
-
-        private static bool HasTable(IReadOnlyList<string> parameters)
-        {
-            var serializer = new DataContractJsonSerializer(typeof(Table));
-
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(parameters[0])))
-            {
-                try
-                {
-                    serializer.ReadObject(stream);
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-            return true;
         }
 
         [Test]
@@ -84,8 +65,10 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             mockMethodExecutor.Setup(e => e.Execute(fooMethodInfo, It.IsAny<string[]>()))
                 .Returns(() => new ProtoExecutionResult {ExecutionTime = 1, Failed = false});
 
+            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object).Process(request);
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockAssemblyLoader.Object).Process(request);
 
             Assert.False(response.ExecutionStatusResponse.ExecutionResult.Failed);
         }
@@ -135,11 +118,13 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
                     Failed = false
                 });
 
+            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object).Process(request);
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockAssemblyLoader.Object).Process(request);
 
             mockMethodExecutor.Verify(executor =>
-                executor.Execute(fooMethodInfo, It.Is<string[]>(strings => HasTable(strings))));
+                executor.Execute(fooMethodInfo, It.Is<string[]>(strings => strings[0]=="")));
             Assert.False(response.ExecutionStatusResponse.ExecutionResult.Failed);
         }
 
@@ -163,8 +148,10 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             mockStepRegistry.Setup(x => x.MethodFor(parsedStepText)).Returns(fooMethod);
             var mockMethodExecutor = new Mock<IMethodExecutor>();
 
+            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object).Process(request);
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockAssemblyLoader.Object).Process(request);
 
             Assert.True(response.ExecutionStatusResponse.ExecutionResult.Failed);
             Assert.AreEqual(response.ExecutionStatusResponse.ExecutionResult.ErrorMessage,
@@ -189,8 +176,10 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(false);
             var mockMethodExecutor = new Mock<IMethodExecutor>();
 
+            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object).Process(request);
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockAssemblyLoader.Object).Process(request);
 
             Assert.True(response.ExecutionStatusResponse.ExecutionResult.Failed);
             Assert.AreEqual(response.ExecutionStatusResponse.ExecutionResult.ErrorMessage,

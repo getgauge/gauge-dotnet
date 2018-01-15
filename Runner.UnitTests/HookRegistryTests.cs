@@ -18,7 +18,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Runner.Extensions;
 using Gauge.CSharp.Runner.Models;
 using Moq;
@@ -35,13 +34,13 @@ namespace Gauge.CSharp.Runner.UnitTests
             _mockAssemblyScanner = new Mock<IAssemblyLoader>();
             var types = new[]
             {
-                typeof(BeforeScenario), typeof(AfterScenario), typeof(BeforeSpec), typeof(AfterSpec),
-                typeof(BeforeStep), typeof(AfterStep), typeof(BeforeSuite), typeof(AfterSuite)
+                LibType.BeforeScenario, LibType.AfterScenario, LibType.BeforeSpec, LibType.AfterSpec,
+                LibType.BeforeStep, LibType.AfterStep, LibType.BeforeSuite, LibType.AfterSuite
             };
             foreach (var type in types)
             {
-                var methodInfos = new List<MethodInfo> {GetType().GetMethod(string.Format("{0}Hook", type.Name))};
-                _mockAssemblyScanner.Setup(scanner => scanner.GetMethods(type.FullName)).Returns(methodInfos);
+                var methodInfos = new List<MethodInfo> {GetType().GetMethod($"{type}Hook")};
+                _mockAssemblyScanner.Setup(scanner => scanner.GetMethods(type)).Returns(methodInfos);
             }
             _hookRegistry = new HookRegistry(_mockAssemblyScanner.Object);
         }

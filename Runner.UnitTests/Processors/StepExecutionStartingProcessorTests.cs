@@ -17,7 +17,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Gauge.CSharp.Lib;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.CSharp.Runner.Strategy;
@@ -60,10 +59,11 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
                 .Returns(protoExecutionResult);
             var hookRegistry = new Mock<IHookRegistry>();
             hookRegistry.Setup(registry => registry.BeforeStepHooks).Returns(new HashSet<IHookMethod>());
-
-            new StepExecutionStartingProcessor(methodExecutor.Object).Process(request);
-
-            Assert.IsEmpty(MessageCollector.GetAllPendingMessages());
+            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
+            var processor = new StepExecutionStartingProcessor(methodExecutor.Object, mockAssemblyLoader.Object);
+            processor.Process(request);
+            Assert.IsEmpty(processor.GetAllPendingMessages());
         }
 
         [Test]
