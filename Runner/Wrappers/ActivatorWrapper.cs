@@ -17,13 +17,13 @@
 
 using System;
 
-namespace Runner.Wrappers
+namespace Gauge.CSharp.Runner.Wrappers
 {
     public class ActivatorWrapper : IActivatorWrapper
     {
-        public object CreateInstance(Type t)
+        public object CreateInstance(Type t, params object[] args)
         {
-            return Activator.CreateInstance(t);
+            return Activator.CreateInstance(t, args);
         }
     }
 }

@@ -16,6 +16,8 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using Gauge.CSharp.Runner.Models;
+using Gauge.CSharp.Runner.Processors;
+using Gauge.CSharp.Runner.Wrappers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
@@ -34,7 +36,9 @@ namespace Gauge.CSharp.Runner.UnitTests
             var mockSandBox = new Mock<ISandbox>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
-            _messageProcessorFactory = new MessageProcessorFactory(mockMethodScanner.Object, mockSandBox.Object, mockAssemblyLoader.Object);
+            var mockActivatorWrapper = new Mock<IActivatorWrapper>();
+            var mockTableFormatter = new Mock<ITableFormatter>();
+            _messageProcessorFactory = new MessageProcessorFactory(mockMethodScanner.Object, mockSandBox.Object, mockAssemblyLoader.Object, mockActivatorWrapper.Object, mockTableFormatter.Object);
         }
 
         private MessageProcessorFactory _messageProcessorFactory;

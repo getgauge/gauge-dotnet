@@ -29,7 +29,6 @@ using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.CSharp.Runner.Wrappers;
 using NLog;
-using Runner.Wrappers;
 
 namespace Gauge.CSharp.Runner
 {

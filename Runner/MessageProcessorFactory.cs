@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
+using Gauge.CSharp.Runner.Wrappers;
 using Gauge.Messages;
 
 namespace Gauge.CSharp.Runner
@@ -27,11 +28,15 @@ namespace Gauge.CSharp.Runner
         private readonly ISandbox _sandbox;
         private readonly IMethodScanner _stepScanner;
         private Dictionary<Message.Types.MessageType, IMessageProcessor> _messageProcessorsDictionary;
+        private readonly ITableFormatter _tableFormatter;
         private readonly IAssemblyLoader _assemblyLoader;
+        private readonly IActivatorWrapper _activatorWrapper;
 
-        public MessageProcessorFactory(IMethodScanner stepScanner, ISandbox sandbox, IAssemblyLoader assemblyLoader)
+        public MessageProcessorFactory(IMethodScanner stepScanner, ISandbox sandbox, IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, ITableFormatter tableFormatter)
         {
+            _tableFormatter = tableFormatter;
             _assemblyLoader = assemblyLoader;
+            _activatorWrapper = activatorWrapper;
             _stepScanner = stepScanner;
             _sandbox = sandbox;
             InitializeProcessors(stepScanner);
@@ -69,7 +74,7 @@ namespace Gauge.CSharp.Runner
                 },
                 {Message.Types.MessageType.StepExecutionStarting, new StepExecutionStartingProcessor(methodExecutor, _assemblyLoader)},
                 {Message.Types.MessageType.StepExecutionEnding, new StepExecutionEndingProcessor(methodExecutor, _assemblyLoader)},
-                {Message.Types.MessageType.ExecuteStep, new ExecuteStepProcessor(stepRegistry, methodExecutor, _assemblyLoader)},
+                {Message.Types.MessageType.ExecuteStep, new ExecuteStepProcessor(stepRegistry, methodExecutor, _tableFormatter)},
                 {Message.Types.MessageType.KillProcessRequest, new KillProcessProcessor()},
                 {Message.Types.MessageType.StepNamesRequest, new StepNamesProcessor(_stepScanner)},
                 {Message.Types.MessageType.StepValidateRequest, new StepValidationProcessor(stepRegistry)},

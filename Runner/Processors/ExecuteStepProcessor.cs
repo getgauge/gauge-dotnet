@@ -15,12 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.Text;
 using Gauge.CSharp.Runner.Models;
 using Gauge.Messages;
 
@@ -30,13 +26,13 @@ namespace Gauge.CSharp.Runner.Processors
     {
         private readonly IMethodExecutor _methodExecutor;
         private readonly IStepRegistry _stepRegistry;
-        private readonly IAssemblyLoader _assemblyLoader;
+        readonly ITableFormatter _tableFormatter;
 
-        public ExecuteStepProcessor(IStepRegistry stepRegistry, IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader)
+        public ExecuteStepProcessor(IStepRegistry stepRegistry, IMethodExecutor methodExecutor, ITableFormatter tableFormatter)
         {
+            _tableFormatter = tableFormatter;
             _stepRegistry = stepRegistry;
             _methodExecutor = methodExecutor;
-            _assemblyLoader = assemblyLoader;
         }
 
         [DebuggerHidden]
@@ -65,24 +61,10 @@ namespace Gauge.CSharp.Runner.Processors
 
             for (var i = 0; i < parameters; i++)
                 args[i] = validTableParamTypes.Contains(stepParameter[i].ParameterType)
-                    ? GetTableData(stepParameter[i].Table)
+                    ? _tableFormatter.GetJSON(stepParameter[i].Table)
                     : stepParameter[i].Value;
             var protoExecutionResult = _methodExecutor.Execute(method, args);
             return WrapInMessage(protoExecutionResult, request);
-        }
-
-        private string GetTableData(ProtoTable table)
-        {
-            Type tableType = _assemblyLoader.GetLibType(LibType.Table);
-            dynamic table1 = Activator.CreateInstance(tableType, table.Headers.Cells.ToList());
-            foreach (var protoTableRow in table.Rows)
-                table1.AddRow(protoTableRow.Cells.ToList());
-            var serializer = new DataContractJsonSerializer(tableType);
-            using (var memoryStream = new MemoryStream())
-            {
-                serializer.WriteObject(memoryStream, table1);
-                return Encoding.UTF8.GetString(memoryStream.ToArray());
-            }
         }
 
         private static Message ExecutionError(string errorMessage, Message request)

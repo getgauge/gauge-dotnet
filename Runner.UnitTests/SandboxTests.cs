@@ -24,7 +24,6 @@ using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Wrappers;
 using Moq;
 using NUnit.Framework;
-using Runner.Wrappers;
 
 namespace Gauge.CSharp.Runner.UnitTests
 {

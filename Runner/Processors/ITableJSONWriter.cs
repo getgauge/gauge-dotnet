@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
+using Gauge.Messages;
 
-namespace Gauge.CSharp.Runner.Wrappers
+namespace Gauge.CSharp.Runner.Processors
 {
-    public interface IActivatorWrapper
+    public interface ITableFormatter
     {
-        object CreateInstance(Type t, params object[] args);
+        string GetJSON(ProtoTable table);
     }
 }

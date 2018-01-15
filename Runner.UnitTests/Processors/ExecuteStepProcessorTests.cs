@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Json;
-using System.Text;
+using System.Linq;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
+using Gauge.CSharp.Runner.Wrappers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
@@ -65,10 +65,11 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             mockMethodExecutor.Setup(e => e.Execute(fooMethodInfo, It.IsAny<string[]>()))
                 .Returns(() => new ProtoExecutionResult {ExecutionTime = 1, Failed = false});
 
-            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
+            var mockTableFormatter = new Mock<ITableFormatter>();
+
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockAssemblyLoader.Object).Process(request);
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockTableFormatter.Object)
+                .Process(request);
 
             Assert.False(response.ExecutionStatusResponse.ExecutionResult.Failed);
         }
@@ -80,13 +81,7 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         {
             const string parsedStepText = "Foo";
             var protoTable = new ProtoTable();
-            var headers = new ProtoTableRow();
-            headers.Cells.AddRange(new List<string> {"foo", "bar"});
-            protoTable.Headers = headers;
-            var row = new ProtoTableRow();
-            row.Cells.AddRange(new List<string> {"foorow1", "foorow2"});
-            protoTable.Rows.AddRange(new List<ProtoTableRow> {row});
-
+            var tableJSON = "{'headers':['foo', 'bar'],'rows':[['foorow1','barrow1']]}";
             var request = new Message
             {
                 MessageType = Message.Types.MessageType.ExecuteStep,
@@ -120,11 +115,15 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
 
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
+            var mockTableFormatter = new Mock<ITableFormatter>();
+            mockTableFormatter.Setup(x => x.GetJSON(protoTable))
+                .Returns(tableJSON);
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockAssemblyLoader.Object).Process(request);
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockTableFormatter.Object)
+                .Process(request);
 
             mockMethodExecutor.Verify(executor =>
-                executor.Execute(fooMethodInfo, It.Is<string[]>(strings => strings[0]=="")));
+                executor.Execute(fooMethodInfo, It.Is<string[]>(strings => strings[0]== tableJSON)));
             Assert.False(response.ExecutionStatusResponse.ExecutionResult.Failed);
         }
 
@@ -148,10 +147,11 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             mockStepRegistry.Setup(x => x.MethodFor(parsedStepText)).Returns(fooMethod);
             var mockMethodExecutor = new Mock<IMethodExecutor>();
 
-            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
+            var mockTableFormatter = new Mock<ITableFormatter>();
+
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockAssemblyLoader.Object).Process(request);
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockTableFormatter.Object)
+                .Process(request);
 
             Assert.True(response.ExecutionStatusResponse.ExecutionResult.Failed);
             Assert.AreEqual(response.ExecutionStatusResponse.ExecutionResult.ErrorMessage,
@@ -175,11 +175,11 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             var mockStepRegistry = new Mock<IStepRegistry>();
             mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(false);
             var mockMethodExecutor = new Mock<IMethodExecutor>();
+            var mockTableFormatter = new Mock<ITableFormatter>();
 
-            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockAssemblyLoader.Object).Process(request);
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockTableFormatter.Object)
+                .Process(request);
 
             Assert.True(response.ExecutionStatusResponse.ExecutionResult.Failed);
             Assert.AreEqual(response.ExecutionStatusResponse.ExecutionResult.ErrorMessage,

@@ -17,8 +17,8 @@
 
 using Gauge.CSharp.Core;
 using Gauge.CSharp.Runner.Models;
+using Gauge.CSharp.Runner.Processors;
 using Gauge.CSharp.Runner.Wrappers;
-using Runner.Wrappers;
 
 namespace Gauge.CSharp.Runner
 {
@@ -34,9 +34,10 @@ namespace Gauge.CSharp.Runner
                     using (var apiConnection = new GaugeApiConnection(new TcpClientWrapper(Utils.GaugeApiPort)))
                     {
                         var assemblyLoader = new AssemblyLoader();
-                        var sandBox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
+                        var activatorWrapper = new ActivatorWrapper();
+                        var sandBox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, new ReflectionWrapper());
                         var methodScanner = new MethodScanner(apiConnection, sandBox);
-                        var messageProcessorFactory = new MessageProcessorFactory(methodScanner, sandBox, assemblyLoader);
+                        var messageProcessorFactory = new MessageProcessorFactory(methodScanner, sandBox, assemblyLoader, activatorWrapper, new TableFormatter(assemblyLoader, activatorWrapper));
                         return new StartCommand(() => new GaugeListener(messageProcessorFactory), () => new GaugeProjectBuilder());
                     }
             }
