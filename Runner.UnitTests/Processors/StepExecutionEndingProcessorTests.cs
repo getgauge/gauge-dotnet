@@ -35,10 +35,6 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         private Message _request;
         private StepExecutionEndingProcessor _stepExecutionEndingProcessor;
 
-        public void Foo()
-        {
-        }
-
         [SetUp]
         public void Setup()
         {

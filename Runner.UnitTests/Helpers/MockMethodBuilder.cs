@@ -52,9 +52,16 @@ namespace Gauge.CSharp.Runner.UnitTests.Helpers
             methodAttributes = new List<object>();
         }
 
+        internal MockMethodBuilder WithDeclaringTypeName(string name)
+        {
+            var declaringType = new Mock<Type>();
+            declaringType.Setup(x => x.FullName).Returns(name);
+            mockMethod.Setup(x => x.DeclaringType).Returns(declaringType.Object);
+            return this;
+        }
+
         public MethodInfo Build()
         {
-            mockMethod.Setup(x => x.DeclaringType).Returns(default(Type));
             mockMethod.Setup(x => x.GetCustomAttributes(false)).Returns(methodAttributes.ToArray());
             return mockMethod.Object;
         }
