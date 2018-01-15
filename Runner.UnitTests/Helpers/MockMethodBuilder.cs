@@ -28,6 +28,8 @@ namespace Gauge.CSharp.Runner.UnitTests.Helpers
         private Mock<MethodInfo> mockMethod;
         private readonly Mock<IAssemblyLoader> mockAssemblyLoader;
         private List<object> methodAttributes;
+        private Mock<Type> mockContinueOnFailureType;
+        private Mock<Type> mockStepType;
 
         private class TestFilteredHook
         {
@@ -50,6 +52,10 @@ namespace Gauge.CSharp.Runner.UnitTests.Helpers
             mockMethod = new Mock<MethodInfo>();
             this.mockAssemblyLoader = mockAssemblyLoader;
             methodAttributes = new List<object>();
+            mockContinueOnFailureType = new Mock<Type>();
+            mockStepType = new Mock<Type>();
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ContinueOnFailure)).Returns(mockContinueOnFailureType.Object);
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.Step)).Returns(mockStepType.Object);
         }
 
         internal MockMethodBuilder WithDeclaringTypeName(string name)
@@ -80,20 +86,16 @@ namespace Gauge.CSharp.Runner.UnitTests.Helpers
 
         public MockMethodBuilder WithStep(params string[] stepTexts)
         {
-            var mockStepType = new Mock<Type>();
             var step = new TestStep { Names = stepTexts };
             mockStepType.Setup(x => x.IsInstanceOfType(step)).Returns(true);
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.Step)).Returns(mockStepType.Object);
             methodAttributes.Add(step);
             return this;
         }
 
         public MockMethodBuilder WithContinueOnFailure()
         {
-            var mockContinueOnFailureType = new Mock<Type>();
             var continueOnFailure = new TestContinueOnFailure();
             mockContinueOnFailureType.Setup(x => x.IsInstanceOfType(continueOnFailure)).Returns(true);
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ContinueOnFailure)).Returns(mockContinueOnFailureType.Object);
             methodAttributes.Add(continueOnFailure);
             return this;
         }

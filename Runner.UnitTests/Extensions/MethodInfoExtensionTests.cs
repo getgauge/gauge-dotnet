@@ -19,6 +19,7 @@ using Gauge.CSharp.Runner.Extensions;
 using Gauge.CSharp.Runner.UnitTests.Helpers;
 using Moq;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 
 namespace Gauge.CSharp.Runner.UnitTests.Extensions
@@ -47,6 +48,7 @@ namespace Gauge.CSharp.Runner.UnitTests.Extensions
             var assemblyLoader = new Mock<IAssemblyLoader>();
             var fooMethod = new MockMethodBuilder(assemblyLoader)
                 .WithName("Foo")
+                .WithDeclaringTypeName("My.Test.Type")
                 .WithStep("Foo")
                 .Build();
 
@@ -60,8 +62,9 @@ namespace Gauge.CSharp.Runner.UnitTests.Extensions
             var barMethod = new MockMethodBuilder(assemblyLoader)
                 .WithName("Bar")
                 .WithStep("Bar")
+                .WithDeclaringTypeName("My.Test.Type")
                 .WithContinueOnFailure()
-                .WithParameters(new KeyValuePair<string, string>("string", "Bar"))
+                .WithParameters(new KeyValuePair<string, string>("String", "bar"))
                 .Build();
 
             Assert.AreEqual("My.Test.Type.Bar-Stringbar", barMethod.FullyQuallifiedName());
