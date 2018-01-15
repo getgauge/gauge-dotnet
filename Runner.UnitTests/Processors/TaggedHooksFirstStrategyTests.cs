@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Gauge.CSharp.Runner.Extensions;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.CSharp.Runner.UnitTests.Helpers;
@@ -37,8 +36,9 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             {
                 var mockAssemblyLoader = new Mock<IAssemblyLoader>();
                 var method = new MockMethodBuilder(mockAssemblyLoader)
-                    .WithName("Foo")
+                    .WithName(name)
                     .WithTagAggregation(aggregation)
+                    .WithDeclaringTypeName("my.foo.type")
                     .WithFilteredHook(LibType.AfterScenario, tags)
                     .Build();
 
@@ -50,9 +50,9 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             {
                 Create("Foo", 0, "Foo"),
                 Create("Bar", 0, "Bar", "Baz"),
-                Create("Zed", 1, "Foo", "Baz"),
+                Create("Baz", 1, "Foo", "Baz"),
                 Create("Blah"),
-                Create("Baz"),
+                Create("Zed"),
             };
         }
 
@@ -94,11 +94,10 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
          */
         private HashSet<IHookMethod> _hookMethods;
 
-
         [Test]
         public void ShouldFetchTaggedHooksInSortedOrder()
         {
-            var untaggedHooks = new[] {"Blah", "Zed"}.Select(s => GetType().GetMethod(s).FullyQuallifiedName());
+            var untaggedHooks = new[] {"my.foo.type.Blah", "my.foo.type.Zed"};
 
             var applicableHooks = new TaggedHooksFirstStrategy()
                 .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToArray();
@@ -110,9 +109,9 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         [Test]
         public void ShouldFetchUntaggedHooksAfterTaggedHooks()
         {
-            var taggedHooks = new[] {"Baz", "Foo"};
-            var untaggedHooks = new[] {"Blah", "Zed"};
-            var expected = taggedHooks.Concat(untaggedHooks).Select(s => GetType().GetMethod(s).FullyQuallifiedName());
+            var taggedHooks = new[] { "my.foo.type.Baz", "my.foo.type.Foo" };
+            var untaggedHooks = new[] { "my.foo.type.Blah", "my.foo.type.Zed" };
+            var expected = taggedHooks.Concat(untaggedHooks);
 
             var applicableHooks = new TaggedHooksFirstStrategy()
                 .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToList();
@@ -120,15 +119,14 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             Assert.AreEqual(expected, applicableHooks);
         }
 
-
         [Test]
         public void ShouldFetchUntaggedHooksInSortedOrder()
         {
             var applicableHooks = new TaggedHooksFirstStrategy()
                 .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToList();
 
-            Assert.That(applicableHooks[0], Is.EqualTo(GetType().GetMethod("Baz").FullyQuallifiedName()));
-            Assert.That(applicableHooks[1], Is.EqualTo(GetType().GetMethod("Foo").FullyQuallifiedName()));
+            Assert.That(applicableHooks[0], Is.EqualTo("my.foo.type.Baz"));
+            Assert.That(applicableHooks[1], Is.EqualTo("my.foo.type.Foo"));
         }
     }
 }

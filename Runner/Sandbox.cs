@@ -168,8 +168,8 @@ namespace Gauge.CSharp.Runner
             _classInstanceManager.CloseScope();
         }
 
-//        [DebuggerStepperBoundary]
-        //[DebuggerHidden]
+        [DebuggerStepperBoundary]
+        [DebuggerHidden]
         public ExecutionResult ExecuteHooks(string hookType, IHooksStrategy strategy, IList<string> applicableTags)
         {
             var methods = GetHookMethods(hookType, strategy, applicableTags);
@@ -214,7 +214,7 @@ namespace Gauge.CSharp.Runner
             }
         }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         private void ExecuteHook(MethodInfo method, params object[] objects)
         {
             if (HasArguments(method, objects))

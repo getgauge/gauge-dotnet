@@ -105,7 +105,7 @@ namespace Gauge.CSharp.Runner.UnitTests.Helpers
 
             var mockHookType = new Mock<Type>();
             mockHookType.Setup(x => x.IsSubclassOf(mockFilteredHook.Object)).Returns(true);
-            var hookAttribute = new TestFilteredHook { FilterTags = tags };
+            var hookAttribute = new TestFilteredHook { FilterTags = tags.Length > 0 ? tags: null };
             mockHookType.Setup(x => x.IsInstanceOfType(It.IsAny<TestFilteredHook>())).Returns(true);
             mockAssemblyLoader.Setup(a => a.GetLibType(hook)).Returns(mockHookType.Object);
 
