@@ -19,7 +19,7 @@ using System.IO;
 
 namespace Gauge.CSharp.Runner.Wrappers
 {
-    internal class FileWrapper : IFileWrapper
+    public class FileWrapper : IFileWrapper
     {
         public bool Exists(string path)
         {

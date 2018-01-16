@@ -19,7 +19,7 @@ using System.Reflection;
 
 namespace Gauge.CSharp.Runner.Wrappers
 {
-    internal class AssemblyWrapper : IAssemblyWrapper
+    public class AssemblyWrapper : IAssemblyWrapper
     {
         public Assembly[] GetCurrentDomainAssemblies()
         {

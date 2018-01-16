@@ -40,6 +40,7 @@ namespace Gauge.CSharp.Runner
                 ScanAndLoad(location);
 
             LoadTargetLibAssembly();
+            SetDefaultTypes();
         }
 
         public List<Assembly> AssembliesReferencingGaugeLib { get; }
@@ -69,32 +70,36 @@ namespace Gauge.CSharp.Runner
                 return;
 
             AssembliesReferencingGaugeLib.Add(assembly);
-            var types = assembly.GetTypes();
 
             if (ScreengrabberType is null)
-                ScanForScreengrabber(types);
+                ScanForCustomScreengrabber(assembly.GetTypes());
 
             if (ClassInstanceManagerType is null)
-                ScanForInstanceManager(types);
+                ScanForCustomInstanceManager(assembly.GetTypes());
         }
 
-        private void ScanForScreengrabber(IEnumerable<Type> types)
+        private void ScanForCustomScreengrabber(IEnumerable<Type> types)
         {
             var implementingTypes = types.Where(type =>
                 type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.IScreenGrabber"));
-            ScreengrabberType = implementingTypes.FirstOrDefault() ?? _targetLibAssembly.GetType(LibType.DefaultScreenGrabber.FullName());
+            ScreengrabberType = implementingTypes.FirstOrDefault();
         }
 
-        private void ScanForInstanceManager(IEnumerable<Type> types)
+        private void ScanForCustomInstanceManager(IEnumerable<Type> types)
         {
             var implementingTypes = types.Where(type =>
                 type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.IClassInstanceManager"));
-            ClassInstanceManagerType = implementingTypes.FirstOrDefault() ?? _targetLibAssembly.GetType(LibType.DefaultClassInstanceManager.FullName());
+            ClassInstanceManagerType = implementingTypes.FirstOrDefault();
         }
 
+        private void SetDefaultTypes()
+        {
+            ClassInstanceManagerType = ClassInstanceManagerType ?? _targetLibAssembly.GetType(LibType.DefaultClassInstanceManager.FullName());
+            ScreengrabberType = ScreengrabberType ?? _targetLibAssembly.GetType(LibType.DefaultScreenGrabber.FullName());
+        }
         private void LoadTargetLibAssembly()
         {            
-            _targetLibAssembly = _assemblyWrapper.GetCurrentDomainAssemblies().First(x => string.CompareOrdinal(x.GetName().Name, GaugeLibAssembleName) == 0);
+            _targetLibAssembly = _assemblyWrapper.GetCurrentDomainAssemblies().First(x =>  string.CompareOrdinal(x.GetName().Name, GaugeLibAssembleName) == 0);
         }
 
         public Type GetLibType(LibType type)

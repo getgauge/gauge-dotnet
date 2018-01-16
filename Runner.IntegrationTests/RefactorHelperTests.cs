@@ -25,7 +25,6 @@ using Gauge.CSharp.Runner.Wrappers;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
-using Runner.Wrappers;
 
 namespace Gauge.CSharp.Runner.IntegrationTests
 {
@@ -94,8 +93,10 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         public void ShouldAddParameters()
         {
             const string newStepValue = "Refactoring Say <what> to <who> in <where>";
-            var assemblyLoader = new AssemblyLoader();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
+            var reflectionWrapper = new ReflectionWrapper();
+            var activatorWrapper = new ActivatorWrapper();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
 
             var gaugeMethod = sandbox.GetStepMethods().First(info =>
                 info.Name == "IntegrationTestSample.RefactoringSample.RefactoringSaySomething-StringwhatStringwho");
@@ -112,8 +113,11 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         public void ShouldAddParametersWhenNoneExisted()
         {
             const string newStepValue = "Refactoring this is a test step <foo>";
-            var assemblyLoader = new AssemblyLoader();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
+            var reflectionWrapper = new ReflectionWrapper();
+            var activatorWrapper = new ActivatorWrapper();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
+
             var gaugeMethod = sandbox.GetStepMethods().First(info =>
                 info.Name == "IntegrationTestSample.RefactoringSample.RefactoringSampleTest");
             var parameterPositions = new[] {new Tuple<int, int>(-1, 0)};
@@ -127,8 +131,11 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void ShouldAddParametersWithReservedKeywordName()
         {
-            const string newStepValue = "Refactoring this is a test step <class>"; var assemblyLoader = new AssemblyLoader();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
+            const string newStepValue = "Refactoring this is a test step <class>";
+            var reflectionWrapper = new ReflectionWrapper();
+            var activatorWrapper = new ActivatorWrapper();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
 
             var gaugeMethod = sandbox.GetStepMethods().First(info =>
                 info.Name == "IntegrationTestSample.RefactoringSample.RefactoringSampleTest");
@@ -143,8 +150,10 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void ShouldRefactorAndReturnFilesChanged()
         {
-            var assemblyLoader = new AssemblyLoader();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
+            var reflectionWrapper = new ReflectionWrapper();
+            var activatorWrapper = new ActivatorWrapper();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
             var gaugeMethod = sandbox.GetStepMethods().First(info =>
                 info.Name == "IntegrationTestSample.RefactoringSample.RefactoringContext");
             var expectedPath = Path.GetFullPath(Path.Combine(_testProjectPath, "RefactoringSample.cs"));
@@ -158,8 +167,10 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void ShouldRefactorAttributeText()
         {
-            var assemblyLoader = new AssemblyLoader();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
+            var reflectionWrapper = new ReflectionWrapper();
+            var activatorWrapper = new ActivatorWrapper();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
             var gaugeMethod = sandbox.GetStepMethods().First(info =>
                 info.Name == "IntegrationTestSample.RefactoringSample.RefactoringContext");
 
@@ -171,8 +182,10 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void ShouldRemoveParameters()
         {
-            var assemblyLoader = new AssemblyLoader();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
+            var reflectionWrapper = new ReflectionWrapper();
+            var activatorWrapper = new ActivatorWrapper();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
             var gaugeMethod = sandbox.GetStepMethods().First(info =>
                 info.Name == "IntegrationTestSample.RefactoringSample.RefactoringSaySomething-StringwhatStringwho");
 
@@ -186,8 +199,10 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         [Test]
         public void ShouldRemoveParametersInAnyOrder()
         {
-            var assemblyLoader = new AssemblyLoader();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
+            var reflectionWrapper = new ReflectionWrapper();
+            var activatorWrapper = new ActivatorWrapper();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
             var gaugeMethod = sandbox.GetStepMethods().First(info =>
                 info.Name == "IntegrationTestSample.RefactoringSample.RefactoringSaySomething-StringwhatStringwho");
 
@@ -203,8 +218,10 @@ namespace Gauge.CSharp.Runner.IntegrationTests
         public void ShouldReorderParameters()
         {
             const string newStepValue = "Refactoring Say <who> to <what>";
-            var assemblyLoader = new AssemblyLoader();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), new ReflectionWrapper());
+            var reflectionWrapper = new ReflectionWrapper();
+            var activatorWrapper = new ActivatorWrapper();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
             var gaugeMethod = sandbox.GetStepMethods().First(info =>
                 info.Name == "IntegrationTestSample.RefactoringSample.RefactoringSaySomething-StringwhatStringwho");
 
