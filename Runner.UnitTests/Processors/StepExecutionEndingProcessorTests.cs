@@ -15,12 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.CSharp.Runner.UnitTests.Helpers;
+using Gauge.CSharp.Runner.Wrappers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
@@ -41,7 +44,9 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             var mockHookRegistry = new Mock<IHookRegistry>();
             var mockSandbox = new Mock<ISandbox>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
+            var mockMessageCollectorType = new Mock<Type>();
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector))
+                .Returns(mockMessageCollectorType.Object);
             var mockMethod = new MockMethodBuilder(mockAssemblyLoader)
                 .WithName("Foo")
                 .WithFilteredHook(LibType.BeforeSpec)
@@ -71,12 +76,15 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             {
                 ExecutionTime = 0,
                 Failed = false,
-                Message = {_pendingMessages}
+                Message = {}
             };
             _mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("AfterStep", It.IsAny<TaggedHooksFirstStrategy>(), new List<string>()))
                 .Returns(_protoExecutionResult);
-            _stepExecutionEndingProcessor = new StepExecutionEndingProcessor(_mockMethodExecutor.Object, mockAssemblyLoader.Object);
+            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
+            mockReflectionWrapper.Setup(x => x.InvokeMethod(mockMessageCollectorType.Object, null, "GetAllPendingMessages", BindingFlags.Static | BindingFlags.Public))
+                .Returns(_pendingMessages);
+            _stepExecutionEndingProcessor = new StepExecutionEndingProcessor(_mockMethodExecutor.Object, mockAssemblyLoader.Object, mockReflectionWrapper.Object);
         }
 
         [Test]

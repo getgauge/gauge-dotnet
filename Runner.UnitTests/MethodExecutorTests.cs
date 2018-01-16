@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using Gauge.CSharp.Core;
 using Gauge.CSharp.Runner.Models;
@@ -137,13 +138,15 @@ namespace Gauge.CSharp.Runner.UnitTests
                 ExceptionMessage = "error",
                 StackTrace = "stacktrace"
             });
-
+            var expectedScreenshot = Encoding.UTF8.GetBytes("TestScreenshot");
+            mockSandBox.Setup(x => x.TryScreenCapture(out expectedScreenshot))
+                .Returns(true)
+                .Verifiable();
             var executionResult = new MethodExecutor(mockSandBox.Object).Execute(gaugeMethod, args);
 
             mockSandBox.VerifyAll();
             Assert.True(executionResult.Failed);
-            Assert.True(executionResult.ScreenShot != null);
-            Assert.True(executionResult.ScreenShot.Length > 0);
+            Assert.AreEqual(expectedScreenshot, executionResult.ScreenShot);
         }
 
         [Test]

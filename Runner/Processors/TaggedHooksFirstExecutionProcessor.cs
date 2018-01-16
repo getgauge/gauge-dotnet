@@ -16,13 +16,14 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using Gauge.CSharp.Runner.Strategy;
+using Gauge.CSharp.Runner.Wrappers;
 
 namespace Gauge.CSharp.Runner.Processors
 {
     public abstract class TaggedHooksFirstExecutionProcessor : HookExecutionProcessor
     {
-        protected TaggedHooksFirstExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader)
-            : base(methodExecutor, assemblyLoader)
+        protected TaggedHooksFirstExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
+            : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
             Strategy = new TaggedHooksFirstStrategy();
         }

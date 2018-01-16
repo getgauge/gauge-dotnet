@@ -18,13 +18,15 @@
 using System;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.CSharp.Runner.Strategy;
+using Gauge.CSharp.Runner.Wrappers;
 using Gauge.Messages;
 
 namespace Gauge.CSharp.Runner.UnitTests.Processors.Stubs
 {
     public class TestHooksExecutionProcessor : HookExecutionProcessor
     {
-        public TestHooksExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader) : base(methodExecutor, assemblyLoader)
+        public TestHooksExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper) 
+            : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
         }
 

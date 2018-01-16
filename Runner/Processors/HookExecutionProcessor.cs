@@ -22,6 +22,7 @@ using System.Linq;
 using System.Reflection;
 using Gauge.CSharp.Core;
 using Gauge.CSharp.Runner.Strategy;
+using Gauge.CSharp.Runner.Wrappers;
 using Gauge.Messages;
 
 namespace Gauge.CSharp.Runner.Processors
@@ -34,11 +35,13 @@ namespace Gauge.CSharp.Runner.Processors
         protected const string ScenarioLevel = "scenario";
         private readonly Type _messageCollectorType;
         protected readonly IMethodExecutor MethodExecutor;
+        private readonly IReflectionWrapper _reflectionWrapper;
 
-        protected HookExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader)
+        protected HookExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
         {
             _messageCollectorType = assemblyLoader.GetLibType(LibType.MessageCollector); 
             MethodExecutor = methodExecutor;
+            _reflectionWrapper = reflectionWrapper;
             Strategy = new HooksStrategy();
         }
 
@@ -78,17 +81,13 @@ namespace Gauge.CSharp.Runner.Processors
 
         public virtual IEnumerable<string> GetAllPendingMessages()
         {
-            var targetMethod = _messageCollectorType.GetMethod("GetAllPendingMessages",
-               BindingFlags.Static | BindingFlags.Public);
-            return targetMethod.Invoke(null, null) as IEnumerable<string>;
+            return _reflectionWrapper.InvokeMethod(_messageCollectorType, null, "GetAllPendingMessages", BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>;
         }
 
 
         public virtual void ClearAllPendingMessages()
         {
-            var targetMethod = _messageCollectorType.GetMethod("Clear",
-               BindingFlags.Static | BindingFlags.Public);
-            targetMethod.Invoke(null, null);
+            _reflectionWrapper.InvokeMethod(_messageCollectorType, null, "Clear", BindingFlags.Static | BindingFlags.Public);
         }
     }
 }

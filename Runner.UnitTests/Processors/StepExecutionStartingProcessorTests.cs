@@ -15,11 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.CSharp.Runner.Strategy;
+using Gauge.CSharp.Runner.Wrappers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
@@ -60,10 +63,17 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             var hookRegistry = new Mock<IHookRegistry>();
             hookRegistry.Setup(registry => registry.BeforeStepHooks).Returns(new HashSet<IHookMethod>());
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
-            var processor = new StepExecutionStartingProcessor(methodExecutor.Object, mockAssemblyLoader.Object);
+            var mockMessageCollectorType = new Mock<Type>();
+            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
+            mockReflectionWrapper.Setup(x => x.InvokeMethod(mockMessageCollectorType.Object, null, "Clear", BindingFlags.Static | BindingFlags.Public))
+                .Verifiable();
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector))
+                .Returns(mockMessageCollectorType.Object);
+
+            var processor = new StepExecutionStartingProcessor(methodExecutor.Object, mockAssemblyLoader.Object, mockReflectionWrapper.Object);
             processor.Process(request);
-            Assert.IsEmpty(processor.GetAllPendingMessages());
+
+            mockReflectionWrapper.VerifyAll();
         }
 
         [Test]

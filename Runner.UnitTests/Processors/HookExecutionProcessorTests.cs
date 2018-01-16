@@ -23,6 +23,7 @@ using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.CSharp.Runner.UnitTests.Helpers;
 using Gauge.CSharp.Runner.UnitTests.Processors.Stubs;
+using Gauge.CSharp.Runner.Wrappers;
 using Moq;
 using NUnit.Framework;
 
@@ -196,7 +197,8 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         {
             var assemblyLoader = new Mock<IAssemblyLoader>();
             assemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
-            var hooksStrategy = new TestHooksExecutionProcessor(null, assemblyLoader.Object).GetHooksStrategy();
+            var reflectionWrapper = new Mock<IReflectionWrapper>();
+            var hooksStrategy = new TestHooksExecutionProcessor(null, assemblyLoader.Object, reflectionWrapper.Object).GetHooksStrategy();
 
             Assert.IsInstanceOf<HooksStrategy>(hooksStrategy);
         }
@@ -206,7 +208,8 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         {
             var assemblyLoader = new Mock<IAssemblyLoader>();
             assemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
-            var hooksStrategy = new TestTaggedHooksFirstExecutionProcessor(null, assemblyLoader.Object).GetHooksStrategy();
+            var reflectionWrapper = new Mock<IReflectionWrapper>();
+            var hooksStrategy = new TestTaggedHooksFirstExecutionProcessor(null, assemblyLoader.Object, reflectionWrapper.Object).GetHooksStrategy();
 
             Assert.IsInstanceOf<TaggedHooksFirstStrategy>(hooksStrategy);
         }
@@ -216,7 +219,8 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
         {
             var assemblyLoader = new Mock<IAssemblyLoader>();
             assemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
-            var hooksStrategy = new TestUntaggedHooksFirstExecutionProcessor(null, assemblyLoader.Object).GetHooksStrategy();
+            var reflectionWrapper = new Mock<IReflectionWrapper>();
+            var hooksStrategy = new TestUntaggedHooksFirstExecutionProcessor(null, assemblyLoader.Object, reflectionWrapper.Object).GetHooksStrategy();
 
             Assert.IsInstanceOf<UntaggedHooksFirstStrategy>(hooksStrategy);
         }

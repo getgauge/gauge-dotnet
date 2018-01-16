@@ -17,14 +17,15 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Gauge.CSharp.Runner.Wrappers;
 using Gauge.Messages;
 
 namespace Gauge.CSharp.Runner.Processors
 {
     public class ExecutionEndingProcessor : HookExecutionProcessor
     {
-        public ExecutionEndingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader) 
-            : base(methodExecutor, assemblyLoader)
+        public ExecutionEndingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper) 
+            : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
         }
 

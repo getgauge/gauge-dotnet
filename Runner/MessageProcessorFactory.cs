@@ -29,12 +29,14 @@ namespace Gauge.CSharp.Runner
         private readonly IMethodScanner _stepScanner;
         private Dictionary<Message.Types.MessageType, IMessageProcessor> _messageProcessorsDictionary;
         private readonly ITableFormatter _tableFormatter;
+        private readonly IReflectionWrapper _reflectionWrapper;
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly IActivatorWrapper _activatorWrapper;
 
-        public MessageProcessorFactory(IMethodScanner stepScanner, ISandbox sandbox, IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, ITableFormatter tableFormatter)
+        public MessageProcessorFactory(IMethodScanner stepScanner, ISandbox sandbox, IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, ITableFormatter tableFormatter, IReflectionWrapper reflectionWrapper)
         {
             _tableFormatter = tableFormatter;
+            _reflectionWrapper = reflectionWrapper;
             _assemblyLoader = assemblyLoader;
             _activatorWrapper = activatorWrapper;
             _stepScanner = stepScanner;
@@ -54,26 +56,26 @@ namespace Gauge.CSharp.Runner
             var methodExecutor = new MethodExecutor(_sandbox);
             var messageHandlers = new Dictionary<Message.Types.MessageType, IMessageProcessor>
             {
-                {Message.Types.MessageType.ExecutionStarting, new ExecutionStartingProcessor(methodExecutor, _assemblyLoader)},
-                {Message.Types.MessageType.ExecutionEnding, new ExecutionEndingProcessor(methodExecutor, _assemblyLoader)},
+                {Message.Types.MessageType.ExecutionStarting, new ExecutionStartingProcessor(methodExecutor, _assemblyLoader, _reflectionWrapper)},
+                {Message.Types.MessageType.ExecutionEnding, new ExecutionEndingProcessor(methodExecutor, _assemblyLoader, _reflectionWrapper)},
                 {
                     Message.Types.MessageType.SpecExecutionStarting,
-                    new SpecExecutionStartingProcessor(methodExecutor, _sandbox, _assemblyLoader)
+                    new SpecExecutionStartingProcessor(methodExecutor, _sandbox, _assemblyLoader, _reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.SpecExecutionEnding,
-                    new SpecExecutionEndingProcessor(methodExecutor, _sandbox, _assemblyLoader)
+                    new SpecExecutionEndingProcessor(methodExecutor, _sandbox, _assemblyLoader, _reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionStarting,
-                    new ScenarioExecutionStartingProcessor(methodExecutor, _sandbox, _assemblyLoader)
+                    new ScenarioExecutionStartingProcessor(methodExecutor, _sandbox, _assemblyLoader, _reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionEnding,
-                    new ScenarioExecutionEndingProcessor(methodExecutor, _sandbox, _assemblyLoader)
+                    new ScenarioExecutionEndingProcessor(methodExecutor, _sandbox, _assemblyLoader, _reflectionWrapper)
                 },
-                {Message.Types.MessageType.StepExecutionStarting, new StepExecutionStartingProcessor(methodExecutor, _assemblyLoader)},
-                {Message.Types.MessageType.StepExecutionEnding, new StepExecutionEndingProcessor(methodExecutor, _assemblyLoader)},
+                {Message.Types.MessageType.StepExecutionStarting, new StepExecutionStartingProcessor(methodExecutor, _assemblyLoader, _reflectionWrapper)},
+                {Message.Types.MessageType.StepExecutionEnding, new StepExecutionEndingProcessor(methodExecutor, _assemblyLoader, _reflectionWrapper)},
                 {Message.Types.MessageType.ExecuteStep, new ExecuteStepProcessor(stepRegistry, methodExecutor, _tableFormatter)},
                 {Message.Types.MessageType.KillProcessRequest, new KillProcessProcessor()},
                 {Message.Types.MessageType.StepNamesRequest, new StepNamesProcessor(_stepScanner)},

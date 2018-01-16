@@ -18,14 +18,15 @@
 using System.Diagnostics;
 using System.Threading;
 using Gauge.CSharp.Core;
+using Gauge.CSharp.Runner.Wrappers;
 using Gauge.Messages;
 
 namespace Gauge.CSharp.Runner.Processors
 {
     public class ExecutionStartingProcessor : HookExecutionProcessor
     {
-        public ExecutionStartingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader) 
-            : base(methodExecutor, assemblyLoader)
+        public ExecutionStartingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper) 
+            : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
         }
 

@@ -84,9 +84,7 @@ namespace Gauge.CSharp.Runner.UnitTests
                 .Returns(mockInstanceManager.Object);
 
             reflectionWrapper = new Mock<IReflectionWrapper>();
-            reflectionWrapper.Setup(x => x.GetMethod(instanceManagerType.Object, "Initialize"))
-                .Returns(mockInitMethod.Object);
-            reflectionWrapper.Setup(x => x.Invoke(mockInitMethod.Object, mockInstanceManager.Object, It.IsAny<object[]>()));
+            reflectionWrapper.Setup(x => x.InvokeMethod(instanceManagerType.Object, mockInstanceManager.Object, "Initialize", It.IsAny<object[]>()));
             _mockHookRegistry = new Mock<IHookRegistry>();
             var mockHookMethod = new Mock<IHookMethod>();
             var mockHookMethodType = new Mock<Type>();
@@ -100,12 +98,9 @@ namespace Gauge.CSharp.Runner.UnitTests
             var mockType = new Mock<Type>();
             mockInstance = new Mock<object>();
             mockHookMethodInfo = new Mock<MethodInfo>();
-            var mockGetInstanceMethod = new Mock<MethodInfo>();
             mockHookMethodInfo.Setup(x => x.DeclaringType).Returns(mockType.Object);
 
-            reflectionWrapper.Setup(x => x.GetMethod(instanceManagerType.Object, "Get"))
-                .Returns(mockGetInstanceMethod.Object);
-            reflectionWrapper.Setup(x => x.Invoke(mockGetInstanceMethod.Object, mockInstanceManager.Object, mockType.Object))
+            reflectionWrapper.Setup(x => x.InvokeMethod(instanceManagerType.Object, mockInstanceManager.Object, "Get", mockType.Object))
                 .Returns(mockInstance.Object);
         }
 

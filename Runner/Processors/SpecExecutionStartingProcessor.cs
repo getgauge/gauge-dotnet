@@ -17,6 +17,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Gauge.CSharp.Runner.Wrappers;
 using Gauge.Messages;
 
 namespace Gauge.CSharp.Runner.Processors
@@ -25,8 +26,8 @@ namespace Gauge.CSharp.Runner.Processors
     {
         private readonly ISandbox _sandbox;
 
-        public SpecExecutionStartingProcessor(IMethodExecutor methodExecutor, ISandbox sandbox, IAssemblyLoader assemblyLoader)
-            : base(methodExecutor, assemblyLoader)
+        public SpecExecutionStartingProcessor(IMethodExecutor methodExecutor, ISandbox sandbox, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
+            : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
             _sandbox = sandbox;
         }

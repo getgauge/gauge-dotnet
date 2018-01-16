@@ -38,8 +38,8 @@ namespace Gauge.CSharp.Runner.UnitTests
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
             var mockActivatorWrapper = new Mock<IActivatorWrapper>();
             var mockTableFormatter = new Mock<ITableFormatter>();
-
-            _messageProcessorFactory = new MessageProcessorFactory(mockMethodScanner.Object, mockSandBox.Object, mockAssemblyLoader.Object, mockActivatorWrapper.Object, mockTableFormatter.Object);
+            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
+            _messageProcessorFactory = new MessageProcessorFactory(mockMethodScanner.Object, mockSandBox.Object, mockAssemblyLoader.Object, mockActivatorWrapper.Object, mockTableFormatter.Object, mockReflectionWrapper.Object);
         }
 
         private MessageProcessorFactory _messageProcessorFactory;

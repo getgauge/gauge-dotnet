@@ -37,9 +37,10 @@ namespace Gauge.CSharp.Runner
                         {
                             var assemblyLoader = new AssemblyLoader();
                             var activatorWrapper = new ActivatorWrapper();
-                            var sandBox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, new ReflectionWrapper());
+                            var reflectionWrapper = new ReflectionWrapper();
+                            var sandBox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
                             var methodScanner = new MethodScanner(apiConnection, sandBox);
-                            var messageProcessorFactory = new MessageProcessorFactory(methodScanner, sandBox, assemblyLoader, activatorWrapper, new TableFormatter(assemblyLoader, activatorWrapper));
+                            var messageProcessorFactory = new MessageProcessorFactory(methodScanner, sandBox, assemblyLoader, activatorWrapper, new TableFormatter(assemblyLoader, activatorWrapper), reflectionWrapper);
                             return new GaugeListener(messageProcessorFactory);
                         }
                     },

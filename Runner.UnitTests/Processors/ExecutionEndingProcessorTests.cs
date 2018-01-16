@@ -20,6 +20,7 @@ using Gauge.CSharp.Runner.Models;
 using Gauge.CSharp.Runner.Processors;
 using Gauge.CSharp.Runner.Strategy;
 using Gauge.CSharp.Runner.UnitTests.Helpers;
+using Gauge.CSharp.Runner.Wrappers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
@@ -70,7 +71,8 @@ namespace Gauge.CSharp.Runner.UnitTests.Processors
             _mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("AfterSuite", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>()))
                 .Returns(_protoExecutionResult);
-            _executionEndingProcessor = new ExecutionEndingProcessor(_mockMethodExecutor.Object, mockAssemblyLoader.Object);
+            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
+            _executionEndingProcessor = new ExecutionEndingProcessor(_mockMethodExecutor.Object, mockAssemblyLoader.Object, mockReflectionWrapper.Object);
         }
 
         private ExecutionEndingProcessor _executionEndingProcessor;
