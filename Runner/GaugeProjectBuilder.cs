@@ -30,14 +30,15 @@ namespace Gauge.CSharp.Runner
         {
             var gaugeBinDir = Utils.GetGaugeBinDir();
             var csprojEnvVariable = Utils.TryReadEnvValue("GAUGE_CSHARP_PROJECT_FILE");
+            Logger.Info($"Building {csprojEnvVariable}");
             try
             {
                 var startInfo = new ProcessStartInfo {
                     WorkingDirectory = Utils.GaugeProjectRoot,
                     FileName="dotnet",
-                    Arguments=$"build --configuration=release --output=${gaugeBinDir} ${csprojEnvVariable}"
+                    Arguments=$"publish --configuration=release --output={gaugeBinDir} {csprojEnvVariable}"
                 };
-                var buildProcess = new Process { EnableRaisingEvents = true };
+                var buildProcess = new Process { EnableRaisingEvents = true, StartInfo = startInfo };
                 buildProcess.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
                 {
                     Logger.Info(e.Data);
@@ -46,6 +47,8 @@ namespace Gauge.CSharp.Runner
                 {
                     Logger.Error(e.Data);
                 };
+                buildProcess.Start();
+                buildProcess.WaitForExit();
             }
             catch (Exception ex)
             {
