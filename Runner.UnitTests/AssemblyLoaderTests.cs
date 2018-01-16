@@ -41,38 +41,48 @@ namespace Gauge.CSharp.Runner.UnitTests
             var mockStepAttribute = new Mock<Attribute>();
             _mockStepMethod.Setup(x => x.GetCustomAttributes(false))
                 .Returns(new[] { mockStepAttribute.Object });
-
-            mockType.Setup(t => t.GetMethods()).Returns(new[] { _mockStepMethod.Object });
-
+            mockType.Setup(x => x.IsInstanceOfType(mockStepAttribute.Object))
+                .Returns(true);
             var mockIClassInstanceManagerType = new Mock<Type>();
             mockIClassInstanceManagerType.Setup(x => x.FullName).Returns("Gauge.CSharp.Lib.IClassInstanceManager");
             _mockInstanceManagerType = new Mock<Type>();
             _mockInstanceManagerType.Setup(type => type.GetInterfaces())
                 .Returns(new[] {mockIClassInstanceManagerType.Object });
+            _mockInstanceManagerType.Setup(x => x.Name)
+                .Returns("TestInstanceManager");
 
             var mockIScreenGrabberType = new Mock<Type>();
-            mockIClassInstanceManagerType.Setup(x => x.FullName).Returns("Gauge.CSharp.Lib.IScreenGrabber");
+            mockIScreenGrabberType.Setup(x => x.FullName).Returns("Gauge.CSharp.Lib.IScreenGrabber");
             _mockScreenGrabberType = new Mock<Type>();
+            _mockScreenGrabberType.Setup(x => x.Name)
+                .Returns("TestScreenGrabber");
             _mockScreenGrabberType.Setup(x => x.GetInterfaces())
                 .Returns(new[] { mockIScreenGrabberType.Object });
-
+            var assemblyName = new AssemblyName("Gauge.CSharp.Lib");
             _mockAssembly.Setup(assembly => assembly.GetTypes())
                 .Returns(new[] {
                     mockType.Object,
                     _mockScreenGrabberType.Object ,
                     _mockInstanceManagerType.Object
                 });
+            _mockAssembly.Setup(x => x.GetName())
+                .Returns(assemblyName);
             _mockAssembly.Setup(assembly => assembly.GetType(_mockScreenGrabberType.Object.FullName))
                 .Returns(_mockScreenGrabberType.Object);
             _mockAssembly.Setup(assembly => assembly.GetType(_mockInstanceManagerType.Object.FullName))
                 .Returns(_mockInstanceManagerType.Object);
+            _mockAssembly.Setup(assembly => assembly.GetType(LibType.Step.FullName()))
+                .Returns(mockType.Object);
             _mockAssembly.Setup(assembly => assembly.GetReferencedAssemblies())
-                .Returns(new[] {new AssemblyName("Gauge.CSharp.Lib")});
+                .Returns(new[] {assemblyName});
             _mockAssemblyWrapper.Setup(x => x.LoadFrom(assemblyLocation))
                 .Returns(_mockAssembly.Object);
             _mockAssemblyWrapper.Setup(x => x.GetCurrentDomainAssemblies())
                 .Returns(new[] { _mockAssembly.Object });
-            _assemblyLoader = new AssemblyLoader(_mockAssemblyWrapper.Object, new[] {assemblyLocation});
+            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
+            mockReflectionWrapper.Setup(r => r.GetMethods(mockType.Object))
+                .Returns(new[] { _mockStepMethod.Object });
+            _assemblyLoader = new AssemblyLoader(_mockAssemblyWrapper.Object, new[] {assemblyLocation}, mockReflectionWrapper.Object);
         }
 
         [TearDown]
@@ -80,11 +90,6 @@ namespace Gauge.CSharp.Runner.UnitTests
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
-
-        //[Step()]
-        //public void DummyStepMethod()
-        //{
-        //}
 
         private Mock<Assembly> _mockAssembly;
         private AssemblyLoader _assemblyLoader;
@@ -103,13 +108,13 @@ namespace Gauge.CSharp.Runner.UnitTests
         [Test]
         public void ShouldGetClassInstanceManagerType()
         {
-            Assert.Equals(_mockInstanceManagerType.Object, _assemblyLoader.ClassInstanceManagerType);
+            Assert.AreEqual(_mockInstanceManagerType.Object.Name, _assemblyLoader.ClassInstanceManagerType.Name);
         }
 
         [Test]
         public void ShouldGetScreenGrabberType()
         {
-            Assert.Equals(_mockScreenGrabberType.Object, _assemblyLoader.ScreengrabberType);
+            Assert.AreEqual(_mockScreenGrabberType.Object.Name, _assemblyLoader.ScreengrabberType.Name);
         }
 
         [Test]
@@ -128,10 +133,11 @@ namespace Gauge.CSharp.Runner.UnitTests
         public void ShouldThrowExceptionWhenLibAssemblyNotFound()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TmpLocation);
+            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockAssemblyWrapper = new Mock<IAssemblyWrapper>();
             mockAssemblyWrapper.Setup(x => x.LoadFrom(TmpLocation)).Throws<FileNotFoundException>();
             Assert.Throws<FileNotFoundException>(() =>
-                new AssemblyLoader(mockAssemblyWrapper.Object, new[] {TmpLocation}));
+                new AssemblyLoader(mockAssemblyWrapper.Object, new[] {TmpLocation}, mockReflectionWrapper.Object));
         }
     }
 }

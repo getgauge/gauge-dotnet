@@ -23,6 +23,7 @@ namespace Gauge.CSharp.Runner.Wrappers
     public interface IReflectionWrapper
     {
         MethodInfo GetMethod(Type type, string methodName);
+        MethodInfo[] GetMethods(Type type);
         object Invoke(MethodInfo method, object obj, params object[] args);
         object InvokeMethod(Type type, object instance, string methodName, BindingFlags bindAttrs, params object[] args);
         object InvokeMethod(Type type, object instance, string methodName, params object[] args);

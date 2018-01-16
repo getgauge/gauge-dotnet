@@ -35,9 +35,9 @@ namespace Gauge.CSharp.Runner
                     {
                         using (var apiConnection = new GaugeApiConnection(new TcpClientWrapper(Utils.GaugeApiPort)))
                         {
-                            var assemblyLoader = new AssemblyLoader();
-                            var activatorWrapper = new ActivatorWrapper();
                             var reflectionWrapper = new ReflectionWrapper();
+                            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+                            var activatorWrapper = new ActivatorWrapper();
                             var sandBox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
                             var methodScanner = new MethodScanner(apiConnection, sandBox);
                             var messageProcessorFactory = new MessageProcessorFactory(methodScanner, sandBox, assemblyLoader, activatorWrapper, new TableFormatter(assemblyLoader, activatorWrapper), reflectionWrapper);
