@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Gauge.CSharp.Core;
 using Gauge.CSharp.Runner.Wrappers;
 
 namespace Gauge.CSharp.Runner
@@ -38,7 +39,7 @@ namespace Gauge.CSharp.Runner
 
         public IEnumerable<string> GetAllAssemblies()
         {
-            var assemblies = _directoryWrapper.EnumerateFiles(GetGaugeBinDir(), "*.dll", SearchOption.TopDirectoryOnly)
+            var assemblies = _directoryWrapper.EnumerateFiles(Utils.GetGaugeBinDir(), "*.dll", SearchOption.TopDirectoryOnly)
                 .ToList();
             var gaugeAdditionalLibsPath = Environment.GetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS");
             if (string.IsNullOrEmpty(gaugeAdditionalLibsPath))
@@ -55,25 +56,6 @@ namespace Gauge.CSharp.Runner
                 AddFilesFromDirectory(libPath, assemblies);
             }
             return assemblies;
-        }
-
-        public static string GetGaugeBinDir()
-        {
-            var customBuildPath = Environment.GetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH");
-            var GaugeProjectRoot = Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT");
-            if (string.IsNullOrEmpty(customBuildPath))
-                return Path.Combine(GaugeProjectRoot, "gauge-bin");
-            try
-            {
-                Uri result;
-                return Uri.TryCreate(customBuildPath, UriKind.Absolute, out result)
-                    ? customBuildPath
-                    : Path.Combine(GaugeProjectRoot, customBuildPath);
-            }
-            catch (Exception)
-            {
-                return Path.Combine(GaugeProjectRoot, "gauge-bin");
-            }
         }
 
         private void AddFilesFromDirectory(string path, List<string> assemblies)

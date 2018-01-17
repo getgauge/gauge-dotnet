@@ -1,0 +1,19 @@
+{
+  "id" : "csharp-netstandard",
+  "version" : "0.0.1",
+  "description": "C# support for gauge + .NET Core 2.0",
+  "run": {
+    "windows": ["dotnet.cmd", "--start"],
+    "linux": ["dotnet.sh", "--start"],
+    "darwin": ["dotnet.sh", "--start"]
+  },
+  "init": {
+    "windows": ["dotnet.cmd", "--init"],
+    "linux": ["dotnet.sh", "--init"],
+    "darwin": ["dotnet.sh", "--init"]
+  },
+  "gaugeVersionSupport": {
+      "minimum": "0.9.6",
+      "maximum": ""
+  }
+}

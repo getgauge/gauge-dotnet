@@ -1,8 +1,0 @@
-Gauge.CSharp.Core
-Microsoft.CodeAnalysis.Analyzers
-Microsoft.CodeAnalysis.Common
-Microsoft.CodeAnalysis.CSharp
-NLog
-NuGet.Core
-FAKE.Lib
-FSharp.Core

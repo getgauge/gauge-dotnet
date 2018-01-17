@@ -1,0 +1,1 @@
+dotnet bin\Runner.dll %*
