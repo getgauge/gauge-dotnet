@@ -4,7 +4,7 @@ for %%a in (%tasks%) do (
     if %1==%%a goto %1
 )
 
-echo Options: "[build | test | package | install]"
+echo Options: "[build | test | package | install | uninstall | forceinstall]"
 goto :eof
 
 :build
