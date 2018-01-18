@@ -3,14 +3,14 @@
   "version" : "0.0.1",
   "description": "C# support for gauge + .NET Core 2.0",
   "run": {
-    "windows": ["dotnet.cmd", "--start"],
-    "linux": ["dotnet.sh", "--start"],
-    "darwin": ["dotnet.sh", "--start"]
+    "windows": ["launcher.cmd", "--start"],
+    "linux": ["launcher.sh", "--start"],
+    "darwin": ["launcher.sh", "--start"]
   },
   "init": {
-    "windows": ["dotnet.cmd", "--init"],
-    "linux": ["dotnet.sh", "--init"],
-    "darwin": ["dotnet.sh", "--init"]
+    "windows": ["launcher.cmd", "--init"],
+    "linux": ["launcher.sh", "--init"],
+    "darwin": ["launcher.sh", "--init"]
   },
   "gaugeVersionSupport": {
       "minimum": "0.9.6",

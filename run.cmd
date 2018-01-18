@@ -8,11 +8,10 @@ echo Options: "[build | test | package | install | uninstall | forceinstall]"
 goto :eof
 
 :build
-    dotnet build
+    dotnet build -c release
     goto :eof
 
 :test
-    dotnet build
     dotnet test --no-build Runner.UnitTests\Runner.UnitTests.csproj
     dotnet test --no-build Runner.IntegrationTests\Runner.IntegrationTests.csproj
     goto :eof
@@ -20,8 +19,8 @@ goto :eof
 :package
     rmdir /s /q deploy artifacts
     dotnet publish -c release -o ..\deploy\bin Runner\Runner.csproj
-    cp Runner\dotnet.sh deploy
-    cp Runner\dotnet.cmd deploy
+    cp Runner\launcher.sh deploy
+    cp Runner\launcher.cmd deploy
     cp Runner\csharp-netstandard.json deploy
     mkdir artifacts
     call :powershell zip
@@ -32,13 +31,13 @@ goto :eof
     call :powershell install
     goto :eof
 
-:uninstall
-    call :powershell uninstall
-    goto :eof
-
 :forceinstall
     call :uninstall
     call :install
+    goto :eof
+
+:uninstall
+    call :powershell uninstall
     goto :eof
 
 :powershell
