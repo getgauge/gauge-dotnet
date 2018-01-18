@@ -30,7 +30,6 @@ namespace Gauge.CSharp.Runner
         {
             var gaugeBinDir = Utils.GetGaugeBinDir();
             var csprojEnvVariable = Utils.TryReadEnvValue("GAUGE_CSHARP_PROJECT_FILE");
-            Logger.Info($"Building {csprojEnvVariable}");
             try
             {
                 var startInfo = new ProcessStartInfo {
