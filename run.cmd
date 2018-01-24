@@ -21,7 +21,7 @@ goto :eof
     dotnet publish -c release -o ..\deploy\bin Runner\Runner.csproj
     cp Runner\launcher.sh deploy
     cp Runner\launcher.cmd deploy
-    cp Runner\csharp-netstandard.json deploy
+    cp Runner\dotnet.json deploy
     mkdir artifacts
     call :powershell zip
     goto :eof

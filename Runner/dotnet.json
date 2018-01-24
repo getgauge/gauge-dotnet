@@ -1,5 +1,5 @@
 {
-  "id" : "csharp-netstandard",
+  "id" : "dotnet",
   "version" : "0.0.1",
   "description": "C# support for gauge + .NET Core 2.0",
   "run": {
