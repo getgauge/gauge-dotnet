@@ -44,7 +44,7 @@ namespace Gauge.CSharp.Runner.Models
             dynamic tagAggregationBehaviourAttribute = customAttributes.FirstOrDefault(targetTagBehaviourType.IsInstanceOfType);
 
             if (tagAggregationBehaviourAttribute != null)
-                TagAggregation = GetPropValue(tagAggregationBehaviourAttribute, "TagAggregation");
+                TagAggregation = (int)GetPropValue(tagAggregationBehaviourAttribute, "TagAggregation");
         }
 
         public int TagAggregation { get; }
