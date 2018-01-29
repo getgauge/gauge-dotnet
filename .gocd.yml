@@ -74,7 +74,7 @@ pipelines:
                    command: cmd
                    arguments:
                     - /c
-                    - "%GAUGE_ROOT%\bin\gauge"
+                    - "%GAUGE_ROOT%/bin/gauge"
                     - uninstall
                     - dotnet
                - exec:
@@ -82,7 +82,7 @@ pipelines:
                    command: cmd
                    arguments:
                     - /c
-                    - "for %f in (gauge-java-*-windows.x86_64.zip) do %GAUGE_ROOT%\bin\gauge install java -f %f"
+                    - "for %f in (gauge-java-*-windows.x86_64.zip) do %GAUGE_ROOT%/bin/gauge install java -f %f"
                - exec:
                    working_directory: deploy
                    command: mvn
