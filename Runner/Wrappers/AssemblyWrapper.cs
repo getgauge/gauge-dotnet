@@ -15,7 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using System.IO;
 using System.Reflection;
+using System.Runtime.Loader;
 
 namespace Gauge.CSharp.Runner.Wrappers
 {
@@ -28,7 +30,10 @@ namespace Gauge.CSharp.Runner.Wrappers
 
         public Assembly LoadFrom(string location)
         {
-            return Assembly.LoadFrom(location);
+            using (var stream = new FileStream(location, FileMode.Open))
+            {
+                return AssemblyLoadContext.Default.LoadFromStream(stream);
+            }
         }
     }
 }
