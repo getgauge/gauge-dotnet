@@ -42,7 +42,7 @@ namespace Gauge.Dotnet
             return true;
         }
 
-        private static void RunDotnetCommand(string args)
+        public static void RunDotnetCommand(string args)
         {
             var startInfo = new ProcessStartInfo
             {

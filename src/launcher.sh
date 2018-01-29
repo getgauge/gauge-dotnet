@@ -1,1 +1,1 @@
-dotnet bin\Runner.dll %*
+dotnet bin\Gauge.Dotnet.dll %*
