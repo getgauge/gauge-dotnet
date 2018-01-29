@@ -1,0 +1,96 @@
+pipelines:
+  dotnet-build:
+    group: Gauge-Dotnet
+    materials:
+      dotnet:
+        git: https://github.com/getgauge/gauge-dotnet.git
+    stages:
+      - build:
+          jobs:
+            unit-test:
+              tasks:
+               - exec:
+                   command: run
+                   arguments:
+                    - test
+  dotnet-package:
+    group: Gauge-Dotnet
+    materials:
+      dotnet:
+        git: https://github.com/getgauge/gauge-dotnet.git
+      upstream:
+        pipeline: dotnet-build
+        stage: build
+    stages:
+      - artifact:
+          jobs:
+            installer:
+              resources:
+               - windows
+              tasks:
+               - exec:
+                   command: run
+                   arguments:
+                    - package
+              artifacts:
+               - build:
+                   source: deploy/
+  dotnet-FT:
+    group: Gauge-Dotnet
+    materials:
+      upstream:
+        pipeline: dotnet-package
+        stage: artifact
+      upstream:
+        pipeline: Gauge-Package
+        stage: sign
+    stages:
+      - build:
+          jobs:
+            FT:
+              resources:
+               - windows
+               - FT
+              environment_variables:
+                - GAUGE_ROOT: C:/gauge_root
+                - JAVA_HOME: C:\Program Files\Java\jdk1.8.0_121
+              tasks:
+               - fetch:
+                   pipeline: Gauge-Package
+                   stage: sign
+                   job: windows
+                   source: test_installers/gauge-windows.x86_64.exe
+               - fetch:
+                   pipeline: dotnet-package
+                   stage: artifact
+                   job: installer
+                   source: deploy
+               - exec:
+                   command: cmd
+                   arguments:
+                    - /c
+                    - "gauge-windows.x86_64.exe /S /D=%GAUGE_ROOT%"
+               - exec:
+                   command: cmd
+                   arguments:
+                    - /c
+                    - %GAUGE_ROOT%\bin\gauge
+                    - uninstall
+                    - dotnet
+               - exec:
+                   working_directory: deploy
+                   command: cmd
+                   arguments:
+                    - /c
+                    - "for %f in (gauge-java-*-windows.x86_64.zip) do %GAUGE_ROOT%\bin\gauge install java -f %f"
+               - exec:
+                   working_directory: deploy
+                   command: mvn
+                   arguments:                   
+                    - -q
+                    - clean
+                    - install
+                    - -Denv=ci-dotnet
+                    - -Dnodes=4
+                    - -Dtags="csharp"
+                    - -DinParallel=true
