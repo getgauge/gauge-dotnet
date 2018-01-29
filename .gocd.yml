@@ -38,10 +38,10 @@ pipelines:
   dotnet-FT:
     group: Gauge-Dotnet
     materials:
-      upstream:
+      dotnet:
         pipeline: dotnet-package
         stage: artifact
-      upstream:
+      gauge:
         pipeline: Gauge-Package
         stage: sign
     stages:
