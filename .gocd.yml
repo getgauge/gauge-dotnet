@@ -52,8 +52,8 @@ pipelines:
                - windows
                - FT
               environment_variables:
-                - GAUGE_ROOT: C:/gauge_root
-                - JAVA_HOME: C:\Program Files\Java\jdk1.8.0_121
+                GAUGE_ROOT: C:/gauge_root
+                JAVA_HOME: C:\Program Files\Java\jdk1.8.0_121
               tasks:
                - fetch:
                    pipeline: Gauge-Package
