@@ -12,16 +12,16 @@ goto :eof
     goto :eof
 
 :test
-    dotnet test --no-build Runner.UnitTests\Runner.UnitTests.csproj
-    dotnet test --no-build Runner.IntegrationTests\Runner.IntegrationTests.csproj
+    dotnet test --no-build test\Gauge.Dotnet.UnitTests.csproj
+    dotnet test --no-build integration-test\Gauge.Dotnet.IntegrationTests.csproj
     goto :eof
 
 :package
     rmdir /s /q deploy artifacts
-    dotnet publish -c release -o ..\deploy\bin Runner\Runner.csproj
-    cp Runner\launcher.sh deploy
-    cp Runner\launcher.cmd deploy
-    cp Runner\dotnet.json deploy
+    dotnet publish -c release -o ..\deploy\bin src\Gauge.Dotnet.csproj
+    cp src\launcher.sh deploy
+    cp src\launcher.cmd deploy
+    cp src\dotnet.json deploy
     mkdir artifacts
     call :powershell zip
     goto :eof

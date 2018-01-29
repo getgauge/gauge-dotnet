@@ -1,4 +1,4 @@
-$runnerManifest = Get-Content .\Runner\dotnet.json | Out-String | ConvertFrom-Json
+$runnerManifest = Get-Content .\src\dotnet.json | Out-String | ConvertFrom-Json
 $version = $runnerManifest.version
 
 Add-Type -Assembly "System.IO.Compression.FileSystem" ;
