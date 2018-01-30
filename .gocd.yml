@@ -48,8 +48,6 @@ pipelines:
     materials:
       gauge-tests:
         git: https://github.com/getgauge/gauge-tests.git
-      dotnet:
-        git: https://github.com/getgauge/gauge-dotnet.git
       package:
         pipeline: dotnet-package
         stage: artifact
