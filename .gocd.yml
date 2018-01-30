@@ -46,6 +46,8 @@ pipelines:
   dotnet-FT:
     group: Gauge-Dotnet
     materials:
+      gauge-tests:
+        git: https://github.com/getgauge/gauge-tests.git
       dotnet:
         pipeline: dotnet-package
         stage: artifact
@@ -93,7 +95,10 @@ pipelines:
                     - /c
                     - "for %f in (gauge-java-*-windows.x86_64.zip) do %GAUGE_ROOT%/bin/gauge install java -f %f"
                - exec:
-                   working_directory: deploy
+                   command: gauge
+                   arguments:
+                    - install
+               - exec:
                    command: mvn
                    arguments:
                     - -q
