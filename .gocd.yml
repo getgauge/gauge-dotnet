@@ -8,6 +8,8 @@ pipelines:
       - build:
           jobs:
             unit-test:
+              resources:
+               - windows
               tasks:
                - exec:
                    command: run
