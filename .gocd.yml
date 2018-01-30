@@ -108,3 +108,33 @@ pipelines:
                     - -Dnodes=4
                     - -Dtags="csharp"
                     - -DinParallel=true
+  dotnet-release:
+    group: Gauge-Dotnet
+    materials:
+      package:
+        pipeline: dotnet-package
+        stage: artifact
+      dotnet-FT:
+        pipeline: dotnet-FT
+        stage: build
+    stages:
+      - release:
+          approval: manual
+          jobs:
+            github:
+              elastic_profile_id: gauge-centos-all
+              environment_variables:
+                repoName: gauge-dotnet
+              secure_variables:
+                GITHUB_TOKEN: "NQJXCgXvHwzebDC27DfhkpsmjcMjRNwbguFJXdMvVXJyw5eSaKXE2EFPgji/6/ug"
+              tasks:
+               - fetch:
+                   pipeline: dotnet-package
+                   stage: artifact
+                   job: installer
+                   source: artifacts
+               - exec:
+                   command: /bin/sh
+                   arguments:
+                    - -c
+                    - (curl -sSfL https://github.com/getgauge/gauge/raw/master/build/github_release.sh | sh)
