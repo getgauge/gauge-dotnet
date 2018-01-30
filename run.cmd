@@ -12,8 +12,8 @@ goto :eof
     goto :eof
 
 :test
-    dotnet test --no-build test\Gauge.Dotnet.UnitTests.csproj
-    dotnet test --no-build integration-test\Gauge.Dotnet.IntegrationTests.csproj
+    dotnet test --no-build -c release test\Gauge.Dotnet.UnitTests.csproj
+    dotnet test --no-build -c release integration-test\Gauge.Dotnet.IntegrationTests.csproj
     goto :eof
 
 :package
