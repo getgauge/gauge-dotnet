@@ -93,7 +93,7 @@ pipelines:
                    command: cmd
                    arguments:
                     - /c
-                    - "for %f in (gauge-java-*-windows.x86_64.zip) do %GAUGE_ROOT%/bin/gauge install java -f %f"
+                    - "for %f in (gauge-dotnet*.zip) do %GAUGE_ROOT%/bin/gauge install dotnet -f %f"
                - exec:
                    command: gauge
                    arguments:
