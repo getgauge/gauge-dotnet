@@ -67,6 +67,7 @@ pipelines:
                    pipeline: Gauge-Package
                    stage: sign
                    job: windows
+                   is_file: yes
                    source: test_installers/gauge-windows.x86_64.exe
                - fetch:
                    pipeline: dotnet-package
