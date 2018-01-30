@@ -42,7 +42,7 @@ pipelines:
                     - package
               artifacts:
                - build:
-                   source: deploy/
+                   source: artifacts/
   dotnet-FT:
     group: Gauge-Dotnet
     materials:
@@ -77,7 +77,7 @@ pipelines:
                    pipeline: dotnet-package
                    stage: artifact
                    job: installer
-                   source: deploy
+                   source: artifacts
                - exec:
                    command: cmd
                    arguments:
@@ -91,7 +91,7 @@ pipelines:
                     - uninstall
                     - dotnet
                - exec:
-                   working_directory: deploy
+                   working_directory: artifacts
                    command: cmd
                    arguments:
                     - /c
