@@ -60,7 +60,7 @@ namespace Gauge.Dotnet
         {
             var logger = LogManager.GetLogger("AssemblyLoader");
             logger.Debug("Loading assembly from : {0}", path);
-            Assembly assembly = _assemblyWrapper.LoadFrom(path);
+            var assembly = _assemblyWrapper.LoadFrom(path);
             
             var isReferencingGaugeLib = assembly.GetReferencedAssemblies()
                 .Select(name => name.Name)
@@ -71,11 +71,19 @@ namespace Gauge.Dotnet
 
             AssembliesReferencingGaugeLib.Add(assembly);
 
-            if (ScreengrabberType is null)
-                ScanForCustomScreengrabber(assembly.GetTypes());
+            try
+            {
+                if (ScreengrabberType is null)
+                    ScanForCustomScreengrabber(assembly.GetTypes());
 
-            if (ClassInstanceManagerType is null)
-                ScanForCustomInstanceManager(assembly.GetTypes());
+                if (ClassInstanceManagerType is null)
+                    ScanForCustomInstanceManager(assembly.GetTypes());
+            }
+            catch(ReflectionTypeLoadException ex)
+            {
+                foreach (var e in ex.LoaderExceptions)
+                    logger.Error(e);
+            }
         }
 
         private void ScanForCustomScreengrabber(IEnumerable<Type> types)
