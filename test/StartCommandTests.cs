@@ -17,6 +17,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Moq;
 using NUnit.Framework;
 
@@ -98,6 +99,10 @@ namespace Gauge.Dotnet.UnitTests
         {
             var actual = Environment.CurrentDirectory.TrimEnd(Path.DirectorySeparatorChar);
             var expected = TempPath.TrimEnd(Path.DirectorySeparatorChar);
+            // in osx the /var tmp path is a symlink to /private/var
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                expected = $"/private{expected}";
+
             Assert.That(actual, Is.SamePath(expected));
         }
     }
