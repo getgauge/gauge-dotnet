@@ -1,1 +1,1 @@
-dotnet bin\Gauge.Dotnet.dll %*
+dotnet bin/Gauge.Dotnet.dll $@
