@@ -30,20 +30,21 @@ namespace Gauge.Dotnet
         {
             var gaugeBinDir = Utils.GetGaugeBinDir();
             var csprojEnvVariable = Utils.TryReadEnvValue("GAUGE_CSHARP_PROJECT_FILE");
+            var commandArgs = "";
             try
             {
                 var logLevel = Utils.TryReadEnvValue("GAUGE_LOG_LEVEL");
                 var verbosity = "";
                 if (string.Compare(logLevel, "DEBUG", true)!=0)
                 {
-                    verbosity = "--verbosity quiet";
+                    verbosity = "--verbosity=quiet";
                 }
-                RunDotnetCommand($"publish --configuration=release --output={gaugeBinDir} {csprojEnvVariable} {verbosity}");
+                commandArgs = $"publish --configuration=release --output={gaugeBinDir} {csprojEnvVariable} {verbosity}";
+                RunDotnetCommand(commandArgs);
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "C# Project build failed {0}", ex.Message);
-                return false;
+                throw new Exception($"dotnet Project build failed.\nRan 'dotnet {commandArgs}'", ex);
             }
             return true;
         }
