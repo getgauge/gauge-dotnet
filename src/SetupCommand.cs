@@ -16,6 +16,7 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using Gauge.CSharp.Core;
+using Gauge.Dotnet.Extensions;
 using System.IO;
 
 namespace Gauge.Dotnet
@@ -34,7 +35,7 @@ using FluentAssertions;
 using Gauge.CSharp.Lib;
 using Gauge.CSharp.Lib.Attribute;
 
-namespace {projName}
+namespace {projName.ToValidCSharpIdentifier()}
 {{
     public class StepImplementation
     {{
@@ -85,10 +86,10 @@ namespace {projName}
             // remove Class1.cs
             File.Delete(Path.Combine(gaugeProjectRoot, "Class1.cs"));
             // add references to project
-            GaugeProjectBuilder.RunDotnetCommand($"add {projName}.csproj package Gauge.CSharp.Lib");
-            GaugeProjectBuilder.RunDotnetCommand($"add {projName}.csproj package FluentAssertions");
+            GaugeProjectBuilder.RunDotnetCommand($"add \"{projName}.csproj\" package Gauge.CSharp.Lib");
+            GaugeProjectBuilder.RunDotnetCommand($"add \"{projName}.csproj\" package FluentAssertions");
             // add project to sln
-            GaugeProjectBuilder.RunDotnetCommand($"sln {projName}.sln add {projName}.csproj");
+            GaugeProjectBuilder.RunDotnetCommand($"sln \"{projName}.sln\" add \"{projName}.csproj\"");
             return;
         }
     }
