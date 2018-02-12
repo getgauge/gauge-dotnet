@@ -39,7 +39,7 @@ namespace Gauge.Dotnet
                 {
                     verbosity = "--verbosity=quiet";
                 }
-                commandArgs = $"publish --configuration=release --output={gaugeBinDir} {csprojEnvVariable} {verbosity}";
+                commandArgs = $"publish --configuration=release --output=\"{gaugeBinDir}\" \"{csprojEnvVariable}\" {verbosity}";
                 RunDotnetCommand(commandArgs);
             }
             catch (Exception ex)
