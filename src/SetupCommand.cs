@@ -18,6 +18,7 @@
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Extensions;
 using System.IO;
+using NLog;
 
 namespace Gauge.Dotnet
 {
@@ -26,7 +27,22 @@ namespace Gauge.Dotnet
         void IGaugeCommand.Execute()
         {
             string gaugeProjectRoot = Utils.GaugeProjectRoot;
-            var projName = new DirectoryInfo(gaugeProjectRoot).Name;
+            var projName = new DirectoryInfo(gaugeProjectRoot).Name.ToValidCSharpIdentifier();
+
+            var project = $@"<Project Sdk=""Microsoft.NET.Sdk"">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include=""FluentAssertions"" Version=""5.1.0"" />
+    <PackageReference Include=""Gauge.CSharp.Lib"" Version=""0.7.0"" />
+  </ItemGroup>
+
+</Project>
+";
+            var properties = $"GAUGE_CSHARP_PROJECT_FILE={projName}.csproj";
 
             var implementation = $@"using System;
 using System.Collections.Generic;
@@ -35,7 +51,7 @@ using FluentAssertions;
 using Gauge.CSharp.Lib;
 using Gauge.CSharp.Lib.Attribute;
 
-namespace {projName.ToValidCSharpIdentifier()}
+namespace {projName}
 {{
     public class StepImplementation
     {{
@@ -78,19 +94,18 @@ namespace {projName.ToValidCSharpIdentifier()}
         }}
     }}
 }}";
+            var logger = LogManager.GetLogger("");
+            logger.Info("create  StepImplementation.cs");
             File.WriteAllText(Path.Combine(gaugeProjectRoot, "StepImplementation.cs"), implementation);
-            // dotnet new solution
-            GaugeProjectBuilder.RunDotnetCommand("new solution");
-            // dotnet new classlib
-            GaugeProjectBuilder.RunDotnetCommand("new classlib --no-restore");
-            // remove Class1.cs
-            File.Delete(Path.Combine(gaugeProjectRoot, "Class1.cs"));
-            // add references to project
-            GaugeProjectBuilder.RunDotnetCommand($"add \"{projName}.csproj\" package Gauge.CSharp.Lib");
-            GaugeProjectBuilder.RunDotnetCommand($"add \"{projName}.csproj\" package FluentAssertions");
-            // add project to sln
-            GaugeProjectBuilder.RunDotnetCommand($"sln \"{projName}.sln\" add \"{projName}.csproj\"");
-            return;
+
+            logger.Info($"create  {projName}.csproj");
+            File.WriteAllText(Path.Combine(gaugeProjectRoot, $"{projName}.csproj"), project);
+
+            var envPath = Path.Combine(gaugeProjectRoot, "env", "default");
+            Directory.CreateDirectory(envPath);
+
+            logger.Info($"create  {Path.Combine("env", "default", "dotnet.properties")}");
+            File.WriteAllText(Path.Combine(envPath, "dotnet.properties"), properties);
         }
     }
 }
