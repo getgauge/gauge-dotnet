@@ -59,7 +59,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 ExecutionTime = 0,
                 Failed = false
             };
-            _mockMethodExecutor.Setup(x => x.ExecuteHooks("BeforeSuite", It.IsAny<HooksStrategy>(), new List<string>()))
+            _mockMethodExecutor.Setup(x => x.ExecuteHooks("BeforeSuite", It.IsAny<HooksStrategy>(), new List<string>(), It.IsAny<Gauge.CSharp.Lib.ExecutionContext>()))
                 .Returns(_protoExecutionResult);
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             _executionStartingProcessor = new ExecutionStartingProcessor(_mockMethodExecutor.Object, mockAssemblyLoader.Object, mockReflectionWrapper.Object);
@@ -87,14 +87,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 FileName = "",
                 IsFailed = false
             };
             var scenarioInfo = new ScenarioInfo
             {
-                Tags = {"bar"},
+                Tags = { "bar" },
                 Name = "",
                 IsFailed = false
             };

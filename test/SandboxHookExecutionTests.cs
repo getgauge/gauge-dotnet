@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
@@ -70,7 +71,7 @@ namespace Gauge.Dotnet.UnitTests
             _mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockAssembly = new Mock<Assembly>();
             _mockAssemblyLoader.Setup(loader => loader.AssembliesReferencingGaugeLib)
-                .Returns(new List<Assembly> {mockAssembly.Object});
+                .Returns(new List<Assembly> { mockAssembly.Object });
             _mockAssemblyLoader.Setup(loader => loader.ScreengrabberType);
 
             var instanceManagerType = new Mock<Type>();
@@ -89,11 +90,11 @@ namespace Gauge.Dotnet.UnitTests
             var mockHookMethod = new Mock<IHookMethod>();
             var mockHookMethodType = new Mock<Type>();
             mockHookMethod.Setup(method => method.Method).Returns(MethodName);
-            _hookMethods = new HashSet<IHookMethod> {mockHookMethod.Object};
+            _hookMethods = new HashSet<IHookMethod> { mockHookMethod.Object };
             _mockStrategy = new Mock<IHooksStrategy>();
             _applicableTags = Enumerable.Empty<string>().ToList();
             _mockStrategy.Setup(strategy => strategy.GetApplicableHooks(_applicableTags, _hookMethods))
-                .Returns(new[] {MethodName});
+                .Returns(new[] { MethodName });
 
             var mockType = new Mock<Type>();
             mockInstance = new Mock<object>();
@@ -117,7 +118,7 @@ namespace Gauge.Dotnet.UnitTests
                 .Verifiable();
 
             var sandbox = new Sandbox(_mockAssemblyLoader.Object, _mockHookRegistry.Object, activatorWrapper.Object, reflectionWrapper.Object);
-            var executionResult = sandbox.ExecuteHooks(hookType, _mockStrategy.Object, _applicableTags);
+            var executionResult = sandbox.ExecuteHooks(hookType, _mockStrategy.Object, _applicableTags, new ExecutionContext());
 
             Assert.IsTrue(executionResult.Success, executionResult.ExceptionMessage);
             _mockHookRegistry.VerifyAll();
@@ -138,7 +139,7 @@ namespace Gauge.Dotnet.UnitTests
                 .Verifiable();
 
             var sandbox = new Sandbox(_mockAssemblyLoader.Object, _mockHookRegistry.Object, activatorWrapper.Object, reflectionWrapper.Object);
-            var executionResult = sandbox.ExecuteHooks(hookType, _mockStrategy.Object, _applicableTags);
+            var executionResult = sandbox.ExecuteHooks(hookType, _mockStrategy.Object, _applicableTags, new ExecutionContext());
 
             Assert.False(executionResult.Success);
             Assert.AreEqual("foo", executionResult.ExceptionMessage);

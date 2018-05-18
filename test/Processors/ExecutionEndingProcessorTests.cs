@@ -69,7 +69,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             };
             _protoExecutionResult.Message.AddRange(_pendingMessages);
             _mockMethodExecutor.Setup(x =>
-                    x.ExecuteHooks("AfterSuite", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>()))
+                    x.ExecuteHooks("AfterSuite", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),It.IsAny<Gauge.CSharp.Lib.ExecutionContext>()))
                 .Returns(_protoExecutionResult);
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             _executionEndingProcessor = new ExecutionEndingProcessor(_mockMethodExecutor.Object, mockAssemblyLoader.Object, mockReflectionWrapper.Object);

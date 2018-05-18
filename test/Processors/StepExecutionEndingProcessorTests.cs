@@ -32,7 +32,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 {
     internal class StepExecutionEndingProcessorTests
     {
-        private readonly IEnumerable<string> _pendingMessages = new List<string> {"Foo", "Bar"};
+        private readonly IEnumerable<string> _pendingMessages = new List<string> { "Foo", "Bar" };
         private Mock<IMethodExecutor> _mockMethodExecutor;
         private ProtoExecutionResult _protoExecutionResult;
         private Message _request;
@@ -76,10 +76,10 @@ namespace Gauge.Dotnet.UnitTests.Processors
             {
                 ExecutionTime = 0,
                 Failed = false,
-                Message = {}
+                Message = { }
             };
             _mockMethodExecutor.Setup(x =>
-                    x.ExecuteHooks("AfterStep", It.IsAny<TaggedHooksFirstStrategy>(), new List<string>()))
+                    x.ExecuteHooks("AfterStep", It.IsAny<TaggedHooksFirstStrategy>(), new List<string>(), It.IsAny<Gauge.CSharp.Lib.ExecutionContext>()))
                 .Returns(_protoExecutionResult);
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             mockReflectionWrapper.Setup(x => x.InvokeMethod(mockMessageCollectorType.Object, null, "GetAllPendingMessages", BindingFlags.Static | BindingFlags.Public))
@@ -110,14 +110,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 FileName = "",
                 IsFailed = false
             };
             var scenarioInfo = new ScenarioInfo
             {
-                Tags = {"bar"},
+                Tags = { "bar" },
                 Name = "",
                 IsFailed = false
             };
@@ -149,14 +149,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 FileName = "",
                 IsFailed = false
             };
             var scenarioInfo = new ScenarioInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 IsFailed = false
             };

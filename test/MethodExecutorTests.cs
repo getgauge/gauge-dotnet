@@ -52,10 +52,10 @@ namespace Gauge.Dotnet.UnitTests
             var hooksStrategy = new HooksStrategy();
             var executionResult = new ExecutionResult {Success = true};
             mockSandBox.Setup(sandbox =>
-                sandbox.ExecuteHooks("hooks", hooksStrategy, new List<string>())
+                sandbox.ExecuteHooks("hooks", hooksStrategy, new List<string>(),It.IsAny<Gauge.CSharp.Lib.ExecutionContext>())
             ).Returns(executionResult).Verifiable();
 
-            new MethodExecutor(mockSandBox.Object).ExecuteHooks("hooks", hooksStrategy, new List<string>());
+            new MethodExecutor(mockSandBox.Object).ExecuteHooks("hooks", hooksStrategy, new List<string>(), new Gauge.CSharp.Lib.ExecutionContext());
 
             mockSandBox.VerifyAll();
         }
@@ -72,14 +72,14 @@ namespace Gauge.Dotnet.UnitTests
                 StackTrace = "StackTrace"
             };
             mockSandBox.Setup(sandbox =>
-                sandbox.ExecuteHooks("hooks", hooksStrategy, new List<string>())
+                sandbox.ExecuteHooks("hooks", hooksStrategy, new List<string>(), It.IsAny<Gauge.CSharp.Lib.ExecutionContext>())
             ).Returns(result).Verifiable();
 
             var screenshotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
             Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", "false");
 
             var protoExecutionResult =
-                new MethodExecutor(mockSandBox.Object).ExecuteHooks("hooks", hooksStrategy, new List<string>());
+                new MethodExecutor(mockSandBox.Object).ExecuteHooks("hooks", hooksStrategy, new List<string>(), new Gauge.CSharp.Lib.ExecutionContext());
 
             mockSandBox.VerifyAll();
             Assert.False(protoExecutionResult.ScreenShot == null);
