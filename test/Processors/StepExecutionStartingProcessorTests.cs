@@ -58,7 +58,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             var protoExecutionResult = new ProtoExecutionResult {ExecutionTime = 0, Failed = false};
             methodExecutor.Setup(executor =>
-                    executor.ExecuteHooks(It.IsAny<string>(), It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>()))
+                    executor.ExecuteHooks(It.IsAny<string>(), It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(), It.IsAny<Gauge.CSharp.Lib.ExecutionContext>()))
                 .Returns(protoExecutionResult);
             var hookRegistry = new Mock<IHookRegistry>();
             hookRegistry.Setup(registry => registry.BeforeStepHooks).Returns(new HashSet<IHookMethod>());

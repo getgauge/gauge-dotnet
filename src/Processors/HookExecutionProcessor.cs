@@ -64,7 +64,9 @@ namespace Gauge.Dotnet.Processors
         protected virtual ProtoExecutionResult ExecuteHooks(Message request)
         {
             var applicableTags = GetApplicableTags(request);
-            return MethodExecutor.ExecuteHooks(HookType, Strategy, applicableTags);
+            var mapper = new ExecutionInfoMapper();
+            var executionContext = mapper.ExecutionInfoFrom(GetExecutionInfo(request));
+            return MethodExecutor.ExecuteHooks(HookType, Strategy, applicableTags, executionContext);
         }
 
         private void ClearCacheForConfiguredLevel()

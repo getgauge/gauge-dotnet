@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Gauge.CSharp.Core;
+using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Messages;
@@ -63,14 +64,14 @@ namespace Gauge.Dotnet
         }
 
         [DebuggerHidden]
-        public ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags)
+        public ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags, ExecutionContext context)
         {
             var stopwatch = Stopwatch.StartNew();
             var result = new ProtoExecutionResult
             {
                 Failed = false
             };
-            var executionResult = _sandbox.ExecuteHooks(hookType, strategy, applicableTags);
+            var executionResult = _sandbox.ExecuteHooks(hookType, strategy, applicableTags, context);
 
             result.ExecutionTime = stopwatch.ElapsedMilliseconds;
             if (!executionResult.Success)
