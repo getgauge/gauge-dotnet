@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Models;
 using NLog;
@@ -27,13 +28,11 @@ namespace Gauge.Dotnet
     public class MethodScanner : IMethodScanner
     {
         private static readonly Logger Logger = LogManager.GetLogger("MethodScanner");
-        private readonly GaugeApiConnection _apiConnection;
 
         private readonly ISandbox _sandbox;
 
-        public MethodScanner(GaugeApiConnection apiConnection, ISandbox sandbox)
+        public MethodScanner(ISandbox sandbox)
         {
-            _apiConnection = apiConnection;
             _sandbox = sandbox;
         }
 
@@ -49,7 +48,7 @@ namespace Gauge.Dotnet
                 {
                     // HasTable is set to false here, table parameter is interpreted using the Step text.
                     var stepTexts = _sandbox.GetStepTexts(stepMethod).ToList();
-                    var stepValues = _apiConnection.GetStepValues(stepTexts, false).ToList();
+                    var stepValues = this.GetStepValues(stepTexts).ToList();
 
                     for (var i = 0; i < stepTexts.Count; i++)
                         if (!stepTextMap.ContainsKey(stepValues[i]))
@@ -72,6 +71,15 @@ namespace Gauge.Dotnet
                 Logger.Warn(ex, "Steps Fetch failed, Failed to connect to Gauge API");
             }
             return new StepRegistry(stepImplementations, stepTextMap, aliases);
+        }
+
+        private IEnumerable<string> GetStepValues(List<string> stepTexts)
+        {
+             foreach (var stepText in stepTexts)
+            {
+                var stepValue = Regex.Replace(stepText, @"(<.*?>)", @"{}");
+                yield return stepValue;
+            }
         }
 
         public IEnumerable<string> GetStepTexts()

@@ -33,16 +33,13 @@ namespace Gauge.Dotnet
                 default:
                     return new StartCommand(() =>
                     {
-                        using (var apiConnection = new GaugeApiConnection(new TcpClientWrapper(Utils.GaugeApiPort)))
-                        {
-                            var reflectionWrapper = new ReflectionWrapper();
-                            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-                            var activatorWrapper = new ActivatorWrapper();
-                            var sandBox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
-                            var methodScanner = new MethodScanner(apiConnection, sandBox);
-                            var messageProcessorFactory = new MessageProcessorFactory(methodScanner, sandBox, assemblyLoader, activatorWrapper, new TableFormatter(assemblyLoader, activatorWrapper), reflectionWrapper);
-                            return new GaugeListener(messageProcessorFactory);
-                        }
+                        var reflectionWrapper = new ReflectionWrapper();
+                        var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+                        var activatorWrapper = new ActivatorWrapper();
+                        var sandBox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
+                        var methodScanner = new MethodScanner(sandBox);
+                        var messageProcessorFactory = new MessageProcessorFactory(methodScanner, sandBox, assemblyLoader, activatorWrapper, new TableFormatter(assemblyLoader, activatorWrapper), reflectionWrapper);
+                        return new GaugeListener(messageProcessorFactory);
                     },
                     () => new GaugeProjectBuilder());
             }
