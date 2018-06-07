@@ -22,18 +22,18 @@ namespace Gauge.Dotnet.Processors
 {
     public abstract class DataStoreInitProcessorBase : IMessageProcessor
     {
-        private readonly Type _dataStoreFactoryType;
+        private IAssemblyLoader _assemblyLoader;
         private DataStoreType _dataStoreType;
 
         protected DataStoreInitProcessorBase(IAssemblyLoader assemblyLoader, DataStoreType scenario)
         {
+            _assemblyLoader = assemblyLoader;
             _dataStoreType = scenario;
-            _dataStoreFactoryType = assemblyLoader.GetLibType(LibType.DataStoreFactory);
         }
 
         public Message Process(Message request)
         {
-            var initMethod = _dataStoreFactoryType.GetMethod($"Initialize{_dataStoreType}DataStore");
+            var initMethod = _assemblyLoader.GetLibType(LibType.DataStoreFactory).GetMethod($"Initialize{_dataStoreType}DataStore");
             initMethod.Invoke(null, null);
             return new DefaultProcessor().Process(request);
         }

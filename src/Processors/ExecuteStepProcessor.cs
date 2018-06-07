@@ -25,13 +25,11 @@ namespace Gauge.Dotnet.Processors
     public class ExecuteStepProcessor : ExecutionProcessor, IMessageProcessor
     {
         private readonly IMethodExecutor _methodExecutor;
-        private readonly IStepRegistry _stepRegistry;
         readonly ITableFormatter _tableFormatter;
 
-        public ExecuteStepProcessor(IStepRegistry stepRegistry, IMethodExecutor methodExecutor, ITableFormatter tableFormatter)
+        public ExecuteStepProcessor(IMethodExecutor methodExecutor, ITableFormatter tableFormatter)
         {
             _tableFormatter = tableFormatter;
-            _stepRegistry = stepRegistry;
             _methodExecutor = methodExecutor;
         }
 
@@ -39,10 +37,10 @@ namespace Gauge.Dotnet.Processors
         public Message Process(Message request)
         {
             var executeStepRequest = request.ExecuteStepRequest;
-            if (!_stepRegistry.ContainsStep(executeStepRequest.ParsedStepText))
+            if (!StepRegistry.Instance.ContainsStep(executeStepRequest.ParsedStepText))
                 return ExecutionError("Step Implementation not found", request);
 
-            var method = _stepRegistry.MethodFor(executeStepRequest.ParsedStepText);
+            var method = StepRegistry.Instance.MethodFor(executeStepRequest.ParsedStepText);
 
             var parameters = method.ParameterCount;
             var args = new string[parameters];

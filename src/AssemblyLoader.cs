@@ -19,6 +19,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Gauge.Dotnet.Extensions;
+using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
 using NLog;
 
@@ -41,6 +43,7 @@ namespace Gauge.Dotnet
 
             LoadTargetLibAssembly();
             SetDefaultTypes();
+            UpdateStepRegistry();
         }
 
         public List<Assembly> AssembliesReferencingGaugeLib { get; }
@@ -56,12 +59,36 @@ namespace Gauge.Dotnet
             return AssembliesReferencingGaugeLib.SelectMany(assembly => assembly.GetTypes().SelectMany(methodSelector));
         }
 
+
+        public void UpdateStepRegistry()
+        {
+            var infos = GetMethods(LibType.Step);
+            var methodMap = new Dictionary<string, MethodInfo>();
+            foreach (var info in infos)
+            {
+                var stepTexts = info.GetCustomAttributes(GetLibType(LibType.Step)) .SelectMany(x => x.GetType().GetProperty("Names").GetValue(x, null) as string[]);
+                var stepMethod =  new GaugeMethod
+                {
+                    Name = info.FullyQuallifiedName(),
+                    ParameterCount = info.GetParameters().Length,
+                    MethodInfo = info,
+                    ContinueOnFailure = info.IsRecoverableStep(this)
+                };
+                foreach (var stepText in stepTexts)
+                {
+                    var stepValue = stepText.GetStepValue();
+                    stepMethod.StepText = stepText;
+                    stepMethod.StepValue = stepValue;
+                    StepRegistry.Instance.AddStep(stepValue, stepMethod);
+                }
+            }
+        }
         private void ScanAndLoad(string path)
         {
             var logger = LogManager.GetLogger("AssemblyLoader");
             logger.Debug("Loading assembly from : {0}", path);
             var assembly = _assemblyWrapper.LoadFrom(path);
-            
+
             var isReferencingGaugeLib = assembly.GetReferencedAssemblies()
                 .Select(name => name.Name)
                 .Contains(GaugeLibAssembleName);
@@ -71,6 +98,7 @@ namespace Gauge.Dotnet
 
             AssembliesReferencingGaugeLib.Add(assembly);
 
+
             try
             {
                 if (ScreengrabberType is null)
@@ -79,7 +107,7 @@ namespace Gauge.Dotnet
                 if (ClassInstanceManagerType is null)
                     ScanForCustomInstanceManager(assembly.GetTypes());
             }
-            catch(ReflectionTypeLoadException ex)
+            catch (ReflectionTypeLoadException ex)
             {
                 foreach (var e in ex.LoaderExceptions)
                     logger.Error(e);
@@ -106,8 +134,8 @@ namespace Gauge.Dotnet
             ScreengrabberType = ScreengrabberType ?? _targetLibAssembly.GetType(LibType.DefaultScreenGrabber.FullName());
         }
         private void LoadTargetLibAssembly()
-        {            
-            _targetLibAssembly = _assemblyWrapper.GetCurrentDomainAssemblies().First(x =>  string.CompareOrdinal(x.GetName().Name, GaugeLibAssembleName) == 0);
+        {
+            _targetLibAssembly = _assemblyWrapper.GetCurrentDomainAssemblies().First(x => string.CompareOrdinal(x.GetName().Name, GaugeLibAssembleName) == 0);
         }
 
         public Type GetLibType(LibType type)

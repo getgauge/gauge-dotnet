@@ -33,12 +33,7 @@ namespace Gauge.Dotnet
                 default:
                     return new StartCommand(() =>
                     {
-                        var reflectionWrapper = new ReflectionWrapper();
-                        var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-                        var activatorWrapper = new ActivatorWrapper();
-                        var sandBox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
-                        var methodScanner = new MethodScanner(sandBox);
-                        var messageProcessorFactory = new MessageProcessorFactory(methodScanner, sandBox, assemblyLoader, activatorWrapper, new TableFormatter(assemblyLoader, activatorWrapper), reflectionWrapper);
+                        var messageProcessorFactory = new MessageProcessorFactory();
                         return new GaugeListener(messageProcessorFactory);
                     },
                     () => new GaugeProjectBuilder());

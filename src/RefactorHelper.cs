@@ -22,6 +22,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Gauge.Dotnet.Extensions;
+using Gauge.Dotnet.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -30,7 +31,7 @@ namespace Gauge.Dotnet
 {
     public static class RefactorHelper
     {
-        public static string Refactor(MethodInfo method, IList<Tuple<int, int>> parameterPositions,
+        public static string Refactor(GaugeMethod method, IList<Tuple<int, int>> parameterPositions,
             IList<string> parameters, string newStepValue)
         {
             var classFiles = Directory.EnumerateFiles(Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT"),
@@ -47,7 +48,7 @@ namespace Gauge.Dotnet
                     let attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes)
                     let classDef = node.Parent as ClassDeclarationSyntax
                     where string.CompareOrdinal(node.Identifier.ValueText, method.Name) == 0
-                          && string.CompareOrdinal(classDef.Identifier.ValueText, method.DeclaringType.Name) == 0
+                          && string.CompareOrdinal(classDef.Identifier.ValueText, method.ClassName) == 0
                           && attributeSyntaxes.Any(syntax =>
                               string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
                     select node;

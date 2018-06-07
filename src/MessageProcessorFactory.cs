@@ -15,7 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
@@ -25,74 +27,64 @@ namespace Gauge.Dotnet
 {
     public class MessageProcessorFactory
     {
-        private readonly ISandbox _sandbox;
-        private readonly IMethodScanner _stepScanner;
         private Dictionary<Message.Types.MessageType, IMessageProcessor> _messageProcessorsDictionary;
-        private readonly ITableFormatter _tableFormatter;
-        private readonly IReflectionWrapper _reflectionWrapper;
-        private readonly IAssemblyLoader _assemblyLoader;
-        private readonly IActivatorWrapper _activatorWrapper;
 
-        public MessageProcessorFactory(IMethodScanner stepScanner, ISandbox sandbox, IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, ITableFormatter tableFormatter, IReflectionWrapper reflectionWrapper)
+        public MessageProcessorFactory()
         {
-            _tableFormatter = tableFormatter;
-            _reflectionWrapper = reflectionWrapper;
-            _assemblyLoader = assemblyLoader;
-            _activatorWrapper = activatorWrapper;
-            _stepScanner = stepScanner;
-            _sandbox = sandbox;
-            InitializeProcessors(stepScanner);
+            StaticLoader.Instance.LoadImplementations();
+            _messageProcessorsDictionary = InitializeMessageHandlers();
+
         }
         public IMessageProcessor GetProcessor(Message.Types.MessageType messageType)
         {
-            return _messageProcessorsDictionary.ContainsKey(messageType)
-                ? _messageProcessorsDictionary[messageType]
-                : new DefaultProcessor();
+
+            if (!_messageProcessorsDictionary.ContainsKey(messageType)) return new DefaultProcessor();
+            if (messageType == Message.Types.MessageType.SuiteDataStoreInit)
+            {
+                StepRegistry.Instance.Clear();
+                InitializeExecutionMessageHandlers();
+            }
+            return _messageProcessorsDictionary[messageType];
         }
 
-        private Dictionary<Message.Types.MessageType, IMessageProcessor> InitializeMessageHandlers(
-            IStepRegistry stepRegistry)
+        private void InitializeExecutionMessageHandlers()
         {
-            var methodExecutor = new MethodExecutor(_sandbox);
+            var reflectionWrapper = new ReflectionWrapper();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var activatorWrapper = new ActivatorWrapper();
+            var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
+            var stepScanner = new MethodScanner(sandbox);
+            var methodExecutor = new MethodExecutor(sandbox);
+            var handlers = new Dictionary<Message.Types.MessageType, IMessageProcessor>{
+                {Message.Types.MessageType.ExecutionStarting, new ExecutionStartingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)},
+                {Message.Types.MessageType.ExecutionEnding, new ExecutionEndingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)},
+                {Message.Types.MessageType.SpecExecutionStarting, new SpecExecutionStartingProcessor(methodExecutor, sandbox, assemblyLoader, reflectionWrapper) },
+                {Message.Types.MessageType.SpecExecutionEnding,new SpecExecutionEndingProcessor(methodExecutor, sandbox, assemblyLoader, reflectionWrapper)},
+                {Message.Types.MessageType.ScenarioExecutionStarting,new ScenarioExecutionStartingProcessor(methodExecutor, sandbox, assemblyLoader, reflectionWrapper)},
+                {Message.Types.MessageType.ScenarioExecutionEnding,new ScenarioExecutionEndingProcessor(methodExecutor, sandbox, assemblyLoader, reflectionWrapper)},
+                {Message.Types.MessageType.StepExecutionStarting, new StepExecutionStartingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)},
+                {Message.Types.MessageType.StepExecutionEnding, new StepExecutionEndingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)},
+                {Message.Types.MessageType.ExecuteStep, new ExecuteStepProcessor(methodExecutor, tableFormatter)},
+                {Message.Types.MessageType.KillProcessRequest, new KillProcessProcessor()},
+                {Message.Types.MessageType.ScenarioDataStoreInit, new ScenarioDataStoreInitProcessor(assemblyLoader)},
+                {Message.Types.MessageType.SpecDataStoreInit, new SpecDataStoreInitProcessor(assemblyLoader)},
+                {Message.Types.MessageType.SuiteDataStoreInit, new SuiteDataStoreInitProcessor(assemblyLoader)},
+            };
+            handlers.ToList().ForEach(x => _messageProcessorsDictionary.Add(x.Key, x.Value));
+
+        }
+
+        private Dictionary<Message.Types.MessageType, IMessageProcessor> InitializeMessageHandlers()
+        {
             var messageHandlers = new Dictionary<Message.Types.MessageType, IMessageProcessor>
             {
-                {Message.Types.MessageType.ExecutionStarting, new ExecutionStartingProcessor(methodExecutor, _assemblyLoader, _reflectionWrapper)},
-                {Message.Types.MessageType.ExecutionEnding, new ExecutionEndingProcessor(methodExecutor, _assemblyLoader, _reflectionWrapper)},
-                {
-                    Message.Types.MessageType.SpecExecutionStarting,
-                    new SpecExecutionStartingProcessor(methodExecutor, _sandbox, _assemblyLoader, _reflectionWrapper)
-                },
-                {
-                    Message.Types.MessageType.SpecExecutionEnding,
-                    new SpecExecutionEndingProcessor(methodExecutor, _sandbox, _assemblyLoader, _reflectionWrapper)
-                },
-                {
-                    Message.Types.MessageType.ScenarioExecutionStarting,
-                    new ScenarioExecutionStartingProcessor(methodExecutor, _sandbox, _assemblyLoader, _reflectionWrapper)
-                },
-                {
-                    Message.Types.MessageType.ScenarioExecutionEnding,
-                    new ScenarioExecutionEndingProcessor(methodExecutor, _sandbox, _assemblyLoader, _reflectionWrapper)
-                },
-                {Message.Types.MessageType.StepExecutionStarting, new StepExecutionStartingProcessor(methodExecutor, _assemblyLoader, _reflectionWrapper)},
-                {Message.Types.MessageType.StepExecutionEnding, new StepExecutionEndingProcessor(methodExecutor, _assemblyLoader, _reflectionWrapper)},
-                {Message.Types.MessageType.ExecuteStep, new ExecuteStepProcessor(stepRegistry, methodExecutor, _tableFormatter)},
-                {Message.Types.MessageType.KillProcessRequest, new KillProcessProcessor()},
-                {Message.Types.MessageType.StepNamesRequest, new StepNamesProcessor(_stepScanner)},
-                {Message.Types.MessageType.StepValidateRequest, new StepValidationProcessor(stepRegistry)},
-                {Message.Types.MessageType.ScenarioDataStoreInit, new ScenarioDataStoreInitProcessor(_assemblyLoader)},
-                {Message.Types.MessageType.SpecDataStoreInit, new SpecDataStoreInitProcessor(_assemblyLoader)},
-                {Message.Types.MessageType.SuiteDataStoreInit, new SuiteDataStoreInitProcessor(_assemblyLoader)},
-                {Message.Types.MessageType.StepNameRequest, new StepNameProcessor(stepRegistry)},
-                {Message.Types.MessageType.RefactorRequest, new RefactorProcessor(stepRegistry, _sandbox)}
+                {Message.Types.MessageType.StepNamesRequest, new StepNamesProcessor()},
+                {Message.Types.MessageType.StepValidateRequest, new StepValidationProcessor()},
+                {Message.Types.MessageType.StepNameRequest, new StepNameProcessor()},
+                {Message.Types.MessageType.RefactorRequest, new RefactorProcessor()}
             };
             return messageHandlers;
-        }
-
-        private void InitializeProcessors(IMethodScanner stepScanner)
-        {
-            var stepRegistry = stepScanner.GetStepRegistry();
-            _messageProcessorsDictionary = InitializeMessageHandlers(stepRegistry);
         }
     }
 }

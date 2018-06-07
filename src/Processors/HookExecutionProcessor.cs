@@ -33,13 +33,13 @@ namespace Gauge.Dotnet.Processors
         protected const string SuiteLevel = "suite";
         protected const string SpecLevel = "spec";
         protected const string ScenarioLevel = "scenario";
-        private readonly Type _messageCollectorType;
+        private readonly IAssemblyLoader _assemblyLoader;
         protected readonly IMethodExecutor MethodExecutor;
         private readonly IReflectionWrapper _reflectionWrapper;
 
         protected HookExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
         {
-            _messageCollectorType = assemblyLoader.GetLibType(LibType.MessageCollector); 
+            _assemblyLoader = assemblyLoader;
             MethodExecutor = methodExecutor;
             _reflectionWrapper = reflectionWrapper;
             Strategy = new HooksStrategy();
@@ -83,13 +83,15 @@ namespace Gauge.Dotnet.Processors
 
         public virtual IEnumerable<string> GetAllPendingMessages()
         {
-            return _reflectionWrapper.InvokeMethod(_messageCollectorType, null, "GetAllPendingMessages", BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>;
+            Type messageCollectorType = _assemblyLoader.GetLibType(LibType.MessageCollector);
+            return _reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingMessages", BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>;
         }
 
 
         public virtual void ClearAllPendingMessages()
         {
-            _reflectionWrapper.InvokeMethod(_messageCollectorType, null, "Clear", BindingFlags.Static | BindingFlags.Public);
+            Type messageCollectorType = _assemblyLoader.GetLibType(LibType.MessageCollector);
+            _reflectionWrapper.InvokeMethod(messageCollectorType, null, "Clear", BindingFlags.Static | BindingFlags.Public);
         }
     }
 }

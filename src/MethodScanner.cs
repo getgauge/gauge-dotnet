@@ -36,7 +36,7 @@ namespace Gauge.Dotnet
             _sandbox = sandbox;
         }
 
-        public IStepRegistry GetStepRegistry()
+        public StepRegistry GetStepRegistry()
         {
             var stepImplementations = new List<KeyValuePair<string, GaugeMethod>>();
             var aliases = new Dictionary<string, bool>();
@@ -70,12 +70,12 @@ namespace Gauge.Dotnet
                 Console.WriteLine(ex.InnerException);
                 Logger.Warn(ex, "Steps Fetch failed, Failed to connect to Gauge API");
             }
-            return new StepRegistry(stepImplementations, stepTextMap, aliases);
+            return new StepRegistry();
         }
 
         private IEnumerable<string> GetStepValues(List<string> stepTexts)
         {
-             foreach (var stepText in stepTexts)
+            foreach (var stepText in stepTexts)
             {
                 var stepValue = Regex.Replace(stepText, @"(<.*?>)", @"{}");
                 yield return stepValue;

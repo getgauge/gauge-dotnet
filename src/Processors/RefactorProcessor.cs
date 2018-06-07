@@ -24,13 +24,9 @@ namespace Gauge.Dotnet.Processors
 {
     public class RefactorProcessor : IMessageProcessor
     {
-        private readonly ISandbox _sandbox;
-        private readonly IStepRegistry _stepRegistry;
 
-        public RefactorProcessor(IStepRegistry stepRegistry, ISandbox sandbox)
+        public RefactorProcessor()
         {
-            _stepRegistry = stepRegistry;
-            _sandbox = sandbox;
         }
 
         public Message Process(Message request)
@@ -45,8 +41,7 @@ namespace Gauge.Dotnet.Processors
             try
             {
                 var gaugeMethod = GetGaugeMethod(request.RefactorRequest.OldStepValue);
-                var changedFile = _sandbox.Refactor(gaugeMethod, parameterPositions, newStep.Parameters.ToList(),
-                    newStepValue);
+                var changedFile = RefactorHelper.Refactor(gaugeMethod, parameterPositions, newStep.Parameters.ToList(), newStepValue);
                 response.Success = true;
                 response.FilesChanged.Add(changedFile);
             }
@@ -73,10 +68,10 @@ namespace Gauge.Dotnet.Processors
 
         private GaugeMethod GetGaugeMethod(ProtoStepValue stepValue)
         {
-            if (_stepRegistry.HasMultipleImplementations(stepValue.StepValue))
+            if (StepRegistry.Instance.HasMultipleImplementations(stepValue.StepValue))
                 throw new Exception(string.Format("Multiple step implementations found for : {0}",
                     stepValue.ParameterizedStepValue));
-            return _stepRegistry.MethodFor(stepValue.StepValue);
+            return StepRegistry.Instance.MethodFor(stepValue.StepValue);
         }
     }
 }

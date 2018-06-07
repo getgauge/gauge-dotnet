@@ -22,7 +22,7 @@ namespace Gauge.Dotnet
 {
     public interface IMethodScanner
     {
-        IStepRegistry GetStepRegistry();
+        StepRegistry GetStepRegistry();
         IEnumerable<string> GetStepTexts();
     }
 }

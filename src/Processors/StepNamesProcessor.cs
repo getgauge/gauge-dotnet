@@ -16,22 +16,21 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Collections.Generic;
+using Gauge.Dotnet.Models;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
     public class StepNamesProcessor : IMessageProcessor
     {
-        private readonly IMethodScanner _methodScanner;
 
-        public StepNamesProcessor(IMethodScanner methodScanner)
+        public StepNamesProcessor()
         {
-            _methodScanner = methodScanner;
         }
 
         public Message Process(Message request)
         {
-            var allSteps = _methodScanner.GetStepTexts();
+            var allSteps = StepRegistry.Instance.GetStepTexts();
             return GetStepNamesResponseMessage(allSteps, request);
         }
 

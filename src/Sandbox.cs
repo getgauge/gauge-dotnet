@@ -62,7 +62,7 @@ namespace Gauge.Dotnet
         [DebuggerHidden]
         public ExecutionResult ExecuteMethod(GaugeMethod gaugeMethod, params string[] args)
         {
-            var method = MethodMap[gaugeMethod.Name];
+            var method = gaugeMethod.MethodInfo;
             var executionResult = new ExecutionResult {Success = true};
             var logger = LogManager.GetLogger("Sandbox");
             try
@@ -78,7 +78,7 @@ namespace Gauge.Dotnet
                         return o;
                     }
                 }).ToArray();
-                logger.Debug("Executing method: {0}", method.Name);
+                logger.Debug("Executing method: {0}",gaugeMethod.Name);
                 Execute(method, StringParamConverter.TryConvertParams(method, parameters));
             }
             catch (Exception ex)
@@ -197,12 +197,6 @@ namespace Gauge.Dotnet
             return executionResult;
         }
 
-        public string Refactor(GaugeMethod methodInfo, IList<Tuple<int, int>> parameterPositions,
-            IList<string> parametersList, string newStepValue)
-        {
-            return RefactorHelper.Refactor(MethodMap[methodInfo.Name], parameterPositions, parametersList,
-                newStepValue);
-        }
 
         private object GetTable(string jsonString)
         {
