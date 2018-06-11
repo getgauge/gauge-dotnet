@@ -87,7 +87,6 @@ namespace Gauge.Dotnet.Processors
             return _reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingMessages", BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>;
         }
 
-
         public virtual void ClearAllPendingMessages()
         {
             Type messageCollectorType = _assemblyLoader.GetLibType(LibType.MessageCollector);

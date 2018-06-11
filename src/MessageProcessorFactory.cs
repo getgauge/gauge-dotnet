@@ -37,13 +37,12 @@ namespace Gauge.Dotnet
         }
         public IMessageProcessor GetProcessor(Message.Types.MessageType messageType)
         {
-
-            if (!_messageProcessorsDictionary.ContainsKey(messageType)) return new DefaultProcessor();
             if (messageType == Message.Types.MessageType.SuiteDataStoreInit)
             {
                 StepRegistry.Instance.Clear();
                 InitializeExecutionMessageHandlers();
             }
+            if (!_messageProcessorsDictionary.ContainsKey(messageType)) return new DefaultProcessor();
             return _messageProcessorsDictionary[messageType];
         }
 
@@ -54,7 +53,6 @@ namespace Gauge.Dotnet
             var activatorWrapper = new ActivatorWrapper();
             var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
-            var stepScanner = new MethodScanner(sandbox);
             var methodExecutor = new MethodExecutor(sandbox);
             var handlers = new Dictionary<Message.Types.MessageType, IMessageProcessor>{
                 {Message.Types.MessageType.ExecutionStarting, new ExecutionStartingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)},

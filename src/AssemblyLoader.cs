@@ -63,7 +63,6 @@ namespace Gauge.Dotnet
         public void UpdateStepRegistry()
         {
             var infos = GetMethods(LibType.Step);
-            var methodMap = new Dictionary<string, MethodInfo>();
             foreach (var info in infos)
             {
                 var stepTexts = info.GetCustomAttributes(GetLibType(LibType.Step)) .SelectMany(x => x.GetType().GetProperty("Names").GetValue(x, null) as string[]);
@@ -117,7 +116,7 @@ namespace Gauge.Dotnet
         private void ScanForCustomScreengrabber(IEnumerable<Type> types)
         {
             var implementingTypes = types.Where(type =>
-                type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.IScreenGrabber"));
+                type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotGrabber"));
             ScreengrabberType = implementingTypes.FirstOrDefault();
         }
 

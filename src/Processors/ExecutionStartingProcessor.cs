@@ -39,7 +39,6 @@ namespace Gauge.Dotnet.Processors
 
         public override Message Process(Message request)
         {
-            System.Console.WriteLine(" in sode execution");
             var debuggingEnv = Utils.TryReadEnvValue("DEBUGGING");
             if (debuggingEnv != null && debuggingEnv.ToLower().Equals("true"))
             {
