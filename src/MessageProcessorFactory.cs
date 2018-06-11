@@ -28,31 +28,34 @@ namespace Gauge.Dotnet
     public class MessageProcessorFactory
     {
         private Dictionary<Message.Types.MessageType, IMessageProcessor> _messageProcessorsDictionary;
+        private StaticLoader _staticLoader;
+        private IStepRegistry _stepRegistry;
 
-        public MessageProcessorFactory()
+        public MessageProcessorFactory(IStepRegistry registry, StaticLoader loader)
         {
-            StaticLoader.Instance.LoadImplementations();
+            _staticLoader = loader;
+            _stepRegistry = registry;
             _messageProcessorsDictionary = InitializeMessageHandlers();
-
         }
-        public IMessageProcessor GetProcessor(Message.Types.MessageType messageType)
+        public IMessageProcessor GetProcessor(Message.Types.MessageType messageType, bool scanRequire= false)
         {
-            if (messageType == Message.Types.MessageType.SuiteDataStoreInit)
+            if (scanRequire)
             {
-                StepRegistry.Instance.Clear();
-                InitializeExecutionMessageHandlers();
+                _stepRegistry.Clear();
+                var reflectionWrapper = new ReflectionWrapper();
+                var assemblyLoader = new AssemblyLoader(_stepRegistry,new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+                assemblyLoader.UpdateStepRegistry();
+                var activatorWrapper = new ActivatorWrapper();
+                var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
+                var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
+                InitializeExecutionMessageHandlers(reflectionWrapper, assemblyLoader, activatorWrapper, tableFormatter, sandbox);
             }
             if (!_messageProcessorsDictionary.ContainsKey(messageType)) return new DefaultProcessor();
             return _messageProcessorsDictionary[messageType];
         }
 
-        private void InitializeExecutionMessageHandlers()
+        public void InitializeExecutionMessageHandlers(IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, ITableFormatter tableFormatter, ISandbox sandbox)
         {
-            var reflectionWrapper = new ReflectionWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            var activatorWrapper = new ActivatorWrapper();
-            var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
             var methodExecutor = new MethodExecutor(sandbox);
             var handlers = new Dictionary<Message.Types.MessageType, IMessageProcessor>{
                 {Message.Types.MessageType.ExecutionStarting, new ExecutionStartingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)},
@@ -63,24 +66,24 @@ namespace Gauge.Dotnet
                 {Message.Types.MessageType.ScenarioExecutionEnding,new ScenarioExecutionEndingProcessor(methodExecutor, sandbox, assemblyLoader, reflectionWrapper)},
                 {Message.Types.MessageType.StepExecutionStarting, new StepExecutionStartingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)},
                 {Message.Types.MessageType.StepExecutionEnding, new StepExecutionEndingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)},
-                {Message.Types.MessageType.ExecuteStep, new ExecuteStepProcessor(methodExecutor, tableFormatter)},
+                {Message.Types.MessageType.ExecuteStep, new ExecuteStepProcessor(_stepRegistry,methodExecutor, tableFormatter)},
                 {Message.Types.MessageType.KillProcessRequest, new KillProcessProcessor()},
                 {Message.Types.MessageType.ScenarioDataStoreInit, new ScenarioDataStoreInitProcessor(assemblyLoader)},
                 {Message.Types.MessageType.SpecDataStoreInit, new SpecDataStoreInitProcessor(assemblyLoader)},
                 {Message.Types.MessageType.SuiteDataStoreInit, new SuiteDataStoreInitProcessor(assemblyLoader)},
             };
             handlers.ToList().ForEach(x => _messageProcessorsDictionary.Add(x.Key, x.Value));
-
         }
+
 
         private Dictionary<Message.Types.MessageType, IMessageProcessor> InitializeMessageHandlers()
         {
             var messageHandlers = new Dictionary<Message.Types.MessageType, IMessageProcessor>
             {
-                {Message.Types.MessageType.StepNamesRequest, new StepNamesProcessor()},
-                {Message.Types.MessageType.StepValidateRequest, new StepValidationProcessor()},
-                {Message.Types.MessageType.StepNameRequest, new StepNameProcessor()},
-                {Message.Types.MessageType.RefactorRequest, new RefactorProcessor()}
+                {Message.Types.MessageType.StepNamesRequest, new StepNamesProcessor(_stepRegistry)},
+                {Message.Types.MessageType.StepValidateRequest, new StepValidationProcessor(_stepRegistry)},
+                {Message.Types.MessageType.StepNameRequest, new StepNameProcessor(_stepRegistry)},
+                {Message.Types.MessageType.RefactorRequest, new RefactorProcessor(_stepRegistry)}
             };
             return messageHandlers;
         }

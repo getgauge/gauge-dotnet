@@ -31,6 +31,7 @@ namespace Gauge.Dotnet.Extensions
 
         public static Boolean IsRecoverable(this MemberDeclarationSyntax method)
         {
+            //TODO: Figure out if method is recoverable
             return false;
         }
         public static AttributeSyntax GetStepAttribute(this SeparatedSyntaxList<AttributeSyntax> list)

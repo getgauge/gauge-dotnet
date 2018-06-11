@@ -30,7 +30,7 @@ namespace Gauge.Dotnet.Wrappers
 
         public Assembly LoadFrom(string location)
         {
-            using (var stream = new FileStream(location, FileMode.Open))
+            using (var stream = new FileStream(location, FileMode.Open,FileAccess.Read,FileShare.Read))
             {
                 return AssemblyLoadContext.Default.LoadFromStream(stream);
             }

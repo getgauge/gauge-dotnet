@@ -68,7 +68,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var mockTableFormatter = new Mock<ITableFormatter>();
 
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockTableFormatter.Object)
+                new ExecuteStepProcessor(mockStepRegistry.Object,mockMethodExecutor.Object, mockTableFormatter.Object)
                 .Process(request);
 
             Assert.False(response.ExecutionStatusResponse.ExecutionResult.Failed);
@@ -119,7 +119,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockTableFormatter.Setup(x => x.GetJSON(protoTable))
                 .Returns(tableJSON);
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockTableFormatter.Object)
+                new ExecuteStepProcessor(mockStepRegistry.Object,mockMethodExecutor.Object, mockTableFormatter.Object)
                 .Process(request);
 
             mockMethodExecutor.Verify(executor =>
@@ -178,7 +178,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var mockTableFormatter = new Mock<ITableFormatter>();
 
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockTableFormatter.Object)
+                new ExecuteStepProcessor(mockStepRegistry.Object,mockMethodExecutor.Object, mockTableFormatter.Object)
                 .Process(request);
 
             Assert.True(response.ExecutionStatusResponse.ExecutionResult.Failed);

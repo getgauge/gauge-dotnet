@@ -29,23 +29,11 @@ namespace Gauge.Dotnet
 {
     public sealed class StaticLoader
     {
+        private IStepRegistry _stepRegistry;
 
-        private static readonly StaticLoader instance = new StaticLoader();
-
-        static StaticLoader()
+        public StaticLoader(IStepRegistry registry)
         {
-        }
-
-        public StaticLoader()
-        {
-        }
-
-        public static StaticLoader Instance
-        {
-            get
-            {
-                return instance;
-            }
+            this._stepRegistry = registry;
         }
 
         public void LoadImplementations()
@@ -54,7 +42,7 @@ namespace Gauge.Dotnet
             foreach (var f in classFiles)
             {
                 var steps = GetStesFrom(f);
-                AddStepsToRegsitry(f,steps);
+                AddStepsToRegsitry(f, steps);
             }
         }
 
@@ -64,21 +52,23 @@ namespace Gauge.Dotnet
             {
                 var attributeListSyntax = stepMethod.AttributeLists.WithStepAttribute();
                 var attributeSyntax = attributeListSyntax.Attributes.GetStepAttribute();
-                var stepText = attributeSyntax.ArgumentList.Arguments.FirstOrDefault().ToString().Trim('"');
-                var stepValue = stepText.GetStepValue();
+                var stepTextsSyntax = attributeSyntax.ArgumentList.Arguments.ToList();
+                var stepTexts = stepTextsSyntax.Select(s => s.ToString().Trim('"'));
+                var stepValue = stepTexts.FirstOrDefault().GetStepValue();
                 var classDef = stepMethod.Parent as ClassDeclarationSyntax;
                 var entry = new GaugeMethod()
                 {
                     Name = stepMethod.Identifier.ToString(),
                     ParameterCount = stepMethod.ParameterList.Parameters.Count,
                     ContinueOnFailure = stepMethod.IsRecoverable(),
-                    StepText = stepText,
+                    StepTexts = stepTexts,
                     StepValue = stepValue,
                     Span = stepMethod.GetLocation().GetLineSpan(),
                     ClassName = classDef.Identifier.ValueText,
                     FileName = fileName,
                 };
-                StepRegistry.Instance.AddStep(stepValue, entry);
+                _stepRegistry.AddStep(stepValue, entry);
+
             }
         }
 

@@ -48,7 +48,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var stepTextMap = new Dictionary<string, string> {{parameterizedStepText, stepText}};
             var stepRegistry = new StepRegistry(scannedSteps, stepTextMap, aliases);
 
-            var executeStepProcessor = new ExecuteStepProcessor(stepRegistry, new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
+            var executeStepProcessor = new ExecuteStepProcessor( new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
 
             var protoTable = new ProtoTable
             {
@@ -109,9 +109,8 @@ namespace Gauge.Dotnet.IntegrationTests
             };
             var aliases = new Dictionary<string, bool> {{parameterizedStepText, false}};
             var stepTextMap = new Dictionary<string, string> {{parameterizedStepText, stepText}};
-            var stepRegistry = new StepRegistry(scannedSteps, stepTextMap, aliases);
 
-            var executeStepProcessor = new ExecuteStepProcessor(stepRegistry, new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
+            var executeStepProcessor = new ExecuteStepProcessor( new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
 
             var message = new Message
             {

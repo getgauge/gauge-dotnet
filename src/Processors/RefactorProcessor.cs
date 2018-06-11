@@ -24,9 +24,11 @@ namespace Gauge.Dotnet.Processors
 {
     public class RefactorProcessor : IMessageProcessor
     {
+        private IStepRegistry _stepRegistry;
 
-        public RefactorProcessor()
+        public RefactorProcessor(IStepRegistry stepRegistry)
         {
+            _stepRegistry = stepRegistry;
         }
 
         public Message Process(Message request)
@@ -68,10 +70,10 @@ namespace Gauge.Dotnet.Processors
 
         private GaugeMethod GetGaugeMethod(ProtoStepValue stepValue)
         {
-            if (StepRegistry.Instance.HasMultipleImplementations(stepValue.StepValue))
+            if (_stepRegistry.HasMultipleImplementations(stepValue.StepValue))
                 throw new Exception(string.Format("Multiple step implementations found for : {0}",
                     stepValue.ParameterizedStepValue));
-            return StepRegistry.Instance.MethodFor(stepValue.StepValue);
+            return _stepRegistry.MethodFor(stepValue.StepValue);
         }
     }
 }

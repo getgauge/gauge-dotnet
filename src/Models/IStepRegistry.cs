@@ -26,6 +26,9 @@ namespace Gauge.Dotnet.Models
         IEnumerable<string> AllSteps();
         bool HasAlias(string stepText);
         string GetStepText(string parameterizedStepText);
+        IEnumerable<string> GetStepTexts();
         bool HasMultipleImplementations(string parsedStepText);
+        void Clear();
+        void AddStep(string stepValue, GaugeMethod stepMethod);
     }
 }

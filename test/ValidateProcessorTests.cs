@@ -30,16 +30,16 @@ namespace Gauge.Dotnet.UnitTests
         [SetUp]
         public void Setup()
         {
-            var mockMethodScanner = new Mock<IMethodScanner>();
             _mockStepRegistry = new Mock<IStepRegistry>();
-            mockMethodScanner.Setup(x => x.GetStepRegistry()).Returns(_mockStepRegistry.Object);
             var mockSandBox = new Mock<ISandbox>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
             var mockActivatorWrapper = new Mock<IActivatorWrapper>();
             var mockTableFormatter = new Mock<ITableFormatter>();
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            _messageProcessorFactory = new MessageProcessorFactory(mockMethodScanner.Object, mockSandBox.Object, mockAssemblyLoader.Object, mockActivatorWrapper.Object, mockTableFormatter.Object, mockReflectionWrapper.Object);
+            StaticLoader loader = new StaticLoader(_mockStepRegistry.Object);
+            _messageProcessorFactory = new MessageProcessorFactory(_mockStepRegistry.Object, loader);
+            _messageProcessorFactory.InitializeExecutionMessageHandlers(mockReflectionWrapper.Object, mockAssemblyLoader.Object,mockActivatorWrapper.Object,mockTableFormatter.Object,mockSandBox.Object);
         }
 
         private MessageProcessorFactory _messageProcessorFactory;

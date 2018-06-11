@@ -22,9 +22,11 @@ namespace Gauge.Dotnet.Processors
 {
     public class StepValidationProcessor : IMessageProcessor
     {
+        private IStepRegistry _stepRegistry;
 
-        public StepValidationProcessor()
+        public StepValidationProcessor(IStepRegistry stepRegistry)
         {
+            _stepRegistry = stepRegistry;
         }
 
         public Message Process(Message request)
@@ -33,12 +35,12 @@ namespace Gauge.Dotnet.Processors
             var isValid = true;
             var errorMessage = "";
             var errorType = StepValidateResponse.Types.ErrorType.StepImplementationNotFound;
-            if (!StepRegistry.Instance.ContainsStep(stepToValidate))
+            if (!_stepRegistry.ContainsStep(stepToValidate))
             {
                 isValid = false;
                 errorMessage = string.Format("No implementation found for : {0}. Full Step Text :", stepToValidate);
             }
-            else if (StepRegistry.Instance.HasMultipleImplementations(stepToValidate))
+            else if (_stepRegistry.HasMultipleImplementations(stepToValidate))
             {
                 isValid = false;
                 errorType = StepValidateResponse.Types.ErrorType.DuplicateStepImplementation;

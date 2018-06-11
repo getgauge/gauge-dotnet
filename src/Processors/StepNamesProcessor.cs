@@ -23,14 +23,16 @@ namespace Gauge.Dotnet.Processors
 {
     public class StepNamesProcessor : IMessageProcessor
     {
+        private IStepRegistry _stepRegistry;
 
-        public StepNamesProcessor()
+        public StepNamesProcessor(IStepRegistry stepRegistry)
         {
+            _stepRegistry  = stepRegistry;
         }
 
         public Message Process(Message request)
         {
-            var allSteps = StepRegistry.Instance.GetStepTexts();
+            var allSteps = _stepRegistry.GetStepTexts();
             return GetStepNamesResponseMessage(allSteps, request);
         }
 

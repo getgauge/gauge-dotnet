@@ -17,20 +17,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Gauge.Dotnet.Models
 {
     [Serializable]
-    public sealed class StepRegistry
+    public class StepRegistry : IStepRegistry
     {
 
-        private static readonly StepRegistry instance = new StepRegistry();
         private Dictionary<string, List<GaugeMethod>> registry;
-
-        static StepRegistry()
-        {
-        }
 
         public StepRegistry()
         {
@@ -39,23 +35,12 @@ namespace Gauge.Dotnet.Models
 
         public IEnumerable<string> GetStepTexts()
         {
-           foreach (var methods in registry.Values)
-           {
-               foreach (var method in methods)
-               {
-                   yield return method.StepText;
-               }
-           }
+            return registry.Values.SelectMany(methods => {
+                return methods.SelectMany(method => {
+                    return method.StepTexts;
+                });
+            });
         }
-
-        public static StepRegistry Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
-
 
         public void AddStep(string stepValue, GaugeMethod method)
         {
@@ -93,15 +78,14 @@ namespace Gauge.Dotnet.Models
             return registry.Keys;
         }
 
-        public bool HasAlias(string parsedStepText)
+        public bool HasAlias(string stepValue)
         {
-            // check for aliases
-            return false;
+            return registry.ContainsKey(stepValue) && registry.GetValueOrDefault(stepValue).FirstOrDefault().StepTexts.Count() > 1;
         }
 
         public string GetStepText(string stepValue)
         {
-            return registry.ContainsKey(stepValue) ? registry[stepValue][0].StepText : string.Empty;
+            return registry.ContainsKey(stepValue) ? registry[stepValue][0].StepTexts.FirstOrDefault() : string.Empty;
         }
     }
 }

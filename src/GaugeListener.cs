@@ -42,7 +42,7 @@ namespace Gauge.Dotnet
                     while (gaugeConnection.Connected)
                     {
                         var message = Message.Parser.ParseFrom(gaugeConnection.ReadBytes().ToArray());
-                        var processor = _messageProcessorFactory.GetProcessor(message.MessageType);
+                        var processor = _messageProcessorFactory.GetProcessor(message.MessageType, message.MessageType == Message.Types.MessageType.SuiteDataStoreInit);
                         var response = processor.Process(message);
                         gaugeConnection.WriteMessage(response);
                         if (message.MessageType == Message.Types.MessageType.KillProcessRequest)

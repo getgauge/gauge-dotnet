@@ -31,19 +31,20 @@ namespace Gauge.Dotnet
         private const string GaugeLibAssembleName = "Gauge.CSharp.Lib";
         private readonly IAssemblyWrapper _assemblyWrapper;
         private readonly IReflectionWrapper _reflectionWrapper;
+        private readonly IStepRegistry _stepRegistry;
         private Assembly _targetLibAssembly;
 
-        public AssemblyLoader(IAssemblyWrapper assemblyWrapper, IEnumerable<string> assemblyLocations, IReflectionWrapper reflectionWrapper)
+        public AssemblyLoader(IStepRegistry registrty, IAssemblyWrapper assemblyWrapper, IEnumerable<string> assemblyLocations, IReflectionWrapper reflectionWrapper)
         {
             _assemblyWrapper = assemblyWrapper;
             _reflectionWrapper = reflectionWrapper;
+            _stepRegistry = registrty;
             AssembliesReferencingGaugeLib = new List<Assembly>();
             foreach (var location in assemblyLocations)
                 ScanAndLoad(location);
 
             LoadTargetLibAssembly();
             SetDefaultTypes();
-            UpdateStepRegistry();
         }
 
         public List<Assembly> AssembliesReferencingGaugeLib { get; }
@@ -65,21 +66,18 @@ namespace Gauge.Dotnet
             var infos = GetMethods(LibType.Step);
             foreach (var info in infos)
             {
-                var stepTexts = info.GetCustomAttributes(GetLibType(LibType.Step)) .SelectMany(x => x.GetType().GetProperty("Names").GetValue(x, null) as string[]);
-                var stepMethod =  new GaugeMethod
+                var stepTexts = info.GetCustomAttributes(GetLibType(LibType.Step)).SelectMany(x => x.GetType().GetProperty("Names").GetValue(x, null) as string[]);
+                var stepValue = stepTexts.FirstOrDefault().GetStepValue();
+                var stepMethod = new GaugeMethod
                 {
                     Name = info.FullyQuallifiedName(),
                     ParameterCount = info.GetParameters().Length,
+                    StepTexts = stepTexts,
                     MethodInfo = info,
-                    ContinueOnFailure = info.IsRecoverableStep(this)
+                    ContinueOnFailure = info.IsRecoverableStep(this),
+                    StepValue = stepValue
                 };
-                foreach (var stepText in stepTexts)
-                {
-                    var stepValue = stepText.GetStepValue();
-                    stepMethod.StepText = stepText;
-                    stepMethod.StepValue = stepValue;
-                    StepRegistry.Instance.AddStep(stepValue, stepMethod);
-                }
+                _stepRegistry.AddStep(stepValue, stepMethod);
             }
         }
         private void ScanAndLoad(string path)

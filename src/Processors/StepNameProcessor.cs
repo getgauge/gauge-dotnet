@@ -22,17 +22,19 @@ namespace Gauge.Dotnet.Processors
 {
     internal class StepNameProcessor : IMessageProcessor
     {
+        private IStepRegistry _stepRegistry;
 
-        public StepNameProcessor()
+        public StepNameProcessor(IStepRegistry stepRegistry)
         {
+            _stepRegistry = stepRegistry;
         }
 
         public Message Process(Message request)
         {
             var parsedStepText = request.StepNameRequest.StepValue;
-            var isValidStep = StepRegistry.Instance.ContainsStep(parsedStepText);
-            var stepText = StepRegistry.Instance.GetStepText(parsedStepText);
-            var hasAlias = StepRegistry.Instance.HasAlias(stepText);
+            var isValidStep = _stepRegistry.ContainsStep(parsedStepText);
+            var stepText = _stepRegistry.GetStepText(parsedStepText);
+            var hasAlias = _stepRegistry.HasAlias(stepText);
 
             var stepNameResponse = new StepNameResponse
             {

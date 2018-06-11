@@ -60,7 +60,6 @@ namespace Gauge.Dotnet.IntegrationTests
                 };
             var aliases = new Dictionary<string, bool> {{stepValue, false}};
             var stepTextMap = new Dictionary<string, string> {{stepValue, parameterizedStepText}};
-            var stepRegistry = new StepRegistry(scannedSteps, stepTextMap, aliases);
             var message = new Message
             {
                 MessageId = 1234,
@@ -88,7 +87,7 @@ namespace Gauge.Dotnet.IntegrationTests
                 }
             };
 
-            var refactorProcessor = new RefactorProcessor(stepRegistry, sandbox);
+            var refactorProcessor = new RefactorProcessor();
             var result = refactorProcessor.Process(message);
             Assert.IsTrue(result.RefactorResponse.Success);
         }

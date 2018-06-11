@@ -19,6 +19,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
 using Moq;
 using NUnit.Framework;
@@ -47,12 +48,12 @@ namespace Gauge.Dotnet.UnitTests
             mockIClassInstanceManagerType.Setup(x => x.FullName).Returns("Gauge.CSharp.Lib.IClassInstanceManager");
             _mockInstanceManagerType = new Mock<Type>();
             _mockInstanceManagerType.Setup(type => type.GetInterfaces())
-                .Returns(new[] {mockIClassInstanceManagerType.Object });
+                .Returns(new[] { mockIClassInstanceManagerType.Object });
             _mockInstanceManagerType.Setup(x => x.Name)
                 .Returns("TestInstanceManager");
 
             var mockIScreenGrabberType = new Mock<Type>();
-            mockIScreenGrabberType.Setup(x => x.FullName).Returns("Gauge.CSharp.Lib.IScreenGrabber");
+            mockIScreenGrabberType.Setup(x => x.FullName).Returns("Gauge.CSharp.Lib.ICustomScreenshotGrabber");
             _mockScreenGrabberType = new Mock<Type>();
             _mockScreenGrabberType.Setup(x => x.Name)
                 .Returns("TestScreenGrabber");
@@ -74,7 +75,7 @@ namespace Gauge.Dotnet.UnitTests
             _mockAssembly.Setup(assembly => assembly.GetType(LibType.Step.FullName()))
                 .Returns(mockType.Object);
             _mockAssembly.Setup(assembly => assembly.GetReferencedAssemblies())
-                .Returns(new[] {assemblyName});
+                .Returns(new[] { assemblyName });
             _mockAssemblyWrapper.Setup(x => x.LoadFrom(assemblyLocation))
                 .Returns(_mockAssembly.Object);
             _mockAssemblyWrapper.Setup(x => x.GetCurrentDomainAssemblies())
@@ -82,7 +83,9 @@ namespace Gauge.Dotnet.UnitTests
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             mockReflectionWrapper.Setup(r => r.GetMethods(mockType.Object))
                 .Returns(new[] { _mockStepMethod.Object });
-            _assemblyLoader = new AssemblyLoader(_mockAssemblyWrapper.Object, new[] {assemblyLocation}, mockReflectionWrapper.Object);
+            var mockStepRegistry = new Mock<IStepRegistry>();
+
+            _assemblyLoader = new AssemblyLoader(mockStepRegistry.Object, _mockAssemblyWrapper.Object, new[] { assemblyLocation }, mockReflectionWrapper.Object);
         }
 
         [TearDown]
@@ -136,8 +139,9 @@ namespace Gauge.Dotnet.UnitTests
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockAssemblyWrapper = new Mock<IAssemblyWrapper>();
             mockAssemblyWrapper.Setup(x => x.LoadFrom(TmpLocation)).Throws<FileNotFoundException>();
+            var mockStepRegistry = new Mock<IStepRegistry>();
             Assert.Throws<FileNotFoundException>(() =>
-                new AssemblyLoader(mockAssemblyWrapper.Object, new[] {TmpLocation}, mockReflectionWrapper.Object));
+                new AssemblyLoader(mockStepRegistry.Object, mockAssemblyWrapper.Object, new[] { TmpLocation }, mockReflectionWrapper.Object));
         }
     }
 }

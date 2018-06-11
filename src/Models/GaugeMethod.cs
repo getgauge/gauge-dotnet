@@ -16,6 +16,7 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 
@@ -28,10 +29,9 @@ namespace Gauge.Dotnet.Models
         public string Name { get; set; }
         public int ParameterCount { get; set; }
         public bool ContinueOnFailure { get; set; }
-        public string StepText { get; set; }
+        public IEnumerable<string> StepTexts { get; set; }
         public string StepValue { get; set; }
         public string FileName { get; set; }
-
         public string ClassName {get; set;}
         public FileLinePositionSpan Span { get; internal set; }
     }
