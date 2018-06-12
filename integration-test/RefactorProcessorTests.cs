@@ -45,21 +45,14 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             const string parameterizedStepText = "Refactoring 1 Say <what> to <who>";
             const string stepValue = "Refactoring 1 Say {} to {}";
-            var reflectionWrapper = new ReflectionWrapper();
-            var activatorWrapper = new ActivatorWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
-            var gaugeMethod = sandbox.GetStepMethods()
-                .First(method =>
-                    method.Name ==
-                    "IntegrationTestSample.RefactoringSample.RefactoringSaySomething1-StringwhatStringwho");
-            var scannedSteps =
-                new List<KeyValuePair<string, GaugeMethod>>
-                {
-                    new KeyValuePair<string, GaugeMethod>(stepValue, gaugeMethod)
-                };
-            var aliases = new Dictionary<string, bool> {{stepValue, false}};
-            var stepTextMap = new Dictionary<string, string> {{stepValue, parameterizedStepText}};
+            var stepRegistry = new StepRegistry();
+            stepRegistry.AddStep(stepValue, new GaugeMethod(){
+                Name = "RefactoringSaySomething1",
+                ClassName = "RefactoringSample",
+                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs"),
+                StepTexts = new List<string>(){parameterizedStepText},
+                StepValue = stepValue
+            });
             var message = new Message
             {
                 MessageId = 1234,
@@ -87,7 +80,7 @@ namespace Gauge.Dotnet.IntegrationTests
                 }
             };
 
-            var refactorProcessor = new RefactorProcessor();
+            var refactorProcessor = new RefactorProcessor(stepRegistry);
             var result = refactorProcessor.Process(message);
             Assert.IsTrue(result.RefactorResponse.Success);
         }

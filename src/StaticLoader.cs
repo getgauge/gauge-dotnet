@@ -58,7 +58,7 @@ namespace Gauge.Dotnet
                 var classDef = stepMethod.Parent as ClassDeclarationSyntax;
                 var entry = new GaugeMethod()
                 {
-                    Name = stepMethod.Identifier.ToString(),
+                    Name = stepMethod.Identifier.ValueText,
                     ParameterCount = stepMethod.ParameterList.Parameters.Count,
                     ContinueOnFailure = stepMethod.IsRecoverable(),
                     StepTexts = stepTexts,
@@ -72,7 +72,7 @@ namespace Gauge.Dotnet
             }
         }
 
-        private static IEnumerable<MethodDeclarationSyntax> GetStesFrom(string f)
+        private  IEnumerable<MethodDeclarationSyntax> GetStesFrom(string f)
         {
             var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(f));
             var root = tree.GetRoot();

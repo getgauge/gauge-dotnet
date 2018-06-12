@@ -113,6 +113,7 @@ namespace Gauge.Dotnet
                 var method = MethodMap[s];
                 return new GaugeMethod
                 {
+                    MethodInfo = MethodMap[s],
                     Name = s,
                     ParameterCount = method.GetParameters().Length,
                     ContinueOnFailure = method.IsRecoverableStep(_assemblyLoader)

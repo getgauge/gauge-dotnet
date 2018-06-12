@@ -113,8 +113,9 @@ namespace Gauge.Dotnet
 
         private void ScanForCustomScreengrabber(IEnumerable<Type> types)
         {
-            var implementingTypes = types.Where(type =>
-                type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotGrabber"));
+           var implementingTypes = types.Where(type =>
+                type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.IScreenGrabber"
+                    || t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotGrabber"));
             ScreengrabberType = implementingTypes.FirstOrDefault();
         }
 

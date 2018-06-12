@@ -34,45 +34,31 @@ namespace Gauge.Dotnet
         public static string Refactor(GaugeMethod method, IList<Tuple<int, int>> parameterPositions,
             IList<string> parameters, string newStepValue)
         {
-            var classFiles = Directory.EnumerateFiles(Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT"),
-                "*.cs", SearchOption.AllDirectories);
-
             var changedFile = "";
 
-            Parallel.ForEach(classFiles, (f, state) =>
+            var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(method.FileName));
+            var root = tree.GetRoot();
+            var stepMethods = from node in root.DescendantNodes().OfType<MethodDeclarationSyntax>()
+                              let attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes)
+                              let classDef = node.Parent as ClassDeclarationSyntax
+                              where string.CompareOrdinal(node.Identifier.ValueText, method.Name) == 0
+                                    && string.CompareOrdinal(classDef.Identifier.ValueText, method.ClassName) == 0
+                                    && attributeSyntaxes.Any(syntax => string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
+                              select node;
+
+            //TODO: check for aliases and error out
+            foreach (var methodDeclarationSyntax in stepMethods)
             {
-                var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(f));
-                var root = tree.GetRoot();
+                var updatedAttribute = ReplaceAttribute(methodDeclarationSyntax, newStepValue);
+                var updatedParameters = ReplaceParameters(methodDeclarationSyntax, parameterPositions, parameters);
+                var declarationSyntax = methodDeclarationSyntax
+                    .WithAttributeLists(updatedAttribute)
+                    .WithParameterList(updatedParameters);
+                var replaceNode = root.ReplaceNode(methodDeclarationSyntax, declarationSyntax);
 
-                var stepMethods = from node in root.DescendantNodes().OfType<MethodDeclarationSyntax>()
-                    let attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes)
-                    let classDef = node.Parent as ClassDeclarationSyntax
-                    where string.CompareOrdinal(node.Identifier.ValueText, method.Name) == 0
-                          && string.CompareOrdinal(classDef.Identifier.ValueText, method.ClassName) == 0
-                          && attributeSyntaxes.Any(syntax =>
-                              string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
-                    select node;
-
-                if (!stepMethods.Any()) return;
-
-                //Found the method
-                state.Break();
-
-                //TODO: check for aliases and error out
-
-                foreach (var methodDeclarationSyntax in stepMethods)
-                {
-                    var updatedAttribute = ReplaceAttribute(methodDeclarationSyntax, newStepValue);
-                    var updatedParameters = ReplaceParameters(methodDeclarationSyntax, parameterPositions, parameters);
-                    var declarationSyntax = methodDeclarationSyntax
-                        .WithAttributeLists(updatedAttribute)
-                        .WithParameterList(updatedParameters);
-                    var replaceNode = root.ReplaceNode(methodDeclarationSyntax, declarationSyntax);
-
-                    File.WriteAllText(f, replaceNode.ToFullString());
-                    changedFile = f;
-                }
-            });
+                File.WriteAllText(method.FileName, replaceNode.ToFullString());
+                changedFile = method.FileName;
+            }
             return changedFile;
         }
 

@@ -35,7 +35,9 @@ namespace Gauge.Dotnet.IntegrationTests
             const string stepText = "Step that takes a table <table>";
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var stepRegistry = new StepRegistry();
+            var assemblyLoader = new AssemblyLoader(stepRegistry,new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            assemblyLoader.UpdateStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
 
             var gaugeMethod = sandbox.GetStepMethods()
@@ -46,9 +48,9 @@ namespace Gauge.Dotnet.IntegrationTests
             };
             var aliases = new Dictionary<string, bool> {{parameterizedStepText, false}};
             var stepTextMap = new Dictionary<string, string> {{parameterizedStepText, stepText}};
-            var stepRegistry = new StepRegistry(scannedSteps, stepTextMap, aliases);
 
-            var executeStepProcessor = new ExecuteStepProcessor( new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
+
+            var executeStepProcessor = new ExecuteStepProcessor(stepRegistry, new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
 
             var protoTable = new ProtoTable
             {
@@ -98,7 +100,9 @@ namespace Gauge.Dotnet.IntegrationTests
             const string stepText = "I throw a serializable exception";
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var stepRegistry = new StepRegistry();
+            var assemblyLoader = new AssemblyLoader(stepRegistry, new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            assemblyLoader.UpdateStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
 
             var gaugeMethod = sandbox.GetStepMethods()
@@ -110,7 +114,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var aliases = new Dictionary<string, bool> {{parameterizedStepText, false}};
             var stepTextMap = new Dictionary<string, string> {{parameterizedStepText, stepText}};
 
-            var executeStepProcessor = new ExecuteStepProcessor( new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
+            var executeStepProcessor = new ExecuteStepProcessor(stepRegistry, new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
 
             var message = new Message
             {
