@@ -22,7 +22,7 @@ namespace Gauge.Dotnet.Processors
 {
     public class StepValidationProcessor : IMessageProcessor
     {
-        private IStepRegistry _stepRegistry;
+        private readonly IStepRegistry _stepRegistry;
 
         public StepValidationProcessor(IStepRegistry stepRegistry)
         {
@@ -46,6 +46,7 @@ namespace Gauge.Dotnet.Processors
                 errorType = StepValidateResponse.Types.ErrorType.DuplicateStepImplementation;
                 errorMessage = string.Format("Multiple step implementations found for : {0}", stepToValidate);
             }
+
             return GetStepValidateResponseMessage(isValid, request, errorType, errorMessage);
         }
 

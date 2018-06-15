@@ -24,7 +24,7 @@ namespace Gauge.Dotnet.Processors
 {
     public class RefactorProcessor : IMessageProcessor
     {
-        private IStepRegistry _stepRegistry;
+        private readonly IStepRegistry _stepRegistry;
 
         public RefactorProcessor(IStepRegistry stepRegistry)
         {
@@ -43,7 +43,8 @@ namespace Gauge.Dotnet.Processors
             try
             {
                 var gaugeMethod = GetGaugeMethod(request.RefactorRequest.OldStepValue);
-                var changedFile = RefactorHelper.Refactor(gaugeMethod, parameterPositions, newStep.Parameters.ToList(), newStepValue);
+                var changedFile = RefactorHelper.Refactor(gaugeMethod, parameterPositions, newStep.Parameters.ToList(),
+                    newStepValue);
                 response.Success = true;
                 response.FilesChanged.Add(changedFile);
             }

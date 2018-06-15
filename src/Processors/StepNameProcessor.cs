@@ -22,7 +22,7 @@ namespace Gauge.Dotnet.Processors
 {
     internal class StepNameProcessor : IMessageProcessor
     {
-        private IStepRegistry _stepRegistry;
+        private readonly IStepRegistry _stepRegistry;
 
         public StepNameProcessor(IStepRegistry stepRegistry)
         {

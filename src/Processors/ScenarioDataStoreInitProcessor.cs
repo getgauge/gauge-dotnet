@@ -17,10 +17,10 @@
 
 namespace Gauge.Dotnet.Processors
 {
-
     public class ScenarioDataStoreInitProcessor : DataStoreInitProcessorBase
     {
-        public ScenarioDataStoreInitProcessor(IAssemblyLoader assemblyLoader) : base(assemblyLoader, DataStoreType.Scenario)
+        public ScenarioDataStoreInitProcessor(IAssemblyLoader assemblyLoader) : base(assemblyLoader,
+            DataStoreType.Scenario)
         {
         }
     }

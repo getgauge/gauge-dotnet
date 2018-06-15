@@ -18,7 +18,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace Gauge.Dotnet.Extensions
@@ -59,11 +58,6 @@ namespace Gauge.Dotnet.Extensions
         private static string Capitalize(this string s)
         {
             return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(s.ToLower());
-        }
-
-        public static string GetStepValue(this string stepText)
-        {
-            return Regex.Replace(stepText, @"(<.*?>)", @"{}");
         }
     }
 }

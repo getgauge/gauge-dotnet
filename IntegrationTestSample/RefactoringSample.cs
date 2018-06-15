@@ -37,7 +37,7 @@ namespace IntegrationTestSample
         }
 
         [Step("Refactoring 1 Say <what> to <who>")]
-        public void RefactoringSaySomething1(string what,string who)
+        public void RefactoringSaySomething1(string what, string who)
         {
             Console.WriteLine("{0}, {1}!", what, who);
         }

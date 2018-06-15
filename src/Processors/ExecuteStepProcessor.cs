@@ -25,10 +25,11 @@ namespace Gauge.Dotnet.Processors
     public class ExecuteStepProcessor : ExecutionProcessor, IMessageProcessor
     {
         private readonly IMethodExecutor _methodExecutor;
-        readonly ITableFormatter _tableFormatter;
-        private IStepRegistry _stepRegistry;
+        private readonly IStepRegistry _stepRegistry;
+        private readonly ITableFormatter _tableFormatter;
 
-        public ExecuteStepProcessor(IStepRegistry registry, IMethodExecutor methodExecutor, ITableFormatter tableFormatter)
+        public ExecuteStepProcessor(IStepRegistry registry, IMethodExecutor methodExecutor,
+            ITableFormatter tableFormatter)
         {
             _stepRegistry = registry;
             _tableFormatter = tableFormatter;

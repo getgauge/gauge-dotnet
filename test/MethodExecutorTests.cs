@@ -26,6 +26,7 @@ using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Moq;
 using NUnit.Framework;
+using ExecutionContext = Gauge.CSharp.Lib.ExecutionContext;
 
 namespace Gauge.Dotnet.UnitTests
 {
@@ -52,10 +53,11 @@ namespace Gauge.Dotnet.UnitTests
             var hooksStrategy = new HooksStrategy();
             var executionResult = new ExecutionResult {Success = true};
             mockSandBox.Setup(sandbox =>
-                sandbox.ExecuteHooks("hooks", hooksStrategy, new List<string>(),It.IsAny<Gauge.CSharp.Lib.ExecutionContext>())
+                sandbox.ExecuteHooks("hooks", hooksStrategy, new List<string>(), It.IsAny<ExecutionContext>())
             ).Returns(executionResult).Verifiable();
 
-            new MethodExecutor(mockSandBox.Object).ExecuteHooks("hooks", hooksStrategy, new List<string>(), new Gauge.CSharp.Lib.ExecutionContext());
+            new MethodExecutor(mockSandBox.Object).ExecuteHooks("hooks", hooksStrategy, new List<string>(),
+                new ExecutionContext());
 
             mockSandBox.VerifyAll();
         }
@@ -72,14 +74,15 @@ namespace Gauge.Dotnet.UnitTests
                 StackTrace = "StackTrace"
             };
             mockSandBox.Setup(sandbox =>
-                sandbox.ExecuteHooks("hooks", hooksStrategy, new List<string>(), It.IsAny<Gauge.CSharp.Lib.ExecutionContext>())
+                sandbox.ExecuteHooks("hooks", hooksStrategy, new List<string>(), It.IsAny<ExecutionContext>())
             ).Returns(result).Verifiable();
 
             var screenshotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
             Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", "false");
 
             var protoExecutionResult =
-                new MethodExecutor(mockSandBox.Object).ExecuteHooks("hooks", hooksStrategy, new List<string>(), new Gauge.CSharp.Lib.ExecutionContext());
+                new MethodExecutor(mockSandBox.Object).ExecuteHooks("hooks", hooksStrategy, new List<string>(),
+                    new ExecutionContext());
 
             mockSandBox.VerifyAll();
             Assert.False(protoExecutionResult.ScreenShot == null);
@@ -132,8 +135,9 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockSandBox = new Mock<ISandbox>();
             var gaugeMethod = new GaugeMethod {Name = "ShouldExecuteMethod", ParameterCount = 1};
-            var args = new[] { "Bar", "String" };
-            mockSandBox.Setup(sandbox => sandbox.ExecuteMethod(gaugeMethod, args)).Returns(new ExecutionResult {
+            var args = new[] {"Bar", "String"};
+            mockSandBox.Setup(sandbox => sandbox.ExecuteMethod(gaugeMethod, args)).Returns(new ExecutionResult
+            {
                 Success = false,
                 ExceptionMessage = "error",
                 StackTrace = "stacktrace"

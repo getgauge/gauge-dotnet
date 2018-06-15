@@ -18,38 +18,31 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Gauge.Dotnet.Models
 {
     [Serializable]
     public class StepRegistry : IStepRegistry
     {
-
         private Dictionary<string, List<GaugeMethod>> registry;
 
         public StepRegistry()
         {
-            this.registry = new Dictionary<string, List<GaugeMethod>>();
+            registry = new Dictionary<string, List<GaugeMethod>>();
         }
 
         public IEnumerable<string> GetStepTexts()
         {
-            return registry.Values.SelectMany(methods => {
-                return methods.SelectMany(method => {
-                    return method.StepTexts;
-                });
+            return registry.Values.SelectMany(methods =>
+            {
+                return methods.SelectMany(method => { return method.StepTexts; });
             });
         }
 
         public void AddStep(string stepValue, GaugeMethod method)
         {
-            if (!registry.ContainsKey(stepValue))
-            {
-                registry.Add(stepValue, new List<GaugeMethod>());
-            }
+            if (!registry.ContainsKey(stepValue)) registry.Add(stepValue, new List<GaugeMethod>());
             registry.GetValueOrDefault(stepValue).Add(method);
-
         }
 
         public bool ContainsStep(string parsedStepText)
@@ -80,7 +73,8 @@ namespace Gauge.Dotnet.Models
 
         public bool HasAlias(string stepValue)
         {
-            return registry.ContainsKey(stepValue) && registry.GetValueOrDefault(stepValue).FirstOrDefault().StepTexts.Count() > 1;
+            return registry.ContainsKey(stepValue) &&
+                   registry.GetValueOrDefault(stepValue).FirstOrDefault().StepTexts.Count() > 1;
         }
 
         public string GetStepText(string stepValue)

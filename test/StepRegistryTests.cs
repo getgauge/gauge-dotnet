@@ -25,14 +25,6 @@ namespace Gauge.Dotnet.UnitTests
     [TestFixture]
     public class StepRegistryTests
     {
-        public void Foo()
-        {
-        }
-
-        public void Bar()
-        {
-        }
-
         [Test]
         public void ShouldContainMethodForStepDefined()
         {
@@ -42,10 +34,8 @@ namespace Gauge.Dotnet.UnitTests
                 new KeyValuePair<string, GaugeMethod>("Bar", new GaugeMethod {Name = "Bar"})
             };
             var stepRegistry = new StepRegistry();
-            methods.ToList().ForEach(pair =>
-            {
+            foreach (var pair in methods)
                 stepRegistry.AddStep(pair.Key, pair.Value);
-            });
 
             Assert.True(stepRegistry.ContainsStep("Foo"));
             Assert.True(stepRegistry.ContainsStep("Bar"));
@@ -56,11 +46,18 @@ namespace Gauge.Dotnet.UnitTests
         {
             var methods = new[]
             {
-                new KeyValuePair<string, GaugeMethod>("Foo {}", new GaugeMethod {Name = "Foo", StepTexts = new List<string>(){"foo <something>", "foo <somethingelse>"}}),
+                new KeyValuePair<string, GaugeMethod>("Foo {}",
+                    new GaugeMethod
+                    {
+                        Name = "Foo",
+                        StepTexts = new List<string> {"foo <something>", "foo <somethingelse>"}
+                    }),
                 new KeyValuePair<string, GaugeMethod>("Bar", new GaugeMethod {Name = "Bar"})
             };
             var stepRegistry = new StepRegistry();
-            methods.ToList().ForEach(pair => stepRegistry.AddStep(pair.Key, pair.Value));
+            foreach (var pair in methods)
+                stepRegistry.AddStep(pair.Key, pair.Value);
+
             Assert.True(stepRegistry.HasAlias("Foo {}"));
         }
 
@@ -73,10 +70,9 @@ namespace Gauge.Dotnet.UnitTests
                 new KeyValuePair<string, GaugeMethod>("Bar", new GaugeMethod {Name = "Bar"})
             };
             var stepRegistry = new StepRegistry();
-            methods.ToList().ForEach(pair =>
-            {
+            foreach (var pair in methods)
                 stepRegistry.AddStep(pair.Key, pair.Value);
-            });
+
             var allSteps = stepRegistry.AllSteps().ToList();
 
             Assert.AreEqual(allSteps.Count, 2);
@@ -92,9 +88,10 @@ namespace Gauge.Dotnet.UnitTests
                 new KeyValuePair<string, GaugeMethod>("Foo", new GaugeMethod {Name = "Foo"}),
                 new KeyValuePair<string, GaugeMethod>("Bar", new GaugeMethod {Name = "Bar"})
             };
-            var stepTextMap = new Dictionary<string, string> { { "foo_parameterized", "Foo" } };
-
             var stepRegistry = new StepRegistry();
+            foreach (var pair in methods)
+                stepRegistry.AddStep(pair.Key, pair.Value);
+
             Assert.AreEqual(stepRegistry.GetStepText("random"), string.Empty);
         }
 
@@ -107,10 +104,9 @@ namespace Gauge.Dotnet.UnitTests
                 new KeyValuePair<string, GaugeMethod>("Bar", new GaugeMethod {Name = "Bar"})
             };
             var stepRegistry = new StepRegistry();
-            methods.ToList().ForEach(pair =>
-            {
+            foreach (var pair in methods)
                 stepRegistry.AddStep(pair.Key, pair.Value);
-            });
+
             var method = stepRegistry.MethodFor("Foo");
 
             Assert.AreEqual(method.Name, "Foo");
@@ -121,14 +117,19 @@ namespace Gauge.Dotnet.UnitTests
         {
             var methods = new[]
             {
-                new KeyValuePair<string, GaugeMethod>("Foo {}", new GaugeMethod {Name = "Foo", StepValue = "foo {}", StepTexts= new List<string>(){"Foo <something>"}}),
+                new KeyValuePair<string, GaugeMethod>("Foo {}",
+                    new GaugeMethod
+                    {
+                        Name = "Foo",
+                        StepValue = "foo {}",
+                        StepTexts = new List<string> {"Foo <something>"}
+                    }),
                 new KeyValuePair<string, GaugeMethod>("Bar", new GaugeMethod {Name = "Bar"})
             };
             var stepRegistry = new StepRegistry();
-            methods.ToList().ForEach(pair =>
-            {
+            foreach (var pair in methods)
                 stepRegistry.AddStep(pair.Key, pair.Value);
-            });
+
 
             Assert.AreEqual(stepRegistry.GetStepText("Foo {}"), "Foo <something>");
         }
@@ -138,14 +139,14 @@ namespace Gauge.Dotnet.UnitTests
         {
             var methods = new[]
             {
-                new KeyValuePair<string, GaugeMethod>("Foo", new GaugeMethod {Name = "Foo", StepTexts = new List<string>(){"Foo"}}),
-                new KeyValuePair<string, GaugeMethod>("Bar", new GaugeMethod {Name = "Bar", StepTexts = new List<string>(){"Bar"}})
+                new KeyValuePair<string, GaugeMethod>("Foo",
+                    new GaugeMethod {Name = "Foo", StepTexts = new List<string> {"Foo"}}),
+                new KeyValuePair<string, GaugeMethod>("Bar",
+                    new GaugeMethod {Name = "Bar", StepTexts = new List<string> {"Bar"}})
             };
             var stepRegistry = new StepRegistry();
-            methods.ToList().ForEach(p =>
-            {
-                stepRegistry.AddStep(p.Key, p.Value);
-            });
+            foreach (var pair in methods)
+                stepRegistry.AddStep(pair.Key, pair.Value);
 
             Assert.False(stepRegistry.HasAlias("Foo"));
             Assert.False(stepRegistry.HasAlias("Bar"));

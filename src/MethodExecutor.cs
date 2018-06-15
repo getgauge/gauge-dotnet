@@ -60,11 +60,13 @@ namespace Gauge.Dotnet
                 builder.RecoverableError = executionResult.Recoverable;
                 builder.ExecutionTime = elapsedMilliseconds;
             }
+
             return builder;
         }
 
         [DebuggerHidden]
-        public ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags, ExecutionContext context)
+        public ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags,
+            ExecutionContext context)
         {
             var stopwatch = Stopwatch.StartNew();
             var result = new ProtoExecutionResult
@@ -86,6 +88,7 @@ namespace Gauge.Dotnet
                 result.RecoverableError = executionResult.Recoverable;
                 result.ExecutionTime = elapsedMilliseconds;
             }
+
             return result;
         }
 

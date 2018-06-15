@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -29,11 +28,6 @@ namespace Gauge.Dotnet.Extensions
             return list.First(syntax => GetStepAttribute(syntax.Attributes) != null);
         }
 
-        public static Boolean IsRecoverable(this MemberDeclarationSyntax method)
-        {
-            //TODO: Figure out if method is recoverable
-            return false;
-        }
         public static AttributeSyntax GetStepAttribute(this SeparatedSyntaxList<AttributeSyntax> list)
         {
             return list.FirstOrDefault(argumentSyntax =>

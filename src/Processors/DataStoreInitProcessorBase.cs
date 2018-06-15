@@ -15,15 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
     public abstract class DataStoreInitProcessorBase : IMessageProcessor
     {
-        private IAssemblyLoader _assemblyLoader;
-        private DataStoreType _dataStoreType;
+        private readonly IAssemblyLoader _assemblyLoader;
+        private readonly DataStoreType _dataStoreType;
 
         protected DataStoreInitProcessorBase(IAssemblyLoader assemblyLoader, DataStoreType scenario)
         {
@@ -33,7 +32,8 @@ namespace Gauge.Dotnet.Processors
 
         public Message Process(Message request)
         {
-            var initMethod = _assemblyLoader.GetLibType(LibType.DataStoreFactory).GetMethod($"Initialize{_dataStoreType}DataStore");
+            var initMethod = _assemblyLoader.GetLibType(LibType.DataStoreFactory)
+                .GetMethod($"Initialize{_dataStoreType}DataStore");
             initMethod.Invoke(null, null);
             return new DefaultProcessor().Process(request);
         }

@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using System.Collections.Generic;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
@@ -33,7 +32,8 @@ namespace Gauge.Dotnet
         void ClearObjectCache();
         void StartExecutionScope(string tag);
         void CloseExectionScope();
-        ExecutionResult ExecuteHooks(string hookType, IHooksStrategy strategy, IList<string> applicableTags, ExecutionContext context);
 
+        ExecutionResult ExecuteHooks(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
+            ExecutionContext context);
     }
 }

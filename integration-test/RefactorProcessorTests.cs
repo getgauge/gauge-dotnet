@@ -18,10 +18,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using NUnit.Framework;
 
@@ -46,11 +44,12 @@ namespace Gauge.Dotnet.IntegrationTests
             const string parameterizedStepText = "Refactoring 1 Say <what> to <who>";
             const string stepValue = "Refactoring 1 Say {} to {}";
             var stepRegistry = new StepRegistry();
-            stepRegistry.AddStep(stepValue, new GaugeMethod(){
+            stepRegistry.AddStep(stepValue, new GaugeMethod
+            {
                 Name = "RefactoringSaySomething1",
                 ClassName = "RefactoringSample",
                 FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs"),
-                StepTexts = new List<string>(){parameterizedStepText},
+                StepTexts = new List<string> {parameterizedStepText},
                 StepValue = stepValue
             });
             var message = new Message

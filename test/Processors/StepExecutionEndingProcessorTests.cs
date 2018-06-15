@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
@@ -32,7 +33,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 {
     internal class StepExecutionEndingProcessorTests
     {
-        private readonly IEnumerable<string> _pendingMessages = new List<string> { "Foo", "Bar" };
+        private readonly IEnumerable<string> _pendingMessages = new List<string> {"Foo", "Bar"};
         private Mock<IMethodExecutor> _mockMethodExecutor;
         private ProtoExecutionResult _protoExecutionResult;
         private Message _request;
@@ -75,16 +76,18 @@ namespace Gauge.Dotnet.UnitTests.Processors
             _protoExecutionResult = new ProtoExecutionResult
             {
                 ExecutionTime = 0,
-                Failed = false,
-                Message = { }
+                Failed = false
             };
             _mockMethodExecutor.Setup(x =>
-                    x.ExecuteHooks("AfterStep", It.IsAny<TaggedHooksFirstStrategy>(), new List<string>(), It.IsAny<Gauge.CSharp.Lib.ExecutionContext>()))
+                    x.ExecuteHooks("AfterStep", It.IsAny<TaggedHooksFirstStrategy>(), new List<string>(),
+                        It.IsAny<ExecutionContext>()))
                 .Returns(_protoExecutionResult);
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            mockReflectionWrapper.Setup(x => x.InvokeMethod(mockMessageCollectorType.Object, null, "GetAllPendingMessages", BindingFlags.Static | BindingFlags.Public))
+            mockReflectionWrapper.Setup(x => x.InvokeMethod(mockMessageCollectorType.Object, null,
+                    "GetAllPendingMessages", BindingFlags.Static | BindingFlags.Public))
                 .Returns(_pendingMessages);
-            _stepExecutionEndingProcessor = new StepExecutionEndingProcessor(_mockMethodExecutor.Object, mockAssemblyLoader.Object, mockReflectionWrapper.Object);
+            _stepExecutionEndingProcessor = new StepExecutionEndingProcessor(_mockMethodExecutor.Object,
+                mockAssemblyLoader.Object, mockReflectionWrapper.Object);
         }
 
         [Test]
@@ -110,14 +113,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = { "foo" },
+                Tags = {"foo"},
                 Name = "",
                 FileName = "",
                 IsFailed = false
             };
             var scenarioInfo = new ScenarioInfo
             {
-                Tags = { "bar" },
+                Tags = {"bar"},
                 Name = "",
                 IsFailed = false
             };
@@ -149,14 +152,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = { "foo" },
+                Tags = {"foo"},
                 Name = "",
                 FileName = "",
                 IsFailed = false
             };
             var scenarioInfo = new ScenarioInfo
             {
-                Tags = { "foo" },
+                Tags = {"foo"},
                 Name = "",
                 IsFailed = false
             };

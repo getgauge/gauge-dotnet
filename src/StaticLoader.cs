@@ -29,21 +29,24 @@ namespace Gauge.Dotnet
 {
     public sealed class StaticLoader
     {
-        private IStepRegistry _stepRegistry;
+        private readonly IStepRegistry _stepRegistry;
 
-        public StaticLoader(IStepRegistry registry)
+        public StaticLoader()
         {
-            this._stepRegistry = registry;
+            _stepRegistry = new StepRegistry();
         }
 
-        public void LoadImplementations()
+        public IStepRegistry GetStepRegistry()
         {
-            var classFiles = Directory.EnumerateFiles(Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT"), "*.cs", SearchOption.AllDirectories);
+            var classFiles = Directory.EnumerateFiles(Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT"), "*.cs",
+                SearchOption.AllDirectories);
             foreach (var f in classFiles)
             {
-                var steps = GetStesFrom(f);
+                var steps = GetStepsFrom(f);
                 AddStepsToRegsitry(f, steps);
             }
+
+            return _stepRegistry;
         }
 
         private void AddStepsToRegsitry(string fileName, IEnumerable<MethodDeclarationSyntax> stepMethods)
@@ -54,34 +57,32 @@ namespace Gauge.Dotnet
                 var attributeSyntax = attributeListSyntax.Attributes.GetStepAttribute();
                 var stepTextsSyntax = attributeSyntax.ArgumentList.Arguments.ToList();
                 var stepTexts = stepTextsSyntax.Select(s => s.ToString().Trim('"'));
-                var stepValue = stepTexts.FirstOrDefault().GetStepValue();
+                var stepValue = Regex.Replace(stepTexts.FirstOrDefault(), @"(<.*?>)", @"{}");
                 var classDef = stepMethod.Parent as ClassDeclarationSyntax;
-                var entry = new GaugeMethod()
+                var entry = new GaugeMethod
                 {
                     Name = stepMethod.Identifier.ValueText,
                     ParameterCount = stepMethod.ParameterList.Parameters.Count,
-                    ContinueOnFailure = stepMethod.IsRecoverable(),
                     StepTexts = stepTexts,
                     StepValue = stepValue,
                     Span = stepMethod.GetLocation().GetLineSpan(),
                     ClassName = classDef.Identifier.ValueText,
-                    FileName = fileName,
+                    FileName = fileName
                 };
                 _stepRegistry.AddStep(stepValue, entry);
-
             }
         }
 
-        private  IEnumerable<MethodDeclarationSyntax> GetStesFrom(string f)
+        private static IEnumerable<MethodDeclarationSyntax> GetStepsFrom(string f)
         {
             var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(f));
             var root = tree.GetRoot();
 
             var stepMethods = from node in root.DescendantNodes().OfType<MethodDeclarationSyntax>()
-                              let attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes)
-                              where attributeSyntaxes.Any(syntax =>
-                                        string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
-                              select node;
+                let attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes)
+                where attributeSyntaxes.Any(syntax =>
+                    string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
+                select node;
             return stepMethods;
         }
     }

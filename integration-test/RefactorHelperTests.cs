@@ -21,7 +21,6 @@ using System.IO;
 using System.Linq;
 using Gauge.CSharp.Lib.Attribute;
 using Gauge.Dotnet.Models;
-using Gauge.Dotnet.Wrappers;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
@@ -60,7 +59,7 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var stepTexts = root.DescendantNodes().OfType<MethodDeclarationSyntax>()
                 .Select(
-                    node => new { node, attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes) })
+                    node => new {node, attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes)})
                 .Where(t => string.CompareOrdinal(t.node.Identifier.ValueText, name) == 0
                             &&
                             t.attributeSyntaxes.Any(
@@ -92,37 +91,38 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldAddParameters()
         {
             const string newStepValue = "Refactoring Say <what> to <who> in <where>";
-            var gaugeMethod = new GaugeMethod()
+            var gaugeMethod = new GaugeMethod
             {
                 Name = "RefactoringSaySomething",
                 ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs"),
+                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
             };
 
             var parameterPositions = new[]
                 {new Tuple<int, int>(0, 0), new Tuple<int, int>(1, 1), new Tuple<int, int>(-1, 2)};
-            RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> { "what", "who", "where" }, newStepValue);
+            RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> {"what", "who", "where"},
+                newStepValue);
 
             AssertStepAttributeWithTextExists(gaugeMethod.Name, newStepValue);
-            AssertParametersExist(gaugeMethod.Name, new[] { "what", "who", "where" });
+            AssertParametersExist(gaugeMethod.Name, new[] {"what", "who", "where"});
         }
 
         [Test]
         public void ShouldAddParametersWhenNoneExisted()
         {
             const string newStepValue = "Refactoring this is a test step <foo>";
-            var gaugeMethod = new GaugeMethod()
+            var gaugeMethod = new GaugeMethod
             {
                 Name = "RefactoringSampleTest",
                 ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs"),
+                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
             };
-            var parameterPositions = new[] { new Tuple<int, int>(-1, 0) };
+            var parameterPositions = new[] {new Tuple<int, int>(-1, 0)};
 
-            RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> { "foo" }, newStepValue);
+            RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> {"foo"}, newStepValue);
 
             AssertStepAttributeWithTextExists(gaugeMethod.Name, newStepValue);
-            AssertParametersExist(gaugeMethod.Name, new[] { "foo" });
+            AssertParametersExist(gaugeMethod.Name, new[] {"foo"});
         }
 
         [Test]
@@ -130,28 +130,28 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             const string newStepValue = "Refactoring this is a test step <class>";
 
-            var gaugeMethod = new GaugeMethod()
+            var gaugeMethod = new GaugeMethod
             {
                 Name = "RefactoringSampleTest",
                 ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs"),
+                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
             };
-            var parameterPositions = new[] { new Tuple<int, int>(-1, 0) };
+            var parameterPositions = new[] {new Tuple<int, int>(-1, 0)};
 
-            RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> { "class" }, newStepValue);
+            RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> {"class"}, newStepValue);
 
             AssertStepAttributeWithTextExists(gaugeMethod.Name, newStepValue);
-            AssertParametersExist(gaugeMethod.Name, new[] { "@class" });
+            AssertParametersExist(gaugeMethod.Name, new[] {"@class"});
         }
 
         [Test]
         public void ShouldRefactorAndReturnFilesChanged()
         {
-            var gaugeMethod = new GaugeMethod()
+            var gaugeMethod = new GaugeMethod
             {
                 Name = "RefactoringContext",
                 ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs"),
+                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
             };
 
             var expectedPath = Path.GetFullPath(Path.Combine(_testProjectPath, "RefactoringSample.cs"));
@@ -165,12 +165,11 @@ namespace Gauge.Dotnet.IntegrationTests
         [Test]
         public void ShouldRefactorAttributeText()
         {
-
-            var gaugeMethod = new GaugeMethod()
+            var gaugeMethod = new GaugeMethod
             {
                 Name = "RefactoringContext",
                 ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs"),
+                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
             };
             RefactorHelper.Refactor(gaugeMethod, new List<Tuple<int, int>>(), new List<string>(), "foo");
 
@@ -180,36 +179,36 @@ namespace Gauge.Dotnet.IntegrationTests
         [Test]
         public void ShouldRemoveParameters()
         {
-
-            var gaugeMethod = new GaugeMethod()
+            var gaugeMethod = new GaugeMethod
             {
                 Name = "RefactoringSaySomething",
                 ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs"),
+                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
             };
-            var parameterPositions = new[] { new Tuple<int, int>(0, 0) };
+            var parameterPositions = new[] {new Tuple<int, int>(0, 0)};
 
-            RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string>(), "Refactoring Say <what> to someone");
+            RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string>(),
+                "Refactoring Say <what> to someone");
 
-            AssertParametersExist(gaugeMethod.Name, new[] { "what" });
+            AssertParametersExist(gaugeMethod.Name, new[] {"what"});
         }
 
         [Test]
         public void ShouldRemoveParametersInAnyOrder()
         {
-
-            var gaugeMethod = new GaugeMethod()
+            var gaugeMethod = new GaugeMethod
             {
                 Name = "RefactoringSaySomething",
                 ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs"),
+                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
             };
 
-            var parameterPositions = new[] { new Tuple<int, int>(1, 0) };
+            var parameterPositions = new[] {new Tuple<int, int>(1, 0)};
 
-            RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string>(), "Refactoring Say something to <who>");
+            RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string>(),
+                "Refactoring Say something to <who>");
 
-            AssertParametersExist(gaugeMethod.Name, new[] { "who" });
+            AssertParametersExist(gaugeMethod.Name, new[] {"who"});
         }
 
 
@@ -218,18 +217,18 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             const string newStepValue = "Refactoring Say <who> to <what>";
 
-            var gaugeMethod = new GaugeMethod()
+            var gaugeMethod = new GaugeMethod
             {
                 Name = "RefactoringSaySomething",
                 ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs"),
+                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
             };
 
-            var parameterPositions = new[] { new Tuple<int, int>(0, 1), new Tuple<int, int>(1, 0) };
-            RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> { "who", "what" }, newStepValue);
+            var parameterPositions = new[] {new Tuple<int, int>(0, 1), new Tuple<int, int>(1, 0)};
+            RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> {"who", "what"}, newStepValue);
 
             AssertStepAttributeWithTextExists(gaugeMethod.Name, newStepValue);
-            AssertParametersExist(gaugeMethod.Name, new[] { "who", "what" });
+            AssertParametersExist(gaugeMethod.Name, new[] {"who", "what"});
         }
     }
 }

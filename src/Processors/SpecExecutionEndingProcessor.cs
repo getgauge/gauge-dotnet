@@ -26,7 +26,8 @@ namespace Gauge.Dotnet.Processors
     {
         private readonly ISandbox _sandbox;
 
-        public SpecExecutionEndingProcessor(IMethodExecutor methodExecutor, ISandbox sandbox, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
+        public SpecExecutionEndingProcessor(IMethodExecutor methodExecutor, ISandbox sandbox,
+            IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
             : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
             _sandbox = sandbox;

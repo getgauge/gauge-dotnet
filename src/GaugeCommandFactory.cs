@@ -15,11 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using Gauge.CSharp.Core;
-using Gauge.Dotnet.Models;
-using Gauge.Dotnet.Processors;
-using Gauge.Dotnet.Wrappers;
-
 namespace Gauge.Dotnet
 {
     public class GaugeCommandFactory
@@ -32,14 +27,13 @@ namespace Gauge.Dotnet
                     return new SetupCommand();
                 default:
                     return new StartCommand(() =>
-                    {
-                        var registry = new StepRegistry();
-                        var loader  = new StaticLoader(registry);
-                        loader.LoadImplementations();
-                        var messageProcessorFactory = new MessageProcessorFactory(registry, loader);
-                        return new GaugeListener(messageProcessorFactory);
-                    },
-                    () => new GaugeProjectBuilder());
+                        {
+                            var loader = new StaticLoader();
+                            var registry = loader.GetStepRegistry();
+                            var messageProcessorFactory = new MessageProcessorFactory(registry);
+                            return new GaugeListener(messageProcessorFactory);
+                        },
+                        () => new GaugeProjectBuilder());
             }
         }
     }

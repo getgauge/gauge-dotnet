@@ -15,12 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
@@ -68,8 +64,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var mockTableFormatter = new Mock<ITableFormatter>();
 
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object,mockMethodExecutor.Object, mockTableFormatter.Object)
-                .Process(request);
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockTableFormatter.Object)
+                    .Process(request);
 
             Assert.False(response.ExecutionStatusResponse.ExecutionResult.Failed);
         }
@@ -119,11 +115,11 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockTableFormatter.Setup(x => x.GetJSON(protoTable))
                 .Returns(tableJSON);
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object,mockMethodExecutor.Object, mockTableFormatter.Object)
-                .Process(request);
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockTableFormatter.Object)
+                    .Process(request);
 
             mockMethodExecutor.Verify(executor =>
-                executor.Execute(fooMethodInfo, It.Is<string[]>(strings => strings[0]== tableJSON)));
+                executor.Execute(fooMethodInfo, It.Is<string[]>(strings => strings[0] == tableJSON)));
             Assert.False(response.ExecutionStatusResponse.ExecutionResult.Failed);
         }
 
@@ -151,7 +147,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             var response =
                 new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockTableFormatter.Object)
-                .Process(request);
+                    .Process(request);
 
             Assert.True(response.ExecutionStatusResponse.ExecutionResult.Failed);
             Assert.AreEqual(response.ExecutionStatusResponse.ExecutionResult.ErrorMessage,
@@ -178,8 +174,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var mockTableFormatter = new Mock<ITableFormatter>();
 
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object,mockMethodExecutor.Object, mockTableFormatter.Object)
-                .Process(request);
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockMethodExecutor.Object, mockTableFormatter.Object)
+                    .Process(request);
 
             Assert.True(response.ExecutionStatusResponse.ExecutionResult.Failed);
             Assert.AreEqual(response.ExecutionStatusResponse.ExecutionResult.ErrorMessage,

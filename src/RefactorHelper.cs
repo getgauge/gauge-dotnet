@@ -19,8 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
 using Microsoft.CodeAnalysis;
@@ -39,12 +37,13 @@ namespace Gauge.Dotnet
             var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(method.FileName));
             var root = tree.GetRoot();
             var stepMethods = from node in root.DescendantNodes().OfType<MethodDeclarationSyntax>()
-                              let attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes)
-                              let classDef = node.Parent as ClassDeclarationSyntax
-                              where string.CompareOrdinal(node.Identifier.ValueText, method.Name) == 0
-                                    && string.CompareOrdinal(classDef.Identifier.ValueText, method.ClassName) == 0
-                                    && attributeSyntaxes.Any(syntax => string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
-                              select node;
+                let attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes)
+                let classDef = node.Parent as ClassDeclarationSyntax
+                where string.CompareOrdinal(node.Identifier.ValueText, method.Name) == 0
+                      && string.CompareOrdinal(classDef.Identifier.ValueText, method.ClassName) == 0
+                      && attributeSyntaxes.Any(syntax =>
+                          string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
+                select node;
 
             //TODO: check for aliases and error out
             foreach (var methodDeclarationSyntax in stepMethods)
@@ -59,6 +58,7 @@ namespace Gauge.Dotnet
                 File.WriteAllText(method.FileName, replaceNode.ToFullString());
                 changedFile = method.FileName;
             }
+
             return changedFile;
         }
 

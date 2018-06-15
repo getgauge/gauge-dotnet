@@ -25,15 +25,13 @@ namespace Gauge.Dotnet.UnitTests.Processors.Stubs
 {
     public class TestUntaggedHooksFirstExecutionProcessor : UntaggedHooksFirstExecutionProcessor
     {
-        public TestUntaggedHooksFirstExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper) 
+        public TestUntaggedHooksFirstExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader,
+            IReflectionWrapper reflectionWrapper)
             : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
         }
 
-        protected override string HookType
-        {
-            get { throw new NotImplementedException(); }
-        }
+        protected override string HookType => throw new NotImplementedException();
 
         protected override ExecutionInfo GetExecutionInfo(Message request)
         {

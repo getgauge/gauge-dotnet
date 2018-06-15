@@ -45,12 +45,14 @@ namespace Gauge.Dotnet.UnitTests
             var mockActivatorWrapper = new Mock<IActivatorWrapper>();
             var mockScreenGrabber = new Mock<object>();
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            mockReflectionWrapper.Setup(x => x.InvokeMethod(mockScreenGrabberType.Object, mockScreenGrabber.Object, "TakeScreenShot"))
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockScreenGrabberType.Object, mockScreenGrabber.Object, "TakeScreenShot"))
                 .Returns(Encoding.UTF8.GetBytes("TestScreenGrabber"));
             mockActivatorWrapper.Setup(x => x.CreateInstance(mockScreenGrabberType.Object))
                 .Returns(mockScreenGrabber.Object)
                 .Verifiable();
-            var sandbox = new Sandbox(mockAssemblyLoader.Object, null, mockActivatorWrapper.Object, mockReflectionWrapper.Object);
+            var sandbox = new Sandbox(mockAssemblyLoader.Object, null, mockActivatorWrapper.Object,
+                mockReflectionWrapper.Object);
             byte[] screenshot;
             var tryScreenCapture = sandbox.TryScreenCapture(out screenshot);
 

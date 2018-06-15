@@ -24,7 +24,8 @@ namespace Gauge.Dotnet.Processors
 {
     public class StepExecutionEndingProcessor : TaggedHooksFirstExecutionProcessor
     {
-        public StepExecutionEndingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
+        public StepExecutionEndingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader,
+            IReflectionWrapper reflectionWrapper)
             : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
         }

@@ -39,7 +39,8 @@ namespace Gauge.Dotnet
 
         public IEnumerable<string> GetAllAssemblies()
         {
-            var assemblies = _directoryWrapper.EnumerateFiles(Utils.GetGaugeBinDir(), "*.dll", SearchOption.TopDirectoryOnly)
+            var assemblies = _directoryWrapper
+                .EnumerateFiles(Utils.GetGaugeBinDir(), "*.dll", SearchOption.TopDirectoryOnly)
                 .ToList();
             var gaugeAdditionalLibsPath = Environment.GetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS");
             if (string.IsNullOrEmpty(gaugeAdditionalLibsPath))
@@ -53,8 +54,10 @@ namespace Gauge.Dotnet
                     AddFile(libPath, assemblies);
                     continue;
                 }
+
                 AddFilesFromDirectory(libPath, assemblies);
             }
+
             return assemblies;
         }
 

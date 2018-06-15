@@ -26,7 +26,10 @@ namespace Gauge.Dotnet
     public interface IMethodExecutor
     {
         ProtoExecutionResult Execute(GaugeMethod method, params string[] args);
-        ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags, ExecutionContext context);
+
+        ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags,
+            ExecutionContext context);
+
         void ClearCache();
     }
 }

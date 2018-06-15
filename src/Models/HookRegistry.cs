@@ -26,14 +26,14 @@ namespace Gauge.Dotnet.Models
     [Serializable]
     public class HookRegistry : IHookRegistry
     {
+        private readonly IAssemblyLoader _assemblyLoader;
         private readonly IDictionary<LibType, HashSet<IHookMethod>> _hooks;
 
         private readonly IDictionary<string, MethodInfo> _methodMap = new Dictionary<string, MethodInfo>();
-        private readonly IAssemblyLoader _assemblyLoader;
 
         public HookRegistry(IAssemblyLoader assemblyLoader)
         {
-            this._assemblyLoader = assemblyLoader;
+            _assemblyLoader = assemblyLoader;
             _hooks = new Dictionary<LibType, HashSet<IHookMethod>>
             {
                 {LibType.BeforeSuite, new HashSet<IHookMethod>()},
@@ -79,6 +79,7 @@ namespace Gauge.Dotnet.Models
                 if (!_methodMap.ContainsKey(fullyQuallifiedName))
                     _methodMap.Add(fullyQuallifiedName, methodInfo);
             }
+
             _hooks[hookType].UnionWith(hooks.Select(info => new HookMethod(hookType, info, _assemblyLoader)));
         }
     }

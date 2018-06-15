@@ -31,9 +31,9 @@ namespace Gauge.Dotnet.Strategy
             return from hookMethod in hooks.ToList()
                 where hookMethod.FilterTags != null && hookMethod.FilterTags.Any()
                 where
-                     // TagAggregation.And=0, Or=1
-                     hookMethod.TagAggregation == 1 && hookMethod.FilterTags.Intersect(tagsList).Any() ||
-                     hookMethod.TagAggregation == 0 && hookMethod.FilterTags.All(tagsList.Contains)
+                    // TagAggregation.And=0, Or=1
+                    hookMethod.TagAggregation == 1 && hookMethod.FilterTags.Intersect(tagsList).Any() ||
+                    hookMethod.TagAggregation == 0 && hookMethod.FilterTags.All(tagsList.Contains)
                 orderby hookMethod.Method
                 select hookMethod.Method;
         }

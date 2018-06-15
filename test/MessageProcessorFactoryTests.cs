@@ -37,9 +37,9 @@ namespace Gauge.Dotnet.UnitTests
             var mockActivatorWrapper = new Mock<IActivatorWrapper>();
             var mockTableFormatter = new Mock<ITableFormatter>();
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            var loader = new StaticLoader(mockStepRegistry.Object);
-            _messageProcessorFactory = new MessageProcessorFactory(mockStepRegistry.Object, loader);
-            _messageProcessorFactory.InitializeExecutionMessageHandlers(mockReflectionWrapper.Object,mockAssemblyLoader.Object,mockActivatorWrapper.Object, mockTableFormatter.Object, mockSandBox.Object);
+            _messageProcessorFactory = new MessageProcessorFactory(mockStepRegistry.Object);
+            _messageProcessorFactory.InitializeExecutionMessageHandlers(mockReflectionWrapper.Object,
+                mockAssemblyLoader.Object, mockActivatorWrapper.Object, mockTableFormatter.Object, mockSandBox.Object);
         }
 
         private MessageProcessorFactory _messageProcessorFactory;

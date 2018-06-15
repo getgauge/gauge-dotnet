@@ -38,13 +38,14 @@ namespace Gauge.Dotnet.Models
             var filteredHookAttribute = customAttributes.FirstOrDefault(type.IsInstanceOfType);
             if (filteredHookAttribute == null) return;
 
-            FilterTags = (string[])GetPropValue(filteredHookAttribute, "FilterTags");
+            FilterTags = (string[]) GetPropValue(filteredHookAttribute, "FilterTags");
 
             var targetTagBehaviourType = assemblyLoader.GetLibType(LibType.TagAggregationBehaviourAttribute);
-            dynamic tagAggregationBehaviourAttribute = customAttributes.FirstOrDefault(targetTagBehaviourType.IsInstanceOfType);
+            dynamic tagAggregationBehaviourAttribute =
+                customAttributes.FirstOrDefault(targetTagBehaviourType.IsInstanceOfType);
 
             if (tagAggregationBehaviourAttribute != null)
-                TagAggregation = (int)GetPropValue(tagAggregationBehaviourAttribute, "TagAggregation");
+                TagAggregation = (int) GetPropValue(tagAggregationBehaviourAttribute, "TagAggregation");
         }
 
         public int TagAggregation { get; }

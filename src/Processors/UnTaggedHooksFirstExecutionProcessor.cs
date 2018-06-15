@@ -22,7 +22,8 @@ namespace Gauge.Dotnet.Processors
 {
     public abstract class UntaggedHooksFirstExecutionProcessor : HookExecutionProcessor
     {
-        protected UntaggedHooksFirstExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
+        protected UntaggedHooksFirstExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader,
+            IReflectionWrapper reflectionWrapper)
             : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
             Strategy = new UntaggedHooksFirstStrategy();

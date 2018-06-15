@@ -31,23 +31,18 @@ namespace Gauge.Dotnet
             var gaugeBinDir = Utils.GetGaugeBinDir();
             var csprojEnvVariable = Utils.TryReadEnvValue("GAUGE_CSHARP_PROJECT_FILE");
             var commandArgs = $"publish --configuration=release --output=\"{gaugeBinDir}\"";
-            if (!string.IsNullOrEmpty(csprojEnvVariable))
-            {
-                commandArgs = $"{commandArgs} \"{csprojEnvVariable}\"";
-            }
+            if (!string.IsNullOrEmpty(csprojEnvVariable)) commandArgs = $"{commandArgs} \"{csprojEnvVariable}\"";
             try
             {
                 var logLevel = Utils.TryReadEnvValue("GAUGE_LOG_LEVEL");
-                if (string.Compare(logLevel, "DEBUG", true)!=0)
-                {
-                    commandArgs = $"{commandArgs} --verbosity=quiet";
-                }
+                if (string.Compare(logLevel, "DEBUG", true) != 0) commandArgs = $"{commandArgs} --verbosity=quiet";
                 RunDotnetCommand(commandArgs);
             }
             catch (Exception ex)
             {
                 throw new Exception($"dotnet Project build failed.\nRan 'dotnet {commandArgs}'", ex);
             }
+
             return true;
         }
 
@@ -59,15 +54,9 @@ namespace Gauge.Dotnet
                 FileName = "dotnet",
                 Arguments = args
             };
-            var buildProcess = new Process { EnableRaisingEvents = true, StartInfo = startInfo };
-            buildProcess.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
-            {
-                Logger.Debug(e.Data);
-            };
-            buildProcess.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
-            {
-                Logger.Error(e.Data);
-            };
+            var buildProcess = new Process {EnableRaisingEvents = true, StartInfo = startInfo};
+            buildProcess.OutputDataReceived += (sender, e) => { Logger.Debug(e.Data); };
+            buildProcess.ErrorDataReceived += (sender, e) => { Logger.Error(e.Data); };
             buildProcess.Start();
             buildProcess.WaitForExit();
         }

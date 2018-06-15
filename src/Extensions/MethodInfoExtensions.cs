@@ -42,7 +42,7 @@ namespace Gauge.Dotnet.Extensions
             var continueOnFailureType = assemblyLoader.GetLibType(LibType.ContinueOnFailure);
             var customAttributes = info.GetCustomAttributes(false).ToList();
             return customAttributes.Any(stepType.IsInstanceOfType)
-                       && customAttributes.Any(continueOnFailureType.IsInstanceOfType);
+                   && customAttributes.Any(continueOnFailureType.IsInstanceOfType);
         }
     }
 }

@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -34,10 +33,11 @@ namespace Gauge.Dotnet.Processors
         protected const string SpecLevel = "spec";
         protected const string ScenarioLevel = "scenario";
         private readonly IAssemblyLoader _assemblyLoader;
-        protected readonly IMethodExecutor MethodExecutor;
         private readonly IReflectionWrapper _reflectionWrapper;
+        protected readonly IMethodExecutor MethodExecutor;
 
-        protected HookExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
+        protected HookExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader,
+            IReflectionWrapper reflectionWrapper)
         {
             _assemblyLoader = assemblyLoader;
             MethodExecutor = methodExecutor;
@@ -83,14 +83,16 @@ namespace Gauge.Dotnet.Processors
 
         public virtual IEnumerable<string> GetAllPendingMessages()
         {
-            Type messageCollectorType = _assemblyLoader.GetLibType(LibType.MessageCollector);
-            return _reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingMessages", BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>;
+            var messageCollectorType = _assemblyLoader.GetLibType(LibType.MessageCollector);
+            return _reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingMessages",
+                BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>;
         }
 
         public virtual void ClearAllPendingMessages()
         {
-            Type messageCollectorType = _assemblyLoader.GetLibType(LibType.MessageCollector);
-            _reflectionWrapper.InvokeMethod(messageCollectorType, null, "Clear", BindingFlags.Static | BindingFlags.Public);
+            var messageCollectorType = _assemblyLoader.GetLibType(LibType.MessageCollector);
+            _reflectionWrapper.InvokeMethod(messageCollectorType, null, "Clear",
+                BindingFlags.Static | BindingFlags.Public);
         }
     }
 }

@@ -31,10 +31,11 @@ namespace Gauge.Dotnet.IntegrationTests
         public void RecoverableIsTrueOnExceptionThrownWhenContinueOnFailure()
         {
             var reflectionWrapper = new ReflectionWrapper();
-            var stepRegistry = new StepRegistry();
-            var assemblyLoader = new AssemblyLoader(stepRegistry, new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.UpdateStepRegistry();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            assemblyLoader.GetStepRegistry();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
+                reflectionWrapper);
             var stepMethods = sandbox.GetStepMethods();
             var gaugeMethod = stepMethods.First(info =>
                 string.CompareOrdinal(info.Name, "IntegrationTestSample.StepImplementation.ContinueOnFailure") == 0);
@@ -48,17 +49,18 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldCreateTableFromTargetType()
         {
             var reflectionWrapper = new ReflectionWrapper();
-           var stepRegistry = new StepRegistry();
-            var assemblyLoader = new AssemblyLoader(stepRegistry, new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.UpdateStepRegistry();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            assemblyLoader.GetStepRegistry();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
+                reflectionWrapper);
             var stepMethods = sandbox.GetStepMethods();
             var gaugeMethod = stepMethods.First(info =>
                 string.CompareOrdinal(info.Name, "IntegrationTestSample.StepImplementation.ReadTable-Tabletable") == 0);
 
-            var table = new Table(new List<string> { "foo", "bar" });
-            table.AddRow(new List<string> { "foorow1", "barrow1" });
-            table.AddRow(new List<string> { "foorow2", "barrow2" });
+            var table = new Table(new List<string> {"foo", "bar"});
+            table.AddRow(new List<string> {"foorow1", "barrow1"});
+            table.AddRow(new List<string> {"foorow2", "barrow2"});
 
             var executionResult = sandbox.ExecuteMethod(gaugeMethod, SerializeTable(table));
             Assert.True(executionResult.Success);
@@ -68,10 +70,11 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldExecuteMethodAndReturnResult()
         {
             var reflectionWrapper = new ReflectionWrapper();
-           var stepRegistry = new StepRegistry();
-            var assemblyLoader = new AssemblyLoader(stepRegistry, new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.UpdateStepRegistry();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            assemblyLoader.GetStepRegistry();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
+                reflectionWrapper);
             var stepMethods = sandbox.GetStepMethods();
             AssertRunnerDomainDidNotLoadUsersAssembly();
             var gaugeMethod = stepMethods.First(info =>
@@ -85,10 +88,11 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldGetAllStepMethods()
         {
             var reflectionWrapper = new ReflectionWrapper();
-           var stepRegistry = new StepRegistry();
-            var assemblyLoader = new AssemblyLoader(stepRegistry, new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.UpdateStepRegistry();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            assemblyLoader.GetStepRegistry();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
+                reflectionWrapper);
 
             AssertRunnerDomainDidNotLoadUsersAssembly();
             var stepMethods = sandbox.GetStepMethods();
@@ -100,10 +104,11 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldGetAllStepTexts()
         {
             var reflectionWrapper = new ReflectionWrapper();
-           var stepRegistry = new StepRegistry();
-            var assemblyLoader = new AssemblyLoader(stepRegistry, new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.UpdateStepRegistry();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            assemblyLoader.GetStepRegistry();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
+                reflectionWrapper);
 
             var stepTexts = sandbox.GetAllStepTexts().ToList();
 
@@ -123,10 +128,11 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldGetPendingMessages()
         {
             var reflectionWrapper = new ReflectionWrapper();
-           var stepRegistry = new StepRegistry();
-            var assemblyLoader = new AssemblyLoader(stepRegistry, new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.UpdateStepRegistry();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            assemblyLoader.GetStepRegistry();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
+                reflectionWrapper);
 
             var stepMethods = sandbox.GetStepMethods();
             var gaugeMethod = stepMethods.First(info =>
@@ -143,10 +149,11 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldGetStacktraceForAggregateException()
         {
             var reflectionWrapper = new ReflectionWrapper();
-           var stepRegistry = new StepRegistry();
-            var assemblyLoader = new AssemblyLoader(stepRegistry, new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.UpdateStepRegistry();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            assemblyLoader.GetStepRegistry();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
+                reflectionWrapper);
 
             var stepMethods = sandbox.GetStepMethods();
             var gaugeMethod = stepMethods.First(info =>
@@ -163,10 +170,11 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldGetStepTextsForMethod()
         {
             var reflectionWrapper = new ReflectionWrapper();
-            var stepRegistry = new StepRegistry();
-            var assemblyLoader = new AssemblyLoader(stepRegistry, new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.UpdateStepRegistry();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            assemblyLoader.GetStepRegistry();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
+                reflectionWrapper);
 
             var stepMethods = sandbox.GetStepMethods();
             var gaugeMethod = stepMethods.First(info =>
@@ -183,10 +191,11 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldNotLoadTargetLibAssemblyInRunnersDomain()
         {
             var reflectionWrapper = new ReflectionWrapper();
-           var stepRegistry = new StepRegistry();
-            var assemblyLoader = new AssemblyLoader(stepRegistry, new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.UpdateStepRegistry();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            assemblyLoader.GetStepRegistry();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
+                reflectionWrapper);
 
             // The sample project uses a special version of Gauge Lib, versioned 0.0.0 for testing.
             // The actual Gauge CSharp runner uses a different version of Lib 
@@ -199,10 +208,11 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             const string expectedMessage = "I am a custom serializable exception";
             var reflectionWrapper = new ReflectionWrapper();
-            var stepRegistry = new StepRegistry();
-            var assemblyLoader = new AssemblyLoader(stepRegistry, new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.UpdateStepRegistry();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            assemblyLoader.GetStepRegistry();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
+                reflectionWrapper);
 
             var stepMethods = sandbox.GetStepMethods();
             var gaugeMethod = stepMethods.First(info =>
@@ -222,10 +232,11 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             const string expectedMessage = "I am a custom exception";
             var reflectionWrapper = new ReflectionWrapper();
-            var stepRegistry = new StepRegistry();
-            var assemblyLoader = new AssemblyLoader(stepRegistry, new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.UpdateStepRegistry();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(), reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            assemblyLoader.GetStepRegistry();
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
+                reflectionWrapper);
 
             var stepMethods = sandbox.GetStepMethods();
             AssertRunnerDomainDidNotLoadUsersAssembly();

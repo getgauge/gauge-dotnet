@@ -65,6 +65,7 @@ namespace Gauge.Dotnet
                 if (!Path.IsPathRooted(logDir))
                     logDir = Path.Combine(Utils.GaugeProjectRoot, logDir);
             }
+
             return Path.GetFullPath(Path.Combine(logDir, "gauge.log"));
         }
     }

@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using System.IO;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Extensions;
-using System.IO;
 using NLog;
 
 namespace Gauge.Dotnet
@@ -26,7 +26,7 @@ namespace Gauge.Dotnet
     {
         void IGaugeCommand.Execute()
         {
-            string gaugeProjectRoot = Utils.GaugeProjectRoot;
+            var gaugeProjectRoot = Utils.GaugeProjectRoot;
             var projName = new DirectoryInfo(gaugeProjectRoot).Name.ToValidCSharpIdentifier();
 
             var project = $@"<Project Sdk=""Microsoft.NET.Sdk"">

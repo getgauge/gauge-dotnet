@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
@@ -31,14 +32,14 @@ namespace Gauge.Dotnet
         private const string GaugeLibAssembleName = "Gauge.CSharp.Lib";
         private readonly IAssemblyWrapper _assemblyWrapper;
         private readonly IReflectionWrapper _reflectionWrapper;
-        private readonly IStepRegistry _stepRegistry;
         private Assembly _targetLibAssembly;
+        public IStepRegistry StepRegistry = new StepRegistry();
 
-        public AssemblyLoader(IStepRegistry registrty, IAssemblyWrapper assemblyWrapper, IEnumerable<string> assemblyLocations, IReflectionWrapper reflectionWrapper)
+        public AssemblyLoader(IAssemblyWrapper assemblyWrapper, IEnumerable<string> assemblyLocations,
+            IReflectionWrapper reflectionWrapper)
         {
             _assemblyWrapper = assemblyWrapper;
             _reflectionWrapper = reflectionWrapper;
-            _stepRegistry = registrty;
             AssembliesReferencingGaugeLib = new List<Assembly>();
             foreach (var location in assemblyLocations)
                 ScanAndLoad(location);
@@ -54,20 +55,35 @@ namespace Gauge.Dotnet
         public IEnumerable<MethodInfo> GetMethods(LibType type)
         {
             var attributeType = _targetLibAssembly.GetType(type.FullName());
-            bool methodFilter(MethodInfo info) => info.GetCustomAttributes(false)
-                .Any(attributeType.IsInstanceOfType);
-            IEnumerable<MethodInfo> methodSelector(Type t) => _reflectionWrapper.GetMethods(t).Where(methodFilter);
-            return AssembliesReferencingGaugeLib.SelectMany(assembly => assembly.GetTypes().SelectMany(methodSelector));
+
+            bool MethodFilter(MethodInfo info)
+            {
+                return info.GetCustomAttributes(false)
+                    .Any(attributeType.IsInstanceOfType);
+            }
+
+            IEnumerable<MethodInfo> MethodSelector(Type t)
+            {
+                return _reflectionWrapper.GetMethods(t).Where(MethodFilter);
+            }
+
+            return AssembliesReferencingGaugeLib.SelectMany(assembly => assembly.GetTypes().SelectMany(MethodSelector));
+        }
+
+        public Type GetLibType(LibType type)
+        {
+            return _targetLibAssembly.GetType(type.FullName());
         }
 
 
-        public void UpdateStepRegistry()
+        public IStepRegistry GetStepRegistry()
         {
             var infos = GetMethods(LibType.Step);
             foreach (var info in infos)
             {
-                var stepTexts = info.GetCustomAttributes(GetLibType(LibType.Step)).SelectMany(x => x.GetType().GetProperty("Names").GetValue(x, null) as string[]);
-                var stepValue = stepTexts.FirstOrDefault().GetStepValue();
+                var stepTexts = info.GetCustomAttributes(GetLibType(LibType.Step))
+                    .SelectMany(x => x.GetType().GetProperty("Names").GetValue(x, null) as string[]);
+                var stepValue = GetStepValue(stepTexts.FirstOrDefault());
                 var stepMethod = new GaugeMethod
                 {
                     Name = info.FullyQuallifiedName(),
@@ -77,9 +93,17 @@ namespace Gauge.Dotnet
                     ContinueOnFailure = info.IsRecoverableStep(this),
                     StepValue = stepValue
                 };
-                _stepRegistry.AddStep(stepValue, stepMethod);
+                StepRegistry.AddStep(stepValue, stepMethod);
             }
+
+            return StepRegistry;
         }
+
+        private static string GetStepValue(string stepText)
+        {
+            return Regex.Replace(stepText, @"(<.*?>)", @"{}");
+        }
+
         private void ScanAndLoad(string path)
         {
             var logger = LogManager.GetLogger("AssemblyLoader");
@@ -113,9 +137,9 @@ namespace Gauge.Dotnet
 
         private void ScanForCustomScreengrabber(IEnumerable<Type> types)
         {
-           var implementingTypes = types.Where(type =>
+            var implementingTypes = types.Where(type =>
                 type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.IScreenGrabber"
-                    || t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotGrabber"));
+                                              || t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotGrabber"));
             ScreengrabberType = implementingTypes.FirstOrDefault();
         }
 
@@ -128,17 +152,16 @@ namespace Gauge.Dotnet
 
         private void SetDefaultTypes()
         {
-            ClassInstanceManagerType = ClassInstanceManagerType ?? _targetLibAssembly.GetType(LibType.DefaultClassInstanceManager.FullName());
-            ScreengrabberType = ScreengrabberType ?? _targetLibAssembly.GetType(LibType.DefaultScreenGrabber.FullName());
-        }
-        private void LoadTargetLibAssembly()
-        {
-            _targetLibAssembly = _assemblyWrapper.GetCurrentDomainAssemblies().First(x => string.CompareOrdinal(x.GetName().Name, GaugeLibAssembleName) == 0);
+            ClassInstanceManagerType = ClassInstanceManagerType ??
+                                       _targetLibAssembly.GetType(LibType.DefaultClassInstanceManager.FullName());
+            ScreengrabberType =
+                ScreengrabberType ?? _targetLibAssembly.GetType(LibType.DefaultScreenGrabber.FullName());
         }
 
-        public Type GetLibType(LibType type)
+        private void LoadTargetLibAssembly()
         {
-            return _targetLibAssembly.GetType(type.FullName());
+            _targetLibAssembly = _assemblyWrapper.GetCurrentDomainAssemblies()
+                .First(x => string.CompareOrdinal(x.GetName().Name, GaugeLibAssembleName) == 0);
         }
     }
 }

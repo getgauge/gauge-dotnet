@@ -32,6 +32,7 @@ namespace Gauge.Dotnet
                 Console.WriteLine("usage: {0} --<start|init>", AppDomain.CurrentDomain.FriendlyName);
                 Environment.Exit(1);
             }
+
             var phase = args[0];
             var command = GaugeCommandFactory.GetExecutor(phase);
             command.Execute();
