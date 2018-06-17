@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -33,7 +33,6 @@ namespace Gauge.Dotnet
         private readonly IAssemblyWrapper _assemblyWrapper;
         private readonly IReflectionWrapper _reflectionWrapper;
         private Assembly _targetLibAssembly;
-        public IStepRegistry StepRegistry = new StepRegistry();
 
         public AssemblyLoader(IAssemblyWrapper assemblyWrapper, IEnumerable<string> assemblyLocations,
             IReflectionWrapper reflectionWrapper)
@@ -79,6 +78,7 @@ namespace Gauge.Dotnet
         public IStepRegistry GetStepRegistry()
         {
             var infos = GetMethods(LibType.Step);
+            var registry = new StepRegistry();
             foreach (var info in infos)
             {
                 var stepTexts = info.GetCustomAttributes(GetLibType(LibType.Step))
@@ -93,10 +93,10 @@ namespace Gauge.Dotnet
                     ContinueOnFailure = info.IsRecoverableStep(this),
                     StepValue = stepValue
                 };
-                StepRegistry.AddStep(stepValue, stepMethod);
+                registry.AddStep(stepValue, stepMethod);
             }
 
-            return StepRegistry;
+            return registry;
         }
 
         private static string GetStepValue(string stepText)

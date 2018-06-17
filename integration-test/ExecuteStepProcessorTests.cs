@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -35,7 +35,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.GetStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper,
                 reflectionWrapper);
 
@@ -92,7 +91,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.GetStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper,
                 reflectionWrapper);
 

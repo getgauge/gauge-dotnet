@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -33,7 +33,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.GetStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
             var stepMethods = sandbox.GetStepMethods();
@@ -51,7 +50,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.GetStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
             var stepMethods = sandbox.GetStepMethods();
@@ -72,7 +70,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.GetStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
             var stepMethods = sandbox.GetStepMethods();
@@ -90,7 +87,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.GetStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
 
@@ -106,7 +102,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.GetStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
 
@@ -130,7 +125,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.GetStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
 
@@ -151,7 +145,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.GetStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
 
@@ -172,7 +165,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.GetStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
 
@@ -184,23 +176,6 @@ namespace Gauge.Dotnet.IntegrationTests
 
             Assert.Contains("Step with text", stepTexts);
             Assert.Contains("and an alias", stepTexts);
-        }
-
-
-        [Test]
-        public void ShouldNotLoadTargetLibAssemblyInRunnersDomain()
-        {
-            var reflectionWrapper = new ReflectionWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.GetStepRegistry();
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
-                reflectionWrapper);
-
-            // The sample project uses a special version of Gauge Lib, versioned 0.0.0 for testing.
-            // The actual Gauge CSharp runner uses a different version of Lib 
-            // used by runner
-            AssertRunnerDomainDidNotLoadUsersAssembly();
         }
 
         [Test]

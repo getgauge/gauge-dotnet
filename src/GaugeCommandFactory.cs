@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -28,9 +28,7 @@ namespace Gauge.Dotnet
                 default:
                     return new StartCommand(() =>
                         {
-                            var loader = new StaticLoader();
-                            var registry = loader.GetStepRegistry();
-                            var messageProcessorFactory = new MessageProcessorFactory(registry);
+                            var messageProcessorFactory = new MessageProcessorFactory(new StaticLoader().GetStepRegistry());
                             return new GaugeListener(messageProcessorFactory);
                         },
                         () => new GaugeProjectBuilder());

@@ -26,7 +26,7 @@ using NUnit.Framework;
 namespace Gauge.Dotnet.UnitTests
 {
     [TestFixture]
-    public class HookRegistryTests
+    public class SttiaLoaderTests
     {
         [SetUp]
         public void Setup()
@@ -63,69 +63,6 @@ namespace Gauge.Dotnet.UnitTests
         {
             var expectedMethods = new[] {"my.foo.type.AfterScenarioHook"};
             var hooks = _hookRegistry.AfterScenarioHooks.Select(mi => mi.Method);
-
-            Assert.AreEqual(expectedMethods, hooks);
-        }
-
-        [Test]
-        public void ShouldGetAfterSpecHook()
-        {
-            var expectedMethods = new[] {"my.foo.type.AfterSpecHook"};
-            var hooks = _hookRegistry.AfterSpecHooks.Select(mi => mi.Method);
-
-            Assert.AreEqual(expectedMethods, hooks);
-        }
-
-        [Test]
-        public void ShouldGetAfterStepHook()
-        {
-            var expectedMethods = new[] {"my.foo.type.AfterStepHook"};
-            var hooks = _hookRegistry.AfterStepHooks.Select(mi => mi.Method);
-
-            Assert.AreEqual(expectedMethods, hooks);
-        }
-
-        [Test]
-        public void ShouldGetAfterSuiteHook()
-        {
-            var expectedMethods = new[] {"my.foo.type.AfterSuiteHook"};
-            var hooks = _hookRegistry.AfterSuiteHooks.Select(mi => mi.Method);
-
-            Assert.AreEqual(expectedMethods, hooks);
-        }
-
-        [Test]
-        public void ShouldGetBeforeScenarioHook()
-        {
-            var expectedMethods = new[] {"my.foo.type.BeforeScenarioHook"};
-            var hooks = _hookRegistry.BeforeScenarioHooks.Select(mi => mi.Method);
-
-            Assert.AreEqual(expectedMethods, hooks);
-        }
-
-        [Test]
-        public void ShouldGetBeforeSpecHook()
-        {
-            var expectedMethods = new[] {"my.foo.type.BeforeSpecHook"};
-            var hooks = _hookRegistry.BeforeSpecHooks.Select(mi => mi.Method);
-
-            Assert.AreEqual(expectedMethods, hooks);
-        }
-
-        [Test]
-        public void ShouldGetBeforeStepHook()
-        {
-            var expectedMethods = new[] {"my.foo.type.BeforeStepHook"};
-            var hooks = _hookRegistry.BeforeStepHooks.Select(mi => mi.Method);
-
-            Assert.AreEqual(expectedMethods, hooks);
-        }
-
-        [Test]
-        public void ShouldGetBeforeSuiteHook()
-        {
-            var expectedMethods = new[] {"my.foo.type.BeforeSuiteHook"};
-            var hooks = _hookRegistry.BeforeSuiteHooks.Select(mi => mi.Method);
 
             Assert.AreEqual(expectedMethods, hooks);
         }
