@@ -15,56 +15,55 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Gauge.Dotnet.Models;
-using Gauge.Dotnet.UnitTests.Helpers;
-using Moq;
 using NUnit.Framework;
 
 namespace Gauge.Dotnet.UnitTests
 {
     [TestFixture]
-    public class SttiaLoaderTests
+    public class StaticLoaderTests
     {
-        [SetUp]
-        public void Setup()
+        [Test]
+        public void ShouldAddAliasesSteps()
         {
-            _mockAssemblyScanner = new Mock<IAssemblyLoader>();
-            var types = new[]
-            {
-                LibType.BeforeScenario, LibType.AfterScenario, LibType.BeforeSpec, LibType.AfterSpec,
-                LibType.BeforeStep, LibType.AfterStep, LibType.BeforeSuite, LibType.AfterSuite
-            };
-            foreach (var type in types)
-            {
-                var methodInfos = new List<MethodInfo>
-                {
-                    new MockMethodBuilder(_mockAssemblyScanner)
-                        .WithName($"{type}Hook")
-                        .WithFilteredHook(type)
-                        .WithDeclaringTypeName("my.foo.type")
-                        .Build()
-                };
-                _mockAssemblyScanner.Setup(scanner => scanner.GetMethods(type)).Returns(methodInfos);
-            }
+            var loader = new StaticLoader();
+            const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
+                                "namespace foobar\n" +
+                                "{\n" +
+                                "    public class FooBar\n" +
+                                "    {\n" +
+                                "        [Step(\"goodbye\",\"adieu\", \"sayonara\")]\n" +
+                                "        public void farewell()\n" +
+                                "        {\n" +
+                                "        }\n" +
+                                "    }\n" +
+                                "}\n";
+            const string fileName = @"foo.cs";
+            loader.LoadStepsFromText(text, fileName);
+            var registry = loader.GetStepRegistry();
 
-            _hookRegistry = new HookRegistry(_mockAssemblyScanner.Object);
+            Assert.True(registry.ContainsStep("goodbye"));
+            Assert.True(registry.ContainsStep("adieu"));
+            Assert.True(registry.ContainsStep("sayonara"));
         }
 
-
-        public ISandbox SandBox;
-        private HookRegistry _hookRegistry;
-        private Mock<IAssemblyLoader> _mockAssemblyScanner;
-
         [Test]
-        public void ShoulddGetAfterScenarioHook()
+        public void ShouldAddStepsFromGivenContent()
         {
-            var expectedMethods = new[] {"my.foo.type.AfterScenarioHook"};
-            var hooks = _hookRegistry.AfterScenarioHooks.Select(mi => mi.Method);
-
-            Assert.AreEqual(expectedMethods, hooks);
+            var loader = new StaticLoader();
+            const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
+                                "namespace foobar\n" +
+                                "{\n" +
+                                "    public class FooBar\n" +
+                                "    {\n" +
+                                "        [Step(\"hello\")]\n" +
+                                "        public void hello()\n" +
+                                "        {\n" +
+                                "        }\n" +
+                                "    }\n" +
+                                "}\n";
+            const string fileName = @"foo.cs";
+            loader.LoadStepsFromText(text, fileName);
+            Assert.True(loader.GetStepRegistry().ContainsStep("hello"));
         }
     }
 }

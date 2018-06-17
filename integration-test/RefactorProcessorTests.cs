@@ -16,7 +16,6 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
@@ -49,7 +48,7 @@ namespace Gauge.Dotnet.IntegrationTests
                 Name = "RefactoringSaySomething1",
                 ClassName = "RefactoringSample",
                 FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs"),
-                StepTexts = new List<string> {parameterizedStepText},
+                StepText = parameterizedStepText,
                 StepValue = stepValue
             });
             var message = new Message

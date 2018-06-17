@@ -83,17 +83,23 @@ namespace Gauge.Dotnet
             {
                 var stepTexts = info.GetCustomAttributes(GetLibType(LibType.Step))
                     .SelectMany(x => x.GetType().GetProperty("Names").GetValue(x, null) as string[]);
-                var stepValue = GetStepValue(stepTexts.FirstOrDefault());
-                var stepMethod = new GaugeMethod
+                foreach (var stepText in stepTexts)
                 {
-                    Name = info.FullyQuallifiedName(),
-                    ParameterCount = info.GetParameters().Length,
-                    StepTexts = stepTexts,
-                    MethodInfo = info,
-                    ContinueOnFailure = info.IsRecoverableStep(this),
-                    StepValue = stepValue
-                };
-                registry.AddStep(stepValue, stepMethod);
+                    var stepValue = GetStepValue(stepTexts.FirstOrDefault());
+                    var isAlias = stepTexts.Count() > 1;
+                    var stepMethod = new GaugeMethod
+                    {
+                        Name = info.FullyQuallifiedName(),
+                        ParameterCount = info.GetParameters().Length,
+                        StepText = stepText,
+                        IsAlias = isAlias,
+                        Aliases = stepTexts,
+                        MethodInfo = info,
+                        ContinueOnFailure = info.IsRecoverableStep(this),
+                        StepValue = stepValue
+                    };
+                    registry.AddStep(stepValue, stepMethod);
+                }
             }
 
             return registry;

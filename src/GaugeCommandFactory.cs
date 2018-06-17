@@ -28,7 +28,9 @@ namespace Gauge.Dotnet
                 default:
                     return new StartCommand(() =>
                         {
-                            var messageProcessorFactory = new MessageProcessorFactory(new StaticLoader().GetStepRegistry());
+                            var loader = new StaticLoader();
+                            loader.LoadImplementations();
+                            var messageProcessorFactory = new MessageProcessorFactory(loader.GetStepRegistry());
                             return new GaugeListener(messageProcessorFactory);
                         },
                         () => new GaugeProjectBuilder());

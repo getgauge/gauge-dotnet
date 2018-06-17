@@ -46,19 +46,28 @@ namespace Gauge.Dotnet.UnitTests
         {
             var methods = new[]
             {
-                new KeyValuePair<string, GaugeMethod>("Foo {}",
+                new KeyValuePair<string, GaugeMethod>("foo {}",
                     new GaugeMethod
                     {
+                        StepValue = "foo {}",
                         Name = "Foo",
-                        StepTexts = new List<string> {"foo <something>", "foo <somethingelse>"}
+                        StepText = "foo <something>",
+                        IsAlias = true
                     }),
-                new KeyValuePair<string, GaugeMethod>("Bar", new GaugeMethod {Name = "Bar"})
+                new KeyValuePair<string, GaugeMethod>("bar {}",
+                    new GaugeMethod
+                    {
+                        StepValue = "bar {}",
+                        Name = "Foo",
+                        StepText = "boo <something>",
+                        IsAlias = true
+                    })
             };
             var stepRegistry = new StepRegistry();
             foreach (var pair in methods)
                 stepRegistry.AddStep(pair.Key, pair.Value);
 
-            Assert.True(stepRegistry.HasAlias("Foo {}"));
+            Assert.True(stepRegistry.HasAlias("foo {}"));
         }
 
         [Test]
@@ -122,7 +131,7 @@ namespace Gauge.Dotnet.UnitTests
                     {
                         Name = "Foo",
                         StepValue = "foo {}",
-                        StepTexts = new List<string> {"Foo <something>"}
+                        StepText = "Foo <something>"
                     }),
                 new KeyValuePair<string, GaugeMethod>("Bar", new GaugeMethod {Name = "Bar"})
             };
@@ -140,9 +149,9 @@ namespace Gauge.Dotnet.UnitTests
             var methods = new[]
             {
                 new KeyValuePair<string, GaugeMethod>("Foo",
-                    new GaugeMethod {Name = "Foo", StepTexts = new List<string> {"Foo"}}),
+                    new GaugeMethod {Name = "Foo", StepText = "Foo"}),
                 new KeyValuePair<string, GaugeMethod>("Bar",
-                    new GaugeMethod {Name = "Bar", StepTexts = new List<string> {"Bar"}})
+                    new GaugeMethod {Name = "Bar", StepText = "Bar"})
             };
             var stepRegistry = new StepRegistry();
             foreach (var pair in methods)

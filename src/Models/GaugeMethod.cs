@@ -29,10 +29,12 @@ namespace Gauge.Dotnet.Models
         public string Name { get; set; }
         public int ParameterCount { get; set; }
         public bool ContinueOnFailure { get; set; }
-        public IEnumerable<string> StepTexts { get; set; }
+        public string StepText { get; set; }
         public string StepValue { get; set; }
         public string FileName { get; set; }
         public string ClassName { get; set; }
         public FileLinePositionSpan Span { get; internal set; }
+        public bool IsAlias { get; set; }
+        public IEnumerable<string> Aliases { get; set; }
     }
 }

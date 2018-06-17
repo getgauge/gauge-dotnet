@@ -24,62 +24,58 @@ namespace Gauge.Dotnet.Models
     [Serializable]
     public class StepRegistry : IStepRegistry
     {
-        private Dictionary<string, List<GaugeMethod>> registry;
+        private Dictionary<string, List<GaugeMethod>> _registry;
 
         public StepRegistry()
         {
-            registry = new Dictionary<string, List<GaugeMethod>>();
+            _registry = new Dictionary<string, List<GaugeMethod>>();
         }
 
         public IEnumerable<string> GetStepTexts()
         {
-            return registry.Values.SelectMany(methods =>
-            {
-                return methods.SelectMany(method => { return method.StepTexts; });
-            });
+            return _registry.Values.SelectMany(methods => methods.Select(method => method.StepText));
         }
 
         public void AddStep(string stepValue, GaugeMethod method)
         {
-            if (!registry.ContainsKey(stepValue)) registry.Add(stepValue, new List<GaugeMethod>());
-            registry.GetValueOrDefault(stepValue).Add(method);
+            if (!_registry.ContainsKey(stepValue)) _registry.Add(stepValue, new List<GaugeMethod>());
+            _registry.GetValueOrDefault(stepValue).Add(method);
         }
 
         public bool ContainsStep(string parsedStepText)
         {
-            return registry.ContainsKey(parsedStepText);
+            return _registry.ContainsKey(parsedStepText);
         }
 
         public bool HasMultipleImplementations(string parsedStepText)
         {
-            return registry[parsedStepText].Count > 1;
+            return _registry[parsedStepText].Count > 1;
         }
 
         public void Clear()
         {
-            registry = new Dictionary<string, List<GaugeMethod>>();
+            _registry = new Dictionary<string, List<GaugeMethod>>();
         }
 
         public GaugeMethod MethodFor(string parsedStepText)
         {
-            return registry[parsedStepText][0];
+            return _registry[parsedStepText][0];
         }
 
 
         public IEnumerable<string> AllSteps()
         {
-            return registry.Keys;
+            return _registry.Keys;
         }
 
         public bool HasAlias(string stepValue)
         {
-            return registry.ContainsKey(stepValue) &&
-                   registry.GetValueOrDefault(stepValue).FirstOrDefault().StepTexts.Count() > 1;
+            return _registry.ContainsKey(stepValue) && _registry.GetValueOrDefault(stepValue).FirstOrDefault().IsAlias;
         }
 
         public string GetStepText(string stepValue)
         {
-            return registry.ContainsKey(stepValue) ? registry[stepValue][0].StepTexts.FirstOrDefault() : string.Empty;
+            return _registry.ContainsKey(stepValue) ? _registry[stepValue][0].StepText : string.Empty;
         }
     }
 }

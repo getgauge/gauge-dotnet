@@ -185,7 +185,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.GetStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
 
@@ -209,7 +208,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            assemblyLoader.GetStepRegistry();
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
 

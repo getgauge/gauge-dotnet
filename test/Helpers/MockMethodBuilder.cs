@@ -25,8 +25,8 @@ namespace Gauge.Dotnet.UnitTests.Helpers
 {
     public class MockMethodBuilder
     {
-        private readonly Mock<IAssemblyLoader> mockAssemblyLoader;
         private readonly List<object> methodAttributes;
+        private readonly Mock<IAssemblyLoader> mockAssemblyLoader;
         private readonly Mock<Type> mockContinueOnFailureType;
         private readonly Mock<MethodInfo> mockMethod;
         private readonly Mock<Type> mockStepType;
