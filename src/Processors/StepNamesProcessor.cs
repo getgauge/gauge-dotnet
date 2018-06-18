@@ -1,4 +1,4 @@
-// Copyright 2015 ThoughtWorks, Inc.
+// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -16,22 +16,23 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Collections.Generic;
+using Gauge.Dotnet.Models;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
     public class StepNamesProcessor : IMessageProcessor
     {
-        private readonly IMethodScanner _methodScanner;
+        private readonly IStepRegistry _stepRegistry;
 
-        public StepNamesProcessor(IMethodScanner methodScanner)
+        public StepNamesProcessor(IStepRegistry stepRegistry)
         {
-            _methodScanner = methodScanner;
+            _stepRegistry = stepRegistry;
         }
 
         public Message Process(Message request)
         {
-            var allSteps = _methodScanner.GetStepTexts();
+            var allSteps = _stepRegistry.GetStepTexts();
             return GetStepNamesResponseMessage(allSteps, request);
         }
 

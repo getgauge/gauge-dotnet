@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -26,8 +26,6 @@ namespace Gauge.Dotnet.UnitTests
     [TestFixture]
     internal class StartCommandTests
     {
-        private readonly string TempPath = Path.GetTempPath();
-
         [SetUp]
         public void Setup()
         {
@@ -43,6 +41,8 @@ namespace Gauge.Dotnet.UnitTests
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
             Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", null);
         }
+
+        private readonly string TempPath = Path.GetTempPath();
 
         private Mock<IGaugeListener> _mockGaugeListener;
         private Mock<IGaugeProjectBuilder> _mockGaugeProjectBuilder;
@@ -100,7 +100,7 @@ namespace Gauge.Dotnet.UnitTests
             var actual = Environment.CurrentDirectory.TrimEnd(Path.DirectorySeparatorChar);
             var expected = TempPath.TrimEnd(Path.DirectorySeparatorChar);
             // in osx the /var tmp path is a symlink to /private/var
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 expected = $"/private{expected}";
 
             Assert.That(actual, Is.SamePath(expected));

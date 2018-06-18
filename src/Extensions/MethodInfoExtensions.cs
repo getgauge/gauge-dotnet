@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -42,7 +42,7 @@ namespace Gauge.Dotnet.Extensions
             var continueOnFailureType = assemblyLoader.GetLibType(LibType.ContinueOnFailure);
             var customAttributes = info.GetCustomAttributes(false).ToList();
             return customAttributes.Any(stepType.IsInstanceOfType)
-                       && customAttributes.Any(continueOnFailureType.IsInstanceOfType);
+                   && customAttributes.Any(continueOnFailureType.IsInstanceOfType);
         }
     }
 }

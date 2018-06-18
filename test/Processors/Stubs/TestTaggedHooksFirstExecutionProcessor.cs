@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -25,15 +25,13 @@ namespace Gauge.Dotnet.UnitTests.Processors.Stubs
 {
     public class TestTaggedHooksFirstExecutionProcessor : TaggedHooksFirstExecutionProcessor
     {
-        public TestTaggedHooksFirstExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper) 
+        public TestTaggedHooksFirstExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader,
+            IReflectionWrapper reflectionWrapper)
             : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
         }
 
-        protected override string HookType
-        {
-            get { throw new NotImplementedException(); }
-        }
+        protected override string HookType => throw new NotImplementedException();
 
         public HooksStrategy GetHooksStrategy()
         {

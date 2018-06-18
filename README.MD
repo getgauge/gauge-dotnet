@@ -1,31 +1,112 @@
-# Gauge Dotnet Runner
+# Gauge-dotnet
+[![Build Status](https://travis-ci.org/getgauge/gauge-dotnet.svg?branch=master)](https://travis-ci.org/getgauge/gauge-dotnet)
+[![Build status](https://ci.appveyor.com/api/projects/status/t8hjbilxmb6enn4d/branch/master?svg=true)](https://ci.appveyor.com/project/getgauge/gauge-dotnet/branch/master)
+[![Download Nightly](https://api.bintray.com/packages/gauge/gauge-dotnet/Nightly/images/download.svg) ](https://bintray.com/gauge/gauge-dotnet/Nightly/_latestVersion)
 
-This is an .NET Core 2.0 Application that is invoked by Gauge Core. It acts a bridge between C# test code and Gauge's API.
+
+
+This project adds dotnet-core [language plugin](https://docs.gauge.org/latest/installation.html#language-runner) for [gauge](http://gauge.org).
+
+The plugin is authored in [c#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)).
+
+## Getting started
+
+### Pre-requisite
+
+- [Gauge](https://gauge.org)
+- [Dotnet Core](https://docs.microsoft.com/en-us/dotnet/core/index)
+
+
+### Installation
+
+```
+gauge install dotnet
+```
+
+### Create a gauge-dotnet project
+
+```
+gauge init dotnet
+```
+
+### Run tests
+
+```
+gauge run specs
+```
+
+### Alternate Installation options
+
+#### Install specific version
+* Installing specific version
+```
+gauge install dotnet --version 0.0.1
+```
+
+#### Offline installation
+
+* Download the plugin from [Releases](https://github.com/getgauge/gauge-dotnet/releases)
+```
+gauge install dotnet --file gauge-dotnet-0.0.1.zip
+```
+
+#### Nightly installation
+
+To install dotnet nightly, download the latest nightly from [here](https://bintray.com/gauge/gauge-dotnet/Nightly).
+
+Once you have the downloaded nightly gauge-dotnet-version.nightly-yyyy-mm-dd.zip, install using:
+
+    gauge install dotnet -f gauge-dotnet-version.nightly-yyyy-mm-dd.zip
+
+
+#### Build from Source
+
+##### Requirements
+* [Dotnet Core](https://docs.microsoft.com/en-us/dotnet/core/index)
+* [Gauge](http://getgauge.io)
+* [JQ](https://stedolan.github.io/jq/) (for unix)
+
+
+Running `run.sh` or `run.cmd` should give the list of all tasks available. Below sections detail some commonly used tasks.
+
+##### Compiling
+
+To build the project dlls:
+
+````
+./run.cmd|./run.sh build
+````
+##### Testing
+
+After compiling
+
+To run tests (unit and integration):
+
+````
+./run.cmd|./run.sh test
+````
+
+##### Installing
+
+To install the the dotnet plugin use(Note, this will uninstall gauge-dotnet before installing the compiled version):
+
+````
+./run.cmd|./run.sh forceinstall
+````
+
+##### Creating distributable
+
+````
+./run.cmd|./run.sh package
+````
+
+New distribution details need to be updated in the dotnet-install.json file in  [gauge plugin repository](https://github.com/getgauge/gauge-repository) for a new verison update.
 
 ## License
-This project is released under [GPLv3](http://www.gnu.org/licenses/gpl-3.0.txt). 
 
-This project uses [protobuf-csharp-port](https://code.google.com/p/protobuf-csharp-port/) which is released under [New BSD License](http://opensource.org/licenses/BSD-3-Clause). These licenses is included in this repository [here](https://github.com/getgauge/gauge/Lib/licenses) and [here](https://github.com/getgauge/gauge/Runner/licenses), for `Lib` and `Runner` respectively.
+![GNU Public License version 3.0](http://www.gnu.org/graphics/gplv3-127x51.png)
+Gauge-Dotnet is released under [GNU Public License version 3.0](http://www.gnu.org/licenses/gpl-3.0.txt)
 
-## About
-This runner serves the below purposes
+## Copyright
 
-- Scan assemblies referencing `Gauge.CSharp.Lib.dll` to get list of `Step` methods.
-- Holds definition of message processors for various messages passed by Gauge.
-- Parse messages given by Gauge Core and invoke the respective processor.
-- Execute methods in the target test project when respective step is processed.
-- Execute hooks at various stages.
-
-## Developer notes
-
-### Two phases of execution
-
-#### Setup
-The Setup phase is a dummy in .NET Core runner. `dotnet` template is recommended.
-
-#### Start
-This phase is invoked when gauge is executing specs. Gauge launches the runner as a child process and then orchestrates the execution via messages that the Runner processes.
-
-## Sponsors
-
-This project is sponsored by [Thoughtworks Inc.](http://www.thoughtworks.com/).
+Copyright 2018 ThoughtWorks, Inc.

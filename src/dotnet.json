@@ -1,6 +1,6 @@
 {
-  "id" : "dotnet",
-  "version" : "0.0.2",
+  "id": "dotnet",
+  "version": "0.0.2",
   "description": "C# support for gauge + .NET Core 2.0",
   "run": {
     "windows": ["launcher.cmd", "--start"],
@@ -13,7 +13,7 @@
     "darwin": ["launcher.sh", "--init"]
   },
   "gaugeVersionSupport": {
-      "minimum": "0.9.6",
-      "maximum": ""
+    "minimum": "0.9.6",
+    "maximum": ""
   }
 }

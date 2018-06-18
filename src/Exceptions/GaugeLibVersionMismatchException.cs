@@ -1,4 +1,4 @@
-// Copyright 2015 ThoughtWorks, Inc.
+// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -24,8 +24,7 @@ namespace Gauge.Dotnet.Exceptions
     public class GaugeLibVersionMismatchException : Exception
     {
         private const string ExceptionMessageFormat =
-                "The version of Gauge.CSharp.Lib in the project is inconpatible with the version of Gauge CSharp plugin.\n Expecting minimum version: {0}, found {1}"
-            ;
+            "The version of Gauge.CSharp.Lib in the project is inconpatible with the version of Gauge CSharp plugin.\n Expecting minimum version: {0}, found {1}";
 
         public GaugeLibVersionMismatchException(Version targetLibVersion, Version expectedLibVersion)
             : base(string.Format(ExceptionMessageFormat, expectedLibVersion, targetLibVersion))

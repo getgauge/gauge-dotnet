@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -31,7 +31,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [SetUp]
         public void Setup()
         {
-            IHookMethod Create(string name, int aggregation=0, params string[] tags)
+            IHookMethod Create(string name, int aggregation = 0, params string[] tags)
             {
                 var mockAssemblyLoader = new Mock<IAssemblyLoader>();
                 var method = new MockMethodBuilder(mockAssemblyLoader)
@@ -51,7 +51,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 Create("Bar", 0, "Foo", "Bar"),
                 Create("Zed", 1),
                 Create("Blah"),
-                Create("Baz"),
+                Create("Baz")
             };
         }
 
@@ -98,13 +98,15 @@ namespace Gauge.Dotnet.UnitTests.Processors
         public void ShouldFetchTaggedHooksAfterUntaggedHooks()
         {
             var applicableHooks = new UntaggedHooksFirstStrategy()
-                .GetApplicableHooks(new List<string> { "Foo" }, _hookMethods).ToList();
+                .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToList();
 
-            var expectedMethods = new[] {
+            var expectedMethods = new[]
+            {
                 "my.foo.type.Baz",
                 "my.foo.type.Blah",
                 "my.foo.type.Zed",
-                "my.foo.type.Foo"};
+                "my.foo.type.Foo"
+            };
 
 
             Assert.AreEqual(expectedMethods, applicableHooks);
@@ -116,11 +118,13 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var applicableHooks = new UntaggedHooksFirstStrategy()
                 .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToList();
 
-            var expectedMethods = new[] {
+            var expectedMethods = new[]
+            {
                 "my.foo.type.Baz",
                 "my.foo.type.Blah",
                 "my.foo.type.Zed",
-                "my.foo.type.Foo"};
+                "my.foo.type.Foo"
+            };
 
             Assert.AreEqual(expectedMethods, applicableHooks);
         }

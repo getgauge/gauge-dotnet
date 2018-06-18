@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -26,12 +26,13 @@ namespace Gauge.Dotnet.Processors
     {
         private readonly IMethodExecutor _methodExecutor;
         private readonly IStepRegistry _stepRegistry;
-        readonly ITableFormatter _tableFormatter;
+        private readonly ITableFormatter _tableFormatter;
 
-        public ExecuteStepProcessor(IStepRegistry stepRegistry, IMethodExecutor methodExecutor, ITableFormatter tableFormatter)
+        public ExecuteStepProcessor(IStepRegistry registry, IMethodExecutor methodExecutor,
+            ITableFormatter tableFormatter)
         {
+            _stepRegistry = registry;
             _tableFormatter = tableFormatter;
-            _stepRegistry = stepRegistry;
             _methodExecutor = methodExecutor;
         }
 

@@ -1,4 +1,4 @@
-// Copyright 2015 ThoughtWorks, Inc.
+// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -22,11 +22,11 @@ namespace Gauge.Dotnet.Processors
 {
     public class StepValidationProcessor : IMessageProcessor
     {
-        private readonly IStepRegistry _stepMethodTable;
+        private readonly IStepRegistry _stepRegistry;
 
-        public StepValidationProcessor(IStepRegistry stepMethodTable)
+        public StepValidationProcessor(IStepRegistry stepRegistry)
         {
-            _stepMethodTable = stepMethodTable;
+            _stepRegistry = stepRegistry;
         }
 
         public Message Process(Message request)
@@ -35,17 +35,18 @@ namespace Gauge.Dotnet.Processors
             var isValid = true;
             var errorMessage = "";
             var errorType = StepValidateResponse.Types.ErrorType.StepImplementationNotFound;
-            if (!_stepMethodTable.ContainsStep(stepToValidate))
+            if (!_stepRegistry.ContainsStep(stepToValidate))
             {
                 isValid = false;
                 errorMessage = string.Format("No implementation found for : {0}. Full Step Text :", stepToValidate);
             }
-            else if (_stepMethodTable.HasMultipleImplementations(stepToValidate))
+            else if (_stepRegistry.HasMultipleImplementations(stepToValidate))
             {
                 isValid = false;
                 errorType = StepValidateResponse.Types.ErrorType.DuplicateStepImplementation;
                 errorMessage = string.Format("Multiple step implementations found for : {0}", stepToValidate);
             }
+
             return GetStepValidateResponseMessage(isValid, request, errorType, errorMessage);
         }
 

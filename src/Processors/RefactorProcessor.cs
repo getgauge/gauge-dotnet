@@ -1,4 +1,4 @@
-// Copyright 2015 ThoughtWorks, Inc.
+// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -24,13 +24,11 @@ namespace Gauge.Dotnet.Processors
 {
     public class RefactorProcessor : IMessageProcessor
     {
-        private readonly ISandbox _sandbox;
         private readonly IStepRegistry _stepRegistry;
 
-        public RefactorProcessor(IStepRegistry stepRegistry, ISandbox sandbox)
+        public RefactorProcessor(IStepRegistry stepRegistry)
         {
             _stepRegistry = stepRegistry;
-            _sandbox = sandbox;
         }
 
         public Message Process(Message request)
@@ -45,7 +43,7 @@ namespace Gauge.Dotnet.Processors
             try
             {
                 var gaugeMethod = GetGaugeMethod(request.RefactorRequest.OldStepValue);
-                var changedFile = _sandbox.Refactor(gaugeMethod, parameterPositions, newStep.Parameters.ToList(),
+                var changedFile = RefactorHelper.Refactor(gaugeMethod, parameterPositions, newStep.Parameters.ToList(),
                     newStepValue);
                 response.Success = true;
                 response.FilesChanged.Add(changedFile);

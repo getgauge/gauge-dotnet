@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -17,60 +17,65 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Gauge.Dotnet.Models
 {
     [Serializable]
     public class StepRegistry : IStepRegistry
     {
-        private readonly Dictionary<string, bool> _aliases;
+        private Dictionary<string, List<GaugeMethod>> _registry;
 
-        private readonly Dictionary<string, List<GaugeMethod>> _scannedSteps =
-            new Dictionary<string, List<GaugeMethod>>();
-
-        private readonly Dictionary<string, string> _stepTextMap;
-
-        public StepRegistry(IEnumerable<KeyValuePair<string, GaugeMethod>> scannedSteps,
-            Dictionary<string, string> stepTextMap, Dictionary<string, bool> aliases)
+        public StepRegistry()
         {
-            _stepTextMap = stepTextMap;
-            _aliases = aliases;
-            foreach (var stepMap in scannedSteps)
-            {
-                if (!_scannedSteps.ContainsKey(stepMap.Key))
-                    _scannedSteps[stepMap.Key] = new List<GaugeMethod>();
-                _scannedSteps[stepMap.Key].Add(stepMap.Value);
-            }
+            _registry = new Dictionary<string, List<GaugeMethod>>();
+        }
+
+        public IEnumerable<string> GetStepTexts()
+        {
+            return _registry.Values.SelectMany(methods => methods.Select(method => method.StepText));
+        }
+
+        public void AddStep(string stepValue, GaugeMethod method)
+        {
+            if (!_registry.ContainsKey(stepValue)) _registry.Add(stepValue, new List<GaugeMethod>());
+            _registry.GetValueOrDefault(stepValue).Add(method);
         }
 
         public bool ContainsStep(string parsedStepText)
         {
-            return _scannedSteps.ContainsKey(parsedStepText);
+            return _registry.ContainsKey(parsedStepText);
         }
 
         public bool HasMultipleImplementations(string parsedStepText)
         {
-            return _scannedSteps[parsedStepText].Count > 1;
+            return _registry[parsedStepText].Count > 1;
+        }
+
+        public void Clear()
+        {
+            _registry = new Dictionary<string, List<GaugeMethod>>();
         }
 
         public GaugeMethod MethodFor(string parsedStepText)
         {
-            return _scannedSteps[parsedStepText][0];
+            return _registry[parsedStepText][0];
         }
+
 
         public IEnumerable<string> AllSteps()
         {
-            return _scannedSteps.Keys;
+            return _registry.Keys;
         }
 
-        public bool HasAlias(string parsedStepText)
+        public bool HasAlias(string stepValue)
         {
-            return _aliases.ContainsKey(parsedStepText) && _aliases[parsedStepText];
+            return _registry.ContainsKey(stepValue) && _registry.GetValueOrDefault(stepValue).FirstOrDefault().IsAlias;
         }
 
-        public string GetStepText(string parameterizedStepText)
+        public string GetStepText(string stepValue)
         {
-            return _stepTextMap.ContainsKey(parameterizedStepText) ? _stepTextMap[parameterizedStepText] : string.Empty;
+            return _registry.ContainsKey(stepValue) ? _registry[stepValue][0].StepText : string.Empty;
         }
     }
 }

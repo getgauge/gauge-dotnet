@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -52,7 +52,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 Create("Bar", 0, "Bar", "Baz"),
                 Create("Baz", 1, "Foo", "Baz"),
                 Create("Blah"),
-                Create("Zed"),
+                Create("Zed")
             };
         }
 
@@ -109,8 +109,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldFetchUntaggedHooksAfterTaggedHooks()
         {
-            var taggedHooks = new[] { "my.foo.type.Baz", "my.foo.type.Foo" };
-            var untaggedHooks = new[] { "my.foo.type.Blah", "my.foo.type.Zed" };
+            var taggedHooks = new[] {"my.foo.type.Baz", "my.foo.type.Foo"};
+            var untaggedHooks = new[] {"my.foo.type.Blah", "my.foo.type.Zed"};
             var expected = taggedHooks.Concat(untaggedHooks);
 
             var applicableHooks = new TaggedHooksFirstStrategy()

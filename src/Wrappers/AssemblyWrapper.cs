@@ -1,4 +1,4 @@
-// Copyright 2015 ThoughtWorks, Inc.
+// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Loader;
@@ -25,12 +26,12 @@ namespace Gauge.Dotnet.Wrappers
     {
         public Assembly[] GetCurrentDomainAssemblies()
         {
-            return System.AppDomain.CurrentDomain.GetAssemblies();
+            return AppDomain.CurrentDomain.GetAssemblies();
         }
 
         public Assembly LoadFrom(string location)
         {
-            using (var stream = new FileStream(location, FileMode.Open))
+            using (var stream = new FileStream(location, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 return AssemblyLoadContext.Default.LoadFromStream(stream);
             }

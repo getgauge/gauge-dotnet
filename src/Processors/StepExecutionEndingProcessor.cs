@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -24,7 +24,8 @@ namespace Gauge.Dotnet.Processors
 {
     public class StepExecutionEndingProcessor : TaggedHooksFirstExecutionProcessor
     {
-        public StepExecutionEndingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
+        public StepExecutionEndingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader,
+            IReflectionWrapper reflectionWrapper)
             : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
         }

@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -26,7 +26,10 @@ namespace Gauge.Dotnet
     public interface IMethodExecutor
     {
         ProtoExecutionResult Execute(GaugeMethod method, params string[] args);
-        ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags, ExecutionContext context);
+
+        ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags,
+            ExecutionContext context);
+
         void ClearCache();
     }
 }

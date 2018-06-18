@@ -1,4 +1,4 @@
-// Copyright 2015 ThoughtWorks, Inc.
+// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -37,21 +37,22 @@ namespace Gauge.Dotnet
     public class Sandbox : ISandbox
     {
         private readonly IAssemblyLoader _assemblyLoader;
+        private readonly IActivatorWrapper activatorWrapper;
+        private readonly Type instanceManagerType;
+        private readonly IReflectionWrapper reflectionWrapper;
 
         private object _classInstanceManager;
 
         private IHookRegistry _hookRegistry;
-        private readonly IActivatorWrapper activatorWrapper;
-        private readonly IReflectionWrapper reflectionWrapper;
-        private readonly Type instanceManagerType;
 
-        public Sandbox(IAssemblyLoader assemblyLoader, IHookRegistry hookRegistry, IActivatorWrapper activatorWrapper, IReflectionWrapper typeWrapper)
+        public Sandbox(IAssemblyLoader assemblyLoader, IHookRegistry hookRegistry, IActivatorWrapper activatorWrapper,
+            IReflectionWrapper typeWrapper)
         {
             LogConfiguration.Initialize();
             _assemblyLoader = assemblyLoader;
             _hookRegistry = hookRegistry;
             this.activatorWrapper = activatorWrapper;
-            this.reflectionWrapper = typeWrapper;
+            reflectionWrapper = typeWrapper;
             instanceManagerType = _assemblyLoader.ClassInstanceManagerType;
             LoadClassInstanceManager();
         }
@@ -62,7 +63,7 @@ namespace Gauge.Dotnet
         [DebuggerHidden]
         public ExecutionResult ExecuteMethod(GaugeMethod gaugeMethod, params string[] args)
         {
-            var method = MethodMap[gaugeMethod.Name];
+            var method = gaugeMethod.MethodInfo;
             var executionResult = new ExecutionResult {Success = true};
             var logger = LogManager.GetLogger("Sandbox");
             try
@@ -78,7 +79,7 @@ namespace Gauge.Dotnet
                         return o;
                     }
                 }).ToArray();
-                logger.Debug("Executing method: {0}", method.Name);
+                logger.Debug("Executing method: {0}", gaugeMethod.Name);
                 Execute(method, StringParamConverter.TryConvertParams(method, parameters));
             }
             catch (Exception ex)
@@ -108,11 +109,13 @@ namespace Gauge.Dotnet
                 LogManager.GetLogger("Sandbox").Debug("Scanned and caching Gauge Step: {0}, Recoverable: {1}", methodId,
                     info.IsRecoverableStep(_assemblyLoader));
             }
+
             return MethodMap.Keys.Select(s =>
             {
                 var method = MethodMap[s];
                 return new GaugeMethod
                 {
+                    MethodInfo = MethodMap[s],
                     Name = s,
                     ParameterCount = method.GetParameters().Length,
                     ContinueOnFailure = method.IsRecoverableStep(_assemblyLoader)
@@ -139,7 +142,9 @@ namespace Gauge.Dotnet
                 var instance = activatorWrapper.CreateInstance(_assemblyLoader.ScreengrabberType);
                 if (instance != null)
                 {
-                    screenShotBytes = reflectionWrapper.InvokeMethod(_assemblyLoader.ScreengrabberType, instance, "TakeScreenShot") as byte[];
+                    screenShotBytes =
+                        reflectionWrapper.InvokeMethod(_assemblyLoader.ScreengrabberType, instance, "TakeScreenShot") as
+                            byte[];
                     return true;
                 }
             }
@@ -169,7 +174,8 @@ namespace Gauge.Dotnet
 
         [DebuggerStepperBoundary]
         [DebuggerHidden]
-        public ExecutionResult ExecuteHooks(string hookType, IHooksStrategy strategy, IList<string> applicableTags, ExecutionContext context)
+        public ExecutionResult ExecuteHooks(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
+            ExecutionContext context)
         {
             var methods = GetHookMethods(hookType, strategy, applicableTags);
             var executionResult = new ExecutionResult
@@ -194,15 +200,10 @@ namespace Gauge.Dotnet
                     executionResult.Success = false;
                 }
             }
+
             return executionResult;
         }
 
-        public string Refactor(GaugeMethod methodInfo, IList<Tuple<int, int>> parameterPositions,
-            IList<string> parametersList, string newStepValue)
-        {
-            return RefactorHelper.Refactor(MethodMap[methodInfo.Name], parameterPositions, parametersList,
-                newStepValue);
-        }
 
         private object GetTable(string jsonString)
         {
@@ -268,7 +269,8 @@ namespace Gauge.Dotnet
         private void Execute(MethodInfo method, params object[] parameters)
         {
             var typeToLoad = method.DeclaringType;
-            var instance = reflectionWrapper.InvokeMethod(instanceManagerType, _classInstanceManager, "Get", typeToLoad );
+            var instance =
+                reflectionWrapper.InvokeMethod(instanceManagerType, _classInstanceManager, "Get", typeToLoad);
             var logger = LogManager.GetLogger("Sandbox");
             if (instance == null)
             {
@@ -276,6 +278,7 @@ namespace Gauge.Dotnet
                 logger.Error(error);
                 throw new Exception(error);
             }
+
             reflectionWrapper.Invoke(method, instance, parameters);
         }
 
@@ -286,7 +289,8 @@ namespace Gauge.Dotnet
                 var logger = LogManager.GetLogger("Sandbox");
                 _classInstanceManager = activatorWrapper.CreateInstance(instanceManagerType);
                 logger.Debug("Loaded Instance Manager of Type:" + _classInstanceManager.GetType().FullName);
-                reflectionWrapper.InvokeMethod(instanceManagerType, _classInstanceManager, "Initialize", new[] { _assemblyLoader.AssembliesReferencingGaugeLib });
+                reflectionWrapper.InvokeMethod(instanceManagerType, _classInstanceManager, "Initialize",
+                    _assemblyLoader.AssembliesReferencingGaugeLib);
             }
         }
     }

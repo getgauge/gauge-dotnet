@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -15,29 +15,29 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using Gauge.Dotnet.Wrappers;
-using Gauge.Messages;
-using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using Gauge.Dotnet.Wrappers;
+using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
     public class TableFormatter : ITableFormatter
     {
-        private readonly IAssemblyLoader _assemblyLoader;
         private readonly IActivatorWrapper _activatorWrapper;
+        private readonly IAssemblyLoader _assemblyLoader;
 
         public TableFormatter(IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper)
         {
             _assemblyLoader = assemblyLoader;
             _activatorWrapper = activatorWrapper;
         }
+
         public string GetJSON(ProtoTable table)
         {
-            Type tableType = _assemblyLoader.GetLibType(LibType.Table);
+            var tableType = _assemblyLoader.GetLibType(LibType.Table);
             dynamic table1 = _activatorWrapper.CreateInstance(tableType, table.Headers.Cells.ToList());
             foreach (var protoTableRow in table.Rows)
                 table1.AddRow(protoTableRow.Cells.ToList());

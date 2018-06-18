@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -16,6 +16,7 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Collections.Generic;
+using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
@@ -69,10 +70,12 @@ namespace Gauge.Dotnet.UnitTests.Processors
             };
             _protoExecutionResult.Message.AddRange(_pendingMessages);
             _mockMethodExecutor.Setup(x =>
-                    x.ExecuteHooks("AfterSuite", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),It.IsAny<Gauge.CSharp.Lib.ExecutionContext>()))
+                    x.ExecuteHooks("AfterSuite", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
+                        It.IsAny<ExecutionContext>()))
                 .Returns(_protoExecutionResult);
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            _executionEndingProcessor = new ExecutionEndingProcessor(_mockMethodExecutor.Object, mockAssemblyLoader.Object, mockReflectionWrapper.Object);
+            _executionEndingProcessor = new ExecutionEndingProcessor(_mockMethodExecutor.Object,
+                mockAssemblyLoader.Object, mockReflectionWrapper.Object);
         }
 
         private ExecutionEndingProcessor _executionEndingProcessor;

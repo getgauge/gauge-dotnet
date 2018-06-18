@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -25,7 +25,8 @@ namespace Gauge.Dotnet.Processors
 {
     public class ExecutionStartingProcessor : HookExecutionProcessor
     {
-        public ExecutionStartingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper) 
+        public ExecutionStartingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader,
+            IReflectionWrapper reflectionWrapper)
             : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
         }
@@ -54,6 +55,7 @@ namespace Gauge.Dotnet.Processors
                         break;
                 }
             }
+
             return base.Process(request);
         }
     }

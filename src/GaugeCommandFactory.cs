@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -15,11 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using Gauge.CSharp.Core;
-using Gauge.Dotnet.Models;
-using Gauge.Dotnet.Processors;
-using Gauge.Dotnet.Wrappers;
-
 namespace Gauge.Dotnet
 {
     public class GaugeCommandFactory
@@ -32,19 +27,13 @@ namespace Gauge.Dotnet
                     return new SetupCommand();
                 default:
                     return new StartCommand(() =>
-                    {
-                        using (var apiConnection = new GaugeApiConnection(new TcpClientWrapper(Utils.GaugeApiPort)))
                         {
-                            var reflectionWrapper = new ReflectionWrapper();
-                            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-                            var activatorWrapper = new ActivatorWrapper();
-                            var sandBox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
-                            var methodScanner = new MethodScanner(apiConnection, sandBox);
-                            var messageProcessorFactory = new MessageProcessorFactory(methodScanner, sandBox, assemblyLoader, activatorWrapper, new TableFormatter(assemblyLoader, activatorWrapper), reflectionWrapper);
+                            var loader = new StaticLoader();
+                            loader.LoadImplementations();
+                            var messageProcessorFactory = new MessageProcessorFactory(loader.GetStepRegistry());
                             return new GaugeListener(messageProcessorFactory);
-                        }
-                    },
-                    () => new GaugeProjectBuilder());
+                        },
+                        () => new GaugeProjectBuilder());
             }
         }
     }

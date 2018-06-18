@@ -1,4 +1,4 @@
-// Copyright 2015 ThoughtWorks, Inc.
+// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -17,32 +17,39 @@
 
 using System.Linq;
 using Gauge.CSharp.Lib;
+using Gauge.Messages;
 
 namespace Gauge.Dotnet
 {
-
     public class ExecutionInfoMapper
     {
-        public ExecutionContext ExecutionInfoFrom(Messages.ExecutionInfo currentExecutionInfo)
+        public ExecutionContext ExecutionInfoFrom(ExecutionInfo currentExecutionInfo)
         {
             if (currentExecutionInfo == null)
                 return new ExecutionContext();
 
-            return new ExecutionContext(SpecificationFrom(currentExecutionInfo.CurrentSpec), ScenarioFrom(currentExecutionInfo.CurrentScenario),
-                    StepFrom(currentExecutionInfo.CurrentStep));
+            return new ExecutionContext(SpecificationFrom(currentExecutionInfo.CurrentSpec),
+                ScenarioFrom(currentExecutionInfo.CurrentScenario),
+                StepFrom(currentExecutionInfo.CurrentStep));
         }
 
-        public ExecutionContext.Specification SpecificationFrom(Messages.SpecInfo currentSpec)
+        public ExecutionContext.Specification SpecificationFrom(SpecInfo currentSpec)
         {
-            return currentSpec != null ? new ExecutionContext.Specification(currentSpec.Name, currentSpec.FileName, currentSpec.IsFailed, currentSpec.Tags.ToArray()) : new ExecutionContext.Specification();
+            return currentSpec != null
+                ? new ExecutionContext.Specification(currentSpec.Name, currentSpec.FileName, currentSpec.IsFailed,
+                    currentSpec.Tags.ToArray())
+                : new ExecutionContext.Specification();
         }
 
-        public ExecutionContext.Scenario ScenarioFrom(Messages.ScenarioInfo currentScenario)
+        public ExecutionContext.Scenario ScenarioFrom(ScenarioInfo currentScenario)
         {
-            return currentScenario != null ? new ExecutionContext.Scenario(currentScenario.Name, currentScenario.IsFailed, currentScenario.Tags.ToArray()) : new ExecutionContext.Scenario();
+            return currentScenario != null
+                ? new ExecutionContext.Scenario(currentScenario.Name, currentScenario.IsFailed,
+                    currentScenario.Tags.ToArray())
+                : new ExecutionContext.Scenario();
         }
 
-        public ExecutionContext.StepDetails StepFrom(Messages.StepInfo currentStep)
+        public ExecutionContext.StepDetails StepFrom(StepInfo currentStep)
         {
             if (currentStep == null || currentStep.Step == null)
                 return new ExecutionContext.StepDetails();

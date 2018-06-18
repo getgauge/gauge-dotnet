@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -32,6 +32,7 @@ namespace Gauge.Dotnet
                 Console.WriteLine("usage: {0} --<start|init>", AppDomain.CurrentDomain.FriendlyName);
                 Environment.Exit(1);
             }
+
             var phase = args[0];
             var command = GaugeCommandFactory.GetExecutor(phase);
             command.Execute();

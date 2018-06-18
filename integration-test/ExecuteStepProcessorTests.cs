@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -15,8 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
@@ -35,20 +33,13 @@ namespace Gauge.Dotnet.IntegrationTests
             const string stepText = "Step that takes a table <table>";
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper,
+                reflectionWrapper);
 
-            var gaugeMethod = sandbox.GetStepMethods()
-                .First(method => method.Name == "IntegrationTestSample.StepImplementation.ReadTable-Tabletable");
-            var scannedSteps = new List<KeyValuePair<string, GaugeMethod>>
-            {
-                new KeyValuePair<string, GaugeMethod>(parameterizedStepText, gaugeMethod)
-            };
-            var aliases = new Dictionary<string, bool> {{parameterizedStepText, false}};
-            var stepTextMap = new Dictionary<string, string> {{parameterizedStepText, stepText}};
-            var stepRegistry = new StepRegistry(scannedSteps, stepTextMap, aliases);
-
-            var executeStepProcessor = new ExecuteStepProcessor(stepRegistry, new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
+            var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
+                new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
 
             var protoTable = new ProtoTable
             {
@@ -98,20 +89,13 @@ namespace Gauge.Dotnet.IntegrationTests
             const string stepText = "I throw a serializable exception";
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper, reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper,
+                reflectionWrapper);
 
-            var gaugeMethod = sandbox.GetStepMethods()
-                .First(method => method.Name == "IntegrationTestSample.StepImplementation.ThrowSerializableException");
-            var scannedSteps = new List<KeyValuePair<string, GaugeMethod>>
-            {
-                new KeyValuePair<string, GaugeMethod>(parameterizedStepText, gaugeMethod)
-            };
-            var aliases = new Dictionary<string, bool> {{parameterizedStepText, false}};
-            var stepTextMap = new Dictionary<string, string> {{parameterizedStepText, stepText}};
-            var stepRegistry = new StepRegistry(scannedSteps, stepTextMap, aliases);
-
-            var executeStepProcessor = new ExecuteStepProcessor(stepRegistry, new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
+            var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
+                new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
 
             var message = new Message
             {

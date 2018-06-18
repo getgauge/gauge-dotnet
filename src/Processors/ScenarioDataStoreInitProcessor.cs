@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -17,10 +17,10 @@
 
 namespace Gauge.Dotnet.Processors
 {
-
     public class ScenarioDataStoreInitProcessor : DataStoreInitProcessorBase
     {
-        public ScenarioDataStoreInitProcessor(IAssemblyLoader assemblyLoader) : base(assemblyLoader, DataStoreType.Scenario)
+        public ScenarioDataStoreInitProcessor(IAssemblyLoader assemblyLoader) : base(assemblyLoader,
+            DataStoreType.Scenario)
         {
         }
     }

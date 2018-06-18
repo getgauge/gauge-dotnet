@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -22,7 +22,8 @@ namespace Gauge.Dotnet.Processors
 {
     public abstract class UntaggedHooksFirstExecutionProcessor : HookExecutionProcessor
     {
-        protected UntaggedHooksFirstExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
+        protected UntaggedHooksFirstExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader,
+            IReflectionWrapper reflectionWrapper)
             : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
             Strategy = new UntaggedHooksFirstStrategy();

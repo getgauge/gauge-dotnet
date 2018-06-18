@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -16,6 +16,7 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Collections.Generic;
+using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
@@ -59,10 +60,12 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 ExecutionTime = 0,
                 Failed = false
             };
-            _mockMethodExecutor.Setup(x => x.ExecuteHooks("BeforeSuite", It.IsAny<HooksStrategy>(), new List<string>(), It.IsAny<Gauge.CSharp.Lib.ExecutionContext>()))
+            _mockMethodExecutor.Setup(x => x.ExecuteHooks("BeforeSuite", It.IsAny<HooksStrategy>(), new List<string>(),
+                    It.IsAny<ExecutionContext>()))
                 .Returns(_protoExecutionResult);
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            _executionStartingProcessor = new ExecutionStartingProcessor(_mockMethodExecutor.Object, mockAssemblyLoader.Object, mockReflectionWrapper.Object);
+            _executionStartingProcessor = new ExecutionStartingProcessor(_mockMethodExecutor.Object,
+                mockAssemblyLoader.Object, mockReflectionWrapper.Object);
         }
 
         private ExecutionStartingProcessor _executionStartingProcessor;
@@ -87,14 +90,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = { "foo" },
+                Tags = {"foo"},
                 Name = "",
                 FileName = "",
                 IsFailed = false
             };
             var scenarioInfo = new ScenarioInfo
             {
-                Tags = { "bar" },
+                Tags = {"bar"},
                 Name = "",
                 IsFailed = false
             };

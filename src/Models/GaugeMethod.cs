@@ -1,4 +1,4 @@
-// Copyright 2015 ThoughtWorks, Inc.
+// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -16,14 +16,25 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+using Microsoft.CodeAnalysis;
 
 namespace Gauge.Dotnet.Models
 {
     [Serializable]
     public class GaugeMethod
     {
+        public MethodInfo MethodInfo { get; set; }
         public string Name { get; set; }
         public int ParameterCount { get; set; }
         public bool ContinueOnFailure { get; set; }
+        public string StepText { get; set; }
+        public string StepValue { get; set; }
+        public string FileName { get; set; }
+        public string ClassName { get; set; }
+        public FileLinePositionSpan Span { get; internal set; }
+        public bool IsAlias { get; set; }
+        public IEnumerable<string> Aliases { get; set; }
     }
 }

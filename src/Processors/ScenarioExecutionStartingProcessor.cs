@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -26,7 +26,8 @@ namespace Gauge.Dotnet.Processors
     {
         private readonly ISandbox _sandbox;
 
-        public ScenarioExecutionStartingProcessor(IMethodExecutor methodExecutor, ISandbox sandbox, IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
+        public ScenarioExecutionStartingProcessor(IMethodExecutor methodExecutor, ISandbox sandbox,
+            IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
             : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
             _sandbox = sandbox;

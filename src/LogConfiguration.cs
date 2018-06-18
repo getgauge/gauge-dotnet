@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -65,6 +65,7 @@ namespace Gauge.Dotnet
                 if (!Path.IsPathRooted(logDir))
                     logDir = Path.Combine(Utils.GaugeProjectRoot, logDir);
             }
+
             return Path.GetFullPath(Path.Combine(logDir, "gauge.log"));
         }
     }

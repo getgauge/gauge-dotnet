@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -15,12 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using System.Collections.Generic;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.UnitTests.Helpers;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 
 namespace Gauge.Dotnet.UnitTests.Extensions
 {
@@ -69,6 +68,7 @@ namespace Gauge.Dotnet.UnitTests.Extensions
 
             Assert.AreEqual("My.Test.Type.Bar-Stringbar", barMethod.FullyQuallifiedName());
         }
+
         [Test]
         public void ShouldNotBeRecoverable()
         {
@@ -105,7 +105,8 @@ namespace Gauge.Dotnet.UnitTests.Extensions
                 .WithParameters(new KeyValuePair<string, string>("string", "Bar"))
                 .Build();
 
-            Assert.False(bazMethod.IsRecoverableStep(assemblyLoader.Object), "Recoverable is true only when method is a Step");
+            Assert.False(bazMethod.IsRecoverableStep(assemblyLoader.Object),
+                "Recoverable is true only when method is a Step");
         }
     }
 }

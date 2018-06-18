@@ -1,4 +1,4 @@
-// Copyright 2015 ThoughtWorks, Inc.
+// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using System.Collections.Generic;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
@@ -33,9 +32,8 @@ namespace Gauge.Dotnet
         void ClearObjectCache();
         void StartExecutionScope(string tag);
         void CloseExectionScope();
-        ExecutionResult ExecuteHooks(string hookType, IHooksStrategy strategy, IList<string> applicableTags, ExecutionContext context);
 
-        string Refactor(GaugeMethod methodInfo, IList<Tuple<int, int>> parameterPositions,
-            IList<string> parametersList, string newStepValue);
+        ExecutionResult ExecuteHooks(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
+            ExecutionContext context);
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -25,7 +25,10 @@ namespace Gauge.Dotnet.Wrappers
         MethodInfo GetMethod(Type type, string methodName);
         MethodInfo[] GetMethods(Type type);
         object Invoke(MethodInfo method, object obj, params object[] args);
-        object InvokeMethod(Type type, object instance, string methodName, BindingFlags bindAttrs, params object[] args);
+
+        object InvokeMethod(Type type, object instance, string methodName, BindingFlags bindAttrs,
+            params object[] args);
+
         object InvokeMethod(Type type, object instance, string methodName, params object[] args);
     }
 }

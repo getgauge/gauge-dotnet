@@ -1,4 +1,4 @@
-﻿// Copyright 2015 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
@@ -58,19 +59,22 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             var protoExecutionResult = new ProtoExecutionResult {ExecutionTime = 0, Failed = false};
             methodExecutor.Setup(executor =>
-                    executor.ExecuteHooks(It.IsAny<string>(), It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(), It.IsAny<Gauge.CSharp.Lib.ExecutionContext>()))
+                    executor.ExecuteHooks(It.IsAny<string>(), It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
+                        It.IsAny<ExecutionContext>()))
                 .Returns(protoExecutionResult);
             var hookRegistry = new Mock<IHookRegistry>();
             hookRegistry.Setup(registry => registry.BeforeStepHooks).Returns(new HashSet<IHookMethod>());
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockMessageCollectorType = new Mock<Type>();
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            mockReflectionWrapper.Setup(x => x.InvokeMethod(mockMessageCollectorType.Object, null, "Clear", BindingFlags.Static | BindingFlags.Public))
+            mockReflectionWrapper.Setup(x => x.InvokeMethod(mockMessageCollectorType.Object, null, "Clear",
+                    BindingFlags.Static | BindingFlags.Public))
                 .Verifiable();
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector))
                 .Returns(mockMessageCollectorType.Object);
 
-            var processor = new StepExecutionStartingProcessor(methodExecutor.Object, mockAssemblyLoader.Object, mockReflectionWrapper.Object);
+            var processor = new StepExecutionStartingProcessor(methodExecutor.Object, mockAssemblyLoader.Object,
+                mockReflectionWrapper.Object);
             processor.Process(request);
 
             mockReflectionWrapper.VerifyAll();
