@@ -85,7 +85,7 @@ namespace Gauge.Dotnet
                     .SelectMany(x => x.GetType().GetProperty("Names").GetValue(x, null) as string[]);
                 foreach (var stepText in stepTexts)
                 {
-                    var stepValue = GetStepValue(stepTexts.FirstOrDefault());
+                    var stepValue = GetStepValue(stepText);
                     var isAlias = stepTexts.Count() > 1;
                     var stepMethod = new GaugeMethod
                     {

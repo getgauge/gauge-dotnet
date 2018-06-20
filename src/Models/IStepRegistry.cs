@@ -23,12 +23,10 @@ namespace Gauge.Dotnet.Models
     {
         bool ContainsStep(string parsedStepText);
         GaugeMethod MethodFor(string parsedStepText);
-        IEnumerable<string> AllSteps();
         bool HasAlias(string stepText);
         string GetStepText(string parameterizedStepText);
         IEnumerable<string> GetStepTexts();
         bool HasMultipleImplementations(string parsedStepText);
-        void Clear();
         void AddStep(string stepValue, GaugeMethod stepMethod);
     }
 }

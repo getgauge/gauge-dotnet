@@ -35,9 +35,8 @@ namespace Gauge.Dotnet.IntegrationTests
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
-            var stepMethods = sandbox.GetStepMethods();
-            var gaugeMethod = stepMethods.First(info =>
-                string.CompareOrdinal(info.Name, "IntegrationTestSample.StepImplementation.ContinueOnFailure") == 0);
+            var gaugeMethod = assemblyLoader.GetStepRegistry()
+                .MethodFor("I throw a serializable exception and continue");
             var executionResult = sandbox.ExecuteMethod(gaugeMethod);
 
             Assert.IsFalse(executionResult.Success);
@@ -52,10 +51,7 @@ namespace Gauge.Dotnet.IntegrationTests
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
-            var stepMethods = sandbox.GetStepMethods();
-            var gaugeMethod = stepMethods.First(info =>
-                string.CompareOrdinal(info.Name, "IntegrationTestSample.StepImplementation.ReadTable-Tabletable") == 0);
-
+            var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("Step that takes a table {}");
             var table = new Table(new List<string> {"foo", "bar"});
             table.AddRow(new List<string> {"foorow1", "barrow1"});
             table.AddRow(new List<string> {"foorow2", "barrow2"});
@@ -72,52 +68,14 @@ namespace Gauge.Dotnet.IntegrationTests
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
-            var stepMethods = sandbox.GetStepMethods();
             AssertRunnerDomainDidNotLoadUsersAssembly();
-            var gaugeMethod = stepMethods.First(info =>
-                string.CompareOrdinal(info.Name, "IntegrationTestSample.StepImplementation.Context") == 0);
+            var gaugeMethod = assemblyLoader.GetStepRegistry()
+                .MethodFor("A context step which gets executed before every scenario");
 
             var executionResult = sandbox.ExecuteMethod(gaugeMethod);
             Assert.True(executionResult.Success);
         }
 
-        [Test]
-        public void ShouldGetAllStepMethods()
-        {
-            var reflectionWrapper = new ReflectionWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
-                reflectionWrapper);
-
-            AssertRunnerDomainDidNotLoadUsersAssembly();
-            var stepMethods = sandbox.GetStepMethods();
-
-            Assert.AreEqual(13, stepMethods.Count);
-        }
-
-        [Test]
-        public void ShouldGetAllStepTexts()
-        {
-            var reflectionWrapper = new ReflectionWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
-                reflectionWrapper);
-
-            var stepTexts = sandbox.GetAllStepTexts().ToList();
-
-            new List<string>
-            {
-                "Say <what> to <who>",
-                "A context step which gets executed before every scenario",
-                "Step that takes a table <table>",
-                "Refactoring Say <what> to <who>",
-                "Refactoring 1 Say <what> to <who>",
-                "Refactoring A context step which gets executed before every scenario",
-                "Refactoring Step that takes a table <table>"
-            }.ForEach(s => Assert.Contains(s, stepTexts));
-        }
 
         [Test]
         public void ShouldGetPendingMessages()
@@ -128,10 +86,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
 
-            var stepMethods = sandbox.GetStepMethods();
-            var gaugeMethod = stepMethods.First(info =>
-                string.CompareOrdinal(info.Name,
-                    "IntegrationTestSample.StepImplementation.SaySomething-StringwhatStringwho") == 0);
+            var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("Say {} to {}");
 
             sandbox.ExecuteMethod(gaugeMethod, "hello", "world");
             var pendingMessages = MessageCollector.GetAllPendingMessages();
@@ -148,10 +103,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
 
-            var stepMethods = sandbox.GetStepMethods();
-            var gaugeMethod = stepMethods.First(info =>
-                string.CompareOrdinal(info.Name, "IntegrationTestSample.StepImplementation.AsyncExeption") == 0);
-
+            var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an AggregateException");
             var executionResult = sandbox.ExecuteMethod(gaugeMethod);
 
             Assert.AreEqual(false, executionResult.Success);
@@ -165,14 +117,9 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
-                reflectionWrapper);
-
-            var stepMethods = sandbox.GetStepMethods();
-            var gaugeMethod = stepMethods.First(info =>
-                string.CompareOrdinal(info.Name, "IntegrationTestSample.StepImplementation.StepWithAliases") == 0);
-
-            var stepTexts = sandbox.GetStepTexts(gaugeMethod).ToList();
+            var registry = assemblyLoader.GetStepRegistry();
+            var gaugeMethod = registry.MethodFor("and an alias");
+            var stepTexts = gaugeMethod.Aliases.ToList();
 
             Assert.Contains("Step with text", stepTexts);
             Assert.Contains("and an alias", stepTexts);
@@ -188,10 +135,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
 
-            var stepMethods = sandbox.GetStepMethods();
-            var gaugeMethod = stepMethods.First(info =>
-                string.CompareOrdinal(info.Name,
-                    "IntegrationTestSample.StepImplementation.ThrowSerializableException") == 0);
+            var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw a serializable exception");
 
             var executionResult = sandbox.ExecuteMethod(gaugeMethod);
 
@@ -211,12 +155,8 @@ namespace Gauge.Dotnet.IntegrationTests
             var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), new ActivatorWrapper(),
                 reflectionWrapper);
 
-            var stepMethods = sandbox.GetStepMethods();
             AssertRunnerDomainDidNotLoadUsersAssembly();
-            var gaugeMethod = stepMethods.First(info =>
-                string.CompareOrdinal(info.Name,
-                    "IntegrationTestSample.StepImplementation.ThrowUnserializableException") == 0);
-
+            var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an unserializable exception");
             var executionResult = sandbox.ExecuteMethod(gaugeMethod);
             Assert.False(executionResult.Success);
             Assert.AreEqual(expectedMessage, executionResult.ExceptionMessage);

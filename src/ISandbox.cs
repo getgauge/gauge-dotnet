@@ -26,9 +26,6 @@ namespace Gauge.Dotnet
     {
         ExecutionResult ExecuteMethod(GaugeMethod gaugeMethod, params string[] args);
         bool TryScreenCapture(out byte[] screenShotBytes);
-        List<GaugeMethod> GetStepMethods();
-        IEnumerable<string> GetStepTexts(GaugeMethod gaugeMethod);
-        List<string> GetAllStepTexts();
         void ClearObjectCache();
         void StartExecutionScope(string tag);
         void CloseExectionScope();

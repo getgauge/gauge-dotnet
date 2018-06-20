@@ -25,7 +25,6 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Converters;
-using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
@@ -56,8 +55,6 @@ namespace Gauge.Dotnet
             instanceManagerType = _assemblyLoader.ClassInstanceManagerType;
             LoadClassInstanceManager();
         }
-
-        private IDictionary<string, MethodInfo> MethodMap { get; set; }
 
         [DebuggerStepperBoundary]
         [DebuggerHidden]
@@ -96,43 +93,6 @@ namespace Gauge.Dotnet
             }
 
             return executionResult;
-        }
-
-        public List<GaugeMethod> GetStepMethods()
-        {
-            var infos = _assemblyLoader.GetMethods(LibType.Step);
-            MethodMap = new Dictionary<string, MethodInfo>();
-            foreach (var info in infos)
-            {
-                var methodId = info.FullyQuallifiedName();
-                MethodMap.Add(methodId, info);
-                LogManager.GetLogger("Sandbox").Debug("Scanned and caching Gauge Step: {0}, Recoverable: {1}", methodId,
-                    info.IsRecoverableStep(_assemblyLoader));
-            }
-
-            return MethodMap.Keys.Select(s =>
-            {
-                var method = MethodMap[s];
-                return new GaugeMethod
-                {
-                    MethodInfo = MethodMap[s],
-                    Name = s,
-                    ParameterCount = method.GetParameters().Length,
-                    ContinueOnFailure = method.IsRecoverableStep(_assemblyLoader)
-                };
-            }).ToList();
-        }
-
-        public List<string> GetAllStepTexts()
-        {
-            return GetStepMethods().SelectMany(GetStepTexts).ToList();
-        }
-
-        public IEnumerable<string> GetStepTexts(GaugeMethod gaugeMethod)
-        {
-            var stepMethod = MethodMap[gaugeMethod.Name];
-            return stepMethod.GetCustomAttributes(_assemblyLoader.GetLibType(LibType.Step))
-                .SelectMany(x => x.GetType().GetProperty("Names").GetValue(x, null) as string[]);
         }
 
         public bool TryScreenCapture(out byte[] screenShotBytes)

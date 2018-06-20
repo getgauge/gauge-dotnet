@@ -52,7 +52,7 @@ namespace IntegrationTestSample
             throw new CustomSerializableException("I am a custom serializable exception");
         }
 
-        [Step("I throw a serializable exception")]
+        [Step("I throw a serializable exception and continue")]
         [ContinueOnFailure]
         public void ContinueOnFailure()
         {
