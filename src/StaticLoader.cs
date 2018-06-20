@@ -53,7 +53,6 @@ namespace Gauge.Dotnet
         public void LoadStepsFromText(string content, string fileName)
         {
             var steps = GetStepsFrom(content, fileName);
-            Console.WriteLine(steps.Count());
             AddStepsToRegsitry(fileName, steps);
         }
 
