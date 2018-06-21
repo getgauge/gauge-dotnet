@@ -38,12 +38,12 @@ namespace Gauge.Dotnet
         {
             if (scan)
             {
+                var activatorWrapper = new ActivatorWrapper();
                 var reflectionWrapper = new ReflectionWrapper();
                 var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                     new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(),
                     reflectionWrapper);
                 _stepRegistry = assemblyLoader.GetStepRegistry();
-                var activatorWrapper = new ActivatorWrapper();
                 var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
                 var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper,
                     reflectionWrapper);
@@ -73,19 +73,19 @@ namespace Gauge.Dotnet
                 },
                 {
                     Message.Types.MessageType.SpecExecutionStarting,
-                    new SpecExecutionStartingProcessor(methodExecutor, sandbox, assemblyLoader, reflectionWrapper)
+                    new SpecExecutionStartingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.SpecExecutionEnding,
-                    new SpecExecutionEndingProcessor(methodExecutor, sandbox, assemblyLoader, reflectionWrapper)
+                    new SpecExecutionEndingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionStarting,
-                    new ScenarioExecutionStartingProcessor(methodExecutor, sandbox, assemblyLoader, reflectionWrapper)
+                    new ScenarioExecutionStartingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionEnding,
-                    new ScenarioExecutionEndingProcessor(methodExecutor, sandbox, assemblyLoader, reflectionWrapper)
+                    new ScenarioExecutionEndingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.StepExecutionStarting,

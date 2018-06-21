@@ -31,5 +31,7 @@ namespace Gauge.Dotnet
             ExecutionContext context);
 
         void ClearCache();
+
+        ISandbox GetSandbox();
     }
 }

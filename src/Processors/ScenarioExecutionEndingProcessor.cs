@@ -24,13 +24,13 @@ namespace Gauge.Dotnet.Processors
 {
     public class ScenarioExecutionEndingProcessor : TaggedHooksFirstExecutionProcessor
     {
-        private readonly ISandbox _sandbox;
+        private readonly IMethodExecutor _methodExecutor;
 
-        public ScenarioExecutionEndingProcessor(IMethodExecutor methodExecutor, ISandbox sandbox,
+        public ScenarioExecutionEndingProcessor(IMethodExecutor methodExecutor,
             IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
             : base(methodExecutor, assemblyLoader, reflectionWrapper)
         {
-            _sandbox = sandbox;
+            _methodExecutor = methodExecutor;
         }
 
         protected override string HookType => "AfterScenario";
@@ -40,7 +40,7 @@ namespace Gauge.Dotnet.Processors
 
         public override Message Process(Message request)
         {
-            _sandbox.CloseExectionScope();
+            _methodExecutor.GetSandbox().CloseExectionScope();
             return base.Process(request);
         }
 

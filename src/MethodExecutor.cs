@@ -29,7 +29,7 @@ namespace Gauge.Dotnet
 {
     public class MethodExecutor : IMethodExecutor
     {
-        private static readonly Logger Logger = LogManager.GetLogger("Sandbox");
+        private static readonly Logger Logger = LogManager.GetLogger("_sandbox");
         private readonly ISandbox _sandbox;
 
         public MethodExecutor(ISandbox sandbox)
@@ -95,6 +95,11 @@ namespace Gauge.Dotnet
         public void ClearCache()
         {
             _sandbox.ClearObjectCache();
+        }
+
+        public ISandbox GetSandbox()
+        {
+            return _sandbox;
         }
 
         private ByteString TakeScreenshot()
