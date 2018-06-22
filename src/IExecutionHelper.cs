@@ -23,15 +23,16 @@ using Gauge.Messages;
 
 namespace Gauge.Dotnet
 {
-    public interface IMethodExecutor
+    public interface IExecutionHelper
     {
-        ProtoExecutionResult Execute(GaugeMethod method, params string[] args);
+        ProtoExecutionResult ExecuteStep(GaugeMethod method, params string[] args);
 
         ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags,
             ExecutionContext context);
 
         void ClearCache();
 
-        ISandbox GetSandbox();
+        void StartExecutionScope(string tag);
+        void CloseExectionScope();
     }
 }

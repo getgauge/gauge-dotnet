@@ -41,7 +41,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldClearExistingGaugeMessages()
         {
-            var methodExecutor = new Mock<IMethodExecutor>();
+            var mockExectionHelper = new Mock<IExecutionHelper>();
 
             var request = new Message
             {
@@ -58,7 +58,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             };
 
             var protoExecutionResult = new ProtoExecutionResult {ExecutionTime = 0, Failed = false};
-            methodExecutor.Setup(executor =>
+            mockExectionHelper.Setup(executor =>
                     executor.ExecuteHooks(It.IsAny<string>(), It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
                         It.IsAny<ExecutionContext>()))
                 .Returns(protoExecutionResult);
@@ -73,7 +73,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector))
                 .Returns(mockMessageCollectorType.Object);
 
-            var processor = new StepExecutionStartingProcessor(methodExecutor.Object, mockAssemblyLoader.Object,
+            var processor = new StepExecutionStartingProcessor(mockExectionHelper.Object, mockAssemblyLoader.Object,
                 mockReflectionWrapper.Object);
             processor.Process(request);
 

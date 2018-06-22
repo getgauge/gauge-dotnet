@@ -1,4 +1,4 @@
-// Copyright 2018 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -15,18 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using Gauge.Dotnet.Strategy;
-using Gauge.Dotnet.Wrappers;
+using Gauge.Dotnet.Models;
 
-namespace Gauge.Dotnet.Processors
+namespace Gauge.Dotnet
 {
-    public abstract class TaggedHooksFirstExecutionProcessor : HookExecutionProcessor
+    public interface IStepExecutor
     {
-        protected TaggedHooksFirstExecutionProcessor(IExecutionHelper executionHelper, IAssemblyLoader assemblyLoader,
-            IReflectionWrapper reflectionWrapper)
-            : base(executionHelper, assemblyLoader, reflectionWrapper)
-        {
-            Strategy = new TaggedHooksFirstStrategy();
-        }
+        ExecutionResult ExecuteStep(GaugeMethod gaugeMethod, string[] args);
+        void SetClassInstanceManager(object classInstanceManager);
     }
 }

@@ -34,7 +34,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
     internal class StepExecutionEndingProcessorTests
     {
         private readonly IEnumerable<string> _pendingMessages = new List<string> {"Foo", "Bar"};
-        private Mock<IMethodExecutor> _mockMethodExecutor;
+        private Mock<IExecutionHelper> _mockMethodExecutor;
         private ProtoExecutionResult _protoExecutionResult;
         private Message _request;
         private StepExecutionEndingProcessor _stepExecutionEndingProcessor;
@@ -43,7 +43,6 @@ namespace Gauge.Dotnet.UnitTests.Processors
         public void Setup()
         {
             var mockHookRegistry = new Mock<IHookRegistry>();
-            var mockSandbox = new Mock<ISandbox>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockMessageCollectorType = new Mock<Type>();
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector))
@@ -72,7 +71,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 StepExecutionEndingRequest = stepExecutionEndingRequest
             };
 
-            _mockMethodExecutor = new Mock<IMethodExecutor>();
+            _mockMethodExecutor = new Mock<IExecutionHelper>();
             _protoExecutionResult = new ProtoExecutionResult
             {
                 ExecutionTime = 0,

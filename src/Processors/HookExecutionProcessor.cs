@@ -34,13 +34,13 @@ namespace Gauge.Dotnet.Processors
         protected const string ScenarioLevel = "scenario";
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly IReflectionWrapper _reflectionWrapper;
-        protected readonly IMethodExecutor MethodExecutor;
+        protected readonly IExecutionHelper ExecutionHelper;
 
-        protected HookExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader,
+        protected HookExecutionProcessor(IExecutionHelper executionHelper, IAssemblyLoader assemblyLoader,
             IReflectionWrapper reflectionWrapper)
         {
             _assemblyLoader = assemblyLoader;
-            MethodExecutor = methodExecutor;
+            ExecutionHelper = executionHelper;
             _reflectionWrapper = reflectionWrapper;
             Strategy = new HooksStrategy();
         }
@@ -66,14 +66,14 @@ namespace Gauge.Dotnet.Processors
             var applicableTags = GetApplicableTags(request);
             var mapper = new ExecutionInfoMapper();
             var executionContext = mapper.ExecutionInfoFrom(GetExecutionInfo(request));
-            return MethodExecutor.ExecuteHooks(HookType, Strategy, applicableTags, executionContext);
+            return ExecutionHelper.ExecuteHooks(HookType, Strategy, applicableTags, executionContext);
         }
 
         private void ClearCacheForConfiguredLevel()
         {
             var flag = Utils.TryReadEnvValue(ClearStateFlag);
             if (!string.IsNullOrEmpty(flag) && flag.Trim().Equals(CacheClearLevel))
-                MethodExecutor.ClearCache();
+                ExecutionHelper.ClearCache();
         }
 
         protected virtual List<string> GetApplicableTags(Message request)

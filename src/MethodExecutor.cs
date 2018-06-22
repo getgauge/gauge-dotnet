@@ -15,99 +15,46 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using System.Collections.Generic;
-using System.Diagnostics;
-using Gauge.CSharp.Core;
-using Gauge.CSharp.Lib;
-using Gauge.Dotnet.Models;
-using Gauge.Dotnet.Strategy;
-using Gauge.Messages;
-using Google.Protobuf;
+using System;
+using System.Reflection;
+using Gauge.Dotnet.Wrappers;
 using NLog;
 
 namespace Gauge.Dotnet
 {
-    public class MethodExecutor : IMethodExecutor
+    public class MethodExecutor
     {
-        private static readonly Logger Logger = LogManager.GetLogger("_sandbox");
-        private readonly ISandbox _sandbox;
+        private object _classInstanceManager;
+        private readonly Type _instanceManagerType;
+        private readonly IReflectionWrapper _reflectionWrapper;
 
-        public MethodExecutor(ISandbox sandbox)
+       
+        protected MethodExecutor(Type type,
+            IReflectionWrapper reflectionWrapper)
         {
-            _sandbox = sandbox;
+            _instanceManagerType = type;
+            _reflectionWrapper = reflectionWrapper;
         }
 
-        [DebuggerHidden]
-        public ProtoExecutionResult Execute(GaugeMethod method, params string[] args)
+        public void SetClassInstanceManager(object classInstanceManager)
         {
-            var stopwatch = Stopwatch.StartNew();
-            var builder = new ProtoExecutionResult
-            {
-                Failed = false
-            };
-            var executionResult = _sandbox.ExecuteMethod(method, args);
+            _classInstanceManager = classInstanceManager;
+        }
 
-            builder.ExecutionTime = stopwatch.ElapsedMilliseconds;
-            if (!executionResult.Success)
+        protected void Execute(MethodInfo method, params object[] parameters)
+        {
+            var typeToLoad = method.DeclaringType;
+            var instance =
+                _reflectionWrapper.InvokeMethod(_instanceManagerType, _classInstanceManager, "Get", typeToLoad);
+            var logger = LogManager.GetLogger("ExecutionHelper");
+            if (instance == null)
             {
-                var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
-                builder.Failed = true;
-                var isScreenShotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
-                if (isScreenShotEnabled == null || isScreenShotEnabled.ToLower() != "false")
-                    builder.ScreenShot = TakeScreenshot();
-                builder.ErrorMessage = executionResult.ExceptionMessage;
-                builder.StackTrace = executionResult.StackTrace;
-                builder.RecoverableError = executionResult.Recoverable;
-                builder.ExecutionTime = elapsedMilliseconds;
+                var error = "Could not load instance type: " + typeToLoad;
+                logger.Error(error);
+                throw new Exception(error);
             }
 
-            return builder;
-        }
-
-        [DebuggerHidden]
-        public ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags,
-            ExecutionContext context)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            var result = new ProtoExecutionResult
-            {
-                Failed = false
-            };
-            var executionResult = _sandbox.ExecuteHooks(hookType, strategy, applicableTags, context);
-
-            result.ExecutionTime = stopwatch.ElapsedMilliseconds;
-            if (!executionResult.Success)
-            {
-                var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
-                result.Failed = true;
-                var isScreenShotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
-                if (isScreenShotEnabled == null || isScreenShotEnabled.ToLower() != "false")
-                    result.ScreenShot = TakeScreenshot();
-                result.ErrorMessage = executionResult.ExceptionMessage;
-                result.StackTrace = executionResult.StackTrace;
-                result.RecoverableError = executionResult.Recoverable;
-                result.ExecutionTime = elapsedMilliseconds;
-            }
-
-            return result;
-        }
-
-        public void ClearCache()
-        {
-            _sandbox.ClearObjectCache();
-        }
-
-        public ISandbox GetSandbox()
-        {
-            return _sandbox;
-        }
-
-        private ByteString TakeScreenshot()
-        {
-            byte[] screenShotBytes;
-            return _sandbox.TryScreenCapture(out screenShotBytes)
-                ? ByteString.CopyFrom(screenShotBytes)
-                : ByteString.Empty;
+            _reflectionWrapper.Invoke(method, instance, parameters);
         }
     }
 }

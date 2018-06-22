@@ -24,9 +24,9 @@ namespace Gauge.Dotnet.Processors
 {
     public class ExecutionEndingProcessor : HookExecutionProcessor
     {
-        public ExecutionEndingProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader,
+        public ExecutionEndingProcessor(IExecutionHelper executionHelper, IAssemblyLoader assemblyLoader,
             IReflectionWrapper reflectionWrapper)
-            : base(methodExecutor, assemblyLoader, reflectionWrapper)
+            : base(executionHelper, assemblyLoader, reflectionWrapper)
         {
         }
 

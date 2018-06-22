@@ -24,13 +24,13 @@ namespace Gauge.Dotnet.Processors
 {
     public class SpecExecutionStartingProcessor : UntaggedHooksFirstExecutionProcessor
     {
-        private IMethodExecutor _methodExecutor;
+        private readonly IExecutionHelper _executionHelper;
 
-        public SpecExecutionStartingProcessor(IMethodExecutor methodExecutor,
+        public SpecExecutionStartingProcessor(IExecutionHelper executionHelper,
             IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
-            : base(methodExecutor, assemblyLoader, reflectionWrapper)
+            : base(executionHelper, assemblyLoader, reflectionWrapper)
         {
-            _methodExecutor = methodExecutor;
+            _executionHelper = executionHelper;
         }
 
         protected override string HookType => "BeforeSpec";
@@ -47,7 +47,7 @@ namespace Gauge.Dotnet.Processors
 
         public override Message Process(Message request)
         {
-            _methodExecutor.GetSandbox().StartExecutionScope("spec");
+            _executionHelper.StartExecutionScope("spec");
             return base.Process(request);
         }
     }

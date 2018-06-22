@@ -25,9 +25,9 @@ namespace Gauge.Dotnet.UnitTests.Processors.Stubs
 {
     public class TestHooksExecutionProcessor : HookExecutionProcessor
     {
-        public TestHooksExecutionProcessor(IMethodExecutor methodExecutor, IAssemblyLoader assemblyLoader,
+        public TestHooksExecutionProcessor(IExecutionHelper executionHelper, IAssemblyLoader assemblyLoader,
             IReflectionWrapper reflectionWrapper)
-            : base(methodExecutor, assemblyLoader, reflectionWrapper)
+            : base(executionHelper, assemblyLoader, reflectionWrapper)
         {
         }
 

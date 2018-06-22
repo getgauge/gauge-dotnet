@@ -45,7 +45,7 @@ namespace Gauge.Dotnet.Strategy
         }
 
         protected IOrderedEnumerable<string> GetUntaggedHooks(IEnumerable<IHookMethod> hookMethods)
-        {
+        {          
             return hookMethods.Where(method => method.FilterTags == null || !method.FilterTags.Any())
                 .Select(method => method.Method)
                 .OrderBy(info => info);

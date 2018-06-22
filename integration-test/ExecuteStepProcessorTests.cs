@@ -16,7 +16,6 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Text;
-using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
@@ -35,11 +34,12 @@ namespace Gauge.Dotnet.IntegrationTests
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper,
-                reflectionWrapper);
+            var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
+                new HookExecutor(assemblyLoader, reflectionWrapper),
+                new StepExecutor(assemblyLoader, reflectionWrapper));
 
             var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
-                new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
+                executionHelper, new TableFormatter(assemblyLoader, activatorWrapper));
 
             var protoTable = new ProtoTable
             {
@@ -91,11 +91,13 @@ namespace Gauge.Dotnet.IntegrationTests
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper,
-                reflectionWrapper);
+            var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
+                new HookExecutor(assemblyLoader, reflectionWrapper),
+                new StepExecutor(assemblyLoader, reflectionWrapper));
 
             var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
-                new MethodExecutor(sandbox), new TableFormatter(assemblyLoader, activatorWrapper));
+                executionHelper, new TableFormatter(assemblyLoader, activatorWrapper));
+
 
             var message = new Message
             {

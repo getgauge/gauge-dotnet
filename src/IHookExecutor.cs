@@ -1,4 +1,4 @@
-// Copyright 2018 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -22,15 +22,11 @@ using Gauge.Dotnet.Strategy;
 
 namespace Gauge.Dotnet
 {
-    public interface ISandbox
+    public interface IHookExecutor
     {
-        ExecutionResult ExecuteMethod(GaugeMethod gaugeMethod, params string[] args);
-        bool TryScreenCapture(out byte[] screenShotBytes);
-        void ClearObjectCache();
-        void StartExecutionScope(string tag);
-        void CloseExectionScope();
-
         ExecutionResult ExecuteHooks(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
             ExecutionContext context);
+
+        void SetClassInstanceManager(object classInstanceManager);
     }
 }

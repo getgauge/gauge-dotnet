@@ -54,7 +54,6 @@ namespace Gauge.Dotnet.UnitTests
         }
 
 
-        public ISandbox SandBox;
         private HookRegistry _hookRegistry;
         private Mock<IAssemblyLoader> _mockAssemblyScanner;
 

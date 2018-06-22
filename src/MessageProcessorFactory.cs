@@ -45,10 +45,7 @@ namespace Gauge.Dotnet
                     reflectionWrapper);
                 _stepRegistry = assemblyLoader.GetStepRegistry();
                 var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
-                var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper,
-                    reflectionWrapper);
-                InitializeExecutionMessageHandlers(reflectionWrapper, assemblyLoader, activatorWrapper, tableFormatter,
-                    sandbox);
+                InitializeExecutionMessageHandlers(reflectionWrapper, assemblyLoader, activatorWrapper, tableFormatter);
             }
 
             return !_messageProcessorsDictionary.ContainsKey(messageType)
@@ -57,47 +54,48 @@ namespace Gauge.Dotnet
         }
 
         public void InitializeExecutionMessageHandlers(IReflectionWrapper reflectionWrapper,
-            IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, ITableFormatter tableFormatter,
-            ISandbox sandbox)
+            IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, ITableFormatter tableFormatter)
         {
-            var methodExecutor = new MethodExecutor(sandbox);
+            var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
+                new HookExecutor(assemblyLoader, reflectionWrapper),
+                new StepExecutor(assemblyLoader, reflectionWrapper));
             var handlers = new Dictionary<Message.Types.MessageType, IMessageProcessor>
             {
                 {
                     Message.Types.MessageType.ExecutionStarting,
-                    new ExecutionStartingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
+                    new ExecutionStartingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ExecutionEnding,
-                    new ExecutionEndingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
+                    new ExecutionEndingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.SpecExecutionStarting,
-                    new SpecExecutionStartingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
+                    new SpecExecutionStartingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.SpecExecutionEnding,
-                    new SpecExecutionEndingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
+                    new SpecExecutionEndingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionStarting,
-                    new ScenarioExecutionStartingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
+                    new ScenarioExecutionStartingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionEnding,
-                    new ScenarioExecutionEndingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
+                    new ScenarioExecutionEndingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.StepExecutionStarting,
-                    new StepExecutionStartingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
+                    new StepExecutionStartingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.StepExecutionEnding,
-                    new StepExecutionEndingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
+                    new StepExecutionEndingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ExecuteStep,
-                    new ExecuteStepProcessor(_stepRegistry, methodExecutor, tableFormatter)
+                    new ExecuteStepProcessor(_stepRegistry, executionHelper, tableFormatter)
                 },
                 {Message.Types.MessageType.KillProcessRequest, new KillProcessProcessor()},
                 {Message.Types.MessageType.ScenarioDataStoreInit, new ScenarioDataStoreInitProcessor(assemblyLoader)},
