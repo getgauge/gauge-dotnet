@@ -24,7 +24,6 @@ using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Google.Protobuf;
-using NLog;
 
 namespace Gauge.Dotnet
 {
@@ -32,21 +31,19 @@ namespace Gauge.Dotnet
     {
         private readonly IActivatorWrapper _activatorWrapper;
         private readonly IAssemblyLoader _assemblyLoader;
+        private readonly object _classInstanceManager;
         private readonly IHookExecutor _hookExecutor;
         private readonly IReflectionWrapper _reflectionWrapper;
         private readonly IStepExecutor _stepExecutor;
 
-        private object _classInstanceManager;
-
         public ExecutionHelper(IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader,
-            IActivatorWrapper activatorWrapper, IHookExecutor hookExecutor, IStepExecutor stepExecutor)
+            IActivatorWrapper activatorWrapper, object classInstanceManager, IHookExecutor hookExecutor,
+            IStepExecutor stepExecutor)
         {
             _reflectionWrapper = reflectionWrapper;
             _assemblyLoader = assemblyLoader;
             _activatorWrapper = activatorWrapper;
-            LoadClassInstanceManager();
-            hookExecutor.SetClassInstanceManager(_classInstanceManager);
-            stepExecutor.SetClassInstanceManager(_classInstanceManager);
+            _classInstanceManager = classInstanceManager;
             _hookExecutor = hookExecutor;
             _stepExecutor = stepExecutor;
         }
@@ -150,17 +147,6 @@ namespace Gauge.Dotnet
 
             screenShotBytes = null;
             return false;
-        }
-
-        private void LoadClassInstanceManager()
-        {
-            var instanceManagerType = _assemblyLoader.ClassInstanceManagerType;
-            if (instanceManagerType == null) return;
-            var logger = LogManager.GetLogger("ExecutionHelper");
-            _classInstanceManager = _activatorWrapper.CreateInstance(instanceManagerType);
-            logger.Debug("Loaded Instance Manager of Type:" + _classInstanceManager.GetType().FullName);
-            _reflectionWrapper.InvokeMethod(instanceManagerType, _classInstanceManager, "Initialize",
-                _assemblyLoader.AssembliesReferencingGaugeLib);
         }
     }
 }

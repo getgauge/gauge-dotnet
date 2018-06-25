@@ -36,17 +36,20 @@ namespace Gauge.Dotnet
 
         public IMessageProcessor GetProcessor(Message.Types.MessageType messageType, bool scan = false)
         {
-            if (scan)
-            {
-                var activatorWrapper = new ActivatorWrapper();
-                var reflectionWrapper = new ReflectionWrapper();
-                var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                    new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(),
-                    reflectionWrapper);
-                _stepRegistry = assemblyLoader.GetStepRegistry();
-                var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
-                InitializeExecutionMessageHandlers(reflectionWrapper, assemblyLoader, activatorWrapper, tableFormatter);
-            }
+            if (!scan)
+                return !_messageProcessorsDictionary.ContainsKey(messageType)
+                    ? new DefaultProcessor()
+                    : _messageProcessorsDictionary[messageType];
+            var activatorWrapper = new ActivatorWrapper();
+            var reflectionWrapper = new ReflectionWrapper();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(),
+                reflectionWrapper);
+            _stepRegistry = assemblyLoader.GetStepRegistry();
+            var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+            InitializeExecutionMessageHandlers(reflectionWrapper, assemblyLoader, activatorWrapper, tableFormatter,
+                classInstanceManager);
 
             return !_messageProcessorsDictionary.ContainsKey(messageType)
                 ? new DefaultProcessor()
@@ -54,11 +57,13 @@ namespace Gauge.Dotnet
         }
 
         public void InitializeExecutionMessageHandlers(IReflectionWrapper reflectionWrapper,
-            IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, ITableFormatter tableFormatter)
+            IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, ITableFormatter tableFormatter,
+            object classInstanceManager)
         {
             var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
-                new HookExecutor(assemblyLoader, reflectionWrapper),
-                new StepExecutor(assemblyLoader, reflectionWrapper));
+                classInstanceManager,
+                new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
+                new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
             var handlers = new Dictionary<Message.Types.MessageType, IMessageProcessor>
             {
                 {

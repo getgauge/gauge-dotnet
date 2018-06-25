@@ -22,6 +22,5 @@ namespace Gauge.Dotnet
     public interface IStepExecutor
     {
         ExecutionResult ExecuteStep(GaugeMethod gaugeMethod, string[] args);
-        void SetClassInstanceManager(object classInstanceManager);
     }
 }

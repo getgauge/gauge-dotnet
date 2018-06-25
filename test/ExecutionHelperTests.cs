@@ -55,6 +55,7 @@ namespace Gauge.Dotnet.UnitTests
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockActivationWrapper = new Mock<IActivatorWrapper>();
+            var mockClassInstanceManager = new Mock<object>().Object;
             var hooksStrategy = new HooksStrategy();
             var mockHookExecuter = new Mock<IHookExecutor>();
             mockHookExecuter.Setup(m =>
@@ -64,7 +65,7 @@ namespace Gauge.Dotnet.UnitTests
             var reflectionWrapper = mockReflectionWrapper.Object;
             var assemblyLoader = mockAssemblyLoader.Object;
             var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, mockActivationWrapper.Object,
-                mockHookExecuter.Object, mockStepExecuter.Object);
+                mockClassInstanceManager, mockHookExecuter.Object, mockStepExecuter.Object);
 
 
             var result = executionHelper.ExecuteHooks("hooks", hooksStrategy, new List<string>(),
@@ -84,6 +85,7 @@ namespace Gauge.Dotnet.UnitTests
                 ExceptionMessage = "Some Error",
                 StackTrace = "StackTrace"
             };
+            var mockClassInstanceManager = new Mock<object>().Object;
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockActivationWrapper = new Mock<IActivatorWrapper>();
@@ -92,6 +94,7 @@ namespace Gauge.Dotnet.UnitTests
             var reflectionWrapper = mockReflectionWrapper.Object;
             var assemblyLoader = mockAssemblyLoader.Object;
             var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, mockActivationWrapper.Object,
+                mockClassInstanceManager,
                 mockHookExecuter.Object, mockStepExecuter.Object);
             mockHookExecuter.Setup(sandbox =>
                 sandbox.ExecuteHooks("hooks", hooksStrategy, new List<string>(), It.IsAny<ExecutionContext>())
@@ -115,19 +118,19 @@ namespace Gauge.Dotnet.UnitTests
             var gaugeMethod = new GaugeMethod {Name = "ShouldExecuteMethod", ParameterCount = 1};
             var args = new[] {"Bar", "String"};
 
-
+            var mockClassInstanceManager = new Mock<object>().Object;
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockActivationWrapper = new Mock<IActivatorWrapper>();
             var mockHookExecuter = new Mock<IHookExecutor>();
             var mockStepExecutor = new Mock<IStepExecutor>();
 
-            mockStepExecutor.Setup(sandbox => sandbox.ExecuteStep(gaugeMethod, It.IsAny<string[]>()))
+            mockStepExecutor.Setup(executor => executor.ExecuteStep(gaugeMethod, It.IsAny<string[]>()))
                 .Returns(() => new ExecutionResult {Success = true})
                 .Callback(() => Thread.Sleep(1)); // Simulate a delay in method execution
 
             var executionHelper = new ExecutionHelper(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
-                mockActivationWrapper.Object,
+                mockActivationWrapper.Object, mockClassInstanceManager,
                 mockHookExecuter.Object, mockStepExecutor.Object);
             var result = executionHelper.ExecuteStep(gaugeMethod, args);
             mockStepExecutor.VerifyAll();
@@ -146,16 +149,17 @@ namespace Gauge.Dotnet.UnitTests
                 ExceptionMessage = "Some Error",
                 StackTrace = "StackTrace"
             };
+            var mockClassInstanceManager = new Mock<object>().Object;
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockActivationWrapper = new Mock<IActivatorWrapper>();
             var mockHookExecuter = new Mock<IHookExecutor>();
             var mockStepExecutor = new Mock<IStepExecutor>();
-            mockStepExecutor.Setup(sandbox => sandbox.ExecuteStep(gaugeMethod, It.IsAny<string[]>()))
+            mockStepExecutor.Setup(executor => executor.ExecuteStep(gaugeMethod, It.IsAny<string[]>()))
                 .Returns(executionResult);
 
             var executionHelper = new ExecutionHelper(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
-                mockActivationWrapper.Object,
+                mockActivationWrapper.Object, mockClassInstanceManager,
                 mockHookExecuter.Object, mockStepExecutor.Object);
 
             var screenshotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
@@ -195,11 +199,11 @@ namespace Gauge.Dotnet.UnitTests
 
             var mockHookExecuter = new Mock<IHookExecutor>();
             var mockStepExecutor = new Mock<IStepExecutor>();
-            mockStepExecutor.Setup(sandbox => sandbox.ExecuteStep(gaugeMethod, It.IsAny<string[]>()))
+            mockStepExecutor.Setup(executor => executor.ExecuteStep(gaugeMethod, It.IsAny<string[]>()))
                 .Returns(executionResult).Verifiable();
 
             var executionHelper = new ExecutionHelper(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
-                mockActivationWrapper.Object,
+                mockActivationWrapper.Object, mockInstance,
                 mockHookExecuter.Object, mockStepExecutor.Object);
 
             var result = executionHelper.ExecuteStep(gaugeMethod, "Bar", "String");

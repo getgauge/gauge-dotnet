@@ -37,8 +37,10 @@ namespace Gauge.Dotnet.UnitTests
             var mockTableFormatter = new Mock<ITableFormatter>();
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             _messageProcessorFactory = new MessageProcessorFactory(mockStepRegistry.Object);
+            var mockClassInstanceManager = new Mock<object>().Object;
             _messageProcessorFactory.InitializeExecutionMessageHandlers(mockReflectionWrapper.Object,
-                mockAssemblyLoader.Object, mockActivatorWrapper.Object, mockTableFormatter.Object);
+                mockAssemblyLoader.Object, mockActivatorWrapper.Object, mockTableFormatter.Object,
+                mockClassInstanceManager);
         }
 
         private MessageProcessorFactory _messageProcessorFactory;

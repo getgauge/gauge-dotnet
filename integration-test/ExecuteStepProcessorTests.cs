@@ -34,9 +34,11 @@ namespace Gauge.Dotnet.IntegrationTests
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
             var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
-                new HookExecutor(assemblyLoader, reflectionWrapper),
-                new StepExecutor(assemblyLoader, reflectionWrapper));
+                classInstanceManager,
+                new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
+                new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
 
             var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
                 executionHelper, new TableFormatter(assemblyLoader, activatorWrapper));
@@ -91,9 +93,12 @@ namespace Gauge.Dotnet.IntegrationTests
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+
             var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
-                new HookExecutor(assemblyLoader, reflectionWrapper),
-                new StepExecutor(assemblyLoader, reflectionWrapper));
+                classInstanceManager,
+                new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
+                new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
 
             var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
                 executionHelper, new TableFormatter(assemblyLoader, activatorWrapper));

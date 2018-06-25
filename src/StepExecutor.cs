@@ -31,19 +31,20 @@ namespace Gauge.Dotnet
     {
         private readonly IAssemblyLoader _assemblyLoader;
 
-        public StepExecutor(IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper) : base(
+        public StepExecutor(IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper,
+            object classInstanceMananger) : base(
             assemblyLoader.ClassInstanceManagerType,
-            reflectionWrapper)
+            reflectionWrapper, classInstanceMananger)
         {
             _assemblyLoader = assemblyLoader;
         }
 
-        public ExecutionResult ExecuteStep(GaugeMethod gaugeMethod, string[] args)
+        public ExecutionResult ExecuteStep(GaugeMethod gaugeMethod, params string[] args)
         {
             {
                 var method = gaugeMethod.MethodInfo;
                 var executionResult = new ExecutionResult {Success = true};
-                var logger = LogManager.GetLogger("Sandbox");
+                var logger = LogManager.GetLogger("StepExecutor");
                 try
                 {
                     var parameters = args.Select(o =>

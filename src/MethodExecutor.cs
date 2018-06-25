@@ -24,20 +24,16 @@ namespace Gauge.Dotnet
 {
     public class MethodExecutor
     {
-        private object _classInstanceManager;
-        private readonly Type _instanceManagerType;
+        private readonly object _classInstanceManager;
+        private readonly Type _classInstanceManagerType;
         private readonly IReflectionWrapper _reflectionWrapper;
 
-       
-        protected MethodExecutor(Type type,
-            IReflectionWrapper reflectionWrapper)
-        {
-            _instanceManagerType = type;
-            _reflectionWrapper = reflectionWrapper;
-        }
 
-        public void SetClassInstanceManager(object classInstanceManager)
+        protected MethodExecutor(Type type,
+            IReflectionWrapper reflectionWrapper, object classInstanceManager)
         {
+            _classInstanceManagerType = type;
+            _reflectionWrapper = reflectionWrapper;
             _classInstanceManager = classInstanceManager;
         }
 
@@ -45,8 +41,8 @@ namespace Gauge.Dotnet
         {
             var typeToLoad = method.DeclaringType;
             var instance =
-                _reflectionWrapper.InvokeMethod(_instanceManagerType, _classInstanceManager, "Get", typeToLoad);
-            var logger = LogManager.GetLogger("ExecutionHelper");
+                _reflectionWrapper.InvokeMethod(_classInstanceManagerType, _classInstanceManager, "Get", typeToLoad);
+            var logger = LogManager.GetLogger("MethodExecutor");
             if (instance == null)
             {
                 var error = "Could not load instance type: " + typeToLoad;

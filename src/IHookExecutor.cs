@@ -26,7 +26,5 @@ namespace Gauge.Dotnet
     {
         ExecutionResult ExecuteHooks(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
             ExecutionContext context);
-
-        void SetClassInstanceManager(object classInstanceManager);
     }
 }

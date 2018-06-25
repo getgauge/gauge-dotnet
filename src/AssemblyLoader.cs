@@ -105,6 +105,17 @@ namespace Gauge.Dotnet
             return registry;
         }
 
+        public object GetClassInstanceManager(IActivatorWrapper activatorWrapper)
+        {
+            if (ClassInstanceManagerType == null) return null;
+            var logger = LogManager.GetLogger("MessageProcessorFactory");
+            var classInstanceManager = activatorWrapper.CreateInstance(ClassInstanceManagerType);
+            logger.Debug("Loaded Instance Manager of Type:" + classInstanceManager.GetType().FullName);
+            _reflectionWrapper.InvokeMethod(ClassInstanceManagerType, classInstanceManager, "Initialize",
+                AssembliesReferencingGaugeLib);
+            return classInstanceManager;
+        }
+
         private static string GetStepValue(string stepText)
         {
             return Regex.Replace(stepText, @"(<.*?>)", @"{}");

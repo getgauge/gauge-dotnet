@@ -32,8 +32,9 @@ namespace Gauge.Dotnet
         private readonly IAssemblyLoader _assemblyLoader;
         private IHookRegistry _registry;
 
-        public HookExecutor(IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper) :
-            base(assemblyLoader.ClassInstanceManagerType, reflectionWrapper)
+        public HookExecutor(IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper,
+            object claasInstanceManager) :
+            base(assemblyLoader.ClassInstanceManagerType, reflectionWrapper, claasInstanceManager)
         {
             _assemblyLoader = assemblyLoader;
             _registry = new HookRegistry(assemblyLoader);
@@ -56,7 +57,7 @@ namespace Gauge.Dotnet
                 }
                 catch (Exception ex)
                 {
-                    LogManager.GetLogger("Sandbox").Debug("{0} Hook execution failed : {1}.{2}", hookType,
+                    LogManager.GetLogger("HookExecutor").Debug("{0} Hook execution failed : {1}.{2}", hookType,
                         methodInfo.DeclaringType.FullName, methodInfo.Name);
                     var innerException = ex.InnerException ?? ex;
                     executionResult.ExceptionMessage = innerException.Message;
