@@ -35,7 +35,6 @@ namespace Gauge.Dotnet.UnitTests.Processors
         public void Setup()
         {
             var mockHookRegistry = new Mock<IHookRegistry>();
-            var mockSandbox = new Mock<ISandbox>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
             var mockMethod = new MockMethodBuilder(mockAssemblyLoader)
@@ -62,7 +61,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 ExecutionEndingRequest = executionEndingRequest
             };
 
-            _mockMethodExecutor = new Mock<IMethodExecutor>();
+            _mockMethodExecutor = new Mock<IExecutionOrchestrator>();
             _protoExecutionResult = new ProtoExecutionResult
             {
                 ExecutionTime = 0,
@@ -80,7 +79,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
         private ExecutionEndingProcessor _executionEndingProcessor;
         private Message _request;
-        private Mock<IMethodExecutor> _mockMethodExecutor;
+        private Mock<IExecutionOrchestrator> _mockMethodExecutor;
         private ProtoExecutionResult _protoExecutionResult;
         private readonly IEnumerable<string> _pendingMessages = new List<string> {"Foo", "Bar"};
 

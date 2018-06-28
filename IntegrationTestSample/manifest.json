@@ -1,5 +1,5 @@
 {
-  "Language": "csharp",
+  "Language": "dotnet",
   "Plugins": [
     "html-report"
   ]

@@ -1,4 +1,4 @@
-// Copyright 2018 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-CSharp.
 //
@@ -19,21 +19,20 @@ using System.Collections.Generic;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
+using Gauge.Messages;
 
 namespace Gauge.Dotnet
 {
-    public interface ISandbox
+    public interface IExecutionOrchestrator
     {
-        ExecutionResult ExecuteMethod(GaugeMethod gaugeMethod, params string[] args);
-        bool TryScreenCapture(out byte[] screenShotBytes);
-        List<GaugeMethod> GetStepMethods();
-        IEnumerable<string> GetStepTexts(GaugeMethod gaugeMethod);
-        List<string> GetAllStepTexts();
-        void ClearObjectCache();
+        ProtoExecutionResult ExecuteStep(GaugeMethod method, params string[] args);
+
+        ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags,
+            ExecutionContext context);
+
+        void ClearCache();
+
         void StartExecutionScope(string tag);
         void CloseExectionScope();
-
-        ExecutionResult ExecuteHooks(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
-            ExecutionContext context);
     }
 }

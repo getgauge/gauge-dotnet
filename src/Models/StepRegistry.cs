@@ -52,20 +52,9 @@ namespace Gauge.Dotnet.Models
             return _registry[parsedStepText].Count > 1;
         }
 
-        public void Clear()
-        {
-            _registry = new Dictionary<string, List<GaugeMethod>>();
-        }
-
         public GaugeMethod MethodFor(string parsedStepText)
         {
             return _registry[parsedStepText][0];
-        }
-
-
-        public IEnumerable<string> AllSteps()
-        {
-            return _registry.Keys;
         }
 
         public bool HasAlias(string stepValue)
@@ -76,6 +65,17 @@ namespace Gauge.Dotnet.Models
         public string GetStepText(string stepValue)
         {
             return _registry.ContainsKey(stepValue) ? _registry[stepValue][0].StepText : string.Empty;
+        }
+
+        public void Clear()
+        {
+            _registry = new Dictionary<string, List<GaugeMethod>>();
+        }
+
+
+        public IEnumerable<string> AllSteps()
+        {
+            return _registry.Keys;
         }
     }
 }

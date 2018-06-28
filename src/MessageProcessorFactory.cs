@@ -36,20 +36,20 @@ namespace Gauge.Dotnet
 
         public IMessageProcessor GetProcessor(Message.Types.MessageType messageType, bool scan = false)
         {
-            if (scan)
-            {
-                var reflectionWrapper = new ReflectionWrapper();
-                var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                    new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(),
-                    reflectionWrapper);
-                _stepRegistry = assemblyLoader.GetStepRegistry();
-                var activatorWrapper = new ActivatorWrapper();
-                var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
-                var sandbox = new Sandbox(assemblyLoader, new HookRegistry(assemblyLoader), activatorWrapper,
-                    reflectionWrapper);
-                InitializeExecutionMessageHandlers(reflectionWrapper, assemblyLoader, activatorWrapper, tableFormatter,
-                    sandbox);
-            }
+            if (!scan)
+                return !_messageProcessorsDictionary.ContainsKey(messageType)
+                    ? new DefaultProcessor()
+                    : _messageProcessorsDictionary[messageType];
+            var activatorWrapper = new ActivatorWrapper();
+            var reflectionWrapper = new ReflectionWrapper();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(),
+                reflectionWrapper);
+            _stepRegistry = assemblyLoader.GetStepRegistry();
+            var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+            InitializeExecutionMessageHandlers(reflectionWrapper, assemblyLoader, activatorWrapper, tableFormatter,
+                classInstanceManager);
 
             return !_messageProcessorsDictionary.ContainsKey(messageType)
                 ? new DefaultProcessor()
@@ -58,46 +58,49 @@ namespace Gauge.Dotnet
 
         public void InitializeExecutionMessageHandlers(IReflectionWrapper reflectionWrapper,
             IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, ITableFormatter tableFormatter,
-            ISandbox sandbox)
+            object classInstanceManager)
         {
-            var methodExecutor = new MethodExecutor(sandbox);
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+                classInstanceManager,
+                new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
+                new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
             var handlers = new Dictionary<Message.Types.MessageType, IMessageProcessor>
             {
                 {
                     Message.Types.MessageType.ExecutionStarting,
-                    new ExecutionStartingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
+                    new ExecutionStartingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ExecutionEnding,
-                    new ExecutionEndingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
+                    new ExecutionEndingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.SpecExecutionStarting,
-                    new SpecExecutionStartingProcessor(methodExecutor, sandbox, assemblyLoader, reflectionWrapper)
+                    new SpecExecutionStartingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.SpecExecutionEnding,
-                    new SpecExecutionEndingProcessor(methodExecutor, sandbox, assemblyLoader, reflectionWrapper)
+                    new SpecExecutionEndingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionStarting,
-                    new ScenarioExecutionStartingProcessor(methodExecutor, sandbox, assemblyLoader, reflectionWrapper)
+                    new ScenarioExecutionStartingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionEnding,
-                    new ScenarioExecutionEndingProcessor(methodExecutor, sandbox, assemblyLoader, reflectionWrapper)
+                    new ScenarioExecutionEndingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.StepExecutionStarting,
-                    new StepExecutionStartingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
+                    new StepExecutionStartingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.StepExecutionEnding,
-                    new StepExecutionEndingProcessor(methodExecutor, assemblyLoader, reflectionWrapper)
+                    new StepExecutionEndingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ExecuteStep,
-                    new ExecuteStepProcessor(_stepRegistry, methodExecutor, tableFormatter)
+                    new ExecuteStepProcessor(_stepRegistry, executionOrchestrator, tableFormatter)
                 },
                 {Message.Types.MessageType.KillProcessRequest, new KillProcessProcessor()},
                 {Message.Types.MessageType.ScenarioDataStoreInit, new ScenarioDataStoreInitProcessor(assemblyLoader)},
