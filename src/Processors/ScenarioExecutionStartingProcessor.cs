@@ -24,20 +24,20 @@ namespace Gauge.Dotnet.Processors
 {
     public class ScenarioExecutionStartingProcessor : UntaggedHooksFirstExecutionProcessor
     {
-        private readonly IExecutionHelper _executionHelper;
+        private readonly IExecutionOrchestrator _executionOrchestrator;
 
-        public ScenarioExecutionStartingProcessor(IExecutionHelper executionHelper,
+        public ScenarioExecutionStartingProcessor(IExecutionOrchestrator executionOrchestrator,
             IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
-            : base(executionHelper, assemblyLoader, reflectionWrapper)
+            : base(executionOrchestrator, assemblyLoader, reflectionWrapper)
         {
-            _executionHelper = executionHelper;
+            _executionOrchestrator = executionOrchestrator;
         }
 
         protected override string HookType => "BeforeScenario";
 
         public override Message Process(Message request)
         {
-            _executionHelper.StartExecutionScope("scenario");
+            _executionOrchestrator.StartExecutionScope("scenario");
             return base.Process(request);
         }
 

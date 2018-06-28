@@ -24,7 +24,7 @@ namespace Gauge.Dotnet
 {
     public interface IHookExecutor
     {
-        ExecutionResult ExecuteHooks(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
+        ExecutionResult Execute(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
             ExecutionContext context);
     }
 }

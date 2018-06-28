@@ -41,7 +41,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldClearExistingGaugeMessages()
         {
-            var mockExectionHelper = new Mock<IExecutionHelper>();
+            var mockExectionHelper = new Mock<IExecutionOrchestrator>();
 
             var request = new Message
             {

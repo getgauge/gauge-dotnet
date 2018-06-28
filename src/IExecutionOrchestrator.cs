@@ -23,7 +23,7 @@ using Gauge.Messages;
 
 namespace Gauge.Dotnet
 {
-    public interface IExecutionHelper
+    public interface IExecutionOrchestrator
     {
         ProtoExecutionResult ExecuteStep(GaugeMethod method, params string[] args);
 

@@ -21,6 +21,6 @@ namespace Gauge.Dotnet
 {
     public interface IStepExecutor
     {
-        ExecutionResult ExecuteStep(GaugeMethod gaugeMethod, string[] args);
+        ExecutionResult Execute(GaugeMethod gaugeMethod, string[] args);
     }
 }

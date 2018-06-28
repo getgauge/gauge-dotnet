@@ -54,7 +54,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 ExecutionStartingRequest = executionEndingRequest
             };
 
-            _mockMethodExecutor = new Mock<IExecutionHelper>();
+            _mockMethodExecutor = new Mock<IExecutionOrchestrator>();
             _protoExecutionResult = new ProtoExecutionResult
             {
                 ExecutionTime = 0,
@@ -70,7 +70,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
         private ExecutionStartingProcessor _executionStartingProcessor;
         private Message _request;
-        private Mock<IExecutionHelper> _mockMethodExecutor;
+        private Mock<IExecutionOrchestrator> _mockMethodExecutor;
         private ProtoExecutionResult _protoExecutionResult;
 
         public void Foo()

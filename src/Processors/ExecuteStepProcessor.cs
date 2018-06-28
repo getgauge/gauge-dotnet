@@ -24,16 +24,16 @@ namespace Gauge.Dotnet.Processors
 {
     public class ExecuteStepProcessor : ExecutionProcessor, IMessageProcessor
     {
-        private readonly IExecutionHelper _executionHelper;
+        private readonly IExecutionOrchestrator _executionOrchestrator;
         private readonly IStepRegistry _stepRegistry;
         private readonly ITableFormatter _tableFormatter;
 
-        public ExecuteStepProcessor(IStepRegistry registry, IExecutionHelper executionHelper,
+        public ExecuteStepProcessor(IStepRegistry registry, IExecutionOrchestrator executionOrchestrator,
             ITableFormatter tableFormatter)
         {
             _stepRegistry = registry;
             _tableFormatter = tableFormatter;
-            _executionHelper = executionHelper;
+            _executionOrchestrator = executionOrchestrator;
         }
 
         [DebuggerHidden]
@@ -64,7 +64,7 @@ namespace Gauge.Dotnet.Processors
                 args[i] = validTableParamTypes.Contains(stepParameter[i].ParameterType)
                     ? _tableFormatter.GetJSON(stepParameter[i].Table)
                     : stepParameter[i].Value;
-            var protoExecutionResult = _executionHelper.ExecuteStep(method, args);
+            var protoExecutionResult = _executionOrchestrator.ExecuteStep(method, args);
             return WrapInMessage(protoExecutionResult, request);
         }
 

@@ -35,13 +35,13 @@ namespace Gauge.Dotnet.IntegrationTests
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
-            var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var mockOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
 
             var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
-                executionHelper, new TableFormatter(assemblyLoader, activatorWrapper));
+                mockOrchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
 
             var protoTable = new ProtoTable
             {
@@ -95,13 +95,13 @@ namespace Gauge.Dotnet.IntegrationTests
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
 
-            var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var mockOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
 
             var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
-                executionHelper, new TableFormatter(assemblyLoader, activatorWrapper));
+                mockOrchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
 
 
             var message = new Message

@@ -24,7 +24,7 @@ using NUnit.Framework;
 namespace Gauge.Dotnet.IntegrationTests
 {
     [TestFixture]
-    public class ExecutionHelperTests : IntegrationTestsBase
+    public class ExecutionOrchestratorTests : IntegrationTestsBase
     {
         [Test]
         public void RecoverableIsTrueOnExceptionThrownWhenContinueOnFailure()
@@ -34,13 +34,13 @@ namespace Gauge.Dotnet.IntegrationTests
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
             var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
-            var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
             var gaugeMethod = assemblyLoader.GetStepRegistry()
                 .MethodFor("I throw a serializable exception and continue");
-            var executionResult = executionHelper.ExecuteStep(gaugeMethod);
+            var executionResult = orchestrator.ExecuteStep(gaugeMethod);
             Assert.IsTrue(executionResult.Failed);
             Assert.IsTrue(executionResult.RecoverableError);
         }
@@ -53,7 +53,7 @@ namespace Gauge.Dotnet.IntegrationTests
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
             var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
-            var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
@@ -62,7 +62,7 @@ namespace Gauge.Dotnet.IntegrationTests
             table.AddRow(new List<string> {"foorow1", "barrow1"});
             table.AddRow(new List<string> {"foorow2", "barrow2"});
 
-            var executionResult = executionHelper.ExecuteStep(gaugeMethod, SerializeTable(table));
+            var executionResult = orchestrator.ExecuteStep(gaugeMethod, SerializeTable(table));
             Assert.False(executionResult.Failed);
         }
 
@@ -74,7 +74,7 @@ namespace Gauge.Dotnet.IntegrationTests
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
             var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
-            var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
@@ -82,7 +82,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var gaugeMethod = assemblyLoader.GetStepRegistry()
                 .MethodFor("A context step which gets executed before every scenario");
 
-            var executionResult = executionHelper.ExecuteStep(gaugeMethod);
+            var executionResult = orchestrator.ExecuteStep(gaugeMethod);
             Assert.False(executionResult.Failed);
         }
 
@@ -95,14 +95,14 @@ namespace Gauge.Dotnet.IntegrationTests
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
             var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
-            var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
 
             var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("Say {} to {}");
 
-            executionHelper.ExecuteStep(gaugeMethod, "hello", "world");
+            executionOrchestrator.ExecuteStep(gaugeMethod, "hello", "world");
             var pendingMessages = MessageCollector.GetAllPendingMessages();
 
             Assert.Contains("hello, world!", pendingMessages);
@@ -116,13 +116,13 @@ namespace Gauge.Dotnet.IntegrationTests
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
             var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
-            var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
 
             var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an AggregateException");
-            var executionResult = executionHelper.ExecuteStep(gaugeMethod);
+            var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod);
 
             Assert.True(executionResult.Failed);
             Assert.True(executionResult.StackTrace.Contains("First Exception"));
@@ -152,13 +152,13 @@ namespace Gauge.Dotnet.IntegrationTests
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
             var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
-            var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
             var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw a serializable exception");
 
-            var executionResult = executionHelper.ExecuteStep(gaugeMethod);
+            var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod);
 
             Assert.True(executionResult.Failed);
             Assert.AreEqual(expectedMessage, executionResult.ErrorMessage);
@@ -175,14 +175,14 @@ namespace Gauge.Dotnet.IntegrationTests
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
             var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
-            var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
 
             AssertRunnerDomainDidNotLoadUsersAssembly();
             var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an unserializable exception");
-            var executionResult = executionHelper.ExecuteStep(gaugeMethod);
+            var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod);
             Assert.True(executionResult.Failed);
             Assert.AreEqual(expectedMessage, executionResult.ErrorMessage);
             StringAssert.Contains("IntegrationTestSample.StepImplementation.ThrowUnserializableException",

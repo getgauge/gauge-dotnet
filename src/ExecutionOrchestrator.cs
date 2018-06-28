@@ -27,7 +27,7 @@ using Google.Protobuf;
 
 namespace Gauge.Dotnet
 {
-    public class ExecutionHelper : IExecutionHelper
+    public class ExecutionOrchestrator : IExecutionOrchestrator
     {
         private readonly IActivatorWrapper _activatorWrapper;
         private readonly IAssemblyLoader _assemblyLoader;
@@ -36,7 +36,7 @@ namespace Gauge.Dotnet
         private readonly IReflectionWrapper _reflectionWrapper;
         private readonly IStepExecutor _stepExecutor;
 
-        public ExecutionHelper(IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader,
+        public ExecutionOrchestrator(IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader,
             IActivatorWrapper activatorWrapper, object classInstanceManager, IHookExecutor hookExecutor,
             IStepExecutor stepExecutor)
         {
@@ -57,7 +57,7 @@ namespace Gauge.Dotnet
             {
                 Failed = false
             };
-            var executionResult = _stepExecutor.ExecuteStep(method, args);
+            var executionResult = _stepExecutor.Execute(method, args);
 
             builder.ExecutionTime = stopwatch.ElapsedMilliseconds;
             if (executionResult.Success) return builder;
@@ -102,7 +102,7 @@ namespace Gauge.Dotnet
                 Failed = false
             };
 
-            var executionResult = _hookExecutor.ExecuteHooks(hookType, strategy, applicableTags, context);
+            var executionResult = _hookExecutor.Execute(hookType, strategy, applicableTags, context);
 
             result.ExecutionTime = stopwatch.ElapsedMilliseconds;
             if (executionResult.Success) return result;

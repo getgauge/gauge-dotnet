@@ -39,7 +39,7 @@ namespace Gauge.Dotnet
             _assemblyLoader = assemblyLoader;
         }
 
-        public ExecutionResult ExecuteStep(GaugeMethod gaugeMethod, params string[] args)
+        public ExecutionResult Execute(GaugeMethod gaugeMethod, params string[] args)
         {
             {
                 var method = gaugeMethod.MethodInfo;

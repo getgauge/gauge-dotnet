@@ -59,7 +59,7 @@ namespace Gauge.Dotnet.UnitTests
                 .Returns(null);
 
 
-            var result = executor.ExecuteStep(gaugeMethod);
+            var result = executor.Execute(gaugeMethod);
             Assert.True(result.Success);
         }
 
@@ -94,7 +94,7 @@ namespace Gauge.Dotnet.UnitTests
             mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance))
                 .Throws(new Exception("step execution failure"));
 
-            var result = executor.ExecuteStep(gaugeMethod);
+            var result = executor.Execute(gaugeMethod);
             Assert.False(result.Success);
             Assert.AreEqual(result.ExceptionMessage, "step execution failure");
         }
@@ -132,7 +132,7 @@ namespace Gauge.Dotnet.UnitTests
             mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance))
                 .Throws(new Exception("step execution failure"));
 
-            var result = executor.ExecuteStep(gaugeMethod);
+            var result = executor.Execute(gaugeMethod);
             Assert.False(result.Success);
             Assert.True(result.Recoverable);
             Assert.AreEqual(result.ExceptionMessage, "step execution failure");

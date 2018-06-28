@@ -59,7 +59,7 @@ namespace Gauge.Dotnet.UnitTests
                 .Returns(null);
 
 
-            var result = executor.ExecuteHooks("BeforeSuite", new HooksStrategy(), new List<string>(),
+            var result = executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(),
                 new ExecutionContext());
             Assert.True(result.Success);
         }
@@ -92,7 +92,7 @@ namespace Gauge.Dotnet.UnitTests
             mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance))
                 .Throws(new Exception("hook failed"));
 
-            var result = executor.ExecuteHooks("BeforeSuite", new HooksStrategy(), new List<string>(),
+            var result = executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(),
                 new ExecutionContext());
             Assert.False(result.Success);
             Assert.AreEqual(result.ExceptionMessage, "hook failed");

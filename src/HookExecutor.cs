@@ -40,7 +40,7 @@ namespace Gauge.Dotnet
             _registry = new HookRegistry(assemblyLoader);
         }
 
-        public ExecutionResult ExecuteHooks(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
+        public ExecutionResult Execute(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
             ExecutionContext context)
         {
             var methods = GetHookMethods(hookType, strategy, applicableTags);

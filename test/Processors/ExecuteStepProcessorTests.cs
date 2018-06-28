@@ -57,14 +57,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(true);
             var fooMethodInfo = new GaugeMethod {Name = "Foo", ParameterCount = 1};
             mockStepRegistry.Setup(x => x.MethodFor(parsedStepText)).Returns(fooMethodInfo);
-            var mockExecutionHelper = new Mock<IExecutionHelper>();
-            mockExecutionHelper.Setup(e => e.ExecuteStep(fooMethodInfo, It.IsAny<string[]>()))
+            var mockOrchestrator = new Mock<IExecutionOrchestrator>();
+            mockOrchestrator.Setup(e => e.ExecuteStep(fooMethodInfo, It.IsAny<string[]>()))
                 .Returns(() => new ProtoExecutionResult {ExecutionTime = 1, Failed = false});
 
             var mockTableFormatter = new Mock<ITableFormatter>();
 
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockExecutionHelper.Object, mockTableFormatter.Object)
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object)
                     .Process(request);
 
             Assert.False(response.ExecutionStatusResponse.ExecutionResult.Failed);
@@ -101,8 +101,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(true);
             var fooMethodInfo = new GaugeMethod {Name = "Foo", ParameterCount = 1};
             mockStepRegistry.Setup(x => x.MethodFor(parsedStepText)).Returns(fooMethodInfo);
-            var mockExecutionHelper = new Mock<IExecutionHelper>();
-            mockExecutionHelper.Setup(e => e.ExecuteStep(fooMethodInfo, It.IsAny<string[]>())).Returns(() =>
+            var mockOrchestrator = new Mock<IExecutionOrchestrator>();
+            mockOrchestrator.Setup(e => e.ExecuteStep(fooMethodInfo, It.IsAny<string[]>())).Returns(() =>
                 new ProtoExecutionResult
                 {
                     ExecutionTime = 1,
@@ -115,10 +115,10 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockTableFormatter.Setup(x => x.GetJSON(protoTable))
                 .Returns(tableJSON);
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockExecutionHelper.Object, mockTableFormatter.Object)
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object)
                     .Process(request);
 
-            mockExecutionHelper.Verify(executor =>
+            mockOrchestrator.Verify(executor =>
                 executor.ExecuteStep(fooMethodInfo, It.Is<string[]>(strings => strings[0] == tableJSON)));
             Assert.False(response.ExecutionStatusResponse.ExecutionResult.Failed);
         }
@@ -141,12 +141,12 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(true);
             var fooMethod = new GaugeMethod {Name = "Foo", ParameterCount = 1};
             mockStepRegistry.Setup(x => x.MethodFor(parsedStepText)).Returns(fooMethod);
-            var mockExecutionHelper = new Mock<IExecutionHelper>();
+            var mockOrchestrator = new Mock<IExecutionOrchestrator>();
 
             var mockTableFormatter = new Mock<ITableFormatter>();
 
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockExecutionHelper.Object, mockTableFormatter.Object)
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object)
                     .Process(request);
 
             Assert.True(response.ExecutionStatusResponse.ExecutionResult.Failed);
@@ -170,11 +170,11 @@ namespace Gauge.Dotnet.UnitTests.Processors
             };
             var mockStepRegistry = new Mock<IStepRegistry>();
             mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(false);
-            var mockExecutionHelper = new Mock<IExecutionHelper>();
+            var mockOrchestrator = new Mock<IExecutionOrchestrator>();
             var mockTableFormatter = new Mock<ITableFormatter>();
 
             var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockExecutionHelper.Object, mockTableFormatter.Object)
+                new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object)
                     .Process(request);
 
             Assert.True(response.ExecutionStatusResponse.ExecutionResult.Failed);

@@ -60,7 +60,7 @@ namespace Gauge.Dotnet
             IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, ITableFormatter tableFormatter,
             object classInstanceManager)
         {
-            var executionHelper = new ExecutionHelper(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
@@ -68,39 +68,39 @@ namespace Gauge.Dotnet
             {
                 {
                     Message.Types.MessageType.ExecutionStarting,
-                    new ExecutionStartingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
+                    new ExecutionStartingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ExecutionEnding,
-                    new ExecutionEndingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
+                    new ExecutionEndingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.SpecExecutionStarting,
-                    new SpecExecutionStartingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
+                    new SpecExecutionStartingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.SpecExecutionEnding,
-                    new SpecExecutionEndingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
+                    new SpecExecutionEndingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionStarting,
-                    new ScenarioExecutionStartingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
+                    new ScenarioExecutionStartingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionEnding,
-                    new ScenarioExecutionEndingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
+                    new ScenarioExecutionEndingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.StepExecutionStarting,
-                    new StepExecutionStartingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
+                    new StepExecutionStartingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.StepExecutionEnding,
-                    new StepExecutionEndingProcessor(executionHelper, assemblyLoader, reflectionWrapper)
+                    new StepExecutionEndingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
                 },
                 {
                     Message.Types.MessageType.ExecuteStep,
-                    new ExecuteStepProcessor(_stepRegistry, executionHelper, tableFormatter)
+                    new ExecuteStepProcessor(_stepRegistry, executionOrchestrator, tableFormatter)
                 },
                 {Message.Types.MessageType.KillProcessRequest, new KillProcessProcessor()},
                 {Message.Types.MessageType.ScenarioDataStoreInit, new ScenarioDataStoreInitProcessor(assemblyLoader)},
