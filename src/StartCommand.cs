@@ -45,7 +45,14 @@ namespace Gauge.Dotnet
                 return;
             try
             {
-                _gaugeListener.Invoke().PollForMessages();
+                if (Utils.TryReadEnvValue("GAUGE_LSP_GRPC") != "")
+                {
+                    _gaugeListener.Invoke().StartGrpcServer();
+                }
+                else
+                {
+                    _gaugeListener.Invoke().PollForMessages();
+                }
             }
             catch (TargetInvocationException e)
             {

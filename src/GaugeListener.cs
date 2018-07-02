@@ -17,8 +17,11 @@
 
 using System;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using Gauge.CSharp.Core;
 using Gauge.Messages;
+using Grpc.Core;
 using NLog;
 
 namespace Gauge.Dotnet
@@ -31,6 +34,25 @@ namespace Gauge.Dotnet
         public GaugeListener(MessageProcessorFactory messageProcessorFactory)
         {
             _messageProcessorFactory = messageProcessorFactory;
+        }
+
+        public void StartGrpcServer()
+        {
+            const int port = 54545;
+            var server = new Server();
+            server.Services.Add(lspService.BindService(new GaugeGrpcConnection(server)));
+            server.Ports.Add(new ServerPort("127.0.0.1", port, ServerCredentials.Insecure));
+            server.Start();
+            Console.WriteLine("Listening on port:"+ port);
+        }
+
+        private static int GetRandomPort()
+        {
+            var l = new TcpListener(IPAddress.Loopback, 0);
+            l.Start();
+            var port = ((IPEndPoint)l.LocalEndpoint).Port;
+            l.Stop();
+            return port;
         }
 
         public void PollForMessages()
