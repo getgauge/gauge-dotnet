@@ -28,5 +28,6 @@ namespace Gauge.Dotnet.Models
         IEnumerable<string> GetStepTexts();
         bool HasMultipleImplementations(string parsedStepText);
         void AddStep(string stepValue, GaugeMethod stepMethod);
+        void RemoveSteps(string filepath);
     }
 }

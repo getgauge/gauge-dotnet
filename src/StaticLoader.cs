@@ -50,10 +50,10 @@ namespace Gauge.Dotnet
         }
 
 
-        public void LoadStepsFromText(string content, string fileName)
+        public void LoadStepsFromText(string content, string filepath)
         {
-            var steps = GetStepsFrom(content, fileName);
-            AddStepsToRegsitry(fileName, steps);
+            var steps = GetStepsFrom(content);
+            AddStepsToRegsitry(filepath, steps);
         }
 
         private void AddStepsToRegsitry(string fileName, IEnumerable<MethodDeclarationSyntax> stepMethods)
@@ -86,7 +86,7 @@ namespace Gauge.Dotnet
             }
         }
 
-        private static IEnumerable<MethodDeclarationSyntax> GetStepsFrom(string content, string f)
+        private static IEnumerable<MethodDeclarationSyntax> GetStepsFrom(string content)
         {
             var tree = CSharpSyntaxTree.ParseText(content);
             var root = tree.GetRoot();
@@ -97,6 +97,12 @@ namespace Gauge.Dotnet
                     string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
                 select node;
             return stepMethods;
+        }
+
+        public void ReloadSteps(string content, string filepath)
+        {
+            _stepRegistry.RemoveSteps(filepath);
+            LoadStepsFromText(content, filepath);
         }
     }
 }

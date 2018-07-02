@@ -42,6 +42,15 @@ namespace Gauge.Dotnet.Models
             _registry.GetValueOrDefault(stepValue).Add(method);
         }
 
+        public void RemoveSteps(string filepath)
+        {
+            foreach (var (key, gaugeMethods) in _registry)
+            {
+                _registry[key] = gaugeMethods.Where(method => filepath.Equals(method.FileName)).ToList();
+            }
+        }
+
+
         public bool ContainsStep(string parsedStepText)
         {
             return _registry.ContainsKey(parsedStepText);
