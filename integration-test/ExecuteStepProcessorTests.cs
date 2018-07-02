@@ -119,7 +119,8 @@ namespace Gauge.Dotnet.IntegrationTests
 
             Assert.IsNotNull(protoExecutionResult);
             Assert.IsTrue(protoExecutionResult.Failed);
-            Assert.AreEqual(Encoding.UTF8.GetString(protoExecutionResult.ScreenShot.ToByteArray()), "ScreenShot");
+            Assert.AreEqual(protoExecutionResult.ScreenShot.Count, 1);
+            Assert.AreEqual(Encoding.UTF8.GetString(protoExecutionResult.ScreenShot[0].ToByteArray()), "ScreenShot");
         }
     }
 }

@@ -210,7 +210,7 @@ namespace Gauge.Dotnet.UnitTests
             mockStepExecutor.VerifyAll();
 
             Assert.True(result.Failed);
-            Assert.AreEqual(expectedScreenshot, result.ScreenShot);
+            Assert.AreEqual(expectedScreenshot, result.ScreenShot[0]);
         }
     }
 }

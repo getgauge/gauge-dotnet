@@ -53,25 +53,9 @@ namespace Gauge.Dotnet
         public ProtoExecutionResult ExecuteStep(GaugeMethod method, params string[] args)
         {
             var stopwatch = Stopwatch.StartNew();
-            var builder = new ProtoExecutionResult
-            {
-                Failed = false
-            };
+
             var executionResult = _stepExecutor.Execute(method, args);
-
-            builder.ExecutionTime = stopwatch.ElapsedMilliseconds;
-            if (executionResult.Success) return builder;
-            var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
-            builder.Failed = true;
-            var isScreenShotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
-            if (isScreenShotEnabled == null || isScreenShotEnabled.ToLower() != "false")
-                builder.ScreenShot = TakeScreenshot();
-            builder.ErrorMessage = executionResult.ExceptionMessage;
-            builder.StackTrace = executionResult.StackTrace;
-            builder.RecoverableError = executionResult.Recoverable;
-            builder.ExecutionTime = elapsedMilliseconds;
-
-            return builder;
+            return BuildResult(stopwatch, executionResult);
         }
 
         public void ClearCache()
@@ -97,20 +81,23 @@ namespace Gauge.Dotnet
             ExecutionContext context)
         {
             var stopwatch = Stopwatch.StartNew();
+            var executionResult = _hookExecutor.Execute(hookType, strategy, applicableTags, context);
+            return BuildResult(stopwatch, executionResult);
+        }
+
+        private ProtoExecutionResult BuildResult(Stopwatch stopwatch, ExecutionResult executionResult)
+        {
             var result = new ProtoExecutionResult
             {
-                Failed = false
+                Failed = false,
+                ExecutionTime = stopwatch.ElapsedMilliseconds
             };
-
-            var executionResult = _hookExecutor.Execute(hookType, strategy, applicableTags, context);
-
-            result.ExecutionTime = stopwatch.ElapsedMilliseconds;
             if (executionResult.Success) return result;
             var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
             result.Failed = true;
             var isScreenShotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
             if (isScreenShotEnabled == null || isScreenShotEnabled.ToLower() != "false")
-                result.ScreenShot = TakeScreenshot();
+                result.ScreenShot.Add(TakeScreenshot());
             result.ErrorMessage = executionResult.ExceptionMessage;
             result.StackTrace = executionResult.StackTrace;
             result.RecoverableError = executionResult.Recoverable;
