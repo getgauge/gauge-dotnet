@@ -31,28 +31,22 @@ namespace Gauge.Dotnet
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly MessageProcessorFactory _messageProcessorFactory;
 
-        public GaugeListener(MessageProcessorFactory messageProcessorFactory)
+        public readonly StaticLoader _loader;
+
+        public GaugeListener(MessageProcessorFactory messageProcessorFactory, StaticLoader loader)
         {
             _messageProcessorFactory = messageProcessorFactory;
+            _loader = loader;
         }
 
         public void StartGrpcServer()
         {
-            const int port = 54545;
             var server = new Server();
             server.Services.Add(lspService.BindService(new GaugeGrpcConnection(server)));
-            server.Ports.Add(new ServerPort("127.0.0.1", port, ServerCredentials.Insecure));
+            var port  = server.Ports.Add(new ServerPort("127.0.0.1", 0, ServerCredentials.Insecure));
             server.Start();
             Console.WriteLine("Listening on port:"+ port);
-        }
-
-        private static int GetRandomPort()
-        {
-            var l = new TcpListener(IPAddress.Loopback, 0);
-            l.Start();
-            var port = ((IPEndPoint)l.LocalEndpoint).Port;
-            l.Stop();
-            return port;
+            server.ShutdownTask.Wait();
         }
 
         public void PollForMessages()

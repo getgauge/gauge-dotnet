@@ -74,7 +74,6 @@ namespace Gauge.Dotnet
         public override Task<StepPositionsResponse> GetStepPositions(StepPositionsRequest request,
             ServerCallContext context)
         {
-            Console.WriteLine("step positions response");
             return base.GetStepPositions(request, context);
         }
 

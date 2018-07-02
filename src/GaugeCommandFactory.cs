@@ -31,7 +31,7 @@ namespace Gauge.Dotnet
                             var loader = new StaticLoader();
                             loader.LoadImplementations();
                             var messageProcessorFactory = new MessageProcessorFactory(loader.GetStepRegistry());
-                            return new GaugeListener(messageProcessorFactory);
+                            return new GaugeListener(messageProcessorFactory, loader);
                         },
                         () => new GaugeProjectBuilder());
             }
