@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using System.Linq;
 using NUnit.Framework;
 
 namespace Gauge.Dotnet.UnitTests
@@ -67,6 +68,47 @@ namespace Gauge.Dotnet.UnitTests
         }
 
         [Test]
+        public void ShouldLoadStepsWithPositin()
+        {
+            var loader = new StaticLoader();
+            const string file1 = @"Foo.cs";
+
+            const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
+                                "namespace foobar\n" +
+                                "{\n" +
+                                "    public class Foo\n" +
+                                "    {\n" +
+                                "        [Step(\"hello\")]\n" +
+                                "        public void hello()\n" +
+                                "        {\n" +
+                                "        }\n" +
+                                "    }\n" +
+                                "}\n";
+
+            loader.LoadStepsFromText(text, file1);
+
+            const string file2 = @"Bar.cs";
+            const string newText = "using Gauge.CSharp.Lib.Attributes;\n" +
+                                   "namespace foobar\n" +
+                                   "{\n" +
+                                   "    public class Bar\n" +
+                                   "    {\n" +
+                                   "        [Step(\"hola\")]\n" +
+                                   "        public void hola()\n" +
+                                   "        {\n" +
+                                   "        }\n" +
+                                   "    }\n" +
+                                   "}\n";
+
+            loader.ReloadSteps(newText, file2);
+
+            var positions = loader.GetStepRegistry().GetStepPositions(file1).ToList();
+            Assert.AreEqual(1, positions.Count);
+            Assert.AreEqual(6, positions.First().Span.Start);
+            Assert.AreEqual(9, positions.First().Span.End);
+        }
+
+        [Test]
         public void ShouldReloadSteps()
         {
             var loader = new StaticLoader();
@@ -110,7 +152,7 @@ namespace Gauge.Dotnet.UnitTests
         public void ShouldRemoveSteps()
         {
             var loader = new StaticLoader();
-            const string file1 = @"foo.cs";
+            const string file1 = @"Foo.cs";
 
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
@@ -147,7 +189,6 @@ namespace Gauge.Dotnet.UnitTests
             loader.RemoveSteps(file2);
 
             Assert.False(loader.GetStepRegistry().ContainsStep("hola"));
-
         }
     }
 }

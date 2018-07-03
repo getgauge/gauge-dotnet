@@ -27,8 +27,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Gauge.Dotnet
 {
-   
-
     public sealed class StaticLoader : IStaticLoader
     {
         private readonly IStepRegistry _stepRegistry;
@@ -44,18 +42,29 @@ namespace Gauge.Dotnet
             return _stepRegistry;
         }
 
-        internal void LoadImplementations()
-        {
-            var classFiles = Directory.EnumerateFiles(Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT"), "*.cs",
-                SearchOption.AllDirectories);
-            foreach (var f in classFiles) LoadStepsFromText(File.ReadAllText(f), f);
-        }
-
 
         public void LoadStepsFromText(string content, string filepath)
         {
             var steps = GetStepsFrom(content);
             AddStepsToRegsitry(filepath, steps);
+        }
+
+        public void ReloadSteps(string content, string filepath)
+        {
+            _stepRegistry.RemoveSteps(filepath);
+            LoadStepsFromText(content, filepath);
+        }
+
+        public void RemoveSteps(string file)
+        {
+            _stepRegistry.RemoveSteps(file);
+        }
+
+        internal void LoadImplementations()
+        {
+            var classFiles = Directory.EnumerateFiles(Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT"), "*.cs",
+                SearchOption.AllDirectories);
+            foreach (var f in classFiles) LoadStepsFromText(File.ReadAllText(f), f);
         }
 
         private void AddStepsToRegsitry(string fileName, IEnumerable<MethodDeclarationSyntax> stepMethods)
@@ -79,7 +88,7 @@ namespace Gauge.Dotnet
                         IsAlias = isAlias,
                         Aliases = stepTexts,
                         StepValue = stepValue,
-                        Span = attributeSyntax.GetLocation().GetLineSpan(),
+                        Span = stepMethod.GetLocation().GetLineSpan(),
                         ClassName = classDef.Identifier.ValueText,
                         FileName = fileName
                     };
@@ -99,17 +108,6 @@ namespace Gauge.Dotnet
                     string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
                 select node;
             return stepMethods;
-        }
-
-        public void ReloadSteps(string content, string filepath)
-        {
-            _stepRegistry.RemoveSteps(filepath);
-            LoadStepsFromText(content, filepath);
-        }
-
-        public void RemoveSteps(string file)
-        {
-            _stepRegistry.RemoveSteps(file);
         }
     }
 }

@@ -16,6 +16,7 @@
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Collections.Generic;
+using static Gauge.Messages.StepPositionsResponse.Types;
 
 namespace Gauge.Dotnet.Models
 {
@@ -29,5 +30,6 @@ namespace Gauge.Dotnet.Models
         bool HasMultipleImplementations(string parsedStepText);
         void AddStep(string stepValue, GaugeMethod stepMethod);
         void RemoveSteps(string filepath);
+        IEnumerable<StepPosition> GetStepPositions(string filePath);
     }
 }

@@ -15,19 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-using Gauge.Dotnet.Strategy;
-using Gauge.Dotnet.Wrappers;
+using Gauge.Dotnet.Models;
+using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
-    public abstract class UntaggedHooksFirstExecutionProcessor : HookExecutionProcessor
+    public class StepPositionsRequestProcessor : IMessageProcessor
     {
-        protected UntaggedHooksFirstExecutionProcessor(IExecutionOrchestrator executionOrchestrator,
-            IAssemblyLoader assemblyLoader,
-            IReflectionWrapper reflectionWrapper)
-            : base(executionOrchestrator, assemblyLoader, reflectionWrapper)
+        private readonly IStepRegistry _stepRegistry;
+
+        public StepPositionsRequestProcessor(IStepRegistry stepRegistry)
         {
-            Strategy = new UntaggedHooksFirstStrategy();
+            _stepRegistry = stepRegistry;
+        }
+
+        public Message Process(Message request)
+        {
+            var positions = _stepRegistry.GetStepPositions(request.StepPositionsRequest.FilePath);
+            var stepPositionsResponse = new StepPositionsResponse();
+            stepPositionsResponse.StepPositions.AddRange(positions);
+            return new Message {StepPositionsResponse = stepPositionsResponse};
         }
     }
 }

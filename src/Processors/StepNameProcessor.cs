@@ -42,9 +42,9 @@ namespace Gauge.Dotnet.Processors
                 FileName = info.FileName,
                 Span = new Span
                 {
-                    Start = info.Span.Span.Start.Line,
+                    Start = info.Span.Span.Start.Line + 1,
                     StartChar = info.Span.StartLinePosition.Character,
-                    End = info.Span.EndLinePosition.Line,
+                    End = info.Span.EndLinePosition.Line + 1,
                     EndChar = info.Span.EndLinePosition.Character
                 }
             };

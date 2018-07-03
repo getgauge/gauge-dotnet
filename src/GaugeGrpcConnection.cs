@@ -1,4 +1,21 @@
-﻿using System.Threading.Tasks;
+﻿// Copyright 2018 ThoughtWorks, Inc.
+//
+// This file is part of Gauge-CSharp.
+//
+// Gauge-CSharp is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Gauge-CSharp is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
+
+using System.Threading.Tasks;
 using Gauge.CSharp.Core;
 using Gauge.Messages;
 using Grpc.Core;
@@ -66,22 +83,9 @@ namespace Gauge.Dotnet
         public override Task<StepPositionsResponse> GetStepPositions(StepPositionsRequest request,
             ServerCallContext context)
         {
-            return Task.FromResult(new StepPositionsResponse
-            {
-                StepPositions =
-                {
-                    new StepPositionsResponse.Types.StepPosition
-                    {
-                        Span = new Span
-                        {
-                            Start = 0,
-                            StartChar = 0,
-                            End = 10,
-                            EndChar = 10
-                        }
-                    }
-                }
-            });
+            var response = _factory.GetProcessor(Message.Types.MessageType.StepPositionsRequest)
+                .Process(new Message {StepPositionsRequest = request});
+            return Task.FromResult(response.StepPositionsResponse);
         }
 
         public override Task<FileDiff> ImplementStub(StubImplementationCodeRequest request, ServerCallContext context)
