@@ -44,10 +44,13 @@ namespace Gauge.Dotnet.Models
 
         public void RemoveSteps(string filepath)
         {
+            var newRegistry = new Dictionary<string, List<GaugeMethod>>();
             foreach (var (key, gaugeMethods) in _registry)
             {
-                _registry[key] = gaugeMethods.Where(method => filepath.Equals(method.FileName)).ToList();
+                var methods = gaugeMethods.Where(method => !filepath.Equals(method.FileName)).ToList();
+                if (methods.Count > 0) newRegistry[key] = methods;
             }
+            _registry = newRegistry;
         }
 
 

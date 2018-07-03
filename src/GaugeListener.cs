@@ -29,18 +29,15 @@ namespace Gauge.Dotnet
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly MessageProcessorFactory _messageProcessorFactory;
 
-        private readonly StaticLoader _loader;
-
-        public GaugeListener(MessageProcessorFactory messageProcessorFactory, StaticLoader loader)
+        public GaugeListener(MessageProcessorFactory messageProcessorFactory)
         {
             _messageProcessorFactory = messageProcessorFactory;
-            _loader = loader;
         }
 
         public void StartGrpcServer()
         {
             var server = new Server();
-            server.Services.Add(lspService.BindService(new GaugeGrpcConnection(server, _loader, _messageProcessorFactory)));
+            server.Services.Add(lspService.BindService(new GaugeGrpcConnection(server, _messageProcessorFactory)));
             var port  = server.Ports.Add(new ServerPort("127.0.0.1", 0, ServerCredentials.Insecure));
             server.Start();
             Console.WriteLine("Listening on port:"+ port);

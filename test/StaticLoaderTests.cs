@@ -65,5 +65,89 @@ namespace Gauge.Dotnet.UnitTests
             loader.LoadStepsFromText(text, fileName);
             Assert.True(loader.GetStepRegistry().ContainsStep("hello"));
         }
+
+        [Test]
+        public void ShouldReloadSteps()
+        {
+            var loader = new StaticLoader();
+            const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
+                                "namespace foobar\n" +
+                                "{\n" +
+                                "    public class FooBar\n" +
+                                "    {\n" +
+                                "        [Step(\"hello\")]\n" +
+                                "        public void hello()\n" +
+                                "        {\n" +
+                                "        }\n" +
+                                "    }\n" +
+                                "}\n";
+            const string fileName = @"foo.cs";
+            loader.LoadStepsFromText(text, fileName);
+            Assert.True(loader.GetStepRegistry().ContainsStep("hello"));
+
+            const string newText = "using Gauge.CSharp.Lib.Attributes;\n" +
+                                   "namespace foobar\n" +
+                                   "{\n" +
+                                   "    public class FooBar\n" +
+                                   "    {\n" +
+                                   "        [Step(\"hello\")]\n" +
+                                   "        public void hello()\n" +
+                                   "        {\n" +
+                                   "        }\n" +
+                                   "        [Step(\"hola\")]\n" +
+                                   "        public void hola()\n" +
+                                   "        {\n" +
+                                   "        }\n" +
+                                   "    }\n" +
+                                   "}\n";
+
+            loader.ReloadSteps(newText, fileName);
+
+            Assert.True(loader.GetStepRegistry().ContainsStep("hola"));
+        }
+
+        [Test]
+        public void ShouldRemoveSteps()
+        {
+            var loader = new StaticLoader();
+            const string file1 = @"foo.cs";
+
+            const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
+                                "namespace foobar\n" +
+                                "{\n" +
+                                "    public class Foo\n" +
+                                "    {\n" +
+                                "        [Step(\"hello\")]\n" +
+                                "        public void hello()\n" +
+                                "        {\n" +
+                                "        }\n" +
+                                "    }\n" +
+                                "}\n";
+
+            loader.LoadStepsFromText(text, file1);
+
+            const string file2 = @"Bar.cs";
+            const string newText = "using Gauge.CSharp.Lib.Attributes;\n" +
+                                   "namespace foobar\n" +
+                                   "{\n" +
+                                   "    public class Bar\n" +
+                                   "    {\n" +
+                                   "        [Step(\"hola\")]\n" +
+                                   "        public void hola()\n" +
+                                   "        {\n" +
+                                   "        }\n" +
+                                   "    }\n" +
+                                   "}\n";
+
+            loader.ReloadSteps(newText, file2);
+
+            Assert.True(loader.GetStepRegistry().ContainsStep("hello"));
+            Assert.True(loader.GetStepRegistry().ContainsStep("hola"));
+
+            loader.RemoveSteps(file2);
+
+            Assert.False(loader.GetStepRegistry().ContainsStep("hola"));
+
+        }
     }
 }

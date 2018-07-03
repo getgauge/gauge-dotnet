@@ -27,7 +27,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Gauge.Dotnet
 {
-    public sealed class StaticLoader
+   
+
+    public sealed class StaticLoader : IStaticLoader
     {
         private readonly IStepRegistry _stepRegistry;
 
@@ -77,7 +79,7 @@ namespace Gauge.Dotnet
                         IsAlias = isAlias,
                         Aliases = stepTexts,
                         StepValue = stepValue,
-                        Span = stepMethod.GetLocation().GetLineSpan(),
+                        Span = attributeSyntax.GetLocation().GetLineSpan(),
                         ClassName = classDef.Identifier.ValueText,
                         FileName = fileName
                     };
@@ -103,6 +105,11 @@ namespace Gauge.Dotnet
         {
             _stepRegistry.RemoveSteps(filepath);
             LoadStepsFromText(content, filepath);
+        }
+
+        public void RemoveSteps(string file)
+        {
+            _stepRegistry.RemoveSteps(file);
         }
     }
 }

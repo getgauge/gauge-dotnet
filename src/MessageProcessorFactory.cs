@@ -25,12 +25,14 @@ namespace Gauge.Dotnet
 {
     public class MessageProcessorFactory
     {
+        private readonly IStaticLoader _loader;
         private readonly Dictionary<Message.Types.MessageType, IMessageProcessor> _messageProcessorsDictionary;
         private IStepRegistry _stepRegistry;
 
-        public MessageProcessorFactory(IStepRegistry registry)
+        public MessageProcessorFactory(IStaticLoader loader)
         {
-            _stepRegistry = registry;
+            _loader = loader;
+            _stepRegistry = loader.GetStepRegistry();
             _messageProcessorsDictionary = InitializeMessageHandlers();
         }
 
@@ -118,7 +120,8 @@ namespace Gauge.Dotnet
                 {Message.Types.MessageType.StepNamesRequest, new StepNamesProcessor(_stepRegistry)},
                 {Message.Types.MessageType.StepValidateRequest, new StepValidationProcessor(_stepRegistry)},
                 {Message.Types.MessageType.StepNameRequest, new StepNameProcessor(_stepRegistry)},
-                {Message.Types.MessageType.RefactorRequest, new RefactorProcessor(_stepRegistry)}
+                {Message.Types.MessageType.RefactorRequest, new RefactorProcessor(_stepRegistry)},
+                {Message.Types.MessageType.CacheFileRequest, new CacheFileRequestProcessor(_loader)}
             };
         }
     }

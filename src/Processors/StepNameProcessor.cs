@@ -32,16 +32,28 @@ namespace Gauge.Dotnet.Processors
         public Message Process(Message request)
         {
             var parsedStepText = request.StepNameRequest.StepValue;
-            var isValidStep = _stepRegistry.ContainsStep(parsedStepText);
             var stepText = _stepRegistry.GetStepText(parsedStepText);
             var hasAlias = _stepRegistry.HasAlias(stepText);
-
+            var info = _stepRegistry.MethodFor(parsedStepText);
             var stepNameResponse = new StepNameResponse
             {
+                IsStepPresent = _stepRegistry.ContainsStep(parsedStepText),
                 HasAlias = hasAlias,
-                IsStepPresent = isValidStep,
-                StepName = {stepText}
+                FileName = info.FileName,
+                Span = new Span
+                {
+                    Start = info.Span.Span.Start.Line,
+                    StartChar = info.Span.StartLinePosition.Character,
+                    End = info.Span.EndLinePosition.Line,
+                    EndChar = info.Span.EndLinePosition.Character
+                }
             };
+            if (hasAlias)
+                stepNameResponse.StepName.AddRange(info.Aliases);
+            else
+                stepNameResponse.StepName.Add(stepText);
+
+
             return new Message
             {
                 MessageId = request.MessageId,
