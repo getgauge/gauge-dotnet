@@ -42,7 +42,7 @@ namespace Gauge.Dotnet
 
 </Project>
 ";
-            var properties = $"GAUGE_CSHARP_PROJECT_FILE={projName}.csproj";
+            string properties = GenerateDefaultProperties(projName);
 
             var implementation = $@"using System;
 using System.Collections.Generic;
@@ -106,6 +106,16 @@ namespace {projName}
 
             logger.Info($"create  {Path.Combine("env", "default", "dotnet.properties")}");
             File.WriteAllText(Path.Combine(envPath, "dotnet.properties"), properties);
+        }
+
+        private static string GenerateDefaultProperties(string projName)
+        {
+            var properties = new[]
+            {
+                $"GAUGE_CSHARP_PROJECT_FILE={projName}.csproj",
+                "GAUGE_CSHARP_PROJECT_CONFIG=release"
+            };
+            return string.Join(System.Environment.NewLine, properties);
         }
     }
 }
