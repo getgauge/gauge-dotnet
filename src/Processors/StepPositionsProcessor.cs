@@ -20,11 +20,11 @@ using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
-    public class StepPositionsRequestProcessor : IMessageProcessor
+    public class StepPositionsProcessor : IMessageProcessor
     {
         private readonly IStepRegistry _stepRegistry;
 
-        public StepPositionsRequestProcessor(IStepRegistry stepRegistry)
+        public StepPositionsProcessor(IStepRegistry stepRegistry)
         {
             _stepRegistry = stepRegistry;
         }

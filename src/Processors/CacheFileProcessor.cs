@@ -23,11 +23,11 @@ using static Gauge.Messages.CacheFileRequest.Types;
 
 namespace Gauge.Dotnet.Processors
 {
-    public class CacheFileRequestProcessor : IMessageProcessor
+    public class CacheFileProcessor : IMessageProcessor
     {
         private readonly IStaticLoader _loader;
 
-        public CacheFileRequestProcessor(IStaticLoader loader)
+        public CacheFileProcessor(IStaticLoader loader)
         {
             _loader = loader;
         }

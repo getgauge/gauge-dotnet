@@ -22,7 +22,7 @@ using NUnit.Framework;
 
 namespace Gauge.Dotnet.UnitTests.Processors
 {
-    public class StepPositionsRequestProcessorTests
+    public class StepPositionsProcessorTests
     {
         [Test]
         public void ShouldProcessRequest()
@@ -42,7 +42,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             const string file = "Foo.cs";
             loader.LoadStepsFromText(content, file);
 
-            var processor = new StepPositionsRequestProcessor(loader.GetStepRegistry());
+            var processor = new StepPositionsProcessor(loader.GetStepRegistry());
             var request = new Message {StepPositionsRequest = new StepPositionsRequest {FilePath = "Foo.cs"}};
 
             var response = processor.Process(request).StepPositionsResponse;
@@ -71,7 +71,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             const string file = "Foo.cs";
             loader.LoadStepsFromText(content, file);
 
-            var processor = new StepPositionsRequestProcessor(loader.GetStepRegistry());
+            var processor = new StepPositionsProcessor(loader.GetStepRegistry());
             var request = new Message {StepPositionsRequest = new StepPositionsRequest {FilePath = "Foo.cs"}};
 
             var response = processor.Process(request).StepPositionsResponse;

@@ -22,14 +22,14 @@ using NUnit.Framework;
 namespace Gauge.Dotnet.UnitTests.Processors
 {
     [TestFixture]
-    public class CacheFileRequestProcessorTests
+    public class CacheFileProcessorTests
     {
         [Test]
         public void ShouldProcessMessage()
         {
             var loader = new StaticLoader();
 
-            var processor = new CacheFileRequestProcessor(loader);
+            var processor = new CacheFileProcessor(loader);
             var request = new Message
             {
                 CacheFileRequest = new CacheFileRequest
@@ -72,7 +72,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                                    "}\n";
             loader.LoadStepsFromText(content, "Foo.cs");
 
-            var processor = new CacheFileRequestProcessor(loader);
+            var processor = new CacheFileProcessor(loader);
             var request = new Message
             {
                 CacheFileRequest = new CacheFileRequest
