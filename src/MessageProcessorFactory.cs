@@ -121,8 +121,9 @@ namespace Gauge.Dotnet
                 {Message.Types.MessageType.StepValidateRequest, new StepValidationProcessor(_stepRegistry)},
                 {Message.Types.MessageType.StepNameRequest, new StepNameProcessor(_stepRegistry)},
                 {Message.Types.MessageType.RefactorRequest, new RefactorProcessor(_stepRegistry)},
-                {Message.Types.MessageType.CacheFileRequest, new CacheFileRequestProcessor(_loader)},
-                {Message.Types.MessageType.StepPositionsRequest, new StepPositionsRequestProcessor(_stepRegistry)}
+                {Message.Types.MessageType.CacheFileRequest, new CacheFileProcessor(_loader)},
+                {Message.Types.MessageType.StepPositionsRequest, new StepPositionsProcessor(_stepRegistry)},
+                {Message.Types.MessageType.StubImplementationCodeRequest, new StubImplementationCodeProcessor()}
             };
         }
     }

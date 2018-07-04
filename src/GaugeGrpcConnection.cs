@@ -17,6 +17,7 @@
 
 using System.Threading.Tasks;
 using Gauge.CSharp.Core;
+using Gauge.Dotnet.Helpers;
 using Gauge.Messages;
 using Grpc.Core;
 
@@ -43,26 +44,16 @@ namespace Gauge.Dotnet
         public override Task<ImplementationFileGlobPatternResponse> GetGlobPatterns(Empty request,
             ServerCallContext context)
         {
-            var response = new ImplementationFileGlobPatternResponse
-            {
-                GlobPatterns =
-                {
-                    $"{Utils.GaugeProjectRoot}/**/*.cs"
-                }
-            };
+            var response = new ImplementationFileGlobPatternResponse();
+            response.GlobPatterns.Add(FileHelper.GetImplementationGlobPatterns());
             return Task.FromResult(response);
         }
 
         public override Task<ImplementationFileListResponse> GetImplementationFiles(Empty request,
             ServerCallContext context)
         {
-            var response = new ImplementationFileListResponse
-            {
-                ImplementationFilePaths =
-                {
-                    "StepImplementation.cs"
-                }
-            };
+            var response = new ImplementationFileListResponse();
+            response.ImplementationFilePaths.AddRange(FileHelper.GetImplementationFiles());
             return Task.FromResult(response);
         }
 
@@ -90,24 +81,9 @@ namespace Gauge.Dotnet
 
         public override Task<FileDiff> ImplementStub(StubImplementationCodeRequest request, ServerCallContext context)
         {
-            return Task.FromResult(new FileDiff
-            {
-                FilePath = "StepImplementation.cs",
-                TextDiffs =
-                {
-                    new TextDiff
-                    {
-                        Span = new Span
-                        {
-                            Start = 0,
-                            StartChar = 0,
-                            End = 10,
-                            EndChar = 10
-                        },
-                        Content = "Hello Word"
-                    }
-                }
-            });
+            var respone = _factory.GetProcessor(Message.Types.MessageType.StubImplementationCodeRequest)
+                .Process(new Message {StubImplementationCodeRequest = request});
+            return Task.FromResult(respone.FileDiff);
         }
 
         public override Task<Empty> KillProcess(KillProcessRequest request, ServerCallContext context)

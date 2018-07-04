@@ -55,7 +55,7 @@ namespace Gauge.Dotnet.Processors
             return GetStepValidateResponseMessage(isValid, request, errorType, errorMessage, suggestion);
         }
 
-        private static string GetSuggestion(ProtoStepValue stepValue)
+        private string GetSuggestion(ProtoStepValue stepValue)
         {
             var name = stepValue.StepValue.ToValidCSharpIdentifier();
             return "\t\t[Step(\"" + stepValue.ParameterizedStepValue + "\")]\n" +
