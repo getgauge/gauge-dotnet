@@ -80,5 +80,3 @@ namespace Gauge.Dotnet.UnitTests.Processors
         }
     }
 }
-
-}

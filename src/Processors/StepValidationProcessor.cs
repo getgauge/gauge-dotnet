@@ -15,6 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
+using System.Collections.Generic;
+using System.Linq;
+using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
 using Gauge.Messages;
 
@@ -34,11 +37,13 @@ namespace Gauge.Dotnet.Processors
             var stepToValidate = request.StepValidateRequest.StepText;
             var isValid = true;
             var errorMessage = "";
+            string suggestion = "";
             var errorType = StepValidateResponse.Types.ErrorType.StepImplementationNotFound;
             if (!_stepRegistry.ContainsStep(stepToValidate))
             {
                 isValid = false;
                 errorMessage = string.Format("No implementation found for : {0}. Full Step Text :", stepToValidate);
+                suggestion = GetSuggestion(request.StepValidateRequest.StepValue);
             }
             else if (_stepRegistry.HasMultipleImplementations(stepToValidate))
             {
@@ -47,17 +52,32 @@ namespace Gauge.Dotnet.Processors
                 errorMessage = string.Format("Multiple step implementations found for : {0}", stepToValidate);
             }
 
-            return GetStepValidateResponseMessage(isValid, request, errorType, errorMessage);
+            return GetStepValidateResponseMessage(isValid, request, errorType, errorMessage, suggestion);
+        }
+
+        private static string GetSuggestion(ProtoStepValue stepValue)
+        {
+            var name = stepValue.StepValue.ToValidCSharpIdentifier();
+            return "\t\t[Step(\"" + stepValue.ParameterizedStepValue + "\")]\n" +
+                   "\t\tpublic void " + name + "(" + GetParamsList(stepValue.Parameters) + ")\n" +
+                   "\t\t{\n\t\t\tthrow new NotImplementedException();\n\t\t}\n";
+        }
+
+        private static string GetParamsList(IEnumerable<string> stepValueParameters)
+        {
+            var paramsString = stepValueParameters.Select((p, i) => $"arg{i}");
+            return string.Join(" ,", paramsString);
         }
 
         private static Message GetStepValidateResponseMessage(bool isValid, Message request,
-            StepValidateResponse.Types.ErrorType errorType, string errorMessage)
+            StepValidateResponse.Types.ErrorType errorType, string errorMessage, string suggestion)
         {
             var stepValidateResponse = new StepValidateResponse
             {
                 ErrorMessage = errorMessage,
                 IsValid = isValid,
-                ErrorType = errorType
+                ErrorType = errorType,
+                Suggestion = suggestion
             };
             return new Message
             {
