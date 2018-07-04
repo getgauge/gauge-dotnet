@@ -30,7 +30,8 @@ namespace Gauge.Dotnet
         {
             var gaugeBinDir = Utils.GetGaugeBinDir();
             var csprojEnvVariable = Utils.TryReadEnvValue("GAUGE_CSHARP_PROJECT_FILE");
-            var commandArgs = $"publish --configuration=release --output=\"{gaugeBinDir}\"";
+            string configurationEnvVariable = ReadBuildConfiguration();
+            var commandArgs = $"publish --configuration={configurationEnvVariable} --output=\"{gaugeBinDir}\"";
             if (!string.IsNullOrEmpty(csprojEnvVariable)) commandArgs = $"{commandArgs} \"{csprojEnvVariable}\"";
             try
             {
@@ -59,6 +60,16 @@ namespace Gauge.Dotnet
             buildProcess.ErrorDataReceived += (sender, e) => { Logger.Error(e.Data); };
             buildProcess.Start();
             buildProcess.WaitForExit();
+        }
+
+        private static string ReadBuildConfiguration()
+        {
+            var configurationEnvVariable = Utils.TryReadEnvValue("GAUGE_CSHARP_PROJECT_CONFIG");
+            if (string.IsNullOrEmpty(configurationEnvVariable))
+            {
+                configurationEnvVariable = "release";
+            }
+            return configurationEnvVariable;
         }
     }
 }
