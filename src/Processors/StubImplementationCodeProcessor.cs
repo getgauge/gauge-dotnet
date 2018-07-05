@@ -102,7 +102,7 @@ namespace Gauge.Dotnet.Processors
                    $"using Gauge.CSharp.Lib.Attribute;{n}{n}" +
                    $"namespace {FileHelper.GetNameSpace()}{n}" +
                    $"{{\n\tpublic class {className}{n}" +
-                   $"\t\t{{{n}{string.Join(Environment.NewLine, stubs)}{n}" +
+                   $"\t{{{n}{string.Join(Environment.NewLine, stubs)}{n}" +
                    $"\t}}{n}}}\n";
         }
     }

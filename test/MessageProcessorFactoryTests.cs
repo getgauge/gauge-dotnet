@@ -170,5 +170,29 @@ namespace Gauge.Dotnet.UnitTests
 
             Assert.AreEqual(messageProcessor.GetType(), typeof(SuiteDataStoreInitProcessor));
         }
+
+        [Test]
+        public void ShouldGetProcessorForStepNameRequest()
+        {
+            var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StepNameRequest);
+
+            Assert.AreEqual(messageProcessor.GetType(), typeof(StepNameProcessor));
+        }
+
+        [Test]
+        public void ShouldGetProcessorForCacheFileRequest ()
+        {
+            var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.CacheFileRequest);
+
+            Assert.AreEqual(messageProcessor.GetType(), typeof(CacheFileProcessor));
+        }
+
+        [Test]
+        public void ShouldGetProcessorForStubImplementationRequest()
+        {
+            var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StubImplementationCodeRequest);
+
+            Assert.AreEqual(messageProcessor.GetType(), typeof(StubImplementationCodeProcessor));
+        }
     }
 }

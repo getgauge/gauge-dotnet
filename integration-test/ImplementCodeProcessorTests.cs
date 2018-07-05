@@ -58,6 +58,57 @@ namespace Gauge.Dotnet.IntegrationTests
             Assert.True(result.FileDiff.TextDiffs[0].Content.Contains("class StepImplementation1"));
         }
 
+        [Test]
+        public void ShouldProcessMessageForExistingButEmptyFile()
+        {
+            var file = Path.Combine(TestUtils.GetIntegrationTestSampleDirectory(), "Empty.cs");
+            var message = new Message
+            {
+                MessageId = 1234,
+                MessageType = Message.Types.MessageType.StubImplementationCodeRequest,
+                StubImplementationCodeRequest = new StubImplementationCodeRequest
+                {
+                    ImplementationFilePath = file,
+                    Codes =
+                    {
+                        "Step Method"
+                    }
+                }
+            };
+
+            var processor = new StubImplementationCodeProcessor();
+            var result = processor.Process(message).FileDiff;
+            Console.WriteLine(result.TextDiffs[0].Content);
+            Assert.AreEqual(1, result.TextDiffs.Count);
+            Assert.True(result.TextDiffs[0].Content.Contains("namespace IntegrationTestSample"));
+            Assert.True(result.TextDiffs[0].Content.Contains("class Empty"));
+            StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
+        }
+
+        [Test]
+        public void ShouldProcessMessageForExistingClass()
+        {
+            var file = Path.Combine(TestUtils.GetIntegrationTestSampleDirectory(), "StepImplementation.cs");
+            var message = new Message
+            {
+                MessageId = 1234,
+                MessageType = Message.Types.MessageType.StubImplementationCodeRequest,
+                StubImplementationCodeRequest = new StubImplementationCodeRequest
+                {
+                    ImplementationFilePath = file,
+                    Codes =
+                    {
+                        "Step Method"
+                    }
+                }
+            };
+
+            var processor = new StubImplementationCodeProcessor();
+            var result = processor.Process(message).FileDiff;
+            Assert.AreEqual(1, result.TextDiffs.Count);
+            StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
+        }
+
         [TearDown]
         public void TearDown()
         {
