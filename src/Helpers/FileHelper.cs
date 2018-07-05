@@ -34,7 +34,7 @@ namespace Gauge.Dotnet.Helpers
 
         public static string GetImplementationGlobPatterns()
         {
-            return Path.Combine(Utils.GaugeProjectRoot, "**", "*.cs");
+            return $"{Utils.GaugeProjectRoot}/**/*.cs";
         }
 
         public static string GetNameSpace()
