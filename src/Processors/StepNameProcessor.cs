@@ -32,34 +32,39 @@ namespace Gauge.Dotnet.Processors
         public Message Process(Message request)
         {
             var parsedStepText = request.StepNameRequest.StepValue;
-            var stepText = _stepRegistry.GetStepText(parsedStepText);
-            var hasAlias = _stepRegistry.HasAlias(stepText);
-            var info = _stepRegistry.MethodFor(parsedStepText);
-            var stepNameResponse = new StepNameResponse
-            {
-                IsStepPresent = _stepRegistry.ContainsStep(parsedStepText),
-                HasAlias = hasAlias,
-                FileName = info.FileName,
-                Span = new Span
-                {
-                    Start = info.Span.Span.Start.Line + 1,
-                    StartChar = info.Span.StartLinePosition.Character,
-                    End = info.Span.EndLinePosition.Line + 1,
-                    EndChar = info.Span.EndLinePosition.Character
-                }
-            };
-            if (hasAlias)
-                stepNameResponse.StepName.AddRange(info.Aliases);
-            else
-                stepNameResponse.StepName.Add(stepText);
-
-
-            return new Message
+            var isStepPresent = _stepRegistry.ContainsStep(parsedStepText);
+            var message = new Message
             {
                 MessageId = request.MessageId,
                 MessageType = Message.Types.MessageType.StepNameResponse,
-                StepNameResponse = stepNameResponse
+                StepNameResponse = new StepNameResponse
+                {
+                    IsStepPresent = isStepPresent
+                }
             };
+
+            if (!isStepPresent) return message;
+
+            var stepText = _stepRegistry.GetStepText(parsedStepText);
+            var hasAlias = _stepRegistry.HasAlias(stepText);
+            var info = _stepRegistry.MethodFor(parsedStepText);
+
+            message.StepNameResponse.HasAlias = hasAlias;
+            message.StepNameResponse.FileName = info.FileName;
+            message.StepNameResponse.Span = new Span
+            {
+                Start = info.Span.Span.Start.Line + 1,
+                StartChar = info.Span.StartLinePosition.Character,
+                End = info.Span.EndLinePosition.Line + 1,
+                EndChar = info.Span.EndLinePosition.Character
+            };
+
+            if (hasAlias)
+                message.StepNameResponse.StepName.AddRange(info.Aliases);
+            else
+                message.StepNameResponse.StepName.Add(stepText);
+
+            return message;
         }
     }
 }
