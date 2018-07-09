@@ -78,7 +78,6 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var processor = new StubImplementationCodeProcessor();
             var result = processor.Process(message).FileDiff;
-            Console.WriteLine(result.TextDiffs[0].Content);
             Assert.AreEqual(1, result.TextDiffs.Count);
             Assert.True(result.TextDiffs[0].Content.Contains("namespace IntegrationTestSample"));
             Assert.True(result.TextDiffs[0].Content.Contains("class Empty"));

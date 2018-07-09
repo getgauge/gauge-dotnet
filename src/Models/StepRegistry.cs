@@ -60,7 +60,8 @@ namespace Gauge.Dotnet.Models
         {
             var positions = new List<StepPosition>();
             foreach (var (stepValue, gaugeMethods) in _registry)
-                gaugeMethods.ForEach(m =>
+            {
+                foreach (var m in gaugeMethods)
                 {
                     if (m.FileName.Equals(filePath))
                     {
@@ -77,7 +78,8 @@ namespace Gauge.Dotnet.Models
                         };
                         positions.Add(p);
                     }
-                });
+                }
+            }
             return positions;
         }
 
