@@ -15,26 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-CSharp.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace Gauge.Dotnet
+using Gauge.Dotnet.Models;
+using Gauge.Messages;
+
+namespace Gauge.Dotnet.Processors
 {
-    public class GaugeCommandFactory
+    public class StepPositionsProcessor : IMessageProcessor
     {
-        public static IGaugeCommand GetExecutor(string phase)
+        private readonly IStepRegistry _stepRegistry;
+
+        public StepPositionsProcessor(IStepRegistry stepRegistry)
         {
-            switch (phase)
-            {
-                case "--init":
-                    return new SetupCommand();
-                default:
-                    return new StartCommand(() =>
-                        {
-                            var loader = new StaticLoader();
-                            loader.LoadImplementations();
-                            var messageProcessorFactory = new MessageProcessorFactory(loader);
-                            return new GaugeListener(messageProcessorFactory);
-                        },
-                        () => new GaugeProjectBuilder());
-            }
+            _stepRegistry = stepRegistry;
+        }
+
+        public Message Process(Message request)
+        {
+            var positions = _stepRegistry.GetStepPositions(request.StepPositionsRequest.FilePath);
+            var stepPositionsResponse = new StepPositionsResponse();
+            stepPositionsResponse.StepPositions.AddRange(positions);
+            return new Message {StepPositionsResponse = stepPositionsResponse};
         }
     }
 }

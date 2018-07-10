@@ -20,7 +20,7 @@ using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
-    internal class StepNameProcessor : IMessageProcessor
+    public class StepNameProcessor : IMessageProcessor
     {
         private readonly IStepRegistry _stepRegistry;
 
@@ -32,22 +32,39 @@ namespace Gauge.Dotnet.Processors
         public Message Process(Message request)
         {
             var parsedStepText = request.StepNameRequest.StepValue;
-            var isValidStep = _stepRegistry.ContainsStep(parsedStepText);
-            var stepText = _stepRegistry.GetStepText(parsedStepText);
-            var hasAlias = _stepRegistry.HasAlias(stepText);
-
-            var stepNameResponse = new StepNameResponse
-            {
-                HasAlias = hasAlias,
-                IsStepPresent = isValidStep,
-                StepName = {stepText}
-            };
-            return new Message
+            var isStepPresent = _stepRegistry.ContainsStep(parsedStepText);
+            var message = new Message
             {
                 MessageId = request.MessageId,
                 MessageType = Message.Types.MessageType.StepNameResponse,
-                StepNameResponse = stepNameResponse
+                StepNameResponse = new StepNameResponse
+                {
+                    IsStepPresent = isStepPresent
+                }
             };
+
+            if (!isStepPresent) return message;
+
+            var stepText = _stepRegistry.GetStepText(parsedStepText);
+            var hasAlias = _stepRegistry.HasAlias(stepText);
+            var info = _stepRegistry.MethodFor(parsedStepText);
+
+            message.StepNameResponse.HasAlias = hasAlias;
+            message.StepNameResponse.FileName = info.FileName;
+            message.StepNameResponse.Span = new Span
+            {
+                Start = info.Span.Span.Start.Line + 1,
+                StartChar = info.Span.StartLinePosition.Character,
+                End = info.Span.EndLinePosition.Line + 1,
+                EndChar = info.Span.EndLinePosition.Character
+            };
+
+            if (hasAlias)
+                message.StepNameResponse.StepName.AddRange(info.Aliases);
+            else
+                message.StepNameResponse.StepName.Add(stepText);
+
+            return message;
         }
     }
 }

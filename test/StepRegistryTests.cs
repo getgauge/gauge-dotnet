@@ -160,5 +160,23 @@ namespace Gauge.Dotnet.UnitTests
             Assert.False(stepRegistry.HasAlias("Foo"));
             Assert.False(stepRegistry.HasAlias("Bar"));
         }
+
+        [Test]
+        public void ShouldRemoveStepsDefinedInAGivenFile()
+        {
+            var methods = new[]
+            {
+                new KeyValuePair<string, GaugeMethod>("Foo",
+                    new GaugeMethod {Name = "Foo", StepText = "Foo", FileName = "Foo.cs"}),
+                new KeyValuePair<string, GaugeMethod>("Bar",
+                    new GaugeMethod {Name = "Bar", StepText = "Bar", FileName = "Bar.cs"})
+            };
+            var stepRegistry = new StepRegistry();
+            foreach (var pair in methods)
+                stepRegistry.AddStep(pair.Key, pair.Value);
+
+            stepRegistry.RemoveSteps("Foo.cs");
+            Assert.False(stepRegistry.ContainsStep("Foo"));
+        }
     }
 }

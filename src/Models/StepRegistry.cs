@@ -18,6 +18,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Gauge.Messages;
+using static Gauge.Messages.StepPositionsResponse.Types;
 
 namespace Gauge.Dotnet.Models
 {
@@ -41,6 +43,46 @@ namespace Gauge.Dotnet.Models
             if (!_registry.ContainsKey(stepValue)) _registry.Add(stepValue, new List<GaugeMethod>());
             _registry.GetValueOrDefault(stepValue).Add(method);
         }
+
+        public void RemoveSteps(string filepath)
+        {
+            var newRegistry = new Dictionary<string, List<GaugeMethod>>();
+            foreach (var (key, gaugeMethods) in _registry)
+            {
+                var methods = gaugeMethods.Where(method => !filepath.Equals(method.FileName)).ToList();
+                if (methods.Count > 0) newRegistry[key] = methods;
+            }
+
+            _registry = newRegistry;
+        }
+
+        public IEnumerable<StepPosition> GetStepPositions(string filePath)
+        {
+            var positions = new List<StepPosition>();
+            foreach (var (stepValue, gaugeMethods) in _registry)
+            {
+                foreach (var m in gaugeMethods)
+                {
+                    if (m.FileName.Equals(filePath))
+                    {
+                        var p = new StepPosition
+                        {
+                            StepValue = stepValue,
+                            Span = new Span
+                            {
+                                Start = m.Span.StartLinePosition.Line + 1,
+                                StartChar = m.Span.StartLinePosition.Character,
+                                End = m.Span.EndLinePosition.Line + 1,
+                                EndChar = m.Span.EndLinePosition.Character
+                            }
+                        };
+                        positions.Add(p);
+                    }
+                }
+            }
+            return positions;
+        }
+
 
         public bool ContainsStep(string parsedStepText)
         {

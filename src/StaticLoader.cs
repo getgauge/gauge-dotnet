@@ -27,7 +27,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Gauge.Dotnet
 {
-    public sealed class StaticLoader
+    public sealed class StaticLoader : IStaticLoader
     {
         private readonly IStepRegistry _stepRegistry;
 
@@ -42,18 +42,29 @@ namespace Gauge.Dotnet
             return _stepRegistry;
         }
 
+
+        public void LoadStepsFromText(string content, string filepath)
+        {
+            var steps = GetStepsFrom(content);
+            AddStepsToRegsitry(filepath, steps);
+        }
+
+        public void ReloadSteps(string content, string filepath)
+        {
+            _stepRegistry.RemoveSteps(filepath);
+            LoadStepsFromText(content, filepath);
+        }
+
+        public void RemoveSteps(string file)
+        {
+            _stepRegistry.RemoveSteps(file);
+        }
+
         internal void LoadImplementations()
         {
             var classFiles = Directory.EnumerateFiles(Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT"), "*.cs",
                 SearchOption.AllDirectories);
             foreach (var f in classFiles) LoadStepsFromText(File.ReadAllText(f), f);
-        }
-
-
-        public void LoadStepsFromText(string content, string fileName)
-        {
-            var steps = GetStepsFrom(content, fileName);
-            AddStepsToRegsitry(fileName, steps);
         }
 
         private void AddStepsToRegsitry(string fileName, IEnumerable<MethodDeclarationSyntax> stepMethods)
@@ -86,7 +97,7 @@ namespace Gauge.Dotnet
             }
         }
 
-        private static IEnumerable<MethodDeclarationSyntax> GetStepsFrom(string content, string f)
+        private static IEnumerable<MethodDeclarationSyntax> GetStepsFrom(string content)
         {
             var tree = CSharpSyntaxTree.ParseText(content);
             var root = tree.GetRoot();

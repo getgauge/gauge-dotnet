@@ -30,14 +30,16 @@ namespace Gauge.Dotnet.UnitTests
         [SetUp]
         public void Setup()
         {
+            var mockLoader = new Mock<IStaticLoader>();
             var mockClassInstanceManager = new Mock<object>().Object;
             _mockStepRegistry = new Mock<IStepRegistry>();
+            mockLoader.Setup(l => l.GetStepRegistry()).Returns(_mockStepRegistry.Object);
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
             var mockActivatorWrapper = new Mock<IActivatorWrapper>();
             var mockTableFormatter = new Mock<ITableFormatter>();
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            _messageProcessorFactory = new MessageProcessorFactory(_mockStepRegistry.Object);
+            _messageProcessorFactory = new MessageProcessorFactory(mockLoader.Object);
             _messageProcessorFactory.InitializeExecutionMessageHandlers(mockReflectionWrapper.Object,
                 mockAssemblyLoader.Object, mockActivatorWrapper.Object, mockTableFormatter.Object,
                 mockClassInstanceManager);
@@ -71,6 +73,7 @@ namespace Gauge.Dotnet.UnitTests
                 response.StepValidateResponse.ErrorType);
             Assert.AreEqual("Multiple step implementations found for : step_text_1",
                 response.StepValidateResponse.ErrorMessage);
+            Assert.IsEmpty(response.StepValidateResponse.Suggestion);
         }
 
         [Test]
@@ -80,7 +83,12 @@ namespace Gauge.Dotnet.UnitTests
             var request = new StepValidateRequest
             {
                 StepText = "step_text_1",
-                NumberOfParameters = 0
+                NumberOfParameters = 0,
+                StepValue = new ProtoStepValue()
+                {
+                    ParameterizedStepValue = "step_text_1",
+                    StepValue = "step_text_1",
+                }
             };
             var message = new Message
             {
@@ -96,6 +104,7 @@ namespace Gauge.Dotnet.UnitTests
                 response.StepValidateResponse.ErrorType);
             StringAssert.Contains("No implementation found for : step_text_1.",
                 response.StepValidateResponse.ErrorMessage);
+            StringAssert.Contains("[Step(\"step_text_1\")]", response.StepValidateResponse.Suggestion);
         }
 
 

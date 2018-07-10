@@ -64,7 +64,8 @@ namespace Gauge.Dotnet.UnitTests
             var mockStepExecuter = new Mock<IStepExecutor>();
             var reflectionWrapper = mockReflectionWrapper.Object;
             var assemblyLoader = mockAssemblyLoader.Object;
-            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, mockActivationWrapper.Object,
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
+                mockActivationWrapper.Object,
                 mockClassInstanceManager, mockHookExecuter.Object, mockStepExecuter.Object);
 
 
@@ -93,7 +94,8 @@ namespace Gauge.Dotnet.UnitTests
             var mockStepExecuter = new Mock<IStepExecutor>();
             var reflectionWrapper = mockReflectionWrapper.Object;
             var assemblyLoader = mockAssemblyLoader.Object;
-            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, mockActivationWrapper.Object,
+            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
+                mockActivationWrapper.Object,
                 mockClassInstanceManager,
                 mockHookExecuter.Object, mockStepExecuter.Object);
             mockHookExecuter.Setup(executor =>
@@ -210,7 +212,7 @@ namespace Gauge.Dotnet.UnitTests
             mockStepExecutor.VerifyAll();
 
             Assert.True(result.Failed);
-            Assert.AreEqual(expectedScreenshot, result.ScreenShot);
+            Assert.AreEqual(expectedScreenshot, result.ScreenShot[0]);
         }
     }
 }

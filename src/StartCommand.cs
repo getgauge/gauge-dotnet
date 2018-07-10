@@ -41,6 +41,12 @@ namespace Gauge.Dotnet
         [DebuggerHidden]
         public void Execute()
         {
+            if (!string.IsNullOrEmpty(Utils.TryReadEnvValue("GAUGE_LSP_GRPC")))
+            {
+                _gaugeListener.Invoke().StartGrpcServer();
+                return;
+            }
+
             if (!TryBuild())
                 return;
             try
