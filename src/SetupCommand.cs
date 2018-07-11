@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.IO;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Extensions;
@@ -42,7 +43,7 @@ namespace Gauge.Dotnet
 
 </Project>
 ";
-            string properties = GenerateDefaultProperties(projName);
+            var properties = GenerateDefaultProperties(projName);
 
             var implementation = $@"using System;
 using System.Collections.Generic;
@@ -115,7 +116,7 @@ namespace {projName}
                 $"GAUGE_CSHARP_PROJECT_FILE={projName}.csproj",
                 "GAUGE_CSHARP_PROJECT_CONFIG=release"
             };
-            return string.Join(System.Environment.NewLine, properties);
+            return string.Join(Environment.NewLine, properties);
         }
     }
 }

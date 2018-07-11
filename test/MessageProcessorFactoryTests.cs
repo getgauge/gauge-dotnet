@@ -48,6 +48,14 @@ namespace Gauge.Dotnet.UnitTests
         private MessageProcessorFactory _messageProcessorFactory;
 
         [Test]
+        public void ShouldGetProcessorForCacheFileRequest()
+        {
+            var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.CacheFileRequest);
+
+            Assert.AreEqual(messageProcessor.GetType(), typeof(CacheFileProcessor));
+        }
+
+        [Test]
         public void ShouldGetProcessorForExecuteStep()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.ExecuteStep);
@@ -148,6 +156,14 @@ namespace Gauge.Dotnet.UnitTests
         }
 
         [Test]
+        public void ShouldGetProcessorForStepNameRequest()
+        {
+            var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StepNameRequest);
+
+            Assert.AreEqual(messageProcessor.GetType(), typeof(StepNameProcessor));
+        }
+
+        [Test]
         public void ShouldGetProcessorForStepNamesRequest()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StepNamesRequest);
@@ -164,35 +180,20 @@ namespace Gauge.Dotnet.UnitTests
         }
 
         [Test]
+        public void ShouldGetProcessorForStubImplementationRequest()
+        {
+            var messageProcessor =
+                _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StubImplementationCodeRequest);
+
+            Assert.AreEqual(messageProcessor.GetType(), typeof(StubImplementationCodeProcessor));
+        }
+
+        [Test]
         public void ShouldGetProcessorForSuiteDataStoreInitRequest()
         {
             var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.SuiteDataStoreInit);
 
             Assert.AreEqual(messageProcessor.GetType(), typeof(SuiteDataStoreInitProcessor));
-        }
-
-        [Test]
-        public void ShouldGetProcessorForStepNameRequest()
-        {
-            var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StepNameRequest);
-
-            Assert.AreEqual(messageProcessor.GetType(), typeof(StepNameProcessor));
-        }
-
-        [Test]
-        public void ShouldGetProcessorForCacheFileRequest ()
-        {
-            var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.CacheFileRequest);
-
-            Assert.AreEqual(messageProcessor.GetType(), typeof(CacheFileProcessor));
-        }
-
-        [Test]
-        public void ShouldGetProcessorForStubImplementationRequest()
-        {
-            var messageProcessor = _messageProcessorFactory.GetProcessor(Message.Types.MessageType.StubImplementationCodeRequest);
-
-            Assert.AreEqual(messageProcessor.GetType(), typeof(StubImplementationCodeProcessor));
         }
     }
 }

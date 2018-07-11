@@ -16,6 +16,7 @@
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.IO;
 using System.Linq;
 using Gauge.Dotnet.Models;
 using Gauge.Messages;
@@ -43,10 +44,17 @@ namespace Gauge.Dotnet.Processors
             try
             {
                 var gaugeMethod = GetGaugeMethod(request.RefactorRequest.OldStepValue);
-                var changedFile = RefactorHelper.Refactor(gaugeMethod, parameterPositions, newStep.Parameters.ToList(),
+                if (gaugeMethod.IsAlias) throw new Exception("Steps with aliases can not be refactored.");
+
+                var fileChanges = RefactorHelper.Refactor(gaugeMethod, parameterPositions, newStep.Parameters.ToList(),
                     newStepValue);
+
+                if (request.RefactorRequest.SaveChanges)
+                    File.WriteAllText(fileChanges.FileName, fileChanges.FileContent);
+
                 response.Success = true;
-                response.FilesChanged.Add(changedFile);
+                response.FilesChanged.Add(gaugeMethod.FileName);
+                response.FileChanges.Add(fileChanges);
             }
             catch (AggregateException ex)
             {

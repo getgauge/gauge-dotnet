@@ -84,10 +84,10 @@ namespace Gauge.Dotnet.UnitTests
             {
                 StepText = "step_text_1",
                 NumberOfParameters = 0,
-                StepValue = new ProtoStepValue()
+                StepValue = new ProtoStepValue
                 {
                     ParameterizedStepValue = "step_text_1",
-                    StepValue = "step_text_1",
+                    StepValue = "step_text_1"
                 }
             };
             var message = new Message

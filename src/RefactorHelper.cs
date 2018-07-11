@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
+using Gauge.Messages;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -29,11 +30,9 @@ namespace Gauge.Dotnet
 {
     public static class RefactorHelper
     {
-        public static string Refactor(GaugeMethod method, IList<Tuple<int, int>> parameterPositions,
+        public static FileChanges Refactor(GaugeMethod method, IList<Tuple<int, int>> parameterPositions,
             IList<string> parameters, string newStepValue)
         {
-            var changedFile = "";
-
             var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(method.FileName));
             var root = tree.GetRoot();
             var stepMethods = from node in root.DescendantNodes().OfType<MethodDeclarationSyntax>()
@@ -45,21 +44,42 @@ namespace Gauge.Dotnet
                           string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
                 select node;
 
-            //TODO: check for aliases and error out
-            foreach (var methodDeclarationSyntax in stepMethods)
+            var stepMethod = stepMethods.First();
+            var stepSpan = stepMethod.AttributeLists.WithStepAttribute().Attributes.GetStepAttribute()
+                .ArgumentList.Arguments.First().GetLocation().GetLineSpan();
+            var paramsSpan = stepMethod.ParameterList.GetLocation().GetLineSpan();
+            var updatedAttribute = ReplaceAttribute(stepMethod, newStepValue);
+            var updatedParameters = ReplaceParameters(stepMethod, parameterPositions, parameters);
+            var declarationSyntax = stepMethod
+                .WithAttributeLists(updatedAttribute)
+                .WithParameterList(updatedParameters);
+            var replaceNode = root.ReplaceNode(stepMethod, declarationSyntax);
+
+            return new FileChanges
             {
-                var updatedAttribute = ReplaceAttribute(methodDeclarationSyntax, newStepValue);
-                var updatedParameters = ReplaceParameters(methodDeclarationSyntax, parameterPositions, parameters);
-                var declarationSyntax = methodDeclarationSyntax
-                    .WithAttributeLists(updatedAttribute)
-                    .WithParameterList(updatedParameters);
-                var replaceNode = root.ReplaceNode(methodDeclarationSyntax, declarationSyntax);
+                FileName = method.FileName,
+                FileContent = replaceNode.ToFullString(),
+                Diffs =
+                {
+                    CreateDiff(stepSpan, $"\"{newStepValue}\""),
+                    CreateDiff(paramsSpan, updatedParameters.ToFullString().Trim())
+                }
+            };
+        }
 
-                File.WriteAllText(method.FileName, replaceNode.ToFullString());
-                changedFile = method.FileName;
-            }
-
-            return changedFile;
+        private static TextDiff CreateDiff(FileLinePositionSpan span, string text)
+        {
+            return new TextDiff
+            {
+                Content = text,
+                Span = new Span
+                {
+                    Start = span.StartLinePosition.Line + 1,
+                    StartChar = span.StartLinePosition.Character,
+                    End = span.EndLinePosition.Line + 1,
+                    EndChar = span.EndLinePosition.Character
+                }
+            };
         }
 
         private static ParameterListSyntax ReplaceParameters(MethodDeclarationSyntax methodDeclarationSyntax,
