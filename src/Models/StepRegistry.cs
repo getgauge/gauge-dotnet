@@ -98,7 +98,7 @@ namespace Gauge.Dotnet.Models
 
         public bool HasAlias(string stepValue)
         {
-            return _registry.ContainsKey(stepValue) && _registry.GetValueOrDefault(stepValue).FirstOrDefault().IsAlias;
+            return _registry.ContainsKey(stepValue) && _registry.GetValueOrDefault(stepValue).FirstOrDefault().HasAlias;
         }
 
         public string GetStepText(string stepValue)

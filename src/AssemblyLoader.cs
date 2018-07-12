@@ -86,13 +86,13 @@ namespace Gauge.Dotnet
                 foreach (var stepText in stepTexts)
                 {
                     var stepValue = GetStepValue(stepText);
-                    var isAlias = stepTexts.Count() > 1;
+                    var hasAlias = stepTexts.Count() > 1;
                     var stepMethod = new GaugeMethod
                     {
                         Name = info.FullyQuallifiedName(),
                         ParameterCount = info.GetParameters().Length,
                         StepText = stepText,
-                        IsAlias = isAlias,
+                        HasAlias = hasAlias,
                         Aliases = stepTexts,
                         MethodInfo = info,
                         ContinueOnFailure = info.IsRecoverableStep(this),

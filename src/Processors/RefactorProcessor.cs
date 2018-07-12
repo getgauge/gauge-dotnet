@@ -44,7 +44,7 @@ namespace Gauge.Dotnet.Processors
             try
             {
                 var gaugeMethod = GetGaugeMethod(request.RefactorRequest.OldStepValue);
-                if (gaugeMethod.IsAlias) throw new Exception("Steps with aliases can not be refactored.");
+                if (gaugeMethod.HasAlias) throw new Exception("Steps with aliases can not be refactored.");
 
                 var fileChanges = RefactorHelper.Refactor(gaugeMethod, parameterPositions, newStep.Parameters.ToList(),
                     newStepValue);

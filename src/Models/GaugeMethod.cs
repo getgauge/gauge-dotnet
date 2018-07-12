@@ -34,7 +34,7 @@ namespace Gauge.Dotnet.Models
         public string FileName { get; set; }
         public string ClassName { get; set; }
         public FileLinePositionSpan Span { get; internal set; }
-        public bool IsAlias { get; set; }
+        public bool HasAlias { get; set; }
         public IEnumerable<string> Aliases { get; set; }
     }
 }

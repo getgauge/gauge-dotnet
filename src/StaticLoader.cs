@@ -85,7 +85,7 @@ namespace Gauge.Dotnet
                         Name = stepMethod.Identifier.ValueText,
                         ParameterCount = stepMethod.ParameterList.Parameters.Count,
                         StepText = stepText,
-                        IsAlias = isAlias,
+                        HasAlias = hasAlias,
                         Aliases = stepTexts,
                         StepValue = stepValue,
                         Span = stepMethod.GetLocation().GetLineSpan(),

@@ -52,7 +52,7 @@ namespace Gauge.Dotnet.UnitTests
                         StepValue = "foo {}",
                         Name = "Foo",
                         StepText = "foo <something>",
-                        IsAlias = true
+                        HasAlias = true
                     }),
                 new KeyValuePair<string, GaugeMethod>("bar {}",
                     new GaugeMethod
@@ -60,7 +60,7 @@ namespace Gauge.Dotnet.UnitTests
                         StepValue = "bar {}",
                         Name = "Foo",
                         StepText = "boo <something>",
-                        IsAlias = true
+                        HasAlias = true
                     })
             };
             var stepRegistry = new StepRegistry();

@@ -61,7 +61,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 var gaugeMethod = new GaugeMethod
                 {
                     FileName = "foo",
-                    IsAlias = true,
+                    HasAlias = true,
                     Aliases = new List<string> {"step2", "step3"}
                 };
                 mockStepRegistry.Setup(r => r.MethodFor(parsedStepText)).Returns(gaugeMethod);
