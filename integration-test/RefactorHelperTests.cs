@@ -51,7 +51,7 @@ namespace Gauge.Dotnet.IntegrationTests
 
         private readonly string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
 
-        private void AssertStepAttributeWithTextExists(FileChanges result, string methodName, string text)
+        private void AssertStepAttributeWithTextExists(RefactoringChange result, string methodName, string text)
         {
             var name = methodName.Split('.').Last().Split('-').First();
             var tree =
@@ -71,7 +71,7 @@ namespace Gauge.Dotnet.IntegrationTests
             Assert.True(stepTexts.Contains(text));
         }
 
-        private void AssertParametersExist(FileChanges result, string methodName, IReadOnlyList<string> parameters)
+        private void AssertParametersExist(RefactoringChange result, string methodName, IReadOnlyList<string> parameters)
         {
             var name = methodName.Split('.').Last().Split('-').First();
             var tree =
@@ -104,7 +104,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions,
                 new List<string> {"what", "who", "where"},
                 newStepValue);
-
             AssertStepAttributeWithTextExists(changes, gaugeMethod.Name, newStepValue);
             AssertParametersExist(changes, gaugeMethod.Name, new[] {"what", "who", "where"});
         }

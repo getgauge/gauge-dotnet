@@ -21,7 +21,6 @@ using System.IO;
 using System.Linq;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
-using Gauge.Messages;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -30,7 +29,7 @@ namespace Gauge.Dotnet
 {
     public static class RefactorHelper
     {
-        public static FileChanges Refactor(GaugeMethod method, IList<Tuple<int, int>> parameterPositions,
+        public static RefactoringChange Refactor(GaugeMethod method, IList<Tuple<int, int>> parameterPositions,
             IList<string> parameters, string newStepValue)
         {
             var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(method.FileName));
@@ -54,32 +53,24 @@ namespace Gauge.Dotnet
                 .WithAttributeLists(updatedAttribute)
                 .WithParameterList(updatedParameters);
             var replaceNode = root.ReplaceNode(stepMethod, declarationSyntax);
-
-            return new FileChanges
+            var change = new RefactoringChange
             {
                 FileName = method.FileName,
-                FileContent = replaceNode.ToFullString(),
-                Diffs =
-                {
-                    CreateDiff(stepSpan, $"\"{newStepValue}\""),
-                    CreateDiff(paramsSpan, updatedParameters.ToFullString().Trim())
-                }
+                Diffs = new List<Diff>(),
+                FileContent = replaceNode.ToFullString()
             };
+            change.Diffs.Add(CreateDiff(stepSpan, $"\"{newStepValue}\""));
+            change.Diffs.Add(CreateDiff(paramsSpan, updatedParameters.ToFullString().Trim()));
+            return change;
         }
 
-        private static TextDiff CreateDiff(FileLinePositionSpan span, string text)
+        private static Diff CreateDiff(FileLinePositionSpan fileLinePositionSpan, string text)
         {
-            return new TextDiff
-            {
-                Content = text,
-                Span = new Span
-                {
-                    Start = span.StartLinePosition.Line + 1,
-                    StartChar = span.StartLinePosition.Character,
-                    End = span.EndLinePosition.Line + 1,
-                    EndChar = span.EndLinePosition.Character
-                }
-            };
+            var start = new Position(fileLinePositionSpan.StartLinePosition.Line + 1,
+                fileLinePositionSpan.StartLinePosition.Character);
+            var end = new Position(fileLinePositionSpan.EndLinePosition.Line + 1,
+                fileLinePositionSpan.EndLinePosition.Character);
+            return new Diff(text, new Range(start, end));
         }
 
         private static ParameterListSyntax ReplaceParameters(MethodDeclarationSyntax methodDeclarationSyntax,

@@ -75,7 +75,7 @@ namespace Gauge.Dotnet
                 var attributeSyntax = attributeListSyntax.Attributes.GetStepAttribute();
                 var stepTextsSyntax = attributeSyntax.ArgumentList.Arguments.ToList();
                 var stepTexts = stepTextsSyntax.Select(s => s.ToString().Trim('"'));
-                var isAlias = stepTexts.Count() > 1;
+                var hasAlias = stepTexts.Count() > 1;
                 foreach (var stepText in stepTexts)
                 {
                     var stepValue = Regex.Replace(stepText, @"(<.*?>)", @"{}");
