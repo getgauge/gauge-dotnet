@@ -29,11 +29,9 @@ namespace Gauge.Dotnet
 {
     public static class RefactorHelper
     {
-        public static string Refactor(GaugeMethod method, IList<Tuple<int, int>> parameterPositions,
+        public static RefactoringChange Refactor(GaugeMethod method, IList<Tuple<int, int>> parameterPositions,
             IList<string> parameters, string newStepValue)
         {
-            var changedFile = "";
-
             var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(method.FileName));
             var root = tree.GetRoot();
             var stepMethods = from node in root.DescendantNodes().OfType<MethodDeclarationSyntax>()
@@ -45,21 +43,34 @@ namespace Gauge.Dotnet
                           string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
                 select node;
 
-            //TODO: check for aliases and error out
-            foreach (var methodDeclarationSyntax in stepMethods)
+            var stepMethod = stepMethods.First();
+            var stepSpan = stepMethod.AttributeLists.WithStepAttribute().Attributes.GetStepAttribute()
+                .ArgumentList.Arguments.First().GetLocation().GetLineSpan();
+            var paramsSpan = stepMethod.ParameterList.GetLocation().GetLineSpan();
+            var updatedAttribute = ReplaceAttribute(stepMethod, newStepValue);
+            var updatedParameters = ReplaceParameters(stepMethod, parameterPositions, parameters);
+            var declarationSyntax = stepMethod
+                .WithAttributeLists(updatedAttribute)
+                .WithParameterList(updatedParameters);
+            var replaceNode = root.ReplaceNode(stepMethod, declarationSyntax);
+            var change = new RefactoringChange
             {
-                var updatedAttribute = ReplaceAttribute(methodDeclarationSyntax, newStepValue);
-                var updatedParameters = ReplaceParameters(methodDeclarationSyntax, parameterPositions, parameters);
-                var declarationSyntax = methodDeclarationSyntax
-                    .WithAttributeLists(updatedAttribute)
-                    .WithParameterList(updatedParameters);
-                var replaceNode = root.ReplaceNode(methodDeclarationSyntax, declarationSyntax);
+                FileName = method.FileName,
+                Diffs = new List<Diff>(),
+                FileContent = replaceNode.ToFullString()
+            };
+            change.Diffs.Add(CreateDiff(stepSpan, $"\"{newStepValue}\""));
+            change.Diffs.Add(CreateDiff(paramsSpan, updatedParameters.ToFullString().Trim()));
+            return change;
+        }
 
-                File.WriteAllText(method.FileName, replaceNode.ToFullString());
-                changedFile = method.FileName;
-            }
-
-            return changedFile;
+        private static Diff CreateDiff(FileLinePositionSpan fileLinePositionSpan, string text)
+        {
+            var start = new Position(fileLinePositionSpan.StartLinePosition.Line + 1,
+                fileLinePositionSpan.StartLinePosition.Character);
+            var end = new Position(fileLinePositionSpan.EndLinePosition.Line + 1,
+                fileLinePositionSpan.EndLinePosition.Character);
+            return new Diff(text, new Range(start, end));
         }
 
         private static ParameterListSyntax ReplaceParameters(MethodDeclarationSyntax methodDeclarationSyntax,

@@ -1,4 +1,4 @@
-// Copyright 2018 ThoughtWorks, Inc.
+﻿// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-Dotnet.
 //
@@ -15,26 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.CodeAnalysis;
-
 namespace Gauge.Dotnet.Models
 {
-    [Serializable]
-    public class GaugeMethod
+    public class Range
     {
-        public MethodInfo MethodInfo { get; set; }
-        public string Name { get; set; }
-        public int ParameterCount { get; set; }
-        public bool ContinueOnFailure { get; set; }
-        public string StepText { get; set; }
-        public string StepValue { get; set; }
-        public string FileName { get; set; }
-        public string ClassName { get; set; }
-        public FileLinePositionSpan Span { get; internal set; }
-        public bool HasAlias { get; set; }
-        public IEnumerable<string> Aliases { get; set; }
+        public Range(Position start, Position end)
+        {
+            Start = start;
+            End = end;
+        }
+
+        public Position Start { get; internal set; }
+        public Position End { get; internal set; }
     }
 }

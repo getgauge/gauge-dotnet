@@ -60,26 +60,23 @@ namespace Gauge.Dotnet.Models
         {
             var positions = new List<StepPosition>();
             foreach (var (stepValue, gaugeMethods) in _registry)
-            {
-                foreach (var m in gaugeMethods)
+            foreach (var m in gaugeMethods)
+                if (m.FileName.Equals(filePath))
                 {
-                    if (m.FileName.Equals(filePath))
+                    var p = new StepPosition
                     {
-                        var p = new StepPosition
+                        StepValue = stepValue,
+                        Span = new Span
                         {
-                            StepValue = stepValue,
-                            Span = new Span
-                            {
-                                Start = m.Span.StartLinePosition.Line + 1,
-                                StartChar = m.Span.StartLinePosition.Character,
-                                End = m.Span.EndLinePosition.Line + 1,
-                                EndChar = m.Span.EndLinePosition.Character
-                            }
-                        };
-                        positions.Add(p);
-                    }
+                            Start = m.Span.StartLinePosition.Line + 1,
+                            StartChar = m.Span.StartLinePosition.Character,
+                            End = m.Span.EndLinePosition.Line + 1,
+                            EndChar = m.Span.EndLinePosition.Character
+                        }
+                    };
+                    positions.Add(p);
                 }
-            }
+
             return positions;
         }
 
@@ -101,7 +98,7 @@ namespace Gauge.Dotnet.Models
 
         public bool HasAlias(string stepValue)
         {
-            return _registry.ContainsKey(stepValue) && _registry.GetValueOrDefault(stepValue).FirstOrDefault().IsAlias;
+            return _registry.ContainsKey(stepValue) && _registry.GetValueOrDefault(stepValue).FirstOrDefault().HasAlias;
         }
 
         public string GetStepText(string stepValue)

@@ -16,7 +16,6 @@
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Threading.Tasks;
-using Gauge.CSharp.Core;
 using Gauge.Dotnet.Helpers;
 using Gauge.Messages;
 using Grpc.Core;

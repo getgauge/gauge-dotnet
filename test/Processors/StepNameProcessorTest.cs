@@ -17,12 +17,17 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 var mockStepRegistry = new Mock<IStepRegistry>();
                 var request = new Message
                 {
-                    StepNameRequest = new StepNameRequest()
+                    StepNameRequest = new StepNameRequest
+                    {
+                        StepValue = "step1"
+                    }
                 };
+
                 var parsedStepText = request.StepNameRequest.StepValue;
                 const string stepText = "step1";
+                mockStepRegistry.Setup(r => r.ContainsStep(parsedStepText)).Returns(true);
                 mockStepRegistry.Setup(r => r.GetStepText(parsedStepText)).Returns(stepText);
-                var gaugeMethod = new GaugeMethod()
+                var gaugeMethod = new GaugeMethod
                 {
                     FileName = "foo"
                 };
@@ -43,17 +48,21 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 var mockStepRegistry = new Mock<IStepRegistry>();
                 var request = new Message
                 {
-                    StepNameRequest = new StepNameRequest()
+                    StepNameRequest = new StepNameRequest
+                    {
+                        StepValue = "step1"
+                    }
                 };
                 var parsedStepText = request.StepNameRequest.StepValue;
                 const string stepText = "step1";
+                mockStepRegistry.Setup(r => r.ContainsStep(parsedStepText)).Returns(true);
                 mockStepRegistry.Setup(r => r.GetStepText(parsedStepText)).Returns(stepText);
 
-                var gaugeMethod = new GaugeMethod()
+                var gaugeMethod = new GaugeMethod
                 {
                     FileName = "foo",
-                    IsAlias = true,
-                    Aliases = new List<string>() {"step2", "step3"},
+                    HasAlias = true,
+                    Aliases = new List<string> {"step2", "step3"}
                 };
                 mockStepRegistry.Setup(r => r.MethodFor(parsedStepText)).Returns(gaugeMethod);
                 mockStepRegistry.Setup(r => r.HasAlias(stepText)).Returns(true);

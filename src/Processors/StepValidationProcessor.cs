@@ -37,7 +37,7 @@ namespace Gauge.Dotnet.Processors
             var stepToValidate = request.StepValidateRequest.StepText;
             var isValid = true;
             var errorMessage = "";
-            string suggestion = "";
+            var suggestion = "";
             var errorType = StepValidateResponse.Types.ErrorType.StepImplementationNotFound;
             if (!_stepRegistry.ContainsStep(stepToValidate))
             {
