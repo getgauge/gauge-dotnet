@@ -44,6 +44,7 @@ namespace Gauge.Dotnet.Processors
             if (debuggingEnv != null && debuggingEnv.ToLower().Equals("true"))
             {
                 // if the runner is launched in DEBUG mode, let the debugger attach.
+                System.Console.WriteLine("Runner Ready for Debugging at Process ID " + System.Diagnostics.Process.GetCurrentProcess().Id);
                 var j = 0;
                 while (!Debugger.IsAttached)
                 {

@@ -33,6 +33,12 @@ namespace Gauge.Dotnet.Wrappers
         {
             using (var stream = new FileStream(location, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
+                var symbolFile = Path.ChangeExtension(location, "pdb");
+                if (File.Exists(symbolFile))
+                {
+                    var symbolStream = new FileStream(symbolFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    return AssemblyLoadContext.Default.LoadFromStream(stream, symbolStream);
+                }
                 return AssemblyLoadContext.Default.LoadFromStream(stream);
             }
         }
