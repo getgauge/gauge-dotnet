@@ -15,15 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
-
-using System.Collections.Generic;
-
-namespace Gauge.Dotnet
+namespace Gauge.Dotnet.Models
 {
-    public class RefactoringChange
+    public class Range
     {
-        public string FileName { get; internal set; }
-        public string FileContent { get; internal set; }
-        public List<Diff> Diffs { get; set; }
+        public Range(Position start, Position end)
+        {
+            Start = start;
+            End = end;
+        }
+
+        public Position Start { get; internal set; }
+        public Position End { get; internal set; }
     }
 }
