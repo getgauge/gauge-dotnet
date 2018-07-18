@@ -87,7 +87,7 @@ namespace Gauge.Dotnet
 
         public override Task<Empty> KillProcess(KillProcessRequest request, ServerCallContext context)
         {
-            _server.ShutdownAsync().Wait();
+            _server.KillAsync().Wait();
             return Task.FromResult(new Empty());
         }
 
