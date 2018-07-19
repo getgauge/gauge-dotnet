@@ -15,7 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
@@ -36,7 +38,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var mockHookRegistry = new Mock<IHookRegistry>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
+            var mockType = new Mock<Type>().Object;
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
             var mockMethod = new MockMethodBuilder(mockAssemblyLoader)
                 .WithName("Foo")
                 .WithFilteredHook(LibType.BeforeSpec)
@@ -73,6 +76,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
                         It.IsAny<ExecutionContext>()))
                 .Returns(_protoExecutionResult);
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingMessages", It.IsAny<BindingFlags>()))
+                .Returns(new List<string>());
             _executionEndingProcessor = new ExecutionEndingProcessor(_mockMethodExecutor.Object,
                 mockAssemblyLoader.Object, mockReflectionWrapper.Object);
         }
@@ -105,8 +111,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldProcessHooks()
         {
-            _executionEndingProcessor.Process(_request);
+            var result = _executionEndingProcessor.Process(_request);
             _mockMethodExecutor.VerifyAll();
+            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message, _pendingMessages);
         }
 
         [Test]

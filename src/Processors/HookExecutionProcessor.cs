@@ -66,7 +66,11 @@ namespace Gauge.Dotnet.Processors
             var applicableTags = GetApplicableTags(request);
             var mapper = new ExecutionInfoMapper();
             var executionContext = mapper.ExecutionInfoFrom(GetExecutionInfo(request));
-            return ExecutionOrchestrator.ExecuteHooks(HookType, Strategy, applicableTags, executionContext);
+            var protoExecutionResult =
+                ExecutionOrchestrator.ExecuteHooks(HookType, Strategy, applicableTags, executionContext);
+            var allPendingMessages = GetAllPendingMessages().Where(m => m != null);
+            protoExecutionResult.Message.AddRange(allPendingMessages);
+            return protoExecutionResult;
         }
 
         private void ClearCacheForConfiguredLevel()

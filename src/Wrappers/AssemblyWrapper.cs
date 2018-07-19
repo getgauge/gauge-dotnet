@@ -39,6 +39,7 @@ namespace Gauge.Dotnet.Wrappers
                     var symbolStream = new FileStream(symbolFile, FileMode.Open, FileAccess.Read, FileShare.Read);
                     return AssemblyLoadContext.Default.LoadFromStream(stream, symbolStream);
                 }
+
                 return AssemblyLoadContext.Default.LoadFromStream(stream);
             }
         }

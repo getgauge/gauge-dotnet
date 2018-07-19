@@ -35,10 +35,7 @@ namespace Gauge.Dotnet.Processors
 
         protected override ProtoExecutionResult ExecuteHooks(Message request)
         {
-            var protoExecutionResult = base.ExecuteHooks(request);
-            var allPendingMessages = GetAllPendingMessages().Where(m => m != null);
-            protoExecutionResult.Message.AddRange(allPendingMessages);
-            return protoExecutionResult;
+            return base.ExecuteHooks(request);
         }
 
         protected override ExecutionInfo GetExecutionInfo(Message request)
