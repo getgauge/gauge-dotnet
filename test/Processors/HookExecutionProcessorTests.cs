@@ -64,38 +64,6 @@ namespace Gauge.Dotnet.UnitTests.Processors
             };
         }
 
-        //[BeforeScenario("Foo")]
-        //public void Foo()
-        //{
-        //}
-
-        //[BeforeScenario("Bar", "Baz")]
-        //public void Bar()
-        //{
-        //}
-
-        //[BeforeScenario("Foo", "Baz")]
-        //[TagAggregationBehaviour(TagAggregation.Or)]
-        //public void Baz()
-        //{
-        //}
-
-        //[BeforeScenario]
-        //public void Blah()
-        //{
-        //}
-
-
-        /*
-         * untagged hooks are executed for all.
-         * Tags     | Methods
-         * Foo      | Foo, Baz
-         * Bar      | NONE
-         * Baz      | Baz
-         * Bar, Baz | Bar, Baz
-         * Foo, Baz | Baz
-         */
-
         private IList<IHookMethod> _hookMethods;
         private MethodInfo mockFooMethod;
         private MethodInfo mockBarMethod;

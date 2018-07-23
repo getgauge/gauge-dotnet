@@ -56,42 +56,6 @@ namespace Gauge.Dotnet.UnitTests.Processors
             };
         }
 
-        //[AfterScenario("Foo")]
-        //public void Foo()
-        //{
-        //}
-
-        //[AfterScenario("Bar", "Baz")]
-        //public void Bar()
-        //{
-        //}
-
-        //[AfterScenario("Foo", "Baz")]
-        //[TagAggregationBehaviour(TagAggregation.Or)]
-        //public void Baz()
-        //{
-        //}
-
-        //[AfterScenario]
-        //public void Blah()
-        //{
-        //}
-
-        //[AfterScenario]
-        //public void Zed()
-        //{
-        //}
-
-        /*
-         * untagged hooks are executed for all.
-         * Tags     | Methods
-         * Foo      | Foo, Baz
-         * Bar      | NONE
-         * Baz      | Baz
-         * Bar, Baz | Bar, Baz
-         * Foo, Baz | Baz
-         * After hooks should execute tagged hooks prior to untagged
-         */
         private HashSet<IHookMethod> _hookMethods;
 
         [Test]
