@@ -15,7 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
@@ -36,6 +38,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var mockHookRegistry = new Mock<IHookRegistry>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+            var mockType = new Mock<Type>().Object;
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
             var mockMethod = new MockMethodBuilder(mockAssemblyLoader)
                 .WithName("Foo")
                 .WithFilteredHook(LibType.BeforeSpec)
@@ -64,6 +68,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
                     It.IsAny<ExecutionContext>()))
                 .Returns(_protoExecutionResult);
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingMessages", It.IsAny<BindingFlags>()))
+                .Returns(_pendingMessages);
             _executionStartingProcessor = new ExecutionStartingProcessor(_mockMethodExecutor.Object,
                 mockAssemblyLoader.Object, mockReflectionWrapper.Object);
         }
@@ -72,6 +79,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
         private Message _request;
         private Mock<IExecutionOrchestrator> _mockMethodExecutor;
         private ProtoExecutionResult _protoExecutionResult;
+
+        private readonly IEnumerable<string> _pendingMessages = new List<string> {"Foo", "Bar"};
+
 
         public void Foo()
         {
@@ -124,8 +134,10 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldProcessHooks()
         {
-            _executionStartingProcessor.Process(_request);
+            var result = _executionStartingProcessor.Process(_request);
+
             _mockMethodExecutor.VerifyAll();
+            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message, _pendingMessages);
         }
     }
 }

@@ -40,7 +40,6 @@ namespace Gauge.Dotnet.Processors
 
         protected override ProtoExecutionResult ExecuteHooks(Message request)
         {
-            ClearAllPendingMessages();
             return base.ExecuteHooks(request);
         }
 

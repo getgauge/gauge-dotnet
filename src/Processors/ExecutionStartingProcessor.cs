@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Diagnostics;
 using System.Threading;
 using Gauge.CSharp.Core;
@@ -44,7 +45,8 @@ namespace Gauge.Dotnet.Processors
             if (debuggingEnv != null && debuggingEnv.ToLower().Equals("true"))
             {
                 // if the runner is launched in DEBUG mode, let the debugger attach.
-                System.Console.WriteLine("Runner Ready for Debugging at Process ID " + System.Diagnostics.Process.GetCurrentProcess().Id);
+                Console.WriteLine("Runner Ready for Debugging at Process ID " +
+                                  System.Diagnostics.Process.GetCurrentProcess().Id);
                 var j = 0;
                 while (!Debugger.IsAttached)
                 {

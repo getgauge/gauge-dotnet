@@ -15,9 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Processors;
+using Gauge.Dotnet.Strategy;
+using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
+using Moq;
 using NUnit.Framework;
 
 namespace Gauge.Dotnet.UnitTests.Processors
@@ -109,6 +116,50 @@ namespace Gauge.Dotnet.UnitTests.Processors
             Assert.IsNotEmpty(tags);
             Assert.AreEqual(1, tags.Count);
             Assert.Contains("foo", tags);
+        }
+
+        [Test]
+        public void ShouldExecutreBeforeScenarioHook()
+        {
+            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+            var mockType = new Mock<Type>().Object;
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
+            var scenarioExecutionStartingRequest = new ScenarioExecutionStartingRequest
+            {
+                CurrentExecutionInfo = new ExecutionInfo
+                {
+                    CurrentSpec = new SpecInfo(),
+                    CurrentScenario = new ScenarioInfo()
+                }
+            };
+            var request = new Message
+            {
+                MessageId = 20,
+                MessageType = Message.Types.MessageType.SpecExecutionStarting,
+                ScenarioExecutionStartingRequest = scenarioExecutionStartingRequest
+            };
+
+            var mockMethodExecutor = new Mock<IExecutionOrchestrator>();
+            var protoExecutionResult = new ProtoExecutionResult
+            {
+                ExecutionTime = 0,
+                Failed = false
+            };
+            IEnumerable<string> pendingMessages = new List<string> {"one", "two"};
+            mockMethodExecutor.Setup(x =>
+                    x.ExecuteHooks("BeforeScenario", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
+                        It.IsAny<ExecutionContext>()))
+                .Returns(protoExecutionResult);
+            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingMessages", It.IsAny<BindingFlags>()))
+                .Returns(pendingMessages);
+            var processor = new ScenarioExecutionStartingProcessor(mockMethodExecutor.Object,
+                mockAssemblyLoader.Object, mockReflectionWrapper.Object);
+
+            var result = processor.Process(request);
+            Assert.False(result.ExecutionStatusResponse.ExecutionResult.Failed);
+            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message.ToList(), pendingMessages);
         }
     }
 }

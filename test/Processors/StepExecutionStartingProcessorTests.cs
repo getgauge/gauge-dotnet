@@ -67,9 +67,10 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockMessageCollectorType = new Mock<Type>();
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            mockReflectionWrapper.Setup(x => x.InvokeMethod(mockMessageCollectorType.Object, null, "Clear",
+            mockReflectionWrapper.Setup(x => x.InvokeMethod(mockMessageCollectorType.Object, null,
+                    "GetAllPendingMessages",
                     BindingFlags.Static | BindingFlags.Public))
-                .Verifiable();
+                .Returns(new List<string>()).Verifiable();
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector))
                 .Returns(mockMessageCollectorType.Object);
 
