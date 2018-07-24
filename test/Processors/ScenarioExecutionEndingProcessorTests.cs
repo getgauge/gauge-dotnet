@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
@@ -124,6 +125,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockType = new Mock<Type>().Object;
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotCollector)).Returns(mockType);
             var scenarioExecutionStartingRequest = new ScenarioExecutionStartingRequest
             {
                 CurrentExecutionInfo = new ExecutionInfo
@@ -154,12 +156,18 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockReflectionWrapper.Setup(x =>
                     x.InvokeMethod(mockType, null, "GetAllPendingMessages", It.IsAny<BindingFlags>()))
                 .Returns(pendingMessages);
+            var pendingScreenshot = new List<byte[]> {Encoding.ASCII.GetBytes("Screenshot")};
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingScreenshots", It.IsAny<BindingFlags>()))
+                .Returns(pendingScreenshot);
+
             var processor = new ScenarioExecutionStartingProcessor(mockMethodExecutor.Object,
                 mockAssemblyLoader.Object, mockReflectionWrapper.Object);
 
             var result = processor.Process(request);
             Assert.False(result.ExecutionStatusResponse.ExecutionResult.Failed);
             Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message.ToList(), pendingMessages);
+            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.ScreenShot.ToList(), pendingScreenshot);
         }
     }
 }

@@ -23,6 +23,7 @@ using Gauge.CSharp.Core;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
+using Google.Protobuf;
 
 namespace Gauge.Dotnet.Processors
 {
@@ -69,10 +70,13 @@ namespace Gauge.Dotnet.Processors
             var protoExecutionResult =
                 ExecutionOrchestrator.ExecuteHooks(HookType, Strategy, applicableTags, executionContext);
             var allPendingMessages = GetAllPendingMessages().Where(m => m != null);
+            var allPendingScreenShots = GetAllPendingScreenshots().Select(ByteString.CopyFrom);
             protoExecutionResult.Message.AddRange(allPendingMessages);
+            protoExecutionResult.ScreenShot.AddRange(allPendingScreenShots);
             return protoExecutionResult;
         }
 
+        
         private void ClearCacheForConfiguredLevel()
         {
             var flag = Utils.TryReadEnvValue(ClearStateFlag);
@@ -92,11 +96,11 @@ namespace Gauge.Dotnet.Processors
                 BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>;
         }
 
-        public virtual void ClearAllPendingMessages()
+        private IEnumerable<byte[]> GetAllPendingScreenshots()
         {
-            var messageCollectorType = _assemblyLoader.GetLibType(LibType.MessageCollector);
-            _reflectionWrapper.InvokeMethod(messageCollectorType, null, "Clear",
-                BindingFlags.Static | BindingFlags.Public);
+            var messageCollectorType = _assemblyLoader.GetLibType(LibType.ScreenshotCollector);
+            return _reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingScreenshots",
+                BindingFlags.Static | BindingFlags.Public) as IEnumerable<byte[]>;
         }
     }
 }

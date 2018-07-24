@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
@@ -34,6 +35,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
     internal class StepExecutionEndingProcessorTests
     {
         private readonly IEnumerable<string> _pendingMessages = new List<string> {"Foo", "Bar"};
+        private readonly IEnumerable<byte[]> _pendingScreenshots = new List<byte[]>{Encoding.ASCII.GetBytes("SCREENSHOT")};
+
         private Mock<IExecutionOrchestrator> _mockMethodExecutor;
         private ProtoExecutionResult _protoExecutionResult;
         private Message _request;
@@ -45,8 +48,12 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var mockHookRegistry = new Mock<IHookRegistry>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockMessageCollectorType = new Mock<Type>();
+            var mockScreenshtCollectorType = new Mock<Type>();
+
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector))
                 .Returns(mockMessageCollectorType.Object);
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotCollector))
+                .Returns(mockScreenshtCollectorType.Object);
             var mockMethod = new MockMethodBuilder(mockAssemblyLoader)
                 .WithName("Foo")
                 .WithFilteredHook(LibType.BeforeSpec)
@@ -82,9 +89,17 @@ namespace Gauge.Dotnet.UnitTests.Processors
                         It.IsAny<ExecutionContext>()))
                 .Returns(_protoExecutionResult);
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
+
+            var pendindScreenshots = new List<byte[]>() { Encoding.ASCII.GetBytes("screenshot") };
+
             mockReflectionWrapper.Setup(x => x.InvokeMethod(mockMessageCollectorType.Object, null,
-                    "GetAllPendingMessages", BindingFlags.Static | BindingFlags.Public))
-                .Returns(_pendingMessages);
+                    "GetAllPendingMessages",
+                    BindingFlags.Static | BindingFlags.Public))
+                .Returns(_pendingMessages).Verifiable();
+            mockReflectionWrapper.Setup(x => x.InvokeMethod(mockScreenshtCollectorType.Object, null,
+                    "GetAllPendingScreenshots",
+                    BindingFlags.Static | BindingFlags.Public))
+                .Returns(pendindScreenshots).Verifiable();
             _stepExecutionEndingProcessor = new StepExecutionEndingProcessor(_mockMethodExecutor.Object,
                 mockAssemblyLoader.Object, mockReflectionWrapper.Object);
         }
@@ -103,6 +118,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
             Assert.True(response.ExecutionStatusResponse != null);
             Assert.True(response.ExecutionStatusResponse.ExecutionResult != null);
             Assert.AreEqual(2, response.ExecutionStatusResponse.ExecutionResult.Message.Count);
+            Assert.AreEqual(1, response.ExecutionStatusResponse.ExecutionResult.ScreenShot.Count);
+
             foreach (var pendingMessage in _pendingMessages)
                 Assert.Contains(pendingMessage, response.ExecutionStatusResponse.ExecutionResult.Message.ToList());
         }

@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
@@ -76,6 +77,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockType = new Mock<Type>().Object;
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotCollector)).Returns(mockType);
             var request = new Message
             {
                 MessageId = 20,
@@ -96,6 +98,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 Failed = false
             };
             IEnumerable<string> pendingMessages = new List<string> {"one", "two"};
+            IEnumerable<byte[]> pendingScreenShot = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
             mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("AfterSpec", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
                         It.IsAny<ExecutionContext>()))
@@ -104,12 +107,17 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockReflectionWrapper.Setup(x =>
                     x.InvokeMethod(mockType, null, "GetAllPendingMessages", It.IsAny<BindingFlags>()))
                 .Returns(pendingMessages);
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingScreenshots", It.IsAny<BindingFlags>()))
+                .Returns(pendingScreenShot);
             var processor = new SpecExecutionEndingProcessor(mockMethodExecutor.Object,
                 mockAssemblyLoader.Object, mockReflectionWrapper.Object);
 
             var result = processor.Process(request);
             Assert.False(result.ExecutionStatusResponse.ExecutionResult.Failed);
             Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message.ToList(), pendingMessages);
+            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.ScreenShot.ToList(), pendingScreenShot);
+
         }
     }
 }

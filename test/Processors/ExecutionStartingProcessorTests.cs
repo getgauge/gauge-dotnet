@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
@@ -40,6 +41,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockType = new Mock<Type>().Object;
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotCollector)).Returns(mockType);
             var mockMethod = new MockMethodBuilder(mockAssemblyLoader)
                 .WithName("Foo")
                 .WithFilteredHook(LibType.BeforeSpec)
@@ -71,6 +73,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockReflectionWrapper.Setup(x =>
                     x.InvokeMethod(mockType, null, "GetAllPendingMessages", It.IsAny<BindingFlags>()))
                 .Returns(_pendingMessages);
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingScreenshots", It.IsAny<BindingFlags>()))
+                .Returns(_pendingScrennshots);
             _executionStartingProcessor = new ExecutionStartingProcessor(_mockMethodExecutor.Object,
                 mockAssemblyLoader.Object, mockReflectionWrapper.Object);
         }
@@ -81,6 +86,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         private ProtoExecutionResult _protoExecutionResult;
 
         private readonly IEnumerable<string> _pendingMessages = new List<string> {"Foo", "Bar"};
+        private readonly IEnumerable<byte[]> _pendingScrennshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot") };
 
 
         public void Foo()
@@ -138,6 +144,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             _mockMethodExecutor.VerifyAll();
             Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message, _pendingMessages);
+            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.ScreenShot, _pendingScrennshots);
         }
     }
 }
