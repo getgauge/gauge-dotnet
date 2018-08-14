@@ -197,7 +197,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var assemblyLoader = new Mock<IAssemblyLoader>();
             assemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
             var reflectionWrapper = new Mock<IReflectionWrapper>();
-            var hooksStrategy = new TestHooksExecutionProcessor(null, assemblyLoader.Object, reflectionWrapper.Object)
+            var hooksStrategy = new TestHooksExecutionProcessor(null)
                 .GetHooksStrategy();
 
             Assert.IsInstanceOf<HooksStrategy>(hooksStrategy);
@@ -210,7 +210,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             assemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
             var reflectionWrapper = new Mock<IReflectionWrapper>();
             var hooksStrategy =
-                new TestTaggedHooksFirstExecutionProcessor(null, assemblyLoader.Object, reflectionWrapper.Object)
+                new TestTaggedHooksFirstExecutionProcessor(null)
                     .GetHooksStrategy();
 
             Assert.IsInstanceOf<TaggedHooksFirstStrategy>(hooksStrategy);
@@ -223,7 +223,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             assemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
             var reflectionWrapper = new Mock<IReflectionWrapper>();
             var hooksStrategy =
-                new TestUntaggedHooksFirstExecutionProcessor(null, assemblyLoader.Object, reflectionWrapper.Object)
+                new TestUntaggedHooksFirstExecutionProcessor(null)
                     .GetHooksStrategy();
 
             Assert.IsInstanceOf<UntaggedHooksFirstStrategy>(hooksStrategy);

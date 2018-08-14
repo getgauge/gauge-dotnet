@@ -17,7 +17,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
@@ -26,9 +25,8 @@ namespace Gauge.Dotnet.Processors
     {
         private readonly IExecutionOrchestrator _executionOrchestrator;
 
-        public SpecExecutionEndingProcessor(IExecutionOrchestrator executionOrchestrator,
-            IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper)
-            : base(executionOrchestrator, assemblyLoader, reflectionWrapper)
+        public SpecExecutionEndingProcessor(IExecutionOrchestrator executionOrchestrator)
+            : base(executionOrchestrator)
         {
             _executionOrchestrator = executionOrchestrator;
         }

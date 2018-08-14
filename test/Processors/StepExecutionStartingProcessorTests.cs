@@ -15,16 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
@@ -65,34 +62,23 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 .Returns(protoExecutionResult);
             var hookRegistry = new Mock<IHookRegistry>();
             hookRegistry.Setup(registry => registry.BeforeStepHooks).Returns(new HashSet<IHookMethod>());
-            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockMessageCollectorType = new Mock<Type>();
 
-            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            var pendingMessages = new List<string>(){"one", "two"};
-            var pendindScreenshots = new List<byte[]>(){ Encoding.ASCII.GetBytes("screenshot") };
+            var pendingMessages = new List<string> {"one", "two"};
+            var pendingScreenshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
 
-            mockReflectionWrapper.Setup(x => x.InvokeMethod(mockMessageCollectorType.Object, null,
-                    "GetAllPendingMessages",
-                    BindingFlags.Static | BindingFlags.Public))
-                .Returns(pendingMessages).Verifiable();
-            mockReflectionWrapper.Setup(x => x.InvokeMethod(mockMessageCollectorType.Object, null,
-                    "GetAllPendingScreenshots",
-                    BindingFlags.Static | BindingFlags.Public))
-                .Returns(pendindScreenshots).Verifiable();
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector))
-                .Returns(mockMessageCollectorType.Object);
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotCollector))
-                .Returns(mockMessageCollectorType.Object);
+            mockExectionHelper.Setup(x =>
+                    x.ExecuteHooks("BeforeStep", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
+                        It.IsAny<ExecutionContext>()))
+                .Returns(protoExecutionResult);
+            mockExectionHelper.Setup(x =>
+                x.GetAllPendingMessages()).Returns(pendingMessages);
+            mockExectionHelper.Setup(x =>
+                x.GetAllPendingScreenshots()).Returns(pendingScreenshots);
 
-            var processor = new StepExecutionStartingProcessor(mockExectionHelper.Object, mockAssemblyLoader.Object,
-                mockReflectionWrapper.Object);
+            var processor = new StepExecutionStartingProcessor(mockExectionHelper.Object);
             var result = processor.Process(request);
             Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message, pendingMessages);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.ScreenShot.ToList(), pendindScreenshots);
-
-
-            mockReflectionWrapper.VerifyAll();
+            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Screenshots, pendingScreenshots);
         }
 
         [Test]

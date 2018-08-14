@@ -102,10 +102,10 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("Say {} to {}");
 
-            executionOrchestrator.ExecuteStep(gaugeMethod, "hello", "world");
-            var pendingMessages = MessageCollector.GetAllPendingMessages();
+            var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod, "hello", "world");
 
-            Assert.Contains("hello, world!", pendingMessages);
+            Assert.False(executionResult.Failed);
+            Assert.Contains("hello, world!", executionResult.Message);
         }
 
         [Test]

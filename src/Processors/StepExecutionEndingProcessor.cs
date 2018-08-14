@@ -17,17 +17,14 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
     public class StepExecutionEndingProcessor : TaggedHooksFirstExecutionProcessor
     {
-        public StepExecutionEndingProcessor(IExecutionOrchestrator executionOrchestrator,
-            IAssemblyLoader assemblyLoader,
-            IReflectionWrapper reflectionWrapper)
-            : base(executionOrchestrator, assemblyLoader, reflectionWrapper)
+        public StepExecutionEndingProcessor(IExecutionOrchestrator executionOrchestrator)
+            : base(executionOrchestrator)
         {
         }
 

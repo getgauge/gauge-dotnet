@@ -18,17 +18,14 @@
 using System;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.UnitTests.Processors.Stubs
 {
     public class TestTaggedHooksFirstExecutionProcessor : TaggedHooksFirstExecutionProcessor
     {
-        public TestTaggedHooksFirstExecutionProcessor(IExecutionOrchestrator executionOrchestrator,
-            IAssemblyLoader assemblyLoader,
-            IReflectionWrapper reflectionWrapper)
-            : base(executionOrchestrator, assemblyLoader, reflectionWrapper)
+        public TestTaggedHooksFirstExecutionProcessor(IExecutionOrchestrator executionOrchestrator)
+            : base(executionOrchestrator)
         {
         }
 

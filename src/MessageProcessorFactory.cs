@@ -70,35 +70,35 @@ namespace Gauge.Dotnet
             {
                 {
                     Message.Types.MessageType.ExecutionStarting,
-                    new ExecutionStartingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
+                    new ExecutionStartingProcessor(executionOrchestrator)
                 },
                 {
                     Message.Types.MessageType.ExecutionEnding,
-                    new ExecutionEndingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
+                    new ExecutionEndingProcessor(executionOrchestrator)
                 },
                 {
                     Message.Types.MessageType.SpecExecutionStarting,
-                    new SpecExecutionStartingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
+                    new SpecExecutionStartingProcessor(executionOrchestrator)
                 },
                 {
                     Message.Types.MessageType.SpecExecutionEnding,
-                    new SpecExecutionEndingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
+                    new SpecExecutionEndingProcessor(executionOrchestrator)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionStarting,
-                    new ScenarioExecutionStartingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
+                    new ScenarioExecutionStartingProcessor(executionOrchestrator)
                 },
                 {
                     Message.Types.MessageType.ScenarioExecutionEnding,
-                    new ScenarioExecutionEndingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
+                    new ScenarioExecutionEndingProcessor(executionOrchestrator)
                 },
                 {
                     Message.Types.MessageType.StepExecutionStarting,
-                    new StepExecutionStartingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
+                    new StepExecutionStartingProcessor(executionOrchestrator)
                 },
                 {
                     Message.Types.MessageType.StepExecutionEnding,
-                    new StepExecutionEndingProcessor(executionOrchestrator, assemblyLoader, reflectionWrapper)
+                    new StepExecutionEndingProcessor(executionOrchestrator)
                 },
                 {
                     Message.Types.MessageType.ExecuteStep,

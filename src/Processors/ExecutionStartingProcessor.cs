@@ -19,16 +19,14 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using Gauge.CSharp.Core;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
     public class ExecutionStartingProcessor : HookExecutionProcessor
     {
-        public ExecutionStartingProcessor(IExecutionOrchestrator executionOrchestrator, IAssemblyLoader assemblyLoader,
-            IReflectionWrapper reflectionWrapper)
-            : base(executionOrchestrator, assemblyLoader, reflectionWrapper)
+        public ExecutionStartingProcessor(IExecutionOrchestrator executionOrchestrator)
+            : base(executionOrchestrator)
         {
         }
 

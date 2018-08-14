@@ -29,10 +29,12 @@ namespace Gauge.Dotnet
 
         ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags,
             ExecutionContext context);
-
         void ClearCache();
 
         void StartExecutionScope(string tag);
         void CloseExectionScope();
+        IEnumerable<string> GetAllPendingMessages();
+        IEnumerable<byte[]> GetAllPendingScreenshots();
+
     }
 }
