@@ -15,15 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
@@ -74,10 +71,6 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldExecutreBeforeSpecHook()
         {
-            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockType = new Mock<Type>().Object;
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotCollector)).Returns(mockType);
             var specExecutionStartingRequest = new SpecExecutionStartingRequest
             {
                 CurrentExecutionInfo = new ExecutionInfo
@@ -98,26 +91,24 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 ExecutionTime = 0,
                 Failed = false
             };
-            IEnumerable<string> pendingMessages = new List<string> {"one", "two"};
+            var pendingMessages = new List<string> {"one", "two"};
+            var pendingScreenshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
+
             mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("BeforeSpec", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
                         It.IsAny<ExecutionContext>()))
                 .Returns(protoExecutionResult);
-            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            mockReflectionWrapper.Setup(x =>
-                    x.InvokeMethod(mockType, null, "GetAllPendingMessages", It.IsAny<BindingFlags>()))
-                .Returns(pendingMessages);
-            var pendingScreenshots = new List<byte[]>(){Encoding.ASCII.GetBytes("Screenshot") };
-            mockReflectionWrapper.Setup(x =>
-                    x.InvokeMethod(mockType, null, "GetAllPendingScreenshots", It.IsAny<BindingFlags>()))
-                .Returns(pendingScreenshots);
-            var processor = new SpecExecutionStartingProcessor(mockMethodExecutor.Object,
-                mockAssemblyLoader.Object, mockReflectionWrapper.Object);
+            mockMethodExecutor.Setup(x =>
+                x.GetAllPendingMessages()).Returns(pendingMessages);
+            mockMethodExecutor.Setup(x =>
+                x.GetAllPendingScreenshots()).Returns(pendingScreenshots);
+
+            var processor = new SpecExecutionStartingProcessor(mockMethodExecutor.Object);
 
             var result = processor.Process(request);
             Assert.False(result.ExecutionStatusResponse.ExecutionResult.Failed);
             Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message.ToList(), pendingMessages);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.ScreenShot.ToList(), pendingScreenshots);
+            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Screenshots.ToList(), pendingScreenshots);
         }
     }
 }

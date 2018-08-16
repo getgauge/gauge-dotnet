@@ -17,6 +17,8 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using Gauge.CSharp.Core;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
@@ -76,6 +78,20 @@ namespace Gauge.Dotnet
                 "CloseScope");
         }
 
+        public IEnumerable<string> GetAllPendingMessages()
+        {
+            var messageCollectorType = _assemblyLoader.GetLibType(LibType.MessageCollector);
+            return _reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingMessages",
+                BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>;
+        }
+
+        public IEnumerable<byte[]> GetAllPendingScreenshots()
+        {
+            var messageCollectorType = _assemblyLoader.GetLibType(LibType.ScreenshotCollector);
+            return _reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingScreenshots",
+                BindingFlags.Static | BindingFlags.Public) as IEnumerable<byte[]>;
+        }
+
         [DebuggerHidden]
         public ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags,
             ExecutionContext context)
@@ -92,17 +108,24 @@ namespace Gauge.Dotnet
                 Failed = false,
                 ExecutionTime = stopwatch.ElapsedMilliseconds
             };
+            var allPendingMessages = GetAllPendingMessages().Where(m => m != null);
+            result.Message.AddRange(allPendingMessages);
+            var allPendingScreenShots = GetAllPendingScreenshots().Select(ByteString.CopyFrom);
+            result.Screenshots.AddRange(allPendingScreenShots);
             if (executionResult.Success) return result;
             var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
             result.Failed = true;
             var isScreenShotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
             if (isScreenShotEnabled == null || isScreenShotEnabled.ToLower() != "false")
-                result.ScreenShot.Add(TakeScreenshot());
+            {
+                result.ScreenShot = TakeScreenshot();
+                result.FailureScreenshot = TakeScreenshot();
+            }
+
             result.ErrorMessage = executionResult.ExceptionMessage;
             result.StackTrace = executionResult.StackTrace;
             result.RecoverableError = executionResult.Recoverable;
             result.ExecutionTime = elapsedMilliseconds;
-
             return result;
         }
 

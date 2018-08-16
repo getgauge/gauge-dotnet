@@ -16,16 +16,13 @@
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
 using Gauge.Dotnet.Strategy;
-using Gauge.Dotnet.Wrappers;
 
 namespace Gauge.Dotnet.Processors
 {
     public abstract class TaggedHooksFirstExecutionProcessor : HookExecutionProcessor
     {
-        protected TaggedHooksFirstExecutionProcessor(IExecutionOrchestrator executionOrchestrator,
-            IAssemblyLoader assemblyLoader,
-            IReflectionWrapper reflectionWrapper)
-            : base(executionOrchestrator, assemblyLoader, reflectionWrapper)
+        protected TaggedHooksFirstExecutionProcessor(IExecutionOrchestrator executionOrchestrator)
+            : base(executionOrchestrator)
         {
             Strategy = new TaggedHooksFirstStrategy();
         }

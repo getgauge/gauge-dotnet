@@ -21,7 +21,6 @@ using System.IO;
 using System.Linq;
 using Gauge.CSharp.Lib.Attribute;
 using Gauge.Dotnet.Models;
-using Gauge.Messages;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
@@ -71,7 +70,8 @@ namespace Gauge.Dotnet.IntegrationTests
             Assert.True(stepTexts.Contains(text));
         }
 
-        private void AssertParametersExist(RefactoringChange result, string methodName, IReadOnlyList<string> parameters)
+        private void AssertParametersExist(RefactoringChange result, string methodName,
+            IReadOnlyList<string> parameters)
         {
             var name = methodName.Split('.').Last().Split('-').First();
             var tree =

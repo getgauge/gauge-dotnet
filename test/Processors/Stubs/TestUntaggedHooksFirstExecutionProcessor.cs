@@ -25,10 +25,8 @@ namespace Gauge.Dotnet.UnitTests.Processors.Stubs
 {
     public class TestUntaggedHooksFirstExecutionProcessor : UntaggedHooksFirstExecutionProcessor
     {
-        public TestUntaggedHooksFirstExecutionProcessor(IExecutionOrchestrator executionOrchestrator,
-            IAssemblyLoader assemblyLoader,
-            IReflectionWrapper reflectionWrapper)
-            : base(executionOrchestrator, assemblyLoader, reflectionWrapper)
+        public TestUntaggedHooksFirstExecutionProcessor(IExecutionOrchestrator executionOrchestrator)
+            : base(executionOrchestrator)
         {
         }
 

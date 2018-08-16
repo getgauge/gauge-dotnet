@@ -15,16 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.UnitTests.Helpers;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
@@ -39,9 +36,6 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var mockHookRegistry = new Mock<IHookRegistry>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockType = new Mock<Type>().Object;
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotCollector)).Returns(mockType);
             var mockMethod = new MockMethodBuilder(mockAssemblyLoader)
                 .WithName("Foo")
                 .WithFilteredHook(LibType.BeforeSpec)
@@ -52,12 +46,12 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 new HookMethod(LibType.BeforeSpec, mockMethod, mockAssemblyLoader.Object)
             };
             mockHookRegistry.Setup(x => x.BeforeSuiteHooks).Returns(hooks);
-            var executionEndingRequest = new ExecutionStartingRequest();
+            var executionStartingRequest = new ExecutionStartingRequest();
             _request = new Message
             {
                 MessageId = 20,
-                MessageType = Message.Types.MessageType.ExecutionEnding,
-                ExecutionStartingRequest = executionEndingRequest
+                MessageType = Message.Types.MessageType.ExecutionStarting,
+                ExecutionStartingRequest = executionStartingRequest
             };
 
             _mockMethodExecutor = new Mock<IExecutionOrchestrator>();
@@ -66,18 +60,16 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 ExecutionTime = 0,
                 Failed = false
             };
-            _mockMethodExecutor.Setup(x => x.ExecuteHooks("BeforeSuite", It.IsAny<HooksStrategy>(), new List<string>(),
-                    It.IsAny<ExecutionContext>()))
+
+            _mockMethodExecutor.Setup(x =>
+                    x.ExecuteHooks("BeforeSuite", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
+                        It.IsAny<ExecutionContext>()))
                 .Returns(_protoExecutionResult);
-            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            mockReflectionWrapper.Setup(x =>
-                    x.InvokeMethod(mockType, null, "GetAllPendingMessages", It.IsAny<BindingFlags>()))
-                .Returns(_pendingMessages);
-            mockReflectionWrapper.Setup(x =>
-                    x.InvokeMethod(mockType, null, "GetAllPendingScreenshots", It.IsAny<BindingFlags>()))
-                .Returns(_pendingScrennshots);
-            _executionStartingProcessor = new ExecutionStartingProcessor(_mockMethodExecutor.Object,
-                mockAssemblyLoader.Object, mockReflectionWrapper.Object);
+            _mockMethodExecutor.Setup(x =>
+                x.GetAllPendingMessages()).Returns(_pendingMessages);
+            _mockMethodExecutor.Setup(x =>
+                x.GetAllPendingScreenshots()).Returns(_pendingScrennshots);
+            _executionStartingProcessor = new ExecutionStartingProcessor(_mockMethodExecutor.Object);
         }
 
         private ExecutionStartingProcessor _executionStartingProcessor;
@@ -86,12 +78,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
         private ProtoExecutionResult _protoExecutionResult;
 
         private readonly IEnumerable<string> _pendingMessages = new List<string> {"Foo", "Bar"};
-        private readonly IEnumerable<byte[]> _pendingScrennshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot") };
 
-
-        public void Foo()
-        {
-        }
+        private readonly IEnumerable<byte[]> _pendingScrennshots =
+            new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
 
         [Test]
         public void ShouldExtendFromHooksExecutionProcessor()
@@ -144,7 +133,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             _mockMethodExecutor.VerifyAll();
             Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message, _pendingMessages);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.ScreenShot, _pendingScrennshots);
+            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Screenshots, _pendingScrennshots);
         }
     }
 }

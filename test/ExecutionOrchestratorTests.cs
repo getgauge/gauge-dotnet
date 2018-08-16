@@ -51,6 +51,8 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldExecuteHooks()
         {
+            var pendingMessages = new List<string> {"Foo", "Bar"};
+            var pendingScrennshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
             var executionResult = new ExecutionResult {Success = true};
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
@@ -63,11 +65,19 @@ namespace Gauge.Dotnet.UnitTests
             ).Returns(executionResult).Verifiable();
             var mockStepExecuter = new Mock<IStepExecutor>();
             var reflectionWrapper = mockReflectionWrapper.Object;
+            var mockType = new Mock<Type>().Object;
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotCollector)).Returns(mockType);
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingMessages", It.IsAny<BindingFlags>()))
+                .Returns(pendingMessages);
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingScreenshots", It.IsAny<BindingFlags>()))
+                .Returns(pendingScrennshots);
             var assemblyLoader = mockAssemblyLoader.Object;
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
                 mockActivationWrapper.Object,
                 mockClassInstanceManager, mockHookExecuter.Object, mockStepExecuter.Object);
-
 
             var result = executionOrchestrator.ExecuteHooks("hooks", hooksStrategy, new List<string>(),
                 It.IsAny<ExecutionContext>());
@@ -79,6 +89,8 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldExecuteHooksAndNotTakeScreenshotOnFailureWhenDisabled()
         {
+            var pendingMessages = new List<string> {"Foo", "Bar"};
+            var pendingScrennshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
             var hooksStrategy = new HooksStrategy();
             var executionResult = new ExecutionResult
             {
@@ -101,6 +113,15 @@ namespace Gauge.Dotnet.UnitTests
             mockHookExecuter.Setup(executor =>
                 executor.Execute("hooks", hooksStrategy, new List<string>(), It.IsAny<ExecutionContext>())
             ).Returns(executionResult).Verifiable();
+            var mockType = new Mock<Type>().Object;
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotCollector)).Returns(mockType);
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingMessages", It.IsAny<BindingFlags>()))
+                .Returns(pendingMessages);
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingScreenshots", It.IsAny<BindingFlags>()))
+                .Returns(pendingScrennshots);
 
             var screenshotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
             Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", "false");
@@ -110,13 +131,15 @@ namespace Gauge.Dotnet.UnitTests
 
             mockHookExecuter.VerifyAll();
             Assert.True(result.Failed);
-            Assert.True(result.ScreenShot.IsNullOrEmpty());
+            Assert.True(result.FailureScreenshot.IsNullOrEmpty());
             Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", screenshotEnabled);
         }
 
         [Test]
         public void ShouldExecuteMethod()
         {
+            var pendingMessages = new List<string> {"Foo", "Bar"};
+            var pendingScrennshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
             var gaugeMethod = new GaugeMethod {Name = "ShouldExecuteMethod", ParameterCount = 1};
             var args = new[] {"Bar", "String"};
 
@@ -134,6 +157,16 @@ namespace Gauge.Dotnet.UnitTests
             var orchestrator = new ExecutionOrchestrator(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
                 mockActivationWrapper.Object, mockClassInstanceManager,
                 mockHookExecuter.Object, mockStepExecutor.Object);
+
+            var mockType = new Mock<Type>().Object;
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotCollector)).Returns(mockType);
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingMessages", It.IsAny<BindingFlags>()))
+                .Returns(pendingMessages);
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingScreenshots", It.IsAny<BindingFlags>()))
+                .Returns(pendingScrennshots);
             var result = orchestrator.ExecuteStep(gaugeMethod, args);
             mockStepExecutor.VerifyAll();
             Assert.False(result.Failed);
@@ -143,6 +176,8 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldNotTakeScreenShotWhenDisabled()
         {
+            var pendingMessages = new List<string> {"Foo", "Bar"};
+            var pendingScrennshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
             var gaugeMethod = new GaugeMethod {Name = "ShouldNotTakeScreenShotWhenDisabled", ParameterCount = 1};
 
             var executionResult = new ExecutionResult
@@ -159,6 +194,15 @@ namespace Gauge.Dotnet.UnitTests
             var mockStepExecutor = new Mock<IStepExecutor>();
             mockStepExecutor.Setup(executor => executor.Execute(gaugeMethod, It.IsAny<string[]>()))
                 .Returns(executionResult);
+            var mockType = new Mock<Type>().Object;
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotCollector)).Returns(mockType);
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingMessages", It.IsAny<BindingFlags>()))
+                .Returns(pendingMessages);
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingScreenshots", It.IsAny<BindingFlags>()))
+                .Returns(pendingScrennshots);
 
             var orchestrator = new ExecutionOrchestrator(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
                 mockActivationWrapper.Object, mockClassInstanceManager,
@@ -170,13 +214,15 @@ namespace Gauge.Dotnet.UnitTests
             var result = orchestrator.ExecuteStep(gaugeMethod, "Bar", "string");
 
             mockStepExecutor.VerifyAll();
-            Assert.True(result.ScreenShot.IsNullOrEmpty());
+            Assert.True(result.FailureScreenshot.IsNullOrEmpty());
             Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", screenshotEnabled);
         }
 
         [Test]
         public void ShouldTakeScreenShotOnFailedExecution()
         {
+            var pendingMessages = new List<string> {"Foo", "Bar"};
+            var pendingScrennshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
             var gaugeMethod = new GaugeMethod {Name = "ShouldExecuteMethod", ParameterCount = 1};
             var executionResult = new ExecutionResult
             {
@@ -203,6 +249,15 @@ namespace Gauge.Dotnet.UnitTests
             var mockStepExecutor = new Mock<IStepExecutor>();
             mockStepExecutor.Setup(executor => executor.Execute(gaugeMethod, It.IsAny<string[]>()))
                 .Returns(executionResult).Verifiable();
+            var mockType = new Mock<Type>().Object;
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotCollector)).Returns(mockType);
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingMessages", It.IsAny<BindingFlags>()))
+                .Returns(pendingMessages);
+            mockReflectionWrapper.Setup(x =>
+                    x.InvokeMethod(mockType, null, "GetAllPendingScreenshots", It.IsAny<BindingFlags>()))
+                .Returns(pendingScrennshots);
 
             var orchestrator = new ExecutionOrchestrator(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
                 mockActivationWrapper.Object, mockInstance,
@@ -211,8 +266,9 @@ namespace Gauge.Dotnet.UnitTests
             var result = orchestrator.ExecuteStep(gaugeMethod, "Bar", "String");
             mockStepExecutor.VerifyAll();
 
+
             Assert.True(result.Failed);
-            Assert.AreEqual(expectedScreenshot, result.ScreenShot[0]);
+            Assert.AreEqual(expectedScreenshot, result.FailureScreenshot);
         }
     }
 }

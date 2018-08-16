@@ -18,10 +18,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Strategy;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Google.Protobuf;
 
@@ -33,16 +31,11 @@ namespace Gauge.Dotnet.Processors
         protected const string SuiteLevel = "suite";
         protected const string SpecLevel = "spec";
         protected const string ScenarioLevel = "scenario";
-        private readonly IAssemblyLoader _assemblyLoader;
-        private readonly IReflectionWrapper _reflectionWrapper;
         protected readonly IExecutionOrchestrator ExecutionOrchestrator;
 
-        protected HookExecutionProcessor(IExecutionOrchestrator executionOrchestrator, IAssemblyLoader assemblyLoader,
-            IReflectionWrapper reflectionWrapper)
+        protected HookExecutionProcessor(IExecutionOrchestrator executionOrchestrator)
         {
-            _assemblyLoader = assemblyLoader;
             ExecutionOrchestrator = executionOrchestrator;
-            _reflectionWrapper = reflectionWrapper;
             Strategy = new HooksStrategy();
         }
 
@@ -69,14 +62,13 @@ namespace Gauge.Dotnet.Processors
             var executionContext = mapper.ExecutionInfoFrom(GetExecutionInfo(request));
             var protoExecutionResult =
                 ExecutionOrchestrator.ExecuteHooks(HookType, Strategy, applicableTags, executionContext);
-            var allPendingMessages = GetAllPendingMessages().Where(m => m != null);
-            var allPendingScreenShots = GetAllPendingScreenshots().Select(ByteString.CopyFrom);
+            var allPendingMessages = ExecutionOrchestrator.GetAllPendingMessages().Where(m => m != null);
+            var allPendingScreenShots = ExecutionOrchestrator.GetAllPendingScreenshots().Select(ByteString.CopyFrom);
             protoExecutionResult.Message.AddRange(allPendingMessages);
-            protoExecutionResult.ScreenShot.AddRange(allPendingScreenShots);
+            protoExecutionResult.Screenshots.AddRange(allPendingScreenShots);
             return protoExecutionResult;
         }
 
-        
         private void ClearCacheForConfiguredLevel()
         {
             var flag = Utils.TryReadEnvValue(ClearStateFlag);
@@ -87,20 +79,6 @@ namespace Gauge.Dotnet.Processors
         protected virtual List<string> GetApplicableTags(Message request)
         {
             return Enumerable.Empty<string>().ToList();
-        }
-
-        public virtual IEnumerable<string> GetAllPendingMessages()
-        {
-            var messageCollectorType = _assemblyLoader.GetLibType(LibType.MessageCollector);
-            return _reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingMessages",
-                BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>;
-        }
-
-        private IEnumerable<byte[]> GetAllPendingScreenshots()
-        {
-            var messageCollectorType = _assemblyLoader.GetLibType(LibType.ScreenshotCollector);
-            return _reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingScreenshots",
-                BindingFlags.Static | BindingFlags.Public) as IEnumerable<byte[]>;
         }
     }
 }
