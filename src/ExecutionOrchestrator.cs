@@ -118,8 +118,9 @@ namespace Gauge.Dotnet
             var isScreenShotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
             if (isScreenShotEnabled == null || isScreenShotEnabled.ToLower() != "false")
             {
-                result.ScreenShot = TakeScreenshot();
-                result.FailureScreenshot = TakeScreenshot();
+                var screenshot = TakeScreenshot();
+                result.ScreenShot = screenshot;
+                result.FailureScreenshot = screenshot;
             }
 
             result.ErrorMessage = executionResult.ExceptionMessage;
