@@ -18,6 +18,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Extensions;
 
@@ -27,8 +28,22 @@ namespace Gauge.Dotnet.Helpers
     {
         public static IEnumerable<string> GetImplementationFiles()
         {
-            var classFiles = Directory.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs",
-                SearchOption.AllDirectories);
+            var di = new DirectoryInfo(Utils.GaugeProjectRoot);
+            var allTopLevelDirs = di.GetDirectories("*", SearchOption.TopDirectoryOnly);
+            var projectDirs = new List<string> {"bin", "logs", "env", "gauge_bin", "obj", "reports"};
+            var testDirs = allTopLevelDirs.Where(dir => !projectDirs.Contains(dir.Name) && !dir.Name.StartsWith("."))
+                .Select(dir => dir.FullName);
+
+            var classFiles = Directory.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs", SearchOption.TopDirectoryOnly)
+                .ToList();
+
+
+            foreach (var dir in testDirs)
+            {
+                var files = Directory.EnumerateFiles(dir, "*.cs", SearchOption.AllDirectories);
+                classFiles.AddRange(files);
+            }
+
             return classFiles;
         }
 
