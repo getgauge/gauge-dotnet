@@ -15,8 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+using System.Collections.Generic;
+using System.Xml.Linq;
 using Gauge.Dotnet.Processors;
 using Gauge.Messages;
+using Moq;
 using NUnit.Framework;
 
 namespace Gauge.Dotnet.UnitTests.Processors
@@ -27,7 +30,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldProcessMessage()
         {
-            var loader = new StaticLoader();
+            var xmlMock = new Mock<IXmlLoader>();
+            xmlMock.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+            var loader = new StaticLoader(xmlMock.Object);
 
             var processor = new CacheFileProcessor(loader);
             var request = new Message
@@ -58,7 +63,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldProcessRequestWithDeleteStatus()
         {
-            var loader = new StaticLoader();
+            var xmlMock = new Mock<IXmlLoader>();
+            xmlMock.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+            var loader = new StaticLoader(xmlMock.Object);
             const string content = "using Gauge.CSharp.Lib.Attributes;\n" +
                                    "namespace foobar\n" +
                                    "{\n" +

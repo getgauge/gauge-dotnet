@@ -15,27 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+using System.Collections.Generic;
+using System.Xml.Linq;
+using Gauge.CSharp.Core;
+
 namespace Gauge.Dotnet
 {
-    public class GaugeCommandFactory
+    public class XmlLoader : IXmlLoader
     {
-        public static IGaugeCommand GetExecutor(string phase)
+        public virtual IEnumerable<XAttribute> GetRemovedAttributes()
         {
-            switch (phase)
-            {
-                case "--init":
-                    return new SetupCommand();
-                default:
-                    return new StartCommand(() =>
-                        {
-                            var xmlLoader = new XmlLoader();
-                            var loader = new StaticLoader(xmlLoader);
-                            loader.LoadImplementations();
-                            var messageProcessorFactory = new MessageProcessorFactory(loader);
-                            return new GaugeListener(messageProcessorFactory);
-                        },
-                        () => new GaugeProjectBuilder());
-            }
+            var xmldoc = XDocument.Load(Utils.ReadEnvValue("GAUGE_CSHARP_PROJECT_FILE"));
+            var attributes = xmldoc.Descendants().Attributes("Remove");
+            return attributes;
         }
     }
 }
