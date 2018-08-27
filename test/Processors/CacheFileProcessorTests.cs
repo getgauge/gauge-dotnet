@@ -30,9 +30,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldProcessMessage()
         {
-            var xmlMock = new Mock<IXmlLoader>();
-            xmlMock.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(xmlMock.Object);
+            var mockAttributesLoader = new Mock<IAttributesLoader>();
+            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+            var loader = new StaticLoader(mockAttributesLoader.Object);
 
             var processor = new CacheFileProcessor(loader);
             var request = new Message
@@ -63,9 +63,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldProcessRequestWithDeleteStatus()
         {
-            var xmlMock = new Mock<IXmlLoader>();
-            xmlMock.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(xmlMock.Object);
+            var mockAttributesLoader = new Mock<IAttributesLoader>();
+            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+            var loader = new StaticLoader(mockAttributesLoader.Object);
             const string content = "using Gauge.CSharp.Lib.Attributes;\n" +
                                    "namespace foobar\n" +
                                    "{\n" +

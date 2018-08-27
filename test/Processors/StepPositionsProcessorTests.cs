@@ -30,9 +30,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldProcessRequest()
         {
-            var xmlMock = new Mock<IXmlLoader>();
-            xmlMock.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(xmlMock.Object);
+            var mockAttributesLoader = new Mock<IAttributesLoader>();
+            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+            var loader = new StaticLoader(mockAttributesLoader.Object);
             const string content = "using Gauge.CSharp.Lib.Attributes;\n" +
                                    "namespace foobar\n" +
                                    "{\n" +
@@ -61,9 +61,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldProcessRequestForAliasSteps()
         {
-            var xmlMock = new Mock<IXmlLoader>();
-            xmlMock.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(xmlMock.Object);
+            var mockAttributesLoader = new Mock<IAttributesLoader>();
+            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+            var loader = new StaticLoader(mockAttributesLoader.Object);
             const string content = "using Gauge.CSharp.Lib.Attributes;\n" +
                                    "namespace foobar\n" +
                                    "{\n" +

@@ -17,11 +17,17 @@
 
 using System.Collections.Generic;
 using System.Xml.Linq;
+using Gauge.CSharp.Core;
 
 namespace Gauge.Dotnet
 {
-    public interface IXmlLoader
+    public class AttributesLoader : IAttributesLoader
     {
-        IEnumerable<XAttribute> GetRemovedAttributes();
+        public virtual IEnumerable<XAttribute> GetRemovedAttributes()
+        {
+            var xmldoc = XDocument.Load(Utils.ReadEnvValue("GAUGE_CSHARP_PROJECT_FILE"));
+            var attributes = xmldoc.Descendants().Attributes("Remove");
+            return attributes;
+        }
     }
 }

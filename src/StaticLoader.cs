@@ -31,13 +31,13 @@ namespace Gauge.Dotnet
     public sealed class StaticLoader : IStaticLoader
     {
         private readonly IStepRegistry _stepRegistry;
-        private readonly IXmlLoader _xmlLoader;
+        private readonly IAttributesLoader _attributesLoader;
 
 
-        public StaticLoader(IXmlLoader xmlLoader)
+        public StaticLoader(IAttributesLoader attributesLoader)
         {
             _stepRegistry = new StepRegistry();
-            _xmlLoader = xmlLoader;
+            _attributesLoader = attributesLoader;
         }
 
         public IStepRegistry GetStepRegistry()
@@ -54,7 +54,7 @@ namespace Gauge.Dotnet
 
         public void ReloadSteps(string content, string filepath)
         {
-            var attributes = _xmlLoader.GetRemovedAttributes();
+            var attributes = _attributesLoader.GetRemovedAttributes();
             var isFileRemoved =
                 attributes.Any(attribute => Path.Combine(Utils.GaugeProjectRoot, attribute.Value) == filepath);
             if (isFileRemoved) return;
@@ -71,7 +71,7 @@ namespace Gauge.Dotnet
         {
             var classFiles = Directory.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs",
                 SearchOption.AllDirectories).ToList();
-            var attributes = _xmlLoader.GetRemovedAttributes();
+            var attributes = _attributesLoader.GetRemovedAttributes();
             foreach (var attribute in attributes)
                 classFiles.Remove(Path.Combine(Utils.GaugeProjectRoot, attribute.Value));
 
