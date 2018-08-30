@@ -15,11 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
+using Gauge.CSharp.Core;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
 using Microsoft.CodeAnalysis.CSharp;
@@ -30,11 +31,13 @@ namespace Gauge.Dotnet
     public sealed class StaticLoader : IStaticLoader
     {
         private readonly IStepRegistry _stepRegistry;
+        private readonly IAttributesLoader _attributesLoader;
 
 
-        public StaticLoader()
+        public StaticLoader(IAttributesLoader attributesLoader)
         {
             _stepRegistry = new StepRegistry();
+            _attributesLoader = attributesLoader;
         }
 
         public IStepRegistry GetStepRegistry()
@@ -51,6 +54,10 @@ namespace Gauge.Dotnet
 
         public void ReloadSteps(string content, string filepath)
         {
+            var attributes = _attributesLoader.GetRemovedAttributes();
+            var isFileRemoved =
+                attributes.Any(attribute => Path.Combine(Utils.GaugeProjectRoot, attribute.Value) == filepath);
+            if (isFileRemoved) return;
             _stepRegistry.RemoveSteps(filepath);
             LoadStepsFromText(content, filepath);
         }
@@ -62,8 +69,12 @@ namespace Gauge.Dotnet
 
         internal void LoadImplementations()
         {
-            var classFiles = Directory.EnumerateFiles(Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT"), "*.cs",
-                SearchOption.AllDirectories);
+            var classFiles = Directory.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs",
+                SearchOption.AllDirectories).ToList();
+            var attributes = _attributesLoader.GetRemovedAttributes();
+            foreach (var attribute in attributes)
+                classFiles.Remove(Path.Combine(Utils.GaugeProjectRoot, attribute.Value));
+
             foreach (var f in classFiles) LoadStepsFromText(File.ReadAllText(f), f);
         }
 
