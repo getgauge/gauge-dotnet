@@ -15,7 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Xml.Linq;
+using Gauge.CSharp.Core;
+using Moq;
 using NUnit.Framework;
 
 namespace Gauge.Dotnet.UnitTests
@@ -26,7 +32,9 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldAddAliasesSteps()
         {
-            var loader = new StaticLoader();
+            var mockAttributesLoader = new Mock<IAttributesLoader>();
+            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+            var loader = new StaticLoader(mockAttributesLoader.Object);
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
                                 "{\n" +
@@ -50,7 +58,10 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldAddStepsFromGivenContent()
         {
-            var loader = new StaticLoader();
+            var mockAttributesLoader = new Mock<IAttributesLoader>();
+            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+            var loader = new StaticLoader(mockAttributesLoader.Object);
+
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
                                 "{\n" +
@@ -68,9 +79,11 @@ namespace Gauge.Dotnet.UnitTests
         }
 
         [Test]
-        public void ShouldLoadStepsWithPositin()
+        public void ShouldLoadStepsWithPositoin()
         {
-            var loader = new StaticLoader();
+            var mockAttributesLoader = new Mock<IAttributesLoader>();
+            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+            var loader = new StaticLoader(mockAttributesLoader.Object);
             const string file1 = @"Foo.cs";
 
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
@@ -109,9 +122,41 @@ namespace Gauge.Dotnet.UnitTests
         }
 
         [Test]
+        public void ShouldNotReloadStepOfRemovedFile()
+        {
+            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
+            var mockAttributesLoader = new Mock<IAttributesLoader>();
+            var csprojText = XDocument.Parse("<Compile Remove=\"foo.cs\" />");
+            var attributes = csprojText.Descendants().Attributes("Remove");
+            var list = new List<XAttribute>();
+            list.AddRange(attributes);
+            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(list);
+            var loader = new StaticLoader(mockAttributesLoader.Object);
+
+            const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
+                                "namespace foobar\n" +
+                                "{\n" +
+                                "    public class FooBar\n" +
+                                "    {\n" +
+                                "        [Step(\"hello\")]\n" +
+                                "        public void hello()\n" +
+                                "        {\n" +
+                                "        }\n" +
+                                "    }\n" +
+                                "}\n";
+            const string fileName = @"foo.cs";
+            var filePath = Path.Combine(Utils.GaugeProjectRoot, fileName);
+            loader.ReloadSteps(text, filePath);
+            Assert.False(loader.GetStepRegistry().ContainsStep("hello"));
+            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
+        }
+
+        [Test]
         public void ShouldReloadSteps()
         {
-            var loader = new StaticLoader();
+            var mockAttributesLoader = new Mock<IAttributesLoader>();
+            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+            var loader = new StaticLoader(mockAttributesLoader.Object);
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
                                 "{\n" +
@@ -151,7 +196,9 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldRemoveSteps()
         {
-            var loader = new StaticLoader();
+            var mockAttributesLoader = new Mock<IAttributesLoader>();
+            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+            var loader = new StaticLoader(mockAttributesLoader.Object);
             const string file1 = @"Foo.cs";
 
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
