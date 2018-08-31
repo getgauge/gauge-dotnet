@@ -16,8 +16,10 @@
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
 
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Extensions;
 
@@ -27,8 +29,26 @@ namespace Gauge.Dotnet.Helpers
     {
         public static IEnumerable<string> GetImplementationFiles()
         {
-            var classFiles = Directory.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs",
-                SearchOption.AllDirectories);
+            var excludedDirs = Environment.GetEnvironmentVariable("gauge_exclude_dirs");
+            if (excludedDirs == null)
+                return Directory.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs", SearchOption.AllDirectories);
+
+            var di = new DirectoryInfo(Utils.GaugeProjectRoot);
+            var allTopLevelDirs = di.GetDirectories("*", SearchOption.TopDirectoryOnly);
+            var excludedDirList = excludedDirs.Split(",").Select(dir => dir.Trim()).ToList();
+            var testDirs = allTopLevelDirs
+                .Where(dir => !excludedDirList.Contains(dir.Name) && !dir.Name.StartsWith("."))
+                .Select(dir => dir.FullName);
+
+            var classFiles = Directory.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs", SearchOption.TopDirectoryOnly)
+                .ToList();
+
+            foreach (var dir in testDirs)
+            {
+                var files = Directory.EnumerateFiles(dir, "*.cs", SearchOption.AllDirectories);
+                classFiles.AddRange(files);
+            }
+
             return classFiles;
         }
 
