@@ -29,27 +29,28 @@ namespace Gauge.Dotnet.Helpers
     {
         public static IEnumerable<string> GetImplementationFiles()
         {
-            var excludedDirs = Environment.GetEnvironmentVariable("gauge_exclude_dirs");
-            if (excludedDirs == null)
-                return Directory.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs", SearchOption.AllDirectories);
-
-            var di = new DirectoryInfo(Utils.GaugeProjectRoot);
-            var allTopLevelDirs = di.GetDirectories("*", SearchOption.TopDirectoryOnly);
-            var excludedDirList = excludedDirs.Split(",").Select(dir => dir.Trim()).ToList();
-            var testDirs = allTopLevelDirs
-                .Where(dir => !excludedDirList.Contains(dir.Name) && !dir.Name.StartsWith("."))
-                .Select(dir => dir.FullName);
-
-            var classFiles = Directory.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs", SearchOption.TopDirectoryOnly)
+            var classFiles = Directory.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs", SearchOption.AllDirectories)
                 .ToList();
 
-            foreach (var dir in testDirs)
-            {
-                var files = Directory.EnumerateFiles(dir, "*.cs", SearchOption.AllDirectories);
-                classFiles.AddRange(files);
-            }
+            var attributes = new AttributesLoader().GetRemovedAttributes();
+            foreach (var attribute in attributes)
+                classFiles.Remove(Path.Combine(Utils.GaugeProjectRoot, attribute.Value));
 
-            return classFiles;
+            var removedFiles = GetRemovedDirFiles();
+            return classFiles.Except(removedFiles);
+        }
+
+        public static IEnumerable<string> GetRemovedDirFiles()
+        {
+            var removedFiles = new List<string>();
+            var excludedDirs = Environment.GetEnvironmentVariable("gauge_exclude_dirs");
+            if (excludedDirs == null) return removedFiles;
+
+            var excludedDir = excludedDirs.Split(",").Select(dir => dir.Trim()).ToList();
+            foreach (var dir in excludedDir)
+                removedFiles.AddRange(Directory.EnumerateFiles(Path.Combine(Utils.GaugeProjectRoot, dir), "*.cs",
+                    SearchOption.AllDirectories));
+            return removedFiles;
         }
 
         public static string GetImplementationGlobPatterns()
