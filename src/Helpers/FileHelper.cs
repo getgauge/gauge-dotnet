@@ -48,8 +48,12 @@ namespace Gauge.Dotnet.Helpers
 
             var excludedDir = excludedDirs.Split(",").Select(dir => dir.Trim()).ToList();
             foreach (var dir in excludedDir)
-                removedFiles.AddRange(Directory.EnumerateFiles(Path.Combine(Utils.GaugeProjectRoot, dir), "*.cs",
+            {
+                var dirpath = Path.Combine(Utils.GaugeProjectRoot, dir);
+                if (!Directory.Exists(dirpath)) continue;
+                removedFiles.AddRange(Directory.EnumerateFiles(dirpath, "*.cs",
                     SearchOption.AllDirectories));
+            }
             return removedFiles;
         }
 
