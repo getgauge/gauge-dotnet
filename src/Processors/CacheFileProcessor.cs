@@ -1,4 +1,4 @@
-﻿// Copyright 2018 ThoughtWorks, Inc.
+﻿// Copyright 2019 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-Dotnet.
 //
@@ -44,6 +44,9 @@ namespace Gauge.Dotnet.Processors
                     _loader.ReloadSteps(content, file);
                     break;
                 case FileStatus.Created:
+                    if (_loader.GetStepRegistry().IsFileCached(file))
+                        LoadFromDisk(file);
+                    break;
                 case FileStatus.Closed:
                     LoadFromDisk(file);
                     break;

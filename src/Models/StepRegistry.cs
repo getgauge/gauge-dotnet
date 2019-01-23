@@ -1,4 +1,4 @@
-﻿// Copyright 2018 ThoughtWorks, Inc.
+﻿// Copyright 2019 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-Dotnet.
 //
@@ -115,6 +115,16 @@ namespace Gauge.Dotnet.Models
         public IEnumerable<string> AllSteps()
         {
             return _registry.Keys;
+        }
+
+        public bool IsFileCached(string file)
+        {
+            foreach (var (key, gaugeMethods) in _registry)
+            {
+                if (gaugeMethods.Any(method => file.Equals(method.FileName)))
+                    return true;
+            }
+            return false;
         }
     }
 }

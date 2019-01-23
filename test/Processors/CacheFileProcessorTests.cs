@@ -1,4 +1,4 @@
-﻿// Copyright 2018 ThoughtWorks, Inc.
+﻿// Copyright 2019 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-Dotnet.
 //
