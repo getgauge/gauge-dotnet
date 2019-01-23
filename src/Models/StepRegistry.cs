@@ -119,7 +119,7 @@ namespace Gauge.Dotnet.Models
 
         public bool IsFileCached(string file)
         {
-            foreach (var (key, gaugeMethods) in _registry)
+            foreach (var gaugeMethods in _registry.Values)
             {
                 if (gaugeMethods.Any(method => file.Equals(method.FileName)))
                     return true;
