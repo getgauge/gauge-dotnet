@@ -1,4 +1,4 @@
-// Copyright 2018 ThoughtWorks, Inc.
+// Copyright 2019 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-Dotnet.
 //
@@ -31,5 +31,6 @@ namespace Gauge.Dotnet.Models
         void AddStep(string stepValue, GaugeMethod stepMethod);
         void RemoveSteps(string filepath);
         IEnumerable<StepPosition> GetStepPositions(string filePath);
+        bool IsFileCached(string file);
     }
 }

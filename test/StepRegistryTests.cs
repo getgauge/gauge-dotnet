@@ -178,5 +178,15 @@ namespace Gauge.Dotnet.UnitTests
             stepRegistry.RemoveSteps("Foo.cs");
             Assert.False(stepRegistry.ContainsStep("Foo"));
         }
+
+        [Test]
+        public void ShouldCheckIfFileIsCached()
+        {
+            var stepRegistry = new StepRegistry();
+            stepRegistry.AddStep("Foo", new GaugeMethod {Name = "Foo", StepText = "Foo", FileName = "Foo.cs"});
+
+            Assert.True(stepRegistry.IsFileCached("Foo.cs"));
+            Assert.False(stepRegistry.IsFileCached("Bar.cs"));
+        }
     }
 }
