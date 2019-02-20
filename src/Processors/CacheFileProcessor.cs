@@ -44,7 +44,7 @@ namespace Gauge.Dotnet.Processors
                     _loader.ReloadSteps(content, file);
                     break;
                 case FileStatus.Created:
-                    if (_loader.GetStepRegistry().IsFileCached(file))
+                    if (!_loader.GetStepRegistry().IsFileCached(file))
                         LoadFromDisk(file);
                     break;
                 case FileStatus.Closed:
