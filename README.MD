@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/getgauge/gauge-dotnet.svg?branch=master)](https://travis-ci.org/getgauge/gauge-dotnet)
 [![Build status](https://ci.appveyor.com/api/projects/status/t8hjbilxmb6enn4d/branch/master?svg=true)](https://ci.appveyor.com/project/getgauge/gauge-dotnet/branch/master)
 [![Download Nightly](https://api.bintray.com/packages/gauge/gauge-dotnet/Nightly/images/download.svg) ](https://bintray.com/gauge/gauge-dotnet/Nightly/_latestVersion)
-
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 
 This project adds dotnet-core [language plugin](https://docs.gauge.org/latest/installation.html#language-runner) for [gauge](http://gauge.org).
