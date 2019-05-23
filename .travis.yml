@@ -2,7 +2,7 @@ os:
   - osx
   - linux
 env:
-  - GAUGE_TELEMETRY_ENABLED=false GAUGE_PREFIX=/tmp
+  - GAUGE_TELEMETRY_ENABLED=false GAUGE_PREFIX=/tmp TERM=dumb
 before_install:
   - mozroots --import --sync
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export JAVA_HOME="/usr/lib/jvm/java-8-oracle"; fi
