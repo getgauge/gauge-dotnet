@@ -5,23 +5,25 @@ environment:
 build_script:
 - cmd: run build
 test_script:
-- ps: >-
-    .\run.cmd test
+- ps: .\run.cmd test
 
+- ps: >-
     git clone --depth=1 https://github.com/getgauge/gauge-tests
 
     .\gauge-tests\install_latest_gauge_nightly.ps1
 
-    Write-Host "PATH : $($env:PATH)"
+    $env:Path = "c:\Program Files\Gauge\bin;" + [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
-    gauge config gauge_repository_url  https://raw.githubusercontent.com/getgauge/gauge-nightly-repository/master/
+    Write-Host "PATH : $($env:PATH)"
 
     .\run.cmd forceinstall
 
     cd gauge-tests
 
+    gauge config gauge_repository_url https://raw.githubusercontent.com/getgauge/gauge-nightly-repository/master/
+
     gauge install
 
-    gauge version
+    gauge -v
 
-  - gradlew.bat clean dotnetFT
+- gradlew.bat -q clean dotnetFT
