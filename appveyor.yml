@@ -1,0 +1,27 @@
+version: 1.0.{build}
+environment:
+  GAUGE_PREFIX: c:\Program Files\Gauge\bin
+  GAUGE_TELEMETRY_ENABLED: false
+build_script:
+- cmd: run build
+test_script:
+- ps: >-
+    .\run.cmd test
+
+    git clone --depth=1 https://github.com/getgauge/gauge-tests
+
+    .\gauge-tests\install_latest_gauge_nightly.ps1
+
+    Write-Host "PATH : $($env:PATH)"
+
+    gauge config gauge_repository_url  https://raw.githubusercontent.com/getgauge/gauge-nightly-repository/master/
+
+    .\run.cmd forceinstall
+
+    cd gauge-tests
+
+    gauge install
+
+    gauge version
+
+  - gradlew.bat clean dotnetFT
