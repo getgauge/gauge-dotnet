@@ -23,7 +23,6 @@ using System.Text;
 using Gauge.Dotnet.Converters;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
-using NLog;
 
 namespace Gauge.Dotnet
 {
@@ -44,7 +43,6 @@ namespace Gauge.Dotnet
             {
                 var method = gaugeMethod.MethodInfo;
                 var executionResult = new ExecutionResult {Success = true};
-                var logger = LogManager.GetLogger("StepExecutor");
                 try
                 {
                     var parameters = args.Select(o =>
@@ -58,12 +56,12 @@ namespace Gauge.Dotnet
                             return o;
                         }
                     }).ToArray();
-                    logger.Debug("Executing method: {0}", gaugeMethod.Name);
+                    Logger.Debug($"Executing method: {gaugeMethod.Name}");
                     Execute(method, StringParamConverter.TryConvertParams(method, parameters));
                 }
                 catch (Exception ex)
                 {
-                    logger.Debug("Error executing {0}", method.Name);
+                    Logger.Debug($"Error executing {method.Name}") ;
                     var innerException = ex.InnerException ?? ex;
                     executionResult.ExceptionMessage = innerException.Message;
                     executionResult.StackTrace = innerException is AggregateException

@@ -20,13 +20,11 @@ using System.Linq;
 using Gauge.CSharp.Core;
 using Gauge.Messages;
 using Grpc.Core;
-using NLog;
 
 namespace Gauge.Dotnet
 {
     public class GaugeListener : IGaugeListener
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly MessageProcessorFactory _messageProcessorFactory;
 
         public GaugeListener(MessageProcessorFactory messageProcessorFactory)
@@ -64,7 +62,7 @@ namespace Gauge.Dotnet
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+                Logger.Error(ex.ToString());
             }
         }
     }

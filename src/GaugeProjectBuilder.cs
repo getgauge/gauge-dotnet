@@ -18,13 +18,11 @@
 using System;
 using System.Diagnostics;
 using Gauge.CSharp.Core;
-using NLog;
 
 namespace Gauge.Dotnet
 {
     public class GaugeProjectBuilder : IGaugeProjectBuilder
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public bool BuildTargetGaugeProject()
         {

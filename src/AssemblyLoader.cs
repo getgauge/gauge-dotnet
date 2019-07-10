@@ -23,7 +23,6 @@ using System.Text.RegularExpressions;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
-using NLog;
 
 namespace Gauge.Dotnet
 {
@@ -108,9 +107,8 @@ namespace Gauge.Dotnet
         public object GetClassInstanceManager(IActivatorWrapper activatorWrapper)
         {
             if (ClassInstanceManagerType == null) return null;
-            var logger = LogManager.GetLogger("MessageProcessorFactory");
             var classInstanceManager = activatorWrapper.CreateInstance(ClassInstanceManagerType);
-            logger.Debug("Loaded Instance Manager of Type:" + classInstanceManager.GetType().FullName);
+            Logger.Debug("Loaded Instance Manager of Type:" + classInstanceManager.GetType().FullName);
             _reflectionWrapper.InvokeMethod(ClassInstanceManagerType, classInstanceManager, "Initialize",
                 AssembliesReferencingGaugeLib);
             return classInstanceManager;
@@ -123,8 +121,7 @@ namespace Gauge.Dotnet
 
         private void ScanAndLoad(string path)
         {
-            var logger = LogManager.GetLogger("AssemblyLoader");
-            logger.Debug("Loading assembly from : {0}", path);
+            Logger.Debug($"Loading assembly from : {path}");
             var assembly = _assemblyWrapper.LoadFrom(path);
 
             var isReferencingGaugeLib = assembly.GetReferencedAssemblies()
@@ -148,7 +145,7 @@ namespace Gauge.Dotnet
             catch (ReflectionTypeLoadException ex)
             {
                 foreach (var e in ex.LoaderExceptions)
-                    logger.Error(e);
+                    Logger.Error(e.ToString());
             }
         }
 

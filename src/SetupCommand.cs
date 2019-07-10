@@ -19,7 +19,6 @@ using System;
 using System.IO;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Extensions;
-using NLog;
 
 namespace Gauge.Dotnet
 {
@@ -95,17 +94,16 @@ namespace {projName}
         }}
     }}
 }}";
-            var logger = LogManager.GetLogger("");
-            logger.Info("create  StepImplementation.cs");
+            Logger.Info("create  StepImplementation.cs");
             File.WriteAllText(Path.Combine(gaugeProjectRoot, "StepImplementation.cs"), implementation);
 
-            logger.Info($"create  {projName}.csproj");
+            Logger.Info($"create  {projName}.csproj");
             File.WriteAllText(Path.Combine(gaugeProjectRoot, $"{projName}.csproj"), project);
 
             var envPath = Path.Combine(gaugeProjectRoot, "env", "default");
             Directory.CreateDirectory(envPath);
 
-            logger.Info($"create  {Path.Combine("env", "default", "dotnet.properties")}");
+            Logger.Info($"create  {Path.Combine("env", "default", "dotnet.properties")}");
             File.WriteAllText(Path.Combine(envPath, "dotnet.properties"), properties);
         }
 

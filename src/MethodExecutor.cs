@@ -18,7 +18,6 @@
 using System;
 using System.Reflection;
 using Gauge.Dotnet.Wrappers;
-using NLog;
 
 namespace Gauge.Dotnet
 {
@@ -42,11 +41,10 @@ namespace Gauge.Dotnet
             var typeToLoad = method.DeclaringType;
             var instance =
                 _reflectionWrapper.InvokeMethod(_classInstanceManagerType, _classInstanceManager, "Get", typeToLoad);
-            var logger = LogManager.GetLogger("MethodExecutor");
             if (instance == null)
             {
                 var error = "Could not load instance type: " + typeToLoad;
-                logger.Error(error);
+                Logger.Error(error);
                 throw new Exception(error);
             }
 

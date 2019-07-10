@@ -23,7 +23,6 @@ using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
-using NLog;
 
 namespace Gauge.Dotnet
 {
@@ -57,8 +56,7 @@ namespace Gauge.Dotnet
                 }
                 catch (Exception ex)
                 {
-                    LogManager.GetLogger("HookExecutor").Debug("{0} Hook execution failed : {1}.{2}", hookType,
-                        methodInfo.DeclaringType.FullName, methodInfo.Name);
+                    Logger.Debug($"{hookType} Hook execution failed : {methodInfo.DeclaringType.FullName}.{methodInfo.Name}");
                     var innerException = ex.InnerException ?? ex;
                     executionResult.ExceptionMessage = innerException.Message;
                     executionResult.StackTrace = innerException.StackTrace;
