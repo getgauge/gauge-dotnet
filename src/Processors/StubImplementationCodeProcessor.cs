@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using Gauge.Dotnet.Helpers;
 using Gauge.Messages;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -58,22 +59,52 @@ namespace Gauge.Dotnet.Processors
         private static void ImplementInExistingClass(FileDiff response, string file, IEnumerable<string> stubs)
         {
             var root = CSharpSyntaxTree.ParseText(File.ReadAllText(file)).GetRoot();
-            var stepMethods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
-            var lastMethodEndPosition = stepMethods.Last().GetLocation().GetLineSpan().EndLinePosition;
-            var diff = new TextDiff
+            var stepClass = root.DescendantNodes().OfType<ClassDeclarationSyntax>();
+            var diff = new TextDiff();
+            if (hasStepClass(stepClass))
             {
-                Span = new Span
-                {
-                    Start = lastMethodEndPosition.Line,
-                    StartChar = lastMethodEndPosition.Character + 1,
-                    End = lastMethodEndPosition.Line,
-                    EndChar = lastMethodEndPosition.Character + 1
-                },
-                Content = $"{Environment.NewLine}{string.Join(Environment.NewLine, stubs)}"
-            };
-
+                diff = getTextDiff(diff, stepClass, stubs);
+            } else
+            {
+                diff = getTextDiff(diff, root, stubs, file);
+            }
             response.FilePath = file;
             response.TextDiffs.Add(diff);
+        }
+
+        private static TextDiff getTextDiff(TextDiff diff, SyntaxNode root, IEnumerable<string> stubs, string file)
+        {
+            var stepClassPosition = root.GetLocation().GetLineSpan().EndLinePosition;
+            var className = FileHelper.GetClassName(file);
+
+            diff.Span = new Span
+            {
+                Start = stepClassPosition.Line + 1,
+                StartChar = stepClassPosition.Character,
+                End = stepClassPosition.Line + 1,
+                EndChar = stepClassPosition.Character
+            };
+            diff.Content = GetNewClassContent(className, stubs);
+            return diff;
+        }
+
+        private static bool hasStepClass(IEnumerable<ClassDeclarationSyntax> stepClass)
+        {
+            return stepClass.ToList().Count() > 0;
+        }
+
+        private static TextDiff getTextDiff(TextDiff diff, IEnumerable<ClassDeclarationSyntax> stepClass, IEnumerable<string> stubs)
+        {
+            var stepClassPosition = stepClass.First().GetLocation().GetLineSpan().EndLinePosition;
+            diff.Span = new Span
+            {
+                Start = stepClassPosition.Line,
+                StartChar = stepClassPosition.Character - 1,
+                End = stepClassPosition.Line,
+                EndChar = stepClassPosition.Character - 1
+            };
+            diff.Content = $"{Environment.NewLine}{string.Join(Environment.NewLine, stubs)}\t";
+            return diff;
         }
 
         private static void ImplementInNewClass(FileDiff fileDiff, string filepath, IEnumerable<string> stubs)
