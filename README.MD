@@ -1,7 +1,6 @@
 # Gauge-dotnet
 [![Build Status](https://travis-ci.org/getgauge/gauge-dotnet.svg?branch=master)](https://travis-ci.org/getgauge/gauge-dotnet)
 [![Build status](https://ci.appveyor.com/api/projects/status/t8hjbilxmb6enn4d/branch/master?svg=true)](https://ci.appveyor.com/project/getgauge/gauge-dotnet/branch/master)
-[![Download Nightly](https://api.bintray.com/packages/gauge/gauge-dotnet/Nightly/images/download.svg) ](https://bintray.com/gauge/gauge-dotnet/Nightly/_latestVersion)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 
@@ -49,15 +48,6 @@ gauge install dotnet --version 0.0.1
 ```
 gauge install dotnet --file gauge-dotnet-0.0.1.zip
 ```
-
-#### Nightly installation
-
-To install dotnet nightly, download the latest nightly from [here](https://bintray.com/gauge/gauge-dotnet/Nightly).
-
-Once you have the downloaded nightly gauge-dotnet-version.nightly-yyyy-mm-dd.zip, install using:
-
-    gauge install dotnet -f gauge-dotnet-version.nightly-yyyy-mm-dd.zip
-
 
 #### Build from Source
 
