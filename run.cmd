@@ -18,7 +18,7 @@ goto :eof
 
 :package
     rmdir /s /q deploy artifacts
-    dotnet publish -c release -o ..\deploy\bin src\Gauge.Dotnet.csproj
+    dotnet publish -c release -o .\deploy\bin src\Gauge.Dotnet.csproj
     copy src\launcher.sh deploy
     copy src\launcher.cmd deploy
     copy src\dotnet.json deploy
