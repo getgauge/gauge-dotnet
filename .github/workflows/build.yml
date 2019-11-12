@@ -1,0 +1,177 @@
+name: Dotnet
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Dotnet build
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.2.108
+
+    - name: Dotnet unit test on windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        ./run.cmd build
+        ./run.cmd test
+
+    - name: Dotnet unit test on ubuntu
+      if: matrix.os != 'windows-latest'
+      run: |
+        ./run.sh build
+        ./run.sh test
+
+  Functional-tests:
+
+    name: Dotnet FTs on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    needs: build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup go 1.13.1
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13.1
+
+      - name: Install gauge on linux
+        if: matrix.os != 'windows-latest'
+        run: |
+          git clone https://github.com/getgauge/gauge
+          cd gauge
+          go run build/make.go --verbose
+          go run build/make.go --install --prefix=/tmp/
+          echo "::add-path::/tmp/bin"
+
+      - name: Install gauge on windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          git clone https://github.com/getgauge/gauge
+          cd gauge
+          go run build/make.go --verbose
+          go run build/make.go --install
+          echo "::add-path::C:\Program Files\gauge\bin"
+
+      - name: Install Gauge Dotnet plugin from source on windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          ./run.cmd install
+
+      - name: Install Gauge Dotnet plugin from source on linux
+        if: matrix.os != 'windows-latest'
+        run: |
+          ./run.sh install
+
+      - name: Clone gauge-tests
+        run: |
+          git clone --depth=1 https://github.com/getgauge/gauge-tests
+
+      - name: Run FTs on linux
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd gauge-tests
+          ./gradlew clean dotnetFT
+
+      - name: Run FTs on windows
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          cd gauge-tests
+          .\gradlew.bat clean dotnetFT
+
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: ft-logs-${{ matrix.os }}
+          path: gauge-tests/testLogs
+
+  LSP-tests:
+    name: Dotnet LSP tests ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    needs: build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup go 1.13.1
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13.1
+
+      - name: Install gauge on linux
+        if: matrix.os != 'windows-latest'
+        run: |
+          git clone https://github.com/getgauge/gauge
+          cd gauge
+          go run build/make.go --verbose
+          go run build/make.go --install --prefix=/tmp/
+          echo "::add-path::/tmp/bin"
+
+      - name: Install gauge on windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          git clone https://github.com/getgauge/gauge
+          cd gauge
+          go run build/make.go --verbose
+          go run build/make.go --install
+          echo "::add-path::C:\Program Files\gauge\bin"
+
+      - name: Install Gauge Dotnet plugin from source on windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          ./run.cmd install
+
+      - name: Install Gauge Dotnet plugin from source on linux
+        if: matrix.os != 'windows-latest'
+        run: |
+          ./run.sh install
+
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+
+      - name: Prep gauge-js
+        run: |
+          git clone https://github.com/getgauge/gauge-js.git
+          cd gauge-js
+          npm install
+        shell: bash
+
+      - name: Install gauge-js
+        run: |
+          cd gauge-js
+          npm run installPlugin
+
+      - name: Prep LSP tests
+        run: |
+          git clone https://github.com/getgauge/gauge-lsp-tests
+          cd gauge-lsp-tests
+          npm install
+          gauge install
+          gauge -v
+
+      - name: Run LSP tests
+        shell: bash
+        run: |
+          cd gauge-lsp-tests
+          gauge run --tags="!knownIssue & (actions_on_project_load | actions_on_file_edit)" --env=dotnet-wd
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: lsp-logs-${{ matrix.os }}
+          path: gauge-lsp-tests/logs
