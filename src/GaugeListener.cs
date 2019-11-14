@@ -17,6 +17,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using Gauge.CSharp.Core;
 using Gauge.Messages;
 using Grpc.Core;
@@ -35,11 +36,15 @@ namespace Gauge.Dotnet
         public void StartGrpcServer()
         {
             var server = new Server();
-            server.Services.Add(lspService.BindService(new GaugeGrpcConnection(server, _messageProcessorFactory)));
+            GaugeGrpcConnection serviceImpl = new GaugeGrpcConnection(server, _messageProcessorFactory);
+            server.Services.Add(lspService.BindService(serviceImpl));
             var port = server.Ports.Add(new ServerPort("127.0.0.1", 0, ServerCredentials.Insecure));
             server.Start();
             Console.WriteLine("Listening on port:" + port);
-            server.ShutdownTask.Wait();
+            Thread thread = new Thread(new ThreadStart(serviceImpl.waitForKillEvent));
+            thread.Start();
+            thread.Join();
+            System.Environment.Exit(1);
         }
 
         public void PollForMessages()

@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+using System.Threading;
 using System.Threading.Tasks;
 using Gauge.Dotnet.Helpers;
 using Gauge.Messages;
@@ -87,8 +88,14 @@ namespace Gauge.Dotnet
 
         public override Task<Empty> KillProcess(KillProcessRequest request, ServerCallContext context)
         {
-            _server.KillAsync().Wait();
+            Logger.Debug("KillProcessrequest received");
             return Task.FromResult(new Empty());
+        }
+
+        internal void waitForKillEvent()
+        {
+            Thread.Sleep (500);
+            _server.ShutdownTask.Wait();
         }
 
         public override Task<RefactorResponse> Refactor(RefactorRequest request, ServerCallContext context)
