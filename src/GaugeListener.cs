@@ -33,42 +33,16 @@ namespace Gauge.Dotnet
             _messageProcessorFactory = messageProcessorFactory;
         }
 
-        public void StartGrpcServer()
+        public void StartServer()
         {
             var server = new Server();
-            GaugeGrpcConnection serviceImpl = new GaugeGrpcConnection(server, _messageProcessorFactory);
-            server.Services.Add(lspService.BindService(serviceImpl));
+            RunnerServiceHandler serviceImpl = new RunnerServiceHandler(server, _messageProcessorFactory);
+            server.Services.Add(Runner.BindService(serviceImpl));
             var port = server.Ports.Add(new ServerPort("127.0.0.1", 0, ServerCredentials.Insecure));
             server.Start();
             Console.WriteLine("Listening on port:" + port);
-            Thread thread = new Thread(new ThreadStart(serviceImpl.waitForKillEvent));
-            thread.Start();
-            thread.Join();
-            System.Environment.Exit(1);
-        }
-
-        public void PollForMessages()
-        {
-            try
-            {
-                using (var gaugeConnection = new GaugeConnection(new TcpClientWrapper(Utils.GaugePort)))
-                {
-                    while (gaugeConnection.Connected)
-                    {
-                        var message = Message.Parser.ParseFrom(gaugeConnection.ReadBytes().ToArray());
-                        var processor = _messageProcessorFactory.GetProcessor(message.MessageType,
-                            message.MessageType == Message.Types.MessageType.SuiteDataStoreInit);
-                        var response = processor.Process(message);
-                        gaugeConnection.WriteMessage(response);
-                        if (message.MessageType == Message.Types.MessageType.KillProcessRequest)
-                            return;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex.ToString());
-            }
+            server.ShutdownTask.Wait();
+            Environment.Exit(Environment.ExitCode);
         }
     }
 }

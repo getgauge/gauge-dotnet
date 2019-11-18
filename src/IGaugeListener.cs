@@ -19,7 +19,6 @@ namespace Gauge.Dotnet
 {
     public interface IGaugeListener
     {
-        void StartGrpcServer();
-        void PollForMessages();
+        void StartServer();
     }
 }
