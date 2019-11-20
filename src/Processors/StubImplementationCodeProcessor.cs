@@ -27,12 +27,12 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Gauge.Dotnet.Processors
 {
-    public class StubImplementationCodeProcessor : IMessageProcessor
+    public class StubImplementationCodeProcessor
     {
-        public Message Process(Message request)
+        public FileDiff Process(StubImplementationCodeRequest request)
         {
-            var stubs = request.StubImplementationCodeRequest.Codes;
-            var file = request.StubImplementationCodeRequest.ImplementationFilePath;
+            var stubs = request.Codes;
+            var file = request.ImplementationFilePath;
             var response = new FileDiff();
             if (!File.Exists(file))
             {
@@ -44,10 +44,10 @@ namespace Gauge.Dotnet.Processors
                 ImlementInExistingFile(stubs, file, response);
             }
 
-            return new Message {FileDiff = response};
+            return response;
         }
 
-        private static void ImlementInExistingFile(IEnumerable<string> stubs, string file, FileDiff response)
+        private void ImlementInExistingFile(IEnumerable<string> stubs, string file, FileDiff response)
         {
             var content = File.ReadAllText(file);
             if (content == "")
@@ -56,7 +56,7 @@ namespace Gauge.Dotnet.Processors
                 ImplementInExistingClass(response, file, stubs);
         }
 
-        private static void ImplementInExistingClass(FileDiff response, string file, IEnumerable<string> stubs)
+        private void ImplementInExistingClass(FileDiff response, string file, IEnumerable<string> stubs)
         {
             var root = CSharpSyntaxTree.ParseText(File.ReadAllText(file)).GetRoot();
             var stepClass = root.DescendantNodes().OfType<ClassDeclarationSyntax>();
@@ -64,7 +64,8 @@ namespace Gauge.Dotnet.Processors
             if (hasStepClass(stepClass))
             {
                 diff = getTextDiff(diff, stepClass, stubs);
-            } else
+            }
+            else
             {
                 diff = getTextDiff(diff, root, stubs, file);
             }
@@ -72,7 +73,7 @@ namespace Gauge.Dotnet.Processors
             response.TextDiffs.Add(diff);
         }
 
-        private static TextDiff getTextDiff(TextDiff diff, SyntaxNode root, IEnumerable<string> stubs, string file)
+        private TextDiff getTextDiff(TextDiff diff, SyntaxNode root, IEnumerable<string> stubs, string file)
         {
             var stepClassPosition = root.GetLocation().GetLineSpan().EndLinePosition;
             var className = FileHelper.GetClassName(file);
@@ -88,12 +89,12 @@ namespace Gauge.Dotnet.Processors
             return diff;
         }
 
-        private static bool hasStepClass(IEnumerable<ClassDeclarationSyntax> stepClass)
+        private bool hasStepClass(IEnumerable<ClassDeclarationSyntax> stepClass)
         {
             return stepClass.ToList().Count() > 0;
         }
 
-        private static TextDiff getTextDiff(TextDiff diff, IEnumerable<ClassDeclarationSyntax> stepClass, IEnumerable<string> stubs)
+        private TextDiff getTextDiff(TextDiff diff, IEnumerable<ClassDeclarationSyntax> stepClass, IEnumerable<string> stubs)
         {
             var stepClassPosition = stepClass.First().GetLocation().GetLineSpan().EndLinePosition;
             diff.Span = new Span
@@ -107,7 +108,7 @@ namespace Gauge.Dotnet.Processors
             return diff;
         }
 
-        private static void ImplementInNewClass(FileDiff fileDiff, string filepath, IEnumerable<string> stubs)
+        private void ImplementInNewClass(FileDiff fileDiff, string filepath, IEnumerable<string> stubs)
         {
             var className = FileHelper.GetClassName(filepath);
             var content = GetNewClassContent(className, stubs);
@@ -126,7 +127,7 @@ namespace Gauge.Dotnet.Processors
             fileDiff.FilePath = filepath;
         }
 
-        private static string GetNewClassContent(string className, IEnumerable<string> stubs)
+        private string GetNewClassContent(string className, IEnumerable<string> stubs)
         {
             var n = Environment.NewLine;
             return $"using System;{n}" +

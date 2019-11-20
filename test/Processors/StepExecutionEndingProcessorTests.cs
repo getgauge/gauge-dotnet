@@ -39,7 +39,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
         private Mock<IExecutionOrchestrator> _mockMethodExecutor;
         private ProtoExecutionResult _protoExecutionResult;
-        private Message _request;
+        private StepExecutionEndingRequest _stepExecutionEndingRequest;
         private StepExecutionEndingProcessor _stepExecutionEndingProcessor;
 
         [SetUp]
@@ -63,19 +63,13 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 new HookMethod(LibType.BeforeSpec, mockMethod, mockAssemblyLoader.Object)
             };
             mockHookRegistry.Setup(x => x.AfterStepHooks).Returns(hooks);
-            var stepExecutionEndingRequest = new StepExecutionEndingRequest
+            _stepExecutionEndingRequest = new StepExecutionEndingRequest
             {
                 CurrentExecutionInfo = new ExecutionInfo
                 {
                     CurrentSpec = new SpecInfo(),
                     CurrentScenario = new ScenarioInfo()
                 }
-            };
-            _request = new Message
-            {
-                MessageType = Message.Types.MessageType.StepExecutionEnding,
-                MessageId = 20,
-                StepExecutionEndingRequest = stepExecutionEndingRequest
             };
 
             _mockMethodExecutor = new Mock<IExecutionOrchestrator>();
@@ -105,15 +99,15 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldReadPendingMessages()
         {
-            var response = _stepExecutionEndingProcessor.Process(_request);
+            var response = _stepExecutionEndingProcessor.Process(_stepExecutionEndingRequest);
 
-            Assert.True(response.ExecutionStatusResponse != null);
-            Assert.True(response.ExecutionStatusResponse.ExecutionResult != null);
-            Assert.AreEqual(2, response.ExecutionStatusResponse.ExecutionResult.Message.Count);
-            Assert.AreEqual(1, response.ExecutionStatusResponse.ExecutionResult.Screenshots.Count);
+            Assert.True(response != null);
+            Assert.True(response.ExecutionResult != null);
+            Assert.AreEqual(2, response.ExecutionResult.Message.Count);
+            Assert.AreEqual(1, response.ExecutionResult.Screenshots.Count);
 
             foreach (var pendingMessage in _pendingMessages)
-                Assert.Contains(pendingMessage, response.ExecutionStatusResponse.ExecutionResult.Message.ToList());
+                Assert.Contains(pendingMessage, response.ExecutionResult.Message.ToList());
         }
 
         [Test]
@@ -137,17 +131,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 CurrentScenario = scenarioInfo,
                 CurrentSpec = specInfo
             };
-            var currentExecutionInfo = new StepExecutionEndingRequest
-            {
-                CurrentExecutionInfo = currentScenario
-            };
-            var message = new Message
-            {
-                StepExecutionEndingRequest = currentExecutionInfo,
-                MessageType = Message.Types.MessageType.StepExecutionEnding,
-                MessageId = 0
-            };
-            var tags = AssertEx.ExecuteProtectedMethod<StepExecutionEndingProcessor>("GetApplicableTags", message)
+
+            var tags = AssertEx.ExecuteProtectedMethod<StepExecutionEndingProcessor>("GetApplicableTags", currentScenario)
                 .ToList();
             Assert.IsNotEmpty(tags);
             Assert.AreEqual(2, tags.Count);
@@ -180,13 +165,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
             {
                 CurrentExecutionInfo = currentScenario
             };
-            var message = new Message
-            {
-                StepExecutionEndingRequest = currentExecutionInfo,
-                MessageType = Message.Types.MessageType.StepExecutionEnding,
-                MessageId = 0
-            };
-            var tags = AssertEx.ExecuteProtectedMethod<StepExecutionEndingProcessor>("GetApplicableTags", message)
+
+            var tags = AssertEx.ExecuteProtectedMethod<StepExecutionEndingProcessor>("GetApplicableTags", currentScenario)
                 .ToList();
             Assert.IsNotEmpty(tags);
             Assert.AreEqual(1, tags.Count);

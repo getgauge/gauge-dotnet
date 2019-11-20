@@ -31,11 +31,6 @@ namespace Gauge.Dotnet.UnitTests.Processors.Stubs
 
         protected override string HookType => throw new NotImplementedException();
 
-        protected override ExecutionInfo GetExecutionInfo(Message request)
-        {
-            throw new NotImplementedException();
-        }
-
         public HooksStrategy GetHooksStrategy()
         {
             return Strategy;

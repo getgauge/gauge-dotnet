@@ -19,23 +19,30 @@ using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
-    public abstract class DataStoreInitProcessorBase : IMessageProcessor
+    public abstract class DataStoreInitProcessorBase
     {
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly DataStoreType _dataStoreType;
 
-        protected DataStoreInitProcessorBase(IAssemblyLoader assemblyLoader, DataStoreType scenario)
+        protected DataStoreInitProcessorBase(IAssemblyLoader assemblyLoader, DataStoreType type)
         {
             _assemblyLoader = assemblyLoader;
-            _dataStoreType = scenario;
+            _dataStoreType = type;
         }
 
-        public Message Process(Message request)
+        public ExecutionStatusResponse Process()
         {
             var initMethod = _assemblyLoader.GetLibType(LibType.DataStoreFactory)
                 .GetMethod($"Initialize{_dataStoreType}DataStore");
             initMethod.Invoke(null, null);
-            return new DefaultProcessor().Process(request);
+            return new ExecutionStatusResponse
+            {
+                ExecutionResult = new ProtoExecutionResult
+                {
+                    Failed = false,
+                    ExecutionTime = 0
+                }
+            };
         }
     }
 }

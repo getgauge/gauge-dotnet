@@ -41,21 +41,16 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var mockExectionHelper = new Mock<IExecutionOrchestrator>();
 
-            var request = new Message
+            var request = new StepExecutionStartingRequest
             {
-                MessageId = 20,
-                MessageType = Message.Types.MessageType.ScenarioExecutionStarting,
-                StepExecutionStartingRequest = new StepExecutionStartingRequest
+                CurrentExecutionInfo = new ExecutionInfo
                 {
-                    CurrentExecutionInfo = new ExecutionInfo
-                    {
-                        CurrentSpec = new SpecInfo(),
-                        CurrentScenario = new ScenarioInfo()
-                    }
+                    CurrentSpec = new SpecInfo(),
+                    CurrentScenario = new ScenarioInfo()
                 }
             };
 
-            var protoExecutionResult = new ProtoExecutionResult {ExecutionTime = 0, Failed = false};
+            var protoExecutionResult = new ProtoExecutionResult { ExecutionTime = 0, Failed = false };
             mockExectionHelper.Setup(executor =>
                     executor.ExecuteHooks(It.IsAny<string>(), It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
                         It.IsAny<ExecutionContext>()))
@@ -63,8 +58,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var hookRegistry = new Mock<IHookRegistry>();
             hookRegistry.Setup(registry => registry.BeforeStepHooks).Returns(new HashSet<IHookMethod>());
 
-            var pendingMessages = new List<string> {"one", "two"};
-            var pendingScreenshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
+            var pendingMessages = new List<string> { "one", "two" };
+            var pendingScreenshots = new List<byte[]> { Encoding.ASCII.GetBytes("screenshot") };
 
             mockExectionHelper.Setup(x =>
                     x.ExecuteHooks("BeforeStep", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
@@ -77,8 +72,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             var processor = new StepExecutionStartingProcessor(mockExectionHelper.Object);
             var result = processor.Process(request);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message, pendingMessages);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Screenshots, pendingScreenshots);
+            Assert.AreEqual(result.ExecutionResult.Message, pendingMessages);
+            Assert.AreEqual(result.ExecutionResult.Screenshots, pendingScreenshots);
         }
 
         [Test]
@@ -86,14 +81,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 FileName = "",
                 IsFailed = false
             };
             var scenarioInfo = new ScenarioInfo
             {
-                Tags = {"bar"},
+                Tags = { "bar" },
                 Name = "",
                 IsFailed = false
             };
@@ -102,18 +97,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 CurrentScenario = scenarioInfo,
                 CurrentSpec = specInfo
             };
-            var currentExecutionInfo = new StepExecutionStartingRequest
-            {
-                CurrentExecutionInfo = currentScenario
-            };
 
-            var message = new Message
-            {
-                StepExecutionStartingRequest = currentExecutionInfo,
-                MessageType = Message.Types.MessageType.ScenarioExecutionStarting,
-                MessageId = 0
-            };
-            var tags = AssertEx.ExecuteProtectedMethod<StepExecutionStartingProcessor>("GetApplicableTags", message)
+            var tags = AssertEx.ExecuteProtectedMethod<StepExecutionStartingProcessor>("GetApplicableTags", currentScenario)
                 .ToList();
             Assert.IsNotEmpty(tags);
             Assert.AreEqual(2, tags.Count);
@@ -126,14 +111,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 FileName = "",
                 IsFailed = false
             };
             var scenarioInfo = new ScenarioInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 IsFailed = false
             };
@@ -147,13 +132,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 CurrentExecutionInfo = currentScenario
             };
 
-            var message = new Message
-            {
-                StepExecutionStartingRequest = currentExecutionInfo,
-                MessageType = Message.Types.MessageType.ScenarioExecutionStarting,
-                MessageId = 0
-            };
-            var tags = AssertEx.ExecuteProtectedMethod<StepExecutionStartingProcessor>("GetApplicableTags", message)
+            var tags = AssertEx.ExecuteProtectedMethod<StepExecutionStartingProcessor>("GetApplicableTags", currentScenario)
                 .ToList();
             Assert.IsNotEmpty(tags);
             Assert.AreEqual(1, tags.Count);

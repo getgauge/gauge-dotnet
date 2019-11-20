@@ -48,9 +48,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
             loader.LoadStepsFromText(content, file);
 
             var processor = new StepPositionsProcessor(loader.GetStepRegistry());
-            var request = new Message {StepPositionsRequest = new StepPositionsRequest {FilePath = "Foo.cs"}};
+            var request = new StepPositionsRequest {FilePath = "Foo.cs"};
 
-            var response = processor.Process(request).StepPositionsResponse;
+            var response = processor.Process(request);
 
             Assert.AreEqual(response.StepPositions.Count, 1);
             Assert.AreEqual(response.StepPositions.First().StepValue, "goodbye");
@@ -79,9 +79,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
             loader.LoadStepsFromText(content, file);
 
             var processor = new StepPositionsProcessor(loader.GetStepRegistry());
-            var request = new Message {StepPositionsRequest = new StepPositionsRequest {FilePath = "Foo.cs"}};
+            var request = new StepPositionsRequest {FilePath = "Foo.cs"};
 
-            var response = processor.Process(request).StepPositionsResponse;
+            var response = processor.Process(request);
 
             Assert.AreEqual(response.StepPositions.Count, 2);
         }

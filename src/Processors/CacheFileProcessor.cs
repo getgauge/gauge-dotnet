@@ -23,7 +23,7 @@ using static Gauge.Messages.CacheFileRequest.Types;
 
 namespace Gauge.Dotnet.Processors
 {
-    public class CacheFileProcessor : IMessageProcessor
+    public class CacheFileProcessor
     {
         private readonly IStaticLoader _loader;
 
@@ -32,11 +32,11 @@ namespace Gauge.Dotnet.Processors
             _loader = loader;
         }
 
-        public Message Process(Message request)
+        public Empty Process(CacheFileRequest request)
         {
-            var content = request.CacheFileRequest.Content;
-            var file = request.CacheFileRequest.FilePath;
-            var status = request.CacheFileRequest.Status;
+            var content = request.Content;
+            var file = request.FilePath;
+            var status = request.Status;
             switch (status)
             {
                 case FileStatus.Changed:
@@ -57,7 +57,7 @@ namespace Gauge.Dotnet.Processors
                     throw new ArgumentOutOfRangeException();
             }
 
-            return new Message();
+            return new Empty();
         }
 
         private void LoadFromDisk(string file)

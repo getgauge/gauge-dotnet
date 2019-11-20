@@ -35,10 +35,5 @@ namespace Gauge.Dotnet.UnitTests.Processors.Stubs
         {
             return Strategy;
         }
-
-        protected override ExecutionInfo GetExecutionInfo(Message request)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

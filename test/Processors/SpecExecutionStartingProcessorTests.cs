@@ -49,18 +49,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
             {
                 CurrentSpec = specInfo
             };
-            var currentExecutionInfo = new SpecExecutionStartingRequest
-            {
-                CurrentExecutionInfo = executionInfo
-            };
-            var message = new Message
-            {
-                SpecExecutionStartingRequest = currentExecutionInfo,
-                MessageType = Message.Types.MessageType.SpecExecutionStarting,
-                MessageId = 0
-            };
 
-            var tags = AssertEx.ExecuteProtectedMethod<SpecExecutionStartingProcessor>("GetApplicableTags", message)
+            var tags = AssertEx.ExecuteProtectedMethod<SpecExecutionStartingProcessor>("GetApplicableTags", executionInfo)
                 .ToList();
 
             Assert.IsNotEmpty(tags);
@@ -78,12 +68,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
                     CurrentSpec = new SpecInfo()
                 }
             };
-            var request = new Message
-            {
-                MessageId = 20,
-                MessageType = Message.Types.MessageType.SpecExecutionStarting,
-                SpecExecutionStartingRequest = specExecutionStartingRequest
-            };
+            var request = specExecutionStartingRequest;
+
 
             var mockMethodExecutor = new Mock<IExecutionOrchestrator>();
             var protoExecutionResult = new ProtoExecutionResult
@@ -106,9 +92,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var processor = new SpecExecutionStartingProcessor(mockMethodExecutor.Object);
 
             var result = processor.Process(request);
-            Assert.False(result.ExecutionStatusResponse.ExecutionResult.Failed);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message.ToList(), pendingMessages);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Screenshots.ToList(), pendingScreenshots);
+            Assert.False(result.ExecutionResult.Failed);
+            Assert.AreEqual(result.ExecutionResult.Message.ToList(), pendingMessages);
+            Assert.AreEqual(result.ExecutionResult.Screenshots.ToList(), pendingScreenshots);
         }
     }
 }

@@ -25,7 +25,7 @@ using Google.Protobuf;
 
 namespace Gauge.Dotnet.Processors
 {
-    public abstract class HookExecutionProcessor : ExecutionProcessor, IMessageProcessor
+    public abstract class HookExecutionProcessor : ExecutionProcessor
     {
         private const string ClearStateFlag = "gauge_clear_state_level";
         protected const string SuiteLevel = "suite";
@@ -45,38 +45,28 @@ namespace Gauge.Dotnet.Processors
 
         protected virtual string CacheClearLevel => null;
 
-        [DebuggerHidden]
-        public virtual Message Process(Message request)
+        protected virtual ExecutionStatusResponse ExecuteHooks(ExecutionInfo info)
         {
-            var protoExecutionResult = ExecuteHooks(request);
-            ClearCacheForConfiguredLevel();
-            return WrapInMessage(protoExecutionResult, request);
-        }
-
-        protected abstract ExecutionInfo GetExecutionInfo(Message request);
-
-        protected virtual ProtoExecutionResult ExecuteHooks(Message request)
-        {
-            var applicableTags = GetApplicableTags(request);
+            var applicableTags = GetApplicableTags(info);
             var mapper = new ExecutionInfoMapper();
-            var executionContext = mapper.ExecutionInfoFrom(GetExecutionInfo(request));
+            var executionContext = mapper.ExecutionInfoFrom(info);
             var protoExecutionResult =
                 ExecutionOrchestrator.ExecuteHooks(HookType, Strategy, applicableTags, executionContext);
             var allPendingMessages = ExecutionOrchestrator.GetAllPendingMessages().Where(m => m != null);
             var allPendingScreenShots = ExecutionOrchestrator.GetAllPendingScreenshots().Select(ByteString.CopyFrom);
             protoExecutionResult.Message.AddRange(allPendingMessages);
             protoExecutionResult.Screenshots.AddRange(allPendingScreenShots);
-            return protoExecutionResult;
+            return new ExecutionStatusResponse { ExecutionResult = protoExecutionResult };
         }
 
-        private void ClearCacheForConfiguredLevel()
+        protected void ClearCacheForConfiguredLevel()
         {
             var flag = Utils.TryReadEnvValue(ClearStateFlag);
             if (!string.IsNullOrEmpty(flag) && flag.Trim().Equals(CacheClearLevel))
                 ExecutionOrchestrator.ClearCache();
         }
 
-        protected virtual List<string> GetApplicableTags(Message request)
+        protected virtual List<string> GetApplicableTags(ExecutionInfo info)
         {
             return Enumerable.Empty<string>().ToList();
         }

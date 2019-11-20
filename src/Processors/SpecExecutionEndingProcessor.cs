@@ -34,21 +34,15 @@ namespace Gauge.Dotnet.Processors
         protected override string HookType => "AfterSpec";
 
         protected override string CacheClearLevel => SpecLevel;
-
-        protected override ExecutionInfo GetExecutionInfo(Message request)
+        protected override List<string> GetApplicableTags(ExecutionInfo info)
         {
-            return request.SpecExecutionEndingRequest.CurrentExecutionInfo;
+            return info.CurrentSpec.Tags.ToList();
         }
 
-        protected override List<string> GetApplicableTags(Message request)
-        {
-            return GetExecutionInfo(request).CurrentSpec.Tags.ToList();
-        }
-
-        public override Message Process(Message request)
+        public ExecutionStatusResponse Process(SpecExecutionEndingRequest request)
         {
             _executionOrchestrator.CloseExectionScope();
-            return base.Process(request);
+            return ExecuteHooks(request.CurrentExecutionInfo);
         }
     }
 }

@@ -21,7 +21,7 @@ using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
-    public class StepNamesProcessor : IMessageProcessor
+    public class StepNamesProcessor
     {
         private readonly IStepRegistry _stepRegistry;
 
@@ -30,22 +30,12 @@ namespace Gauge.Dotnet.Processors
             _stepRegistry = stepRegistry;
         }
 
-        public Message Process(Message request)
+        public StepNamesResponse Process(StepNamesRequest request)
         {
             var allSteps = _stepRegistry.GetStepTexts();
-            return GetStepNamesResponseMessage(allSteps, request);
-        }
-
-        private static Message GetStepNamesResponseMessage(IEnumerable<string> allSteps, Message request)
-        {
             var stepNamesResponse = new StepNamesResponse();
             stepNamesResponse.Steps.AddRange(allSteps);
-            return new Message
-            {
-                MessageId = request.MessageId,
-                MessageType = Message.Types.MessageType.StepNamesResponse,
-                StepNamesResponse = stepNamesResponse
-            };
+            return stepNamesResponse;
         }
     }
 }

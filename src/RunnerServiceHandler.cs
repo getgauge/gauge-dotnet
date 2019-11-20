@@ -2,49 +2,99 @@ using System.Threading.Tasks;
 using Gauge.Messages;
 using Grpc.Core;
 using Gauge.Dotnet.Helpers;
-using System.Threading;
-using System;
+using Gauge.Dotnet.Wrappers;
+using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Processors;
 
 namespace Gauge.Dotnet
 {
     class RunnerServiceHandler : Runner.RunnerBase
     {
 
-        private readonly MessageProcessorFactory _factory;
         private readonly Server _server;
+        private readonly IStaticLoader _loader;
+        private IStepRegistry _stepRegistry;
+        private StepValidationProcessor stepValidateRequestProcessor;
+        private StepNameProcessor stepNameRequestProcessor;
+        private RefactorProcessor refactorRequestProcessor;
+        private CacheFileProcessor cacheFileRequestProcessor;
+        private StubImplementationCodeProcessor stubImplementationCodeRequestProcessor;
+        private ExecutionStartingProcessor executionStartingProcessor;
+        private ExecutionEndingProcessor executionEndingProcessor;
+        private SpecExecutionStartingProcessor specExecutionStartingProcessor;
+        private SpecExecutionEndingProcessor specExecutionEndingProcessor;
+        private ScenarioExecutionStartingProcessor scenarioExecutionStartingProcessor;
+        private ScenarioExecutionEndingProcessor scenarioExecutionEndingProcessor;
+        private StepExecutionStartingProcessor stepExecutionStartingProcessor;
+        private StepExecutionEndingProcessor stepExecutionEndingProcessor;
+        private ExecuteStepProcessor executeStepProcessor;
+        private ScenarioDataStoreInitProcessor scenarioDataStoreInitProcessor;
+        private SpecDataStoreInitProcessor specDataStoreInitProcessor;
+        private SuiteDataStoreInitProcessor suiteDataStoreInitProcessor;
+        private StepPositionsProcessor stepPositionsRequestProcessor;
 
-        public RunnerServiceHandler(Server server, MessageProcessorFactory factory)
+        private StepNamesProcessor stepNamesRequestProcessor;
+
+        public RunnerServiceHandler(Server server, IStaticLoader loader)
         {
-            _server = server;
-            _factory = factory;
+            this._server = server;
+            this._loader = loader;
+            this._stepRegistry = _loader.GetStepRegistry();
+            this.InitializeMessageProcessors();
+        }
+
+        private void InitializeMessageProcessors()
+        {
+            this.stepValidateRequestProcessor = new StepValidationProcessor(_stepRegistry);
+            this.stepNameRequestProcessor = new StepNameProcessor(_stepRegistry);
+            this.refactorRequestProcessor = new RefactorProcessor(_stepRegistry);
+            this.cacheFileRequestProcessor = new CacheFileProcessor(_loader);
+            this.stubImplementationCodeRequestProcessor = new StubImplementationCodeProcessor();
+            this.stepPositionsRequestProcessor = new StepPositionsProcessor(_stepRegistry);
+            this.stepNamesRequestProcessor = new StepNamesProcessor(_stepRegistry);
+        }
+
+        private void InitializeExecutionMessageHandlers(IReflectionWrapper reflectionWrapper,
+            IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, ITableFormatter tableFormatter,
+            object classInstanceManager)
+        {
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+                classInstanceManager,
+                new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
+                new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+
+            this.executionStartingProcessor = new ExecutionStartingProcessor(executionOrchestrator);
+            this.executionEndingProcessor = new ExecutionEndingProcessor(executionOrchestrator);
+            this.specExecutionStartingProcessor = new SpecExecutionStartingProcessor(executionOrchestrator);
+            this.specExecutionEndingProcessor = new SpecExecutionEndingProcessor(executionOrchestrator);
+            this.scenarioExecutionStartingProcessor = new ScenarioExecutionStartingProcessor(executionOrchestrator);
+            this.scenarioExecutionEndingProcessor = new ScenarioExecutionEndingProcessor(executionOrchestrator);
+            this.stepExecutionStartingProcessor = new StepExecutionStartingProcessor(executionOrchestrator);
+            this.stepExecutionEndingProcessor = new StepExecutionEndingProcessor(executionOrchestrator);
+            this.executeStepProcessor = new ExecuteStepProcessor(_stepRegistry, executionOrchestrator, tableFormatter);
+            this.scenarioDataStoreInitProcessor = new ScenarioDataStoreInitProcessor(assemblyLoader);
+            this.specDataStoreInitProcessor = new SpecDataStoreInitProcessor(assemblyLoader);
+            this.suiteDataStoreInitProcessor = new SuiteDataStoreInitProcessor(assemblyLoader);
         }
 
         public override Task<Empty> CacheFile(CacheFileRequest request, ServerCallContext context)
         {
-            _factory.GetProcessor(Message.Types.MessageType.CacheFileRequest)
-                .Process(new Message { CacheFileRequest = request });
-            return Task.FromResult(new Empty());
+            return Task.FromResult(this.cacheFileRequestProcessor.Process(request));
         }
 
         public override Task<ExecutionStatusResponse> ExecuteStep(ExecuteStepRequest request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.ExecuteStep)
-                .Process(new Message { ExecuteStepRequest = request });
-            return Task.FromResult(response.ExecutionStatusResponse);
+            return Task.FromResult(this.executeStepProcessor.Process(request));
         }
 
         public override Task<ExecutionStatusResponse> ExecutionEnding(ExecutionEndingRequest request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.ExecutionEnding)
-                .Process(new Message { ExecutionEndingRequest = request });
-            return Task.FromResult(response.ExecutionStatusResponse);
+            return Task.FromResult(this.executionEndingProcessor.Process(request));
         }
 
         public override Task<ExecutionStatusResponse> ExecutionStarting(ExecutionStartingRequest request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.ExecutionStarting)
-                .Process(new Message { ExecutionStartingRequest = request });
-            return Task.FromResult(response.ExecutionStatusResponse);
+            return Task.FromResult(this.executionStartingProcessor.Process(request));
         }
 
 
@@ -65,31 +115,23 @@ namespace Gauge.Dotnet
 
         public override Task<StepNameResponse> GetStepName(StepNameRequest request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.StepNameRequest)
-                .Process(new Message { StepNameRequest = request });
-            return Task.FromResult(response.StepNameResponse);
+            return Task.FromResult(this.stepNameRequestProcessor.Process(request));
         }
 
         public override Task<StepNamesResponse> GetStepNames(StepNamesRequest request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.StepNamesRequest)
-                .Process(new Message { StepNamesRequest = request });
-            return Task.FromResult(response.StepNamesResponse);
+            return Task.FromResult(this.stepNamesRequestProcessor.Process(request));
         }
 
         public override Task<StepPositionsResponse> GetStepPositions(StepPositionsRequest request,
             ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.StepPositionsRequest)
-                .Process(new Message { StepPositionsRequest = request });
-            return Task.FromResult(response.StepPositionsResponse);
+            return Task.FromResult(this.stepPositionsRequestProcessor.Process(request));
         }
 
         public override Task<FileDiff> ImplementStub(StubImplementationCodeRequest request, ServerCallContext context)
         {
-            var respone = _factory.GetProcessor(Message.Types.MessageType.StubImplementationCodeRequest)
-                .Process(new Message { StubImplementationCodeRequest = request });
-            return Task.FromResult(respone.FileDiff);
+            return Task.FromResult(this.stubImplementationCodeRequestProcessor.Process(request));
         }
 
         public override Task<Empty> KillProcess(KillProcessRequest request, ServerCallContext context)
@@ -108,80 +150,65 @@ namespace Gauge.Dotnet
 
         public override Task<RefactorResponse> Refactor(RefactorRequest request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.RefactorRequest)
-                .Process(new Message { RefactorRequest = request });
-            return Task.FromResult(response.RefactorResponse);
+            return Task.FromResult(this.refactorRequestProcessor.Process(request));
         }
 
         public override Task<ExecutionStatusResponse> ScenarioDataStoreInit(Empty request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.ScenarioDataStoreInit)
-            .Process(new Message());
-            return Task.FromResult(response.ExecutionStatusResponse);
+            return Task.FromResult(this.scenarioDataStoreInitProcessor.Process());
         }
 
         public override Task<ExecutionStatusResponse> ScenarioExecutionEnding(ScenarioExecutionEndingRequest request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.ScenarioExecutionEnding)
-                .Process(new Message { ScenarioExecutionEndingRequest = request });
-            return Task.FromResult(response.ExecutionStatusResponse);
+            return Task.FromResult(this.scenarioExecutionEndingProcessor.Process(request));
         }
 
         public override Task<ExecutionStatusResponse> ScenarioExecutionStarting(ScenarioExecutionStartingRequest request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.ScenarioExecutionStarting)
-                .Process(new Message { ScenarioExecutionStartingRequest = request });
-            return Task.FromResult(response.ExecutionStatusResponse);
+            return Task.FromResult(this.scenarioExecutionStartingProcessor.Process(request));
         }
 
         public override Task<ExecutionStatusResponse> SpecDataStoreInit(Empty request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.SpecDataStoreInit)
-            .Process(new Message());
-            return Task.FromResult(response.ExecutionStatusResponse);
+            return Task.FromResult(this.specDataStoreInitProcessor.Process());
         }
 
         public override Task<ExecutionStatusResponse> SpecExecutionEnding(SpecExecutionEndingRequest request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.SpecExecutionEnding)
-                .Process(new Message { SpecExecutionEndingRequest = request });
-            return Task.FromResult(response.ExecutionStatusResponse);
+            return Task.FromResult(this.specExecutionEndingProcessor.Process(request));
         }
 
         public override Task<ExecutionStatusResponse> SpecExecutionStarting(SpecExecutionStartingRequest request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.SpecExecutionStarting)
-                .Process(new Message { SpecExecutionStartingRequest = request });
-            return Task.FromResult(response.ExecutionStatusResponse);
+            return Task.FromResult(this.specExecutionStartingProcessor.Process(request));
         }
 
         public override Task<ExecutionStatusResponse> StepExecutionEnding(StepExecutionEndingRequest request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.StepExecutionEnding)
-                .Process(new Message { StepExecutionEndingRequest = request });
-            return Task.FromResult(response.ExecutionStatusResponse);
+            return Task.FromResult(this.stepExecutionEndingProcessor.Process(request));
         }
 
         public override Task<ExecutionStatusResponse> StepExecutionStarting(StepExecutionStartingRequest request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.StepExecutionStarting)
-                .Process(new Message { StepExecutionStartingRequest = request });
-            ;
-            return Task.FromResult(response.ExecutionStatusResponse);
+            return Task.FromResult(this.stepExecutionStartingProcessor.Process(request));
         }
 
         public override Task<ExecutionStatusResponse> SuiteDataStoreInit(Empty request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.SuiteDataStoreInit, true)
-            .Process(new Message());
-            return Task.FromResult(response.ExecutionStatusResponse);
+            var activatorWrapper = new ActivatorWrapper();
+            var reflectionWrapper = new ReflectionWrapper();
+            var assemblies = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), assemblies, reflectionWrapper);
+            _stepRegistry = assemblyLoader.GetStepRegistry();
+            var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+            InitializeExecutionMessageHandlers(reflectionWrapper, assemblyLoader, activatorWrapper, tableFormatter, classInstanceManager);
+            return Task.FromResult(this.suiteDataStoreInitProcessor.Process());
         }
 
         public override Task<StepValidateResponse> ValidateStep(StepValidateRequest request, ServerCallContext context)
         {
-            var response = _factory.GetProcessor(Message.Types.MessageType.StepValidateRequest)
-                .Process(new Message { StepValidateRequest = request });
-            return Task.FromResult(response.StepValidateResponse);
+            return Task.FromResult(this.stepValidateRequestProcessor.Process(request));
         }
     }
 }

@@ -32,12 +32,9 @@ namespace Gauge.Dotnet.Processors
 
         protected override string HookType => "BeforeSuite";
 
-        protected override ExecutionInfo GetExecutionInfo(Message request)
-        {
-            return request.ExecutionStartingRequest.CurrentExecutionInfo;
-        }
 
-        public override Message Process(Message request)
+        [DebuggerHidden]
+        public virtual ExecutionStatusResponse Process(ExecutionStartingRequest request)
         {
             var debuggingEnv = Utils.TryReadEnvValue("DEBUGGING");
             if (debuggingEnv != null && debuggingEnv.ToLower().Equals("true"))
@@ -56,8 +53,9 @@ namespace Gauge.Dotnet.Processors
                         break;
                 }
             }
+            return ExecuteHooks(request.CurrentExecutionInfo);
 
-            return base.Process(request);
         }
+
     }
 }

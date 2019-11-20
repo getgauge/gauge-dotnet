@@ -22,7 +22,7 @@ using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
-    public class ExecuteStepProcessor : ExecutionProcessor, IMessageProcessor
+    public class ExecuteStepProcessor
     {
         private readonly IExecutionOrchestrator _executionOrchestrator;
         private readonly IStepRegistry _stepRegistry;
@@ -37,24 +37,23 @@ namespace Gauge.Dotnet.Processors
         }
 
         [DebuggerHidden]
-        public Message Process(Message request)
+        public ExecutionStatusResponse Process(ExecuteStepRequest request)
         {
-            var executeStepRequest = request.ExecuteStepRequest;
-            if (!_stepRegistry.ContainsStep(executeStepRequest.ParsedStepText))
-                return ExecutionError("Step Implementation not found", request);
+            if (!_stepRegistry.ContainsStep(request.ParsedStepText))
+                return ExecutionError("Step Implementation not found");
 
-            var method = _stepRegistry.MethodFor(executeStepRequest.ParsedStepText);
+            var method = _stepRegistry.MethodFor(request.ParsedStepText);
 
             var parameters = method.ParameterCount;
             var args = new string[parameters];
-            var stepParameter = executeStepRequest.Parameters;
+            var stepParameter = request.Parameters;
             if (parameters != stepParameter.Count)
             {
                 var argumentMismatchError = string.Format(
                     "Argument length mismatch for {0}. Actual Count: {1}, Expected Count: {2}",
-                    executeStepRequest.ActualStepText,
+                    request.ActualStepText,
                     stepParameter.Count, parameters);
-                return ExecutionError(argumentMismatchError, request);
+                return ExecutionError(argumentMismatchError);
             }
 
             var validTableParamTypes = new[]
@@ -65,10 +64,10 @@ namespace Gauge.Dotnet.Processors
                     ? _tableFormatter.GetJSON(stepParameter[i].Table)
                     : stepParameter[i].Value;
             var protoExecutionResult = _executionOrchestrator.ExecuteStep(method, args);
-            return WrapInMessage(protoExecutionResult, request);
+            return new ExecutionStatusResponse { ExecutionResult = protoExecutionResult };
         }
 
-        private static Message ExecutionError(string errorMessage, Message request)
+        private static ExecutionStatusResponse ExecutionError(string errorMessage)
         {
             var result = new ProtoExecutionResult
             {
@@ -77,7 +76,7 @@ namespace Gauge.Dotnet.Processors
                 ExecutionTime = 0,
                 ErrorMessage = errorMessage
             };
-            return WrapInMessage(result, request);
+            return new ExecutionStatusResponse { ExecutionResult = result };
         }
     }
 }

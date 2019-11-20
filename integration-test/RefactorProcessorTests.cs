@@ -51,36 +51,31 @@ namespace Gauge.Dotnet.IntegrationTests
                 StepText = parameterizedStepText,
                 StepValue = stepValue
             });
-            var message = new Message
+            var message = new RefactorRequest
             {
-                MessageId = 1234,
-                MessageType = Message.Types.MessageType.RefactorRequest,
-                RefactorRequest = new RefactorRequest
+                OldStepValue = new ProtoStepValue
                 {
-                    OldStepValue = new ProtoStepValue
-                    {
-                        StepValue = stepValue,
-                        ParameterizedStepValue = parameterizedStepText,
-                        Parameters = {"what", "who"}
-                    },
-                    NewStepValue = new ProtoStepValue
-                    {
-                        StepValue = "Refactoring 1 Say {} to {} at {}",
-                        ParameterizedStepValue = "Refactoring 1 Say <what> to <who> at <when>",
-                        Parameters = {"who", "what", "when"}
-                    },
-                    ParamPositions =
+                    StepValue = stepValue,
+                    ParameterizedStepValue = parameterizedStepText,
+                    Parameters = { "what", "who" }
+                },
+                NewStepValue = new ProtoStepValue
+                {
+                    StepValue = "Refactoring 1 Say {} to {} at {}",
+                    ParameterizedStepValue = "Refactoring 1 Say <what> to <who> at <when>",
+                    Parameters = { "who", "what", "when" }
+                },
+                ParamPositions =
                     {
                         new ParameterPosition {OldPosition = 0, NewPosition = 0},
                         new ParameterPosition {OldPosition = 1, NewPosition = 1},
                         new ParameterPosition {OldPosition = -1, NewPosition = 2}
                     }
-                }
             };
 
             var refactorProcessor = new RefactorProcessor(stepRegistry);
             var result = refactorProcessor.Process(message);
-            Assert.IsTrue(result.RefactorResponse.Success);
+            Assert.IsTrue(result.Success);
         }
 
         [TearDown]
