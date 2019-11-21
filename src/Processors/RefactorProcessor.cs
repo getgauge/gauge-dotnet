@@ -23,7 +23,7 @@ using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
-    public class RefactorProcessor : IMessageProcessor
+    public class RefactorProcessor
     {
         private readonly IStepRegistry _stepRegistry;
 
@@ -32,24 +32,24 @@ namespace Gauge.Dotnet.Processors
             _stepRegistry = stepRegistry;
         }
 
-        public Message Process(Message request)
+        public RefactorResponse Process(RefactorRequest request)
         {
-            var newStep = request.RefactorRequest.NewStepValue;
+            var newStep = request.NewStepValue;
 
             var newStepValue = newStep.ParameterizedStepValue;
-            var parameterPositions = request.RefactorRequest.ParamPositions
+            var parameterPositions = request.ParamPositions
                 .Select(position => new Tuple<int, int>(position.OldPosition, position.NewPosition)).ToList();
 
             var response = new RefactorResponse();
             try
             {
-                var gaugeMethod = GetGaugeMethod(request.RefactorRequest.OldStepValue);
+                var gaugeMethod = GetGaugeMethod(request.OldStepValue);
                 if (gaugeMethod.HasAlias) throw new Exception("Steps with aliases can not be refactored.");
 
                 var fileChanges = RefactorHelper.Refactor(gaugeMethod, parameterPositions, newStep.Parameters.ToList(),
                     newStepValue);
 
-                if (request.RefactorRequest.SaveChanges)
+                if (request.SaveChanges)
                     File.WriteAllText(fileChanges.FileName, fileChanges.FileContent);
 
                 response.Success = true;
@@ -69,12 +69,7 @@ namespace Gauge.Dotnet.Processors
             }
 
 
-            return new Message
-            {
-                MessageId = request.MessageId,
-                MessageType = Message.Types.MessageType.RefactorResponse,
-                RefactorResponse = response
-            };
+            return response;
         }
 
         private static FileChanges ConvertToProtoFileChanges(RefactoringChange fileChanges)

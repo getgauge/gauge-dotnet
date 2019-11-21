@@ -35,11 +35,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var loader = new StaticLoader(mockAttributesLoader.Object);
 
             var processor = new CacheFileProcessor(loader);
-            var request = new Message
+            var request = new CacheFileRequest
             {
-                CacheFileRequest = new CacheFileRequest
-                {
-                    Content = "using Gauge.CSharp.Lib.Attributes;\n" +
+                Content = "using Gauge.CSharp.Lib.Attributes;\n" +
                               "namespace foobar\n" +
                               "{\n" +
                               "    public class FooBar\n" +
@@ -50,9 +48,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
                               "        }\n" +
                               "    }\n" +
                               "}\n",
-                    FilePath = "Foo.cs",
-                    Status = CacheFileRequest.Types.FileStatus.Opened
-                }
+                FilePath = "Foo.cs",
+                Status = CacheFileRequest.Types.FileStatus.Opened
             };
 
             processor.Process(request);
@@ -80,13 +77,10 @@ namespace Gauge.Dotnet.UnitTests.Processors
             loader.LoadStepsFromText(content, "Foo.cs");
 
             var processor = new CacheFileProcessor(loader);
-            var request = new Message
+            var request = new CacheFileRequest
             {
-                CacheFileRequest = new CacheFileRequest
-                {
-                    FilePath = "Foo.cs",
-                    Status = CacheFileRequest.Types.FileStatus.Deleted
-                }
+                FilePath = "Foo.cs",
+                Status = CacheFileRequest.Types.FileStatus.Deleted
             };
 
             Assert.True(loader.GetStepRegistry().ContainsStep("goodbye"));

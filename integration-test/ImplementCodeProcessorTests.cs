@@ -36,49 +36,39 @@ namespace Gauge.Dotnet.IntegrationTests
         [Test]
         public void ShouldProcessMessage()
         {
-            var message = new Message
+            var message = new StubImplementationCodeRequest
             {
-                MessageId = 1234,
-                MessageType = Message.Types.MessageType.StubImplementationCodeRequest,
-                StubImplementationCodeRequest = new StubImplementationCodeRequest
-                {
-                    ImplementationFilePath = "New File",
-                    Codes =
+                ImplementationFilePath = "New File",
+                Codes =
                     {
                         "method"
                     }
-                }
             };
 
             var processor = new StubImplementationCodeProcessor();
             var result = processor.Process(message);
-            Assert.AreEqual("StepImplementation1.cs", Path.GetFileName(result.FileDiff.FilePath));
-            Assert.AreEqual(1, result.FileDiff.TextDiffs.Count);
-            Assert.True(result.FileDiff.TextDiffs[0].Content.Contains("namespace IntegrationTestSample"));
-            Assert.True(result.FileDiff.TextDiffs[0].Content.Contains("class StepImplementation1"));
-            Assert.AreEqual(result.FileDiff.TextDiffs[0].Span.Start, 0);
+            Assert.AreEqual("StepImplementation1.cs", Path.GetFileName(result.FilePath));
+            Assert.AreEqual(1, result.TextDiffs.Count);
+            Assert.True(result.TextDiffs[0].Content.Contains("namespace IntegrationTestSample"));
+            Assert.True(result.TextDiffs[0].Content.Contains("class StepImplementation1"));
+            Assert.AreEqual(result.TextDiffs[0].Span.Start, 0);
         }
 
         [Test]
         public void ShouldProcessMessageForExistingButEmptyFile()
         {
             var file = Path.Combine(TestUtils.GetIntegrationTestSampleDirectory(), "Empty.cs");
-            var message = new Message
+            var message = new StubImplementationCodeRequest
             {
-                MessageId = 1234,
-                MessageType = Message.Types.MessageType.StubImplementationCodeRequest,
-                StubImplementationCodeRequest = new StubImplementationCodeRequest
-                {
-                    ImplementationFilePath = file,
-                    Codes =
+                ImplementationFilePath = file,
+                Codes =
                     {
                         "Step Method"
                     }
-                }
             };
 
             var processor = new StubImplementationCodeProcessor();
-            var result = processor.Process(message).FileDiff;
+            var result = processor.Process(message);
             Assert.AreEqual(1, result.TextDiffs.Count);
             Assert.True(result.TextDiffs[0].Content.Contains("namespace IntegrationTestSample"));
             Assert.True(result.TextDiffs[0].Content.Contains("class Empty"));
@@ -90,22 +80,17 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldProcessMessageForExistingClass()
         {
             var file = Path.Combine(TestUtils.GetIntegrationTestSampleDirectory(), "StepImplementation.cs");
-            var message = new Message
+            var message = new StubImplementationCodeRequest
             {
-                MessageId = 1234,
-                MessageType = Message.Types.MessageType.StubImplementationCodeRequest,
-                StubImplementationCodeRequest = new StubImplementationCodeRequest
-                {
-                    ImplementationFilePath = file,
-                    Codes =
+                ImplementationFilePath = file,
+                Codes =
                     {
                         "Step Method"
                     }
-                }
             };
 
             var processor = new StubImplementationCodeProcessor();
-            var result = processor.Process(message).FileDiff;
+            var result = processor.Process(message);
             Assert.AreEqual(1, result.TextDiffs.Count);
             StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
             Assert.AreEqual(result.TextDiffs[0].Span.Start, 115);
@@ -115,22 +100,17 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldProcessMessageForExistingFileWithEmptyClass()
         {
             var file = Path.Combine(TestUtils.GetIntegrationTestSampleDirectory(), "EmptyClass.cs");
-            var message = new Message
+            var message = new StubImplementationCodeRequest
             {
-                MessageId = 1234,
-                MessageType = Message.Types.MessageType.StubImplementationCodeRequest,
-                StubImplementationCodeRequest = new StubImplementationCodeRequest
-                {
-                    ImplementationFilePath = file,
-                    Codes =
+                ImplementationFilePath = file,
+                Codes =
                     {
                         "Step Method"
                     }
-                }
             };
 
             var processor = new StubImplementationCodeProcessor();
-            var result = processor.Process(message).FileDiff;
+            var result = processor.Process(message);
             Assert.AreEqual(1, result.TextDiffs.Count);
             StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
             Assert.True(result.TextDiffs[0].Content.Contains("Step Method"));
@@ -141,22 +121,17 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldProcessMessageForExistingFileWithSomeComments()
         {
             var file = Path.Combine(TestUtils.GetIntegrationTestSampleDirectory(), "CommentFile.cs");
-            var message = new Message
-            {
-                MessageId = 1234,
-                MessageType = Message.Types.MessageType.StubImplementationCodeRequest,
-                StubImplementationCodeRequest = new StubImplementationCodeRequest
+            var message = new StubImplementationCodeRequest
                 {
                     ImplementationFilePath = file,
                     Codes =
                     {
                         "Step Method"
                     }
-                }
-            };
+                };
 
             var processor = new StubImplementationCodeProcessor();
-            var result = processor.Process(message).FileDiff;
+            var result = processor.Process(message);
             Assert.AreEqual(1, result.TextDiffs.Count);
             StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
             Assert.True(result.TextDiffs[0].Content.Contains("namespace IntegrationTestSample"));

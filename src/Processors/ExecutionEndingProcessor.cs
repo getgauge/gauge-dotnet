@@ -16,6 +16,7 @@
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Gauge.Messages;
 
@@ -28,18 +29,21 @@ namespace Gauge.Dotnet.Processors
         {
         }
 
+        [DebuggerHidden]
+        public virtual ExecutionStatusResponse Process(ExecutionEndingRequest request)
+        {
+            var result = ExecuteHooks(request.CurrentExecutionInfo);
+            ClearCacheForConfiguredLevel();
+            return result;
+        }
+
         protected override string HookType => "AfterSuite";
 
         protected override string CacheClearLevel => SuiteLevel;
 
-        protected override List<string> GetApplicableTags(Message request)
+        protected override List<string> GetApplicableTags(ExecutionInfo info)
         {
-            return GetExecutionInfo(request)?.CurrentSpec?.Tags?.ToList() ?? new List<string>();
-        }
-
-        protected override ExecutionInfo GetExecutionInfo(Message request)
-        {
-            return request.ExecutionEndingRequest.CurrentExecutionInfo;
+            return info?.CurrentSpec?.Tags?.ToList() ?? new List<string>();
         }
     }
 }

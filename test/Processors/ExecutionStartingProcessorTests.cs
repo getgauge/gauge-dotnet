@@ -46,13 +46,6 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 new HookMethod(LibType.BeforeSpec, mockMethod, mockAssemblyLoader.Object)
             };
             mockHookRegistry.Setup(x => x.BeforeSuiteHooks).Returns(hooks);
-            var executionStartingRequest = new ExecutionStartingRequest();
-            _request = new Message
-            {
-                MessageId = 20,
-                MessageType = Message.Types.MessageType.ExecutionStarting,
-                ExecutionStartingRequest = executionStartingRequest
-            };
 
             _mockMethodExecutor = new Mock<IExecutionOrchestrator>();
             _protoExecutionResult = new ProtoExecutionResult
@@ -73,14 +66,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         }
 
         private ExecutionStartingProcessor _executionStartingProcessor;
-        private Message _request;
+
         private Mock<IExecutionOrchestrator> _mockMethodExecutor;
         private ProtoExecutionResult _protoExecutionResult;
 
-        private readonly IEnumerable<string> _pendingMessages = new List<string> {"Foo", "Bar"};
+        private readonly IEnumerable<string> _pendingMessages = new List<string> { "Foo", "Bar" };
 
         private readonly IEnumerable<byte[]> _pendingScrennshots =
-            new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
+            new List<byte[]> { Encoding.ASCII.GetBytes("screenshot") };
 
         [Test]
         public void ShouldExtendFromHooksExecutionProcessor()
@@ -95,14 +88,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 FileName = "",
                 IsFailed = false
             };
             var scenarioInfo = new ScenarioInfo
             {
-                Tags = {"bar"},
+                Tags = { "bar" },
                 Name = "",
                 IsFailed = false
             };
@@ -111,29 +104,21 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 CurrentScenario = scenarioInfo,
                 CurrentSpec = specInfo
             };
-            var currentExecutionInfo = new ScenarioExecutionStartingRequest
-            {
-                CurrentExecutionInfo = currentScenario
-            };
-            var message = new Message
-            {
-                ScenarioExecutionStartingRequest = currentExecutionInfo,
-                MessageType = Message.Types.MessageType.ScenarioExecutionStarting,
-                MessageId = 0
-            };
 
-            var tags = AssertEx.ExecuteProtectedMethod<ExecutionStartingProcessor>("GetApplicableTags", message);
+
+            var tags = AssertEx.ExecuteProtectedMethod<ExecutionStartingProcessor>("GetApplicableTags", currentScenario);
             Assert.IsEmpty(tags);
         }
 
         [Test]
         public void ShouldProcessHooks()
         {
-            var result = _executionStartingProcessor.Process(_request);
+            var executionStartingRequest = new ExecutionStartingRequest();
+            var result = _executionStartingProcessor.Process(executionStartingRequest);
 
             _mockMethodExecutor.VerifyAll();
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message, _pendingMessages);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Screenshots, _pendingScrennshots);
+            Assert.AreEqual(result.ExecutionResult.Message, _pendingMessages);
+            Assert.AreEqual(result.ExecutionResult.Screenshots, _pendingScrennshots);
         }
     }
 }

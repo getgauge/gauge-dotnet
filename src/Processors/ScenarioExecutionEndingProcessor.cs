@@ -36,21 +36,16 @@ namespace Gauge.Dotnet.Processors
         protected override string CacheClearLevel => ScenarioLevel;
 
 
-        public override Message Process(Message request)
+        public ExecutionStatusResponse Process(ScenarioExecutionEndingRequest request)
         {
             _executionOrchestrator.CloseExectionScope();
-            return base.Process(request);
+            return ExecuteHooks(request.CurrentExecutionInfo);
         }
 
-        protected override List<string> GetApplicableTags(Message request)
+        protected override List<string> GetApplicableTags(ExecutionInfo info)
         {
-            return GetExecutionInfo(request).CurrentScenario.Tags
-                .Union(GetExecutionInfo(request).CurrentSpec.Tags).ToList();
+            return info.CurrentScenario.Tags.Union(info.CurrentSpec.Tags).ToList();
         }
 
-        protected override ExecutionInfo GetExecutionInfo(Message request)
-        {
-            return request.ScenarioExecutionEndingRequest.CurrentExecutionInfo;
-        }
     }
 }

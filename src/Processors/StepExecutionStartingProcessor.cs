@@ -30,20 +30,14 @@ namespace Gauge.Dotnet.Processors
 
         protected override string HookType => "BeforeStep";
 
-        protected override ExecutionInfo GetExecutionInfo(Message request)
+        public ExecutionStatusResponse Process(StepExecutionStartingRequest request)
         {
-            return request.StepExecutionStartingRequest.CurrentExecutionInfo;
+            return ExecuteHooks(request.CurrentExecutionInfo);
         }
 
-        protected override ProtoExecutionResult ExecuteHooks(Message request)
+        protected override List<string> GetApplicableTags(ExecutionInfo info)
         {
-            return base.ExecuteHooks(request);
-        }
-
-        protected override List<string> GetApplicableTags(Message request)
-        {
-            return GetExecutionInfo(request).CurrentScenario.Tags
-                .Union(GetExecutionInfo(request).CurrentSpec.Tags).ToList();
+            return info.CurrentScenario.Tags.Union(info.CurrentSpec.Tags).ToList();
         }
     }
 }

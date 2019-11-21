@@ -33,20 +33,15 @@ namespace Gauge.Dotnet.Processors
 
         protected override string HookType => "BeforeSpec";
 
-        protected override ExecutionInfo GetExecutionInfo(Message request)
+        protected override List<string> GetApplicableTags(ExecutionInfo info)
         {
-            return request.SpecExecutionStartingRequest.CurrentExecutionInfo;
+            return info.CurrentSpec.Tags.ToList();
         }
 
-        protected override List<string> GetApplicableTags(Message request)
-        {
-            return GetExecutionInfo(request).CurrentSpec.Tags.ToList();
-        }
-
-        public override Message Process(Message request)
+        public ExecutionStatusResponse Process(SpecExecutionStartingRequest request)
         {
             _executionOrchestrator.StartExecutionScope("spec");
-            return base.Process(request);
+            return ExecuteHooks(request.CurrentExecutionInfo);
         }
     }
 }

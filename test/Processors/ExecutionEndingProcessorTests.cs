@@ -53,12 +53,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                     CurrentScenario = new ScenarioInfo()
                 }
             };
-            _request = new Message
-            {
-                MessageId = 20,
-                MessageType = Message.Types.MessageType.ExecutionEnding,
-                ExecutionEndingRequest = executionEndingRequest
-            };
+            _request = executionEndingRequest;
 
             _mockMethodExecutor = new Mock<IExecutionOrchestrator>();
             _protoExecutionResult = new ProtoExecutionResult
@@ -78,7 +73,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         }
 
         private ExecutionEndingProcessor _executionEndingProcessor;
-        private Message _request;
+        private ExecutionEndingRequest _request;
         private Mock<IExecutionOrchestrator> _mockMethodExecutor;
         private ProtoExecutionResult _protoExecutionResult;
         private readonly IEnumerable<string> _pendingMessages = new List<string> {"Foo", "Bar"};
@@ -97,7 +92,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldGetEmptyTagListByDefault()
         {
-            var tags = AssertEx.ExecuteProtectedMethod<ExecutionEndingProcessor>("GetApplicableTags", _request);
+            var tags = AssertEx.ExecuteProtectedMethod<ExecutionEndingProcessor>("GetApplicableTags", _request.CurrentExecutionInfo);
             Assert.IsEmpty(tags);
         }
 
@@ -106,17 +101,10 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var result = _executionEndingProcessor.Process(_request);
             _mockMethodExecutor.VerifyAll();
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message, _pendingMessages);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Screenshots, _pendingScreenshots);
+            Assert.AreEqual(result.ExecutionResult.Message, _pendingMessages);
+            Assert.AreEqual(result.ExecutionResult.Screenshots, _pendingScreenshots);
         }
 
-        [Test]
-        public void ShouldWrapInMessage()
-        {
-            var message = _executionEndingProcessor.Process(_request);
 
-            Assert.AreEqual(_request.MessageId, message.MessageId);
-            Assert.AreEqual(Message.Types.MessageType.ExecutionStatusResponse, message.MessageType);
-        }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright 2018 ThoughtWorks, Inc.
+// Copyright 2018 ThoughtWorks, Inc.
 //
 // This file is part of Gauge-Dotnet.
 //
@@ -20,7 +20,7 @@ using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
-    public class StepPositionsProcessor : IMessageProcessor
+    public class StepPositionsProcessor
     {
         private readonly IStepRegistry _stepRegistry;
 
@@ -28,13 +28,11 @@ namespace Gauge.Dotnet.Processors
         {
             _stepRegistry = stepRegistry;
         }
-
-        public Message Process(Message request)
+        public StepPositionsResponse Process(StepPositionsRequest request)
         {
-            var positions = _stepRegistry.GetStepPositions(request.StepPositionsRequest.FilePath);
-            var stepPositionsResponse = new StepPositionsResponse();
-            stepPositionsResponse.StepPositions.AddRange(positions);
-            return new Message {StepPositionsResponse = stepPositionsResponse};
+            var response = new StepPositionsResponse();
+            response.StepPositions.AddRange(_stepRegistry.GetStepPositions(request.FilePath));
+            return response;
         }
     }
 }

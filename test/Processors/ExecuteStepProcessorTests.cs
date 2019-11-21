@@ -34,15 +34,11 @@ namespace Gauge.Dotnet.UnitTests.Processors
         public void ShouldProcessExecuteStepRequest()
         {
             const string parsedStepText = "Foo";
-            var request = new Message
+            var request = new ExecuteStepRequest
             {
-                MessageType = Message.Types.MessageType.ExecuteStep,
-                MessageId = 20,
-                ExecuteStepRequest = new ExecuteStepRequest
-                {
-                    ActualStepText = parsedStepText,
-                    ParsedStepText = parsedStepText,
-                    Parameters =
+                ActualStepText = parsedStepText,
+                ParsedStepText = parsedStepText,
+                Parameters =
                     {
                         new Parameter
                         {
@@ -51,23 +47,21 @@ namespace Gauge.Dotnet.UnitTests.Processors
                             Value = "Bar"
                         }
                     }
-                }
             };
             var mockStepRegistry = new Mock<IStepRegistry>();
             mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(true);
-            var fooMethodInfo = new GaugeMethod {Name = "Foo", ParameterCount = 1};
+            var fooMethodInfo = new GaugeMethod { Name = "Foo", ParameterCount = 1 };
             mockStepRegistry.Setup(x => x.MethodFor(parsedStepText)).Returns(fooMethodInfo);
             var mockOrchestrator = new Mock<IExecutionOrchestrator>();
             mockOrchestrator.Setup(e => e.ExecuteStep(fooMethodInfo, It.IsAny<string[]>()))
-                .Returns(() => new ProtoExecutionResult {ExecutionTime = 1, Failed = false});
+                .Returns(() => new ProtoExecutionResult { ExecutionTime = 1, Failed = false });
 
             var mockTableFormatter = new Mock<ITableFormatter>();
 
-            var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object)
-                    .Process(request);
+            var processor = new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object);
+            var response = processor.Process(request);
 
-            Assert.False(response.ExecutionStatusResponse.ExecutionResult.Failed);
+            Assert.False(response.ExecutionResult.Failed);
         }
 
         [Test]
@@ -78,14 +72,11 @@ namespace Gauge.Dotnet.UnitTests.Processors
             const string parsedStepText = "Foo";
             var protoTable = new ProtoTable();
             var tableJSON = "{'headers':['foo', 'bar'],'rows':[['foorow1','barrow1']]}";
-            var request = new Message
+            var request = new ExecuteStepRequest
             {
-                MessageType = Message.Types.MessageType.ExecuteStep,
-                ExecuteStepRequest = new ExecuteStepRequest
-                {
-                    ActualStepText = parsedStepText,
-                    ParsedStepText = parsedStepText,
-                    Parameters =
+                ActualStepText = parsedStepText,
+                ParsedStepText = parsedStepText,
+                Parameters =
                     {
                         new Parameter
                         {
@@ -93,13 +84,11 @@ namespace Gauge.Dotnet.UnitTests.Processors
                             Table = protoTable
                         }
                     }
-                },
-                MessageId = 20
             };
 
             var mockStepRegistry = new Mock<IStepRegistry>();
             mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(true);
-            var fooMethodInfo = new GaugeMethod {Name = "Foo", ParameterCount = 1};
+            var fooMethodInfo = new GaugeMethod { Name = "Foo", ParameterCount = 1 };
             mockStepRegistry.Setup(x => x.MethodFor(parsedStepText)).Returns(fooMethodInfo);
             var mockOrchestrator = new Mock<IExecutionOrchestrator>();
             mockOrchestrator.Setup(e => e.ExecuteStep(fooMethodInfo, It.IsAny<string[]>())).Returns(() =>
@@ -114,43 +103,36 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var mockTableFormatter = new Mock<ITableFormatter>();
             mockTableFormatter.Setup(x => x.GetJSON(protoTable))
                 .Returns(tableJSON);
-            var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object)
-                    .Process(request);
+            var processor = new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object);
+            var response = processor.Process(request);
 
             mockOrchestrator.Verify(executor =>
                 executor.ExecuteStep(fooMethodInfo, It.Is<string[]>(strings => strings[0] == tableJSON)));
-            Assert.False(response.ExecutionStatusResponse.ExecutionResult.Failed);
+            Assert.False(response.ExecutionResult.Failed);
         }
 
         [Test]
         public void ShouldReportArgumentMismatch()
         {
             const string parsedStepText = "Foo";
-            var request = new Message
+            var request = new ExecuteStepRequest
             {
-                MessageType = Message.Types.MessageType.ExecuteStep,
-                MessageId = 20,
-                ExecuteStepRequest = new ExecuteStepRequest
-                {
-                    ActualStepText = parsedStepText,
-                    ParsedStepText = parsedStepText
-                }
+                ActualStepText = parsedStepText,
+                ParsedStepText = parsedStepText
             };
             var mockStepRegistry = new Mock<IStepRegistry>();
             mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(true);
-            var fooMethod = new GaugeMethod {Name = "Foo", ParameterCount = 1};
+            var fooMethod = new GaugeMethod { Name = "Foo", ParameterCount = 1 };
             mockStepRegistry.Setup(x => x.MethodFor(parsedStepText)).Returns(fooMethod);
             var mockOrchestrator = new Mock<IExecutionOrchestrator>();
 
             var mockTableFormatter = new Mock<ITableFormatter>();
 
-            var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object)
-                    .Process(request);
+            var processor = new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object);
+            var response = processor.Process(request);
 
-            Assert.True(response.ExecutionStatusResponse.ExecutionResult.Failed);
-            Assert.AreEqual(response.ExecutionStatusResponse.ExecutionResult.ErrorMessage,
+            Assert.True(response.ExecutionResult.Failed);
+            Assert.AreEqual(response.ExecutionResult.ErrorMessage,
                 "Argument length mismatch for Foo. Actual Count: 0, Expected Count: 1");
         }
 
@@ -158,27 +140,21 @@ namespace Gauge.Dotnet.UnitTests.Processors
         public void ShouldReportMissingStep()
         {
             const string parsedStepText = "Foo";
-            var request = new Message
+            var request = new ExecuteStepRequest
             {
-                MessageType = Message.Types.MessageType.ExecuteStep,
-                ExecuteStepRequest = new ExecuteStepRequest
-                {
-                    ActualStepText = parsedStepText,
-                    ParsedStepText = parsedStepText
-                },
-                MessageId = 20
+                ActualStepText = parsedStepText,
+                ParsedStepText = parsedStepText
             };
             var mockStepRegistry = new Mock<IStepRegistry>();
             mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(false);
             var mockOrchestrator = new Mock<IExecutionOrchestrator>();
             var mockTableFormatter = new Mock<ITableFormatter>();
 
-            var response =
-                new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object)
-                    .Process(request);
+            var processor = new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object);
+            var response = processor.Process(request);
 
-            Assert.True(response.ExecutionStatusResponse.ExecutionResult.Failed);
-            Assert.AreEqual(response.ExecutionStatusResponse.ExecutionResult.ErrorMessage,
+            Assert.True(response.ExecutionResult.Failed);
+            Assert.AreEqual(response.ExecutionResult.ErrorMessage,
                 "Step Implementation not found");
         }
     }

@@ -40,14 +40,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 FileName = "",
                 IsFailed = false
             };
             var scenarioInfo = new ScenarioInfo
             {
-                Tags = {"bar"},
+                Tags = { "bar" },
                 Name = "",
                 IsFailed = false
             };
@@ -60,14 +60,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             {
                 CurrentExecutionInfo = currentScenario
             };
-            var message = new Message
-            {
-                ScenarioExecutionEndingRequest = currentExecutionInfo,
-                MessageType = Message.Types.MessageType.ScenarioExecutionEnding,
-                MessageId = 0
-            };
-
-            var tags = AssertEx.ExecuteProtectedMethod<ScenarioExecutionEndingProcessor>("GetApplicableTags", message)
+            var tags = AssertEx.ExecuteProtectedMethod<ScenarioExecutionEndingProcessor>("GetApplicableTags", currentScenario)
                 .ToList();
 
             Assert.IsNotEmpty(tags);
@@ -81,14 +74,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 FileName = "",
                 IsFailed = false
             };
             var scenarioInfo = new ScenarioInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 IsFailed = false
             };
@@ -97,18 +90,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 CurrentSpec = specInfo,
                 CurrentScenario = scenarioInfo
             };
-            var currentExecutionInfo = new ScenarioExecutionEndingRequest
-            {
-                CurrentExecutionInfo = currentScenario
-            };
-            var message = new Message
-            {
-                ScenarioExecutionEndingRequest = currentExecutionInfo,
-                MessageType = Message.Types.MessageType.ScenarioExecutionEnding,
-                MessageId = 0
-            };
 
-            var tags = AssertEx.ExecuteProtectedMethod<ScenarioExecutionEndingProcessor>("GetApplicableTags", message)
+
+            var tags = AssertEx.ExecuteProtectedMethod<ScenarioExecutionEndingProcessor>("GetApplicableTags", currentScenario)
                 .ToList();
 
             Assert.IsNotEmpty(tags);
@@ -127,12 +111,6 @@ namespace Gauge.Dotnet.UnitTests.Processors
                     CurrentScenario = new ScenarioInfo()
                 }
             };
-            var request = new Message
-            {
-                MessageId = 20,
-                MessageType = Message.Types.MessageType.SpecExecutionStarting,
-                ScenarioExecutionEndingRequest = scenarioExecutionStartingRequest
-            };
 
             var mockMethodExecutor = new Mock<IExecutionOrchestrator>();
             var protoExecutionResult = new ProtoExecutionResult
@@ -140,8 +118,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 ExecutionTime = 0,
                 Failed = false
             };
-            var pendingMessages = new List<string> {"one", "two"};
-            var pendingScreenshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
+            var pendingMessages = new List<string> { "one", "two" };
+            var pendingScreenshots = new List<byte[]> { Encoding.ASCII.GetBytes("screenshot") };
 
             mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("AfterScenario", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
@@ -154,10 +132,10 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             var processor = new ScenarioExecutionEndingProcessor(mockMethodExecutor.Object);
 
-            var result = processor.Process(request);
-            Assert.False(result.ExecutionStatusResponse.ExecutionResult.Failed);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message.ToList(), pendingMessages);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Screenshots.ToList(), pendingScreenshots);
+            var result = processor.Process(scenarioExecutionStartingRequest);
+            Assert.False(result.ExecutionResult.Failed);
+            Assert.AreEqual(result.ExecutionResult.Message.ToList(), pendingMessages);
+            Assert.AreEqual(result.ExecutionResult.Screenshots.ToList(), pendingScreenshots);
         }
     }
 }

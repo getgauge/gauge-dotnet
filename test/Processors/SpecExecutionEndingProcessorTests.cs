@@ -40,7 +40,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 FileName = "",
                 IsFailed = false
@@ -49,18 +49,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
             {
                 CurrentSpec = specInfo
             };
-            var currentExecutionInfo = new SpecExecutionEndingRequest
-            {
-                CurrentExecutionInfo = executionInfo
-            };
-            var message = new Message
-            {
-                SpecExecutionEndingRequest = currentExecutionInfo,
-                MessageType = Message.Types.MessageType.StepExecutionEnding,
-                MessageId = 0
-            };
 
-            var tags = AssertEx.ExecuteProtectedMethod<SpecExecutionEndingProcessor>("GetApplicableTags", message)
+            var tags = AssertEx.ExecuteProtectedMethod<SpecExecutionEndingProcessor>("GetApplicableTags", executionInfo)
                 .ToList();
 
             Assert.IsNotEmpty(tags);
@@ -71,16 +61,11 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldExecutreBeforeSpecHook()
         {
-            var request = new Message
+            var request = new SpecExecutionEndingRequest
             {
-                MessageId = 20,
-                MessageType = Message.Types.MessageType.SpecExecutionEnding,
-                SpecExecutionEndingRequest = new SpecExecutionEndingRequest
+                CurrentExecutionInfo = new ExecutionInfo
                 {
-                    CurrentExecutionInfo = new ExecutionInfo
-                    {
-                        CurrentSpec = new SpecInfo()
-                    }
+                    CurrentSpec = new SpecInfo()
                 }
             };
 
@@ -91,8 +76,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 Failed = false
             };
 
-            var pendingMessages = new List<string> {"one", "two"};
-            var pendingScreenshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
+            var pendingMessages = new List<string> { "one", "two" };
+            var pendingScreenshots = new List<byte[]> { Encoding.ASCII.GetBytes("screenshot") };
 
             mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("AfterSpec", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
@@ -105,9 +90,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var processor = new SpecExecutionEndingProcessor(mockMethodExecutor.Object);
 
             var result = processor.Process(request);
-            Assert.False(result.ExecutionStatusResponse.ExecutionResult.Failed);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message.ToList(), pendingMessages);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Screenshots.ToList(), pendingScreenshots);
+            Assert.False(result.ExecutionResult.Failed);
+            Assert.AreEqual(result.ExecutionResult.Message.ToList(), pendingMessages);
+            Assert.AreEqual(result.ExecutionResult.Screenshots.ToList(), pendingScreenshots);
         }
     }
 }

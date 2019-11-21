@@ -72,7 +72,7 @@ namespace Gauge.Dotnet.UnitTests
 
             _startCommand.Execute();
 
-            _mockGaugeListener.Verify(listener => listener.PollForMessages(), Times.Never);
+            _mockGaugeListener.Verify(listener => listener.StartServer(), Times.Never);
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace Gauge.Dotnet.UnitTests
 
             _startCommand.Execute();
 
-            _mockGaugeListener.Verify(listener => listener.PollForMessages(), Times.Once);
+            _mockGaugeListener.Verify(listener => listener.StartServer(), Times.Once);
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace Gauge.Dotnet.UnitTests
             Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", "GAUGE_CUSTOM_BUILD_PATH");
             _startCommand.Execute();
 
-            _mockGaugeListener.Verify(listener => listener.PollForMessages(), Times.Once);
+            _mockGaugeListener.Verify(listener => listener.StartServer(), Times.Once);
         }
 
         [Test]

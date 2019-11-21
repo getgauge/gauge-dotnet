@@ -60,14 +60,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
             {
                 CurrentExecutionInfo = currentScenario
             };
-            var message = new Message
-            {
-                ScenarioExecutionStartingRequest = currentExecutionInfo,
-                MessageType = Message.Types.MessageType.ScenarioExecutionStarting,
-                MessageId = 0
-            };
 
-            var tags = AssertEx.ExecuteProtectedMethod<ScenarioExecutionStartingProcessor>("GetApplicableTags", message)
+
+            var tags = AssertEx.ExecuteProtectedMethod<ScenarioExecutionStartingProcessor>("GetApplicableTags", currentScenario)
                 .ToList();
 
             Assert.IsNotEmpty(tags);
@@ -97,18 +92,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 CurrentSpec = specInfo,
                 CurrentScenario = scenarioInfo
             };
-            var currentExecutionInfo = new ScenarioExecutionStartingRequest
-            {
-                CurrentExecutionInfo = currentScenario
-            };
-            var message = new Message
-            {
-                ScenarioExecutionStartingRequest = currentExecutionInfo,
-                MessageType = Message.Types.MessageType.ScenarioExecutionStarting,
-                MessageId = 0
-            };
 
-            var tags = AssertEx.ExecuteProtectedMethod<ScenarioExecutionStartingProcessor>("GetApplicableTags", message)
+
+            var tags = AssertEx.ExecuteProtectedMethod<ScenarioExecutionStartingProcessor>("GetApplicableTags", currentScenario)
                 .ToList();
 
             Assert.IsNotEmpty(tags);
@@ -126,12 +112,6 @@ namespace Gauge.Dotnet.UnitTests.Processors
                     CurrentSpec = new SpecInfo(),
                     CurrentScenario = new ScenarioInfo()
                 }
-            };
-            var request = new Message
-            {
-                MessageId = 20,
-                MessageType = Message.Types.MessageType.SpecExecutionStarting,
-                ScenarioExecutionStartingRequest = scenarioExecutionEndingRequest
             };
 
             var mockMethodExecutor = new Mock<IExecutionOrchestrator>();
@@ -155,10 +135,10 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             var processor = new ScenarioExecutionStartingProcessor(mockMethodExecutor.Object);
 
-            var result = processor.Process(request);
-            Assert.False(result.ExecutionStatusResponse.ExecutionResult.Failed);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Message.ToList(), pendingMessages);
-            Assert.AreEqual(result.ExecutionStatusResponse.ExecutionResult.Screenshots.ToList(), pendingScreenshots);
+            var result = processor.Process(scenarioExecutionEndingRequest);
+            Assert.False(result.ExecutionResult.Failed);
+            Assert.AreEqual(result.ExecutionResult.Message.ToList(), pendingMessages);
+            Assert.AreEqual(result.ExecutionResult.Screenshots.ToList(), pendingScreenshots);
         }
     }
 }

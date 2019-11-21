@@ -15,15 +15,12 @@ namespace Gauge.Dotnet.UnitTests.Processors
             public void ShouldProcessStepNameRequest()
             {
                 var mockStepRegistry = new Mock<IStepRegistry>();
-                var request = new Message
+                var request = new StepNameRequest
                 {
-                    StepNameRequest = new StepNameRequest
-                    {
-                        StepValue = "step1"
-                    }
+                    StepValue = "step1"
                 };
 
-                var parsedStepText = request.StepNameRequest.StepValue;
+                var parsedStepText = request.StepValue;
                 const string stepText = "step1";
                 mockStepRegistry.Setup(r => r.ContainsStep(parsedStepText)).Returns(true);
                 mockStepRegistry.Setup(r => r.GetStepText(parsedStepText)).Returns(stepText);
@@ -35,7 +32,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 mockStepRegistry.Setup(r => r.HasAlias(stepText)).Returns(false);
                 var stepNameProcessor = new StepNameProcessor(mockStepRegistry.Object);
 
-                var response = stepNameProcessor.Process(request).StepNameResponse;
+                var response = stepNameProcessor.Process(request);
 
                 Assert.AreEqual(response.FileName, "foo");
                 Assert.AreEqual(response.StepName[0], "step1");
@@ -46,14 +43,11 @@ namespace Gauge.Dotnet.UnitTests.Processors
             public void ShouldProcessStepNameWithAliasRequest()
             {
                 var mockStepRegistry = new Mock<IStepRegistry>();
-                var request = new Message
+                var request = new StepNameRequest
                 {
-                    StepNameRequest = new StepNameRequest
-                    {
-                        StepValue = "step1"
-                    }
+                    StepValue = "step1"
                 };
-                var parsedStepText = request.StepNameRequest.StepValue;
+                var parsedStepText = request.StepValue;
                 const string stepText = "step1";
                 mockStepRegistry.Setup(r => r.ContainsStep(parsedStepText)).Returns(true);
                 mockStepRegistry.Setup(r => r.GetStepText(parsedStepText)).Returns(stepText);
@@ -62,13 +56,13 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 {
                     FileName = "foo",
                     HasAlias = true,
-                    Aliases = new List<string> {"step2", "step3"}
+                    Aliases = new List<string> { "step2", "step3" }
                 };
                 mockStepRegistry.Setup(r => r.MethodFor(parsedStepText)).Returns(gaugeMethod);
                 mockStepRegistry.Setup(r => r.HasAlias(stepText)).Returns(true);
                 var stepNameProcessor = new StepNameProcessor(mockStepRegistry.Object);
 
-                var response = stepNameProcessor.Process(request).StepNameResponse;
+                var response = stepNameProcessor.Process(request);
 
                 Assert.AreEqual(response.FileName, "foo");
                 Assert.AreEqual(response.StepName[0], "step2");

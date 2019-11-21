@@ -23,7 +23,7 @@ using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
-    public class StepValidationProcessor : IMessageProcessor
+    public class StepValidationProcessor
     {
         private readonly IStepRegistry _stepRegistry;
 
@@ -32,9 +32,9 @@ namespace Gauge.Dotnet.Processors
             _stepRegistry = stepRegistry;
         }
 
-        public Message Process(Message request)
+        public StepValidateResponse Process(StepValidateRequest request)
         {
-            var stepToValidate = request.StepValidateRequest.StepText;
+            var stepToValidate = request.StepText;
             var isValid = true;
             var errorMessage = "";
             var suggestion = "";
@@ -43,7 +43,7 @@ namespace Gauge.Dotnet.Processors
             {
                 isValid = false;
                 errorMessage = string.Format("No implementation found for : {0}. Full Step Text :", stepToValidate);
-                suggestion = GetSuggestion(request.StepValidateRequest.StepValue);
+                suggestion = GetSuggestion(request.StepValue);
             }
             else if (_stepRegistry.HasMultipleImplementations(stepToValidate))
             {
@@ -52,7 +52,7 @@ namespace Gauge.Dotnet.Processors
                 errorMessage = string.Format("Multiple step implementations found for : {0}", stepToValidate);
             }
 
-            return GetStepValidateResponseMessage(isValid, request, errorType, errorMessage, suggestion);
+            return GetStepValidateResponseMessage(isValid, errorType, errorMessage, suggestion);
         }
 
         private string GetSuggestion(ProtoStepValue stepValue)
@@ -69,21 +69,15 @@ namespace Gauge.Dotnet.Processors
             return string.Join(" ,", paramsString);
         }
 
-        private static Message GetStepValidateResponseMessage(bool isValid, Message request,
+        private static StepValidateResponse GetStepValidateResponseMessage(bool isValid,
             StepValidateResponse.Types.ErrorType errorType, string errorMessage, string suggestion)
         {
-            var stepValidateResponse = new StepValidateResponse
+            return new StepValidateResponse
             {
                 ErrorMessage = errorMessage,
                 IsValid = isValid,
                 ErrorType = errorType,
                 Suggestion = suggestion
-            };
-            return new Message
-            {
-                MessageId = request.MessageId,
-                MessageType = Message.Types.MessageType.StepValidateResponse,
-                StepValidateResponse = stepValidateResponse
             };
         }
     }

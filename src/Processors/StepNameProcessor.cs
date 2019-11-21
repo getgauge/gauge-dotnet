@@ -20,7 +20,7 @@ using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
-    public class StepNameProcessor : IMessageProcessor
+    public class StepNameProcessor
     {
         private readonly IStepRegistry _stepRegistry;
 
@@ -29,29 +29,24 @@ namespace Gauge.Dotnet.Processors
             _stepRegistry = stepRegistry;
         }
 
-        public Message Process(Message request)
+        public StepNameResponse Process(StepNameRequest request)
         {
-            var parsedStepText = request.StepNameRequest.StepValue;
+            var parsedStepText = request.StepValue;
             var isStepPresent = _stepRegistry.ContainsStep(parsedStepText);
-            var message = new Message
+            var response = new StepNameResponse
             {
-                MessageId = request.MessageId,
-                MessageType = Message.Types.MessageType.StepNameResponse,
-                StepNameResponse = new StepNameResponse
-                {
-                    IsStepPresent = isStepPresent
-                }
+                IsStepPresent = isStepPresent
             };
 
-            if (!isStepPresent) return message;
+            if (!isStepPresent) return response;
 
             var stepText = _stepRegistry.GetStepText(parsedStepText);
             var hasAlias = _stepRegistry.HasAlias(stepText);
             var info = _stepRegistry.MethodFor(parsedStepText);
 
-            message.StepNameResponse.HasAlias = hasAlias;
-            message.StepNameResponse.FileName = info.FileName;
-            message.StepNameResponse.Span = new Span
+            response.HasAlias = hasAlias;
+            response.FileName = info.FileName;
+            response.Span = new Span
             {
                 Start = info.Span.Span.Start.Line + 1,
                 StartChar = info.Span.StartLinePosition.Character,
@@ -60,11 +55,11 @@ namespace Gauge.Dotnet.Processors
             };
 
             if (hasAlias)
-                message.StepNameResponse.StepName.AddRange(info.Aliases);
+                response.StepName.AddRange(info.Aliases);
             else
-                message.StepNameResponse.StepName.Add(stepText);
+                response.StepName.Add(stepText);
 
-            return message;
+            return response;
         }
     }
 }

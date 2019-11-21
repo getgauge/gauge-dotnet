@@ -57,11 +57,7 @@ namespace Gauge.Dotnet.IntegrationTests
                     }
                 }
             };
-            var message = new Message
-            {
-                MessageId = 1234,
-                MessageType = Message.Types.MessageType.ExecuteStep,
-                ExecuteStepRequest = new ExecuteStepRequest
+            var message = new ExecuteStepRequest
                 {
                     ParsedStepText = parameterizedStepText,
                     ActualStepText = stepText,
@@ -74,12 +70,11 @@ namespace Gauge.Dotnet.IntegrationTests
                             Table = protoTable
                         }
                     }
-                }
-            };
+                };
             var result = executeStepProcessor.Process(message);
 
             AssertRunnerDomainDidNotLoadUsersAssembly();
-            var protoExecutionResult = result.ExecutionStatusResponse.ExecutionResult;
+            var protoExecutionResult = result.ExecutionResult;
             Assert.IsNotNull(protoExecutionResult);
             Assert.IsFalse(protoExecutionResult.Failed);
         }
@@ -104,18 +99,14 @@ namespace Gauge.Dotnet.IntegrationTests
                 mockOrchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
 
 
-            var message = new Message
-            {
-                MessageType = Message.Types.MessageType.ExecuteStep,
-                ExecuteStepRequest = new ExecuteStepRequest
+            var message = new ExecuteStepRequest
                 {
                     ParsedStepText = parameterizedStepText,
                     ActualStepText = stepText
-                }
-            };
+                };
 
             var result = executeStepProcessor.Process(message);
-            var protoExecutionResult = result.ExecutionStatusResponse.ExecutionResult;
+            var protoExecutionResult = result.ExecutionResult;
 
             Assert.IsNotNull(protoExecutionResult);
             Assert.IsTrue(protoExecutionResult.Failed);
