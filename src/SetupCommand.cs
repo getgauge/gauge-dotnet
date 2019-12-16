@@ -112,7 +112,11 @@ namespace {projName}
             var properties = new[]
             {
                 $"GAUGE_CSHARP_PROJECT_FILE={projName}.csproj",
-                "GAUGE_CSHARP_PROJECT_CONFIG=release"
+                "GAUGE_CSHARP_PROJECT_CONFIG=release",
+                Environment.NewLine,
+                "# Possible values for this property are 'suite', 'spec' or 'scenario’.",
+                "# 'scenario' clears the objects after the execution of each scenario, new objects are created for next execution.",
+                "gauge_clear_state_level=scenario"
             };
             return string.Join(Environment.NewLine, properties);
         }
