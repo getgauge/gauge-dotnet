@@ -16,7 +16,6 @@
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using Gauge.Dotnet.Handlers;
 using Gauge.Messages;
 using Grpc.Core;
 
@@ -34,17 +33,8 @@ namespace Gauge.Dotnet
         public void StartServer()
         {
             var server = new Server();
-
-            var executionServiceHandler = new ExecutionServiceHandler(_loader);
-            var authoringServiceHandler = new AuthoringServiceHandler(_loader);
-            var validaterServiceHandler = new ValidatorServiceHandler(_loader);
-            var processServiceHandler = new ProcessHandler(server);
-
-            server.Services.Add(Validator.BindService(validaterServiceHandler));
-            server.Services.Add(Authoring.BindService(authoringServiceHandler));
-            server.Services.Add(Execution.BindService(executionServiceHandler));
-            server.Services.Add(Process.BindService(processServiceHandler));
-
+            var handler = new RunnerServiceHandler(_loader, server);
+            server.Services.Add(Runner.BindService(handler));
             var port = server.Ports.Add(new ServerPort("127.0.0.1", 0, ServerCredentials.Insecure));
             server.Start();
             Console.WriteLine("Listening on port:" + port);

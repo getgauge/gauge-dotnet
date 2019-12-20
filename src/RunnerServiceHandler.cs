@@ -16,17 +16,27 @@
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Threading.Tasks;
+using Gauge.Dotnet.Helpers;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Grpc.Core;
 
-namespace Gauge.Dotnet.Handlers
+namespace Gauge.Dotnet
 {
-    internal class ExecutionServiceHandler : Execution.ExecutionBase
+    internal class RunnerServiceHandler: Runner.RunnerBase
     {
+        private IStaticLoader _loader;
+        private Server _server;
         private IStepRegistry _stepRegistry;
+        private StepValidationProcessor stepValidateRequestProcessor;
+        private StepNameProcessor stepNameRequestProcessor;
+        private RefactorProcessor refactorRequestProcessor;
+        private CacheFileProcessor cacheFileRequestProcessor;
+        private StubImplementationCodeProcessor stubImplementationCodeRequestProcessor;
+        private StepPositionsProcessor stepPositionsRequestProcessor;
+        private StepNamesProcessor stepNamesRequestProcessor;
         private ExecutionStartingProcessor executionStartingProcessor;
         private ExecutionEndingProcessor executionEndingProcessor;
         private SpecExecutionStartingProcessor specExecutionStartingProcessor;
@@ -40,9 +50,18 @@ namespace Gauge.Dotnet.Handlers
         private SpecDataStoreInitProcessor specDataStoreInitProcessor;
         private SuiteDataStoreInitProcessor suiteDataStoreInitProcessor;
 
-        public ExecutionServiceHandler(IStaticLoader loader)
+
+        public RunnerServiceHandler(IStaticLoader loader, Server server)
         {
-            _stepRegistry = loader.GetStepRegistry();
+            _loader = loader;
+            this._server = server;
+            this._stepRegistry = loader.GetStepRegistry();
+            this.InitializeMessageProcessors();
+        }
+
+        public override Task<StepValidateResponse> ValidateStep(StepValidateRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(this.stepValidateRequestProcessor.Process(request));
         }
 
         public override Task<ExecutionStatusResponse> ExecuteStep(ExecuteStepRequest request, ServerCallContext context)
@@ -83,14 +102,7 @@ namespace Gauge.Dotnet.Handlers
 
         public override Task<ExecutionStatusResponse> InitializeSuiteDataStore(Empty request, ServerCallContext context)
         {
-            var activatorWrapper = new ActivatorWrapper();
-            var reflectionWrapper = new ReflectionWrapper();
-            var assemblies = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), assemblies, reflectionWrapper);
-            _stepRegistry = assemblyLoader.GetStepRegistry();
-            var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
-            InitializeExecutionMessageHandlers(reflectionWrapper, assemblyLoader, activatorWrapper, tableFormatter, classInstanceManager);
+            InitializeExecutionMessageHandlers();
             return Task.FromResult(this.suiteDataStoreInitProcessor.Process());
         }
 
@@ -114,10 +126,85 @@ namespace Gauge.Dotnet.Handlers
             return Task.FromResult(this.stepExecutionStartingProcessor.Process(request));
         }
 
-        private void InitializeExecutionMessageHandlers(IReflectionWrapper reflectionWrapper,
-            IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, ITableFormatter tableFormatter,
-            object classInstanceManager)
+        public override Task<Empty> CacheFile(CacheFileRequest request, ServerCallContext context)
         {
+            return Task.FromResult(this.cacheFileRequestProcessor.Process(request));
+        }
+
+
+        public override Task<ImplementationFileGlobPatternResponse> GetGlobPatterns(Empty request, ServerCallContext context)
+        {
+            var response = new ImplementationFileGlobPatternResponse();
+            response.GlobPatterns.Add(FileHelper.GetImplementationGlobPatterns());
+            return Task.FromResult(response);
+        }
+
+
+        public override Task<ImplementationFileListResponse> GetImplementationFiles(Empty request, ServerCallContext context)
+        {
+            var response = new ImplementationFileListResponse();
+            response.ImplementationFilePaths.AddRange(FileHelper.GetImplementationFiles());
+            return Task.FromResult(response);
+        }
+
+        public override Task<StepNameResponse> GetStepName(StepNameRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(this.stepNameRequestProcessor.Process(request));
+        }
+
+        public override Task<StepNamesResponse> GetStepNames(StepNamesRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(this.stepNamesRequestProcessor.Process(request));
+        }
+
+        public override Task<StepPositionsResponse> GetStepPositions(StepPositionsRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(this.stepPositionsRequestProcessor.Process(request));
+        }
+
+        public override Task<FileDiff> ImplementStub(StubImplementationCodeRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(this.stubImplementationCodeRequestProcessor.Process(request));
+        }
+
+        public override Task<RefactorResponse> Refactor(RefactorRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(this.refactorRequestProcessor.Process(request));
+        }
+
+        private void InitializeMessageProcessors()
+        {
+            this.stepValidateRequestProcessor = new StepValidationProcessor(_stepRegistry);
+            this.stepNameRequestProcessor = new StepNameProcessor(_stepRegistry);
+            this.refactorRequestProcessor = new RefactorProcessor(_stepRegistry);
+            this.cacheFileRequestProcessor = new CacheFileProcessor(_loader);
+            this.stubImplementationCodeRequestProcessor = new StubImplementationCodeProcessor();
+            this.stepPositionsRequestProcessor = new StepPositionsProcessor(_stepRegistry);
+            this.stepNamesRequestProcessor = new StepNamesProcessor(_stepRegistry);
+        }
+
+        public override Task<Empty> Kill(KillProcessRequest request, ServerCallContext context)
+        {
+            try
+            {
+                Logger.Debug("KillProcessrequest received");
+                return Task.FromResult(new Empty());
+            }
+            finally
+            {
+                _server.ShutdownAsync();
+            }
+        }
+
+        private void InitializeExecutionMessageHandlers()
+        {
+            var activatorWrapper = new ActivatorWrapper();
+            var reflectionWrapper = new ReflectionWrapper();
+            var assemblies = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), assemblies, reflectionWrapper);
+            _stepRegistry = assemblyLoader.GetStepRegistry();
+            var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
