@@ -32,10 +32,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
 {
     internal class StepExecutionEndingProcessorTests
     {
-        private readonly IEnumerable<string> _pendingMessages = new List<string> {"Foo", "Bar"};
+        private readonly IEnumerable<string> _pendingMessages = new List<string> { "Foo", "Bar" };
 
-        private readonly IEnumerable<byte[]> _pendingScreenshots =
-            new List<byte[]> {Encoding.ASCII.GetBytes("SCREENSHOT")};
+        private readonly IEnumerable<string> _pendingScreenshotFiles = new List<string> { "SCREENSHOT.png" };
 
         private Mock<IExecutionOrchestrator> _mockMethodExecutor;
         private ProtoExecutionResult _protoExecutionResult;
@@ -48,12 +47,12 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var mockHookRegistry = new Mock<IHookRegistry>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var mockMessageCollectorType = new Mock<Type>();
-            var mockScreenshtCollectorType = new Mock<Type>();
+            var mockScreenshotFilesCollectorType = new Mock<Type>();
 
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector))
                 .Returns(mockMessageCollectorType.Object);
-            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotCollector))
-                .Returns(mockScreenshtCollectorType.Object);
+            mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ScreenshotFilesCollector))
+                .Returns(mockScreenshotFilesCollectorType.Object);
             var mockMethod = new MockMethodBuilder(mockAssemblyLoader)
                 .WithName("Foo")
                 .WithFilteredHook(LibType.BeforeSpec)
@@ -86,7 +85,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             _mockMethodExecutor.Setup(x =>
                 x.GetAllPendingMessages()).Returns(_pendingMessages);
             _mockMethodExecutor.Setup(x =>
-                x.GetAllPendingScreenshots()).Returns(_pendingScreenshots);
+                x.GetAllPendingScreenshotFiles()).Returns(_pendingScreenshotFiles);
             _stepExecutionEndingProcessor = new StepExecutionEndingProcessor(_mockMethodExecutor.Object);
         }
 
@@ -104,7 +103,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             Assert.True(response != null);
             Assert.True(response.ExecutionResult != null);
             Assert.AreEqual(2, response.ExecutionResult.Message.Count);
-            Assert.AreEqual(1, response.ExecutionResult.Screenshots.Count);
+            Assert.AreEqual(1, response.ExecutionResult.ScreenshotFiles.Count);
 
             foreach (var pendingMessage in _pendingMessages)
                 Assert.Contains(pendingMessage, response.ExecutionResult.Message.ToList());

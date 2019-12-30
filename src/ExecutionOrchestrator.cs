@@ -17,6 +17,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Gauge.CSharp.Core;
@@ -25,7 +26,6 @@ using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
-using Google.Protobuf;
 
 namespace Gauge.Dotnet
 {
@@ -72,7 +72,7 @@ namespace Gauge.Dotnet
                 "StartScope", tag);
         }
 
-        public void CloseExectionScope()
+        public void CloseExecutionScope()
         {
             _reflectionWrapper.InvokeMethod(_assemblyLoader.ClassInstanceManagerType, _classInstanceManager,
                 "CloseScope");
@@ -85,11 +85,11 @@ namespace Gauge.Dotnet
                 BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>;
         }
 
-        public IEnumerable<byte[]> GetAllPendingScreenshots()
+        public IEnumerable<string> GetAllPendingScreenshotFiles()
         {
-            var messageCollectorType = _assemblyLoader.GetLibType(LibType.ScreenshotCollector);
-            return _reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingScreenshots",
-                BindingFlags.Static | BindingFlags.Public) as IEnumerable<byte[]>;
+            var messageCollectorType = _assemblyLoader.GetLibType(LibType.ScreenshotFilesCollector);
+            return _reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingScreenshotFiles",
+                BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>;
         }
 
         [DebuggerHidden]
@@ -110,17 +110,16 @@ namespace Gauge.Dotnet
             };
             var allPendingMessages = GetAllPendingMessages().Where(m => m != null);
             result.Message.AddRange(allPendingMessages);
-            var allPendingScreenShots = GetAllPendingScreenshots().Select(ByteString.CopyFrom);
-            result.Screenshots.AddRange(allPendingScreenShots);
+            var allPendingScreenShotFiles = GetAllPendingScreenshotFiles().Where(s => s != null);
+            result.ScreenshotFiles.AddRange(allPendingScreenShotFiles);
             if (executionResult.Success) return result;
             var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
             result.Failed = true;
             var isScreenShotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
             if (isScreenShotEnabled == null || isScreenShotEnabled.ToLower() != "false")
             {
-                var screenshot = TakeScreenshot();
-                result.ScreenShot = screenshot;
-                result.FailureScreenshot = screenshot;
+                var ScreenshotFile = TryScreenCapture();
+                result.FailureScreenshotFile = ScreenshotFile;
             }
 
             result.ErrorMessage = executionResult.ExceptionMessage;
@@ -130,34 +129,23 @@ namespace Gauge.Dotnet
             return result;
         }
 
-        private ByteString TakeScreenshot()
-        {
-            return TryScreenCapture(out var screenShotBytes)
-                ? ByteString.CopyFrom(screenShotBytes)
-                : ByteString.Empty;
-        }
-
-        private bool TryScreenCapture(out byte[] screenShotBytes)
+        private string TryScreenCapture()
         {
             try
             {
-                var instance = _activatorWrapper.CreateInstance(_assemblyLoader.ScreengrabberType);
+                var instance = _activatorWrapper.CreateInstance(_assemblyLoader.ScreenshotWriter);
                 if (instance != null)
                 {
-                    screenShotBytes =
-                        _reflectionWrapper.InvokeMethod(_assemblyLoader.ScreengrabberType, instance,
-                                "TakeScreenShot") as
-                            byte[];
-                    return true;
+                    var ScreenshotFile = _reflectionWrapper.InvokeMethod(_assemblyLoader.ScreenshotWriter, instance,
+                                    "TakeScreenShot") as string;
+                    return Path.GetFileName(ScreenshotFile);
                 }
             }
             catch
             {
                 //do nothing, return
             }
-
-            screenShotBytes = null;
-            return false;
+            return "";
         }
     }
 }

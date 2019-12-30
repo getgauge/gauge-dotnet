@@ -39,7 +39,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldClearExistingGaugeMessages()
         {
-            var mockExectionHelper = new Mock<IExecutionOrchestrator>();
+            var mockExecutionHelper = new Mock<IExecutionOrchestrator>();
 
             var request = new StepExecutionStartingRequest
             {
@@ -51,7 +51,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             };
 
             var protoExecutionResult = new ProtoExecutionResult { ExecutionTime = 0, Failed = false };
-            mockExectionHelper.Setup(executor =>
+            mockExecutionHelper.Setup(executor =>
                     executor.ExecuteHooks(It.IsAny<string>(), It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
                         It.IsAny<ExecutionContext>()))
                 .Returns(protoExecutionResult);
@@ -59,21 +59,21 @@ namespace Gauge.Dotnet.UnitTests.Processors
             hookRegistry.Setup(registry => registry.BeforeStepHooks).Returns(new HashSet<IHookMethod>());
 
             var pendingMessages = new List<string> { "one", "two" };
-            var pendingScreenshots = new List<byte[]> { Encoding.ASCII.GetBytes("screenshot") };
+            var pendingScreenshotFiles = new List<string> { "screenshot.png" };
 
-            mockExectionHelper.Setup(x =>
+            mockExecutionHelper.Setup(x =>
                     x.ExecuteHooks("BeforeStep", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
                         It.IsAny<ExecutionContext>()))
                 .Returns(protoExecutionResult);
-            mockExectionHelper.Setup(x =>
+            mockExecutionHelper.Setup(x =>
                 x.GetAllPendingMessages()).Returns(pendingMessages);
-            mockExectionHelper.Setup(x =>
-                x.GetAllPendingScreenshots()).Returns(pendingScreenshots);
+            mockExecutionHelper.Setup(x =>
+                x.GetAllPendingScreenshotFiles()).Returns(pendingScreenshotFiles);
 
-            var processor = new StepExecutionStartingProcessor(mockExectionHelper.Object);
+            var processor = new StepExecutionStartingProcessor(mockExecutionHelper.Object);
             var result = processor.Process(request);
             Assert.AreEqual(result.ExecutionResult.Message, pendingMessages);
-            Assert.AreEqual(result.ExecutionResult.Screenshots, pendingScreenshots);
+            Assert.AreEqual(result.ExecutionResult.ScreenshotFiles, pendingScreenshotFiles);
         }
 
         [Test]

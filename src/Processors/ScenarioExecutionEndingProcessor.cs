@@ -38,7 +38,7 @@ namespace Gauge.Dotnet.Processors
 
         public ExecutionStatusResponse Process(ScenarioExecutionEndingRequest request)
         {
-            _executionOrchestrator.CloseExectionScope();
+            _executionOrchestrator.CloseExecutionScope();
             return ExecuteHooks(request.CurrentExecutionInfo);
         }
 

@@ -78,7 +78,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 Failed = false
             };
             var pendingMessages = new List<string> {"one", "two"};
-            var pendingScreenshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
+            var pendingScreenshotFiles = new List<string> {"screenshot.png"};
 
             mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("BeforeSpec", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
@@ -87,14 +87,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockMethodExecutor.Setup(x =>
                 x.GetAllPendingMessages()).Returns(pendingMessages);
             mockMethodExecutor.Setup(x =>
-                x.GetAllPendingScreenshots()).Returns(pendingScreenshots);
+                x.GetAllPendingScreenshotFiles()).Returns(pendingScreenshotFiles);
 
             var processor = new SpecExecutionStartingProcessor(mockMethodExecutor.Object);
 
             var result = processor.Process(request);
             Assert.False(result.ExecutionResult.Failed);
             Assert.AreEqual(result.ExecutionResult.Message.ToList(), pendingMessages);
-            Assert.AreEqual(result.ExecutionResult.Screenshots.ToList(), pendingScreenshots);
+            Assert.AreEqual(result.ExecutionResult.ScreenshotFiles.ToList(), pendingScreenshotFiles);
         }
     }
 }

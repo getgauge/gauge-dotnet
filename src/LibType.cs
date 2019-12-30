@@ -35,9 +35,9 @@ namespace Gauge.Dotnet
         TagAggregationBehaviourAttribute,
         DataStoreFactory,
         MessageCollector,
-        ScreenshotCollector,
+        ScreenshotFilesCollector,
         ContinueOnFailure,
-        DefaultScreenGrabber,
+        DefaultScreenshotWriter,
         DefaultClassInstanceManager
     }
 
@@ -59,9 +59,9 @@ namespace Gauge.Dotnet
             {LibType.TagAggregationBehaviourAttribute, "Gauge.CSharp.Lib.Attribute.TagAggregationBehaviourAttribute"},
             {LibType.DataStoreFactory, "Gauge.CSharp.Lib.DataStoreFactory"},
             {LibType.MessageCollector, "Gauge.CSharp.Lib.MessageCollector"},
-            {LibType.ScreenshotCollector, "Gauge.CSharp.Lib.ScreenshotCollector"},
+            {LibType.ScreenshotFilesCollector, "Gauge.CSharp.Lib.ScreenshotFilesCollector"},
             {LibType.ContinueOnFailure, "Gauge.CSharp.Lib.Attribute.ContinueOnFailure"},
-            {LibType.DefaultScreenGrabber, "Gauge.CSharp.Lib.DefaultScreenGrabber"},
+            {LibType.DefaultScreenshotWriter, "Gauge.CSharp.Lib.DefaultScreenshotWriter"},
             {LibType.DefaultClassInstanceManager, "Gauge.CSharp.Lib.DefaultClassInstanceManager"}
         };
 

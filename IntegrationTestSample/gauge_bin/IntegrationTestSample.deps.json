@@ -8,17 +8,17 @@
     ".NETCoreApp,Version=v2.0": {
       "IntegrationTestSample/1.0.0": {
         "dependencies": {
-          "Gauge.CSharp.Lib": "0.7.1"
+          "Gauge.CSharp.Lib": "0.7.5"
         },
         "runtime": {
           "IntegrationTestSample.dll": {}
         }
       },
-      "Gauge.CSharp.Lib/0.7.1": {
+      "Gauge.CSharp.Lib/0.7.5": {
         "runtime": {
           "lib/netstandard2.0/Gauge.CSharp.Lib.dll": {
-            "assemblyVersion": "0.7.1.0",
-            "fileVersion": "0.7.1.0"
+            "assemblyVersion": "0.7.5.0",
+            "fileVersion": "0.7.5.0"
           }
         }
       }
@@ -30,12 +30,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Gauge.CSharp.Lib/0.7.1": {
+    "Gauge.CSharp.Lib/0.7.5": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-vS2pyAOAX8EGssvDRBbGaJEUEfJf/XsbUU+M+K7tXD3Nu4ZuFEnwx7liEIslTFEpoN1nf44N+78n24G31MpccQ==",
-      "path": "gauge.csharp.lib/0.7.1",
-      "hashPath": "gauge.csharp.lib.0.7.1.nupkg.sha512"
+      "sha512": "sha512-Kx+FpiDvNcDU5FyINf3WTMRftTp6nRtUBoVpDFPBhJXO3QIaeuEMjjUrPMzFpP4FX2XFE8/aeckPn1W4rBKq5w==",
+      "path": "gauge.csharp.lib/0.7.5",
+      "hashPath": "gauge.csharp.lib.0.7.5.nupkg.sha512"
     }
   }
 }

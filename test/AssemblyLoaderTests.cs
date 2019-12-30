@@ -35,7 +35,7 @@ namespace Gauge.Dotnet.UnitTests
             var assemblyLocation = "/foo/location";
             _mockAssembly = new Mock<Assembly>();
             _mockAssemblyWrapper = new Mock<IAssemblyWrapper>();
-
+            var mockActivationWrapper = new Mock<IActivatorWrapper>();
             var mockType = new Mock<Type>();
             _mockStepMethod = new Mock<MethodInfo>();
             var mockStepAttribute = new Mock<Attribute>();
@@ -51,25 +51,25 @@ namespace Gauge.Dotnet.UnitTests
             _mockInstanceManagerType.Setup(x => x.Name)
                 .Returns("TestInstanceManager");
 
-            var mockIScreenGrabberType = new Mock<Type>();
-            mockIScreenGrabberType.Setup(x => x.FullName).Returns("Gauge.CSharp.Lib.ICustomScreenshotGrabber");
-            _mockScreenGrabberType = new Mock<Type>();
-            _mockScreenGrabberType.Setup(x => x.Name)
+            var mockIScreenshotWriter = new Mock<Type>();
+            mockIScreenshotWriter.Setup(x => x.FullName).Returns("Gauge.CSharp.Lib.ICustomScreenshotWriter");
+            _mockScreenshotWriter = new Mock<Type>();
+            _mockScreenshotWriter.Setup(x => x.Name)
                 .Returns("TestScreenGrabber");
-            _mockScreenGrabberType.Setup(x => x.GetInterfaces())
-                .Returns(new[] {mockIScreenGrabberType.Object});
+            _mockScreenshotWriter.Setup(x => x.GetInterfaces())
+                .Returns(new[] {mockIScreenshotWriter.Object});
             var assemblyName = new AssemblyName("Gauge.CSharp.Lib");
             _mockAssembly.Setup(assembly => assembly.GetTypes())
                 .Returns(new[]
                 {
                     mockType.Object,
-                    _mockScreenGrabberType.Object,
+                    _mockScreenshotWriter.Object,
                     _mockInstanceManagerType.Object
                 });
             _mockAssembly.Setup(x => x.GetName())
                 .Returns(assemblyName);
-            _mockAssembly.Setup(assembly => assembly.GetType(_mockScreenGrabberType.Object.FullName))
-                .Returns(_mockScreenGrabberType.Object);
+            _mockAssembly.Setup(assembly => assembly.GetType(_mockScreenshotWriter.Object.FullName))
+                .Returns(_mockScreenshotWriter.Object);
             _mockAssembly.Setup(assembly => assembly.GetType(_mockInstanceManagerType.Object.FullName))
                 .Returns(_mockInstanceManagerType.Object);
             _mockAssembly.Setup(assembly => assembly.GetType(LibType.Step.FullName()))
@@ -83,9 +83,8 @@ namespace Gauge.Dotnet.UnitTests
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             mockReflectionWrapper.Setup(r => r.GetMethods(mockType.Object))
                 .Returns(new[] {_mockStepMethod.Object});
-
             _assemblyLoader = new AssemblyLoader(_mockAssemblyWrapper.Object, new[] {assemblyLocation},
-                mockReflectionWrapper.Object);
+                mockReflectionWrapper.Object, mockActivationWrapper.Object);
         }
 
         [TearDown]
@@ -98,7 +97,7 @@ namespace Gauge.Dotnet.UnitTests
         private AssemblyLoader _assemblyLoader;
         private Mock<IAssemblyWrapper> _mockAssemblyWrapper;
         private Mock<Type> _mockInstanceManagerType;
-        private Mock<Type> _mockScreenGrabberType;
+        private Mock<Type> _mockScreenshotWriter;
         private Mock<MethodInfo> _mockStepMethod;
         private const string TmpLocation = "/tmp/location";
 
@@ -123,7 +122,7 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldGetScreenGrabberType()
         {
-            Assert.AreEqual(_mockScreenGrabberType.Object.Name, _assemblyLoader.ScreengrabberType.Name);
+            Assert.AreEqual(_mockScreenshotWriter.Object.Name, _assemblyLoader.ScreenshotWriter.Name);
         }
 
         [Test]
@@ -138,9 +137,10 @@ namespace Gauge.Dotnet.UnitTests
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TmpLocation);
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockAssemblyWrapper = new Mock<IAssemblyWrapper>();
+            var mockActivationWrapper = new Mock<IActivatorWrapper>();
             mockAssemblyWrapper.Setup(x => x.LoadFrom(TmpLocation)).Throws<FileNotFoundException>();
             Assert.Throws<FileNotFoundException>(() =>
-                new AssemblyLoader(mockAssemblyWrapper.Object, new[] {TmpLocation}, mockReflectionWrapper.Object));
+                new AssemblyLoader(mockAssemblyWrapper.Object, new[] {TmpLocation}, mockReflectionWrapper.Object, mockActivationWrapper.Object));
         }
     }
 }

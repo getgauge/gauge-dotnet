@@ -61,7 +61,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             _mockMethodExecutor.Setup(x =>
                 x.GetAllPendingMessages()).Returns(_pendingMessages);
             _mockMethodExecutor.Setup(x =>
-                x.GetAllPendingScreenshots()).Returns(_pendingScrennshots);
+                x.GetAllPendingScreenshotFiles()).Returns(_pendingScreenshotFiles);
             _executionStartingProcessor = new ExecutionStartingProcessor(_mockMethodExecutor.Object);
         }
 
@@ -72,8 +72,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
         private readonly IEnumerable<string> _pendingMessages = new List<string> { "Foo", "Bar" };
 
-        private readonly IEnumerable<byte[]> _pendingScrennshots =
-            new List<byte[]> { Encoding.ASCII.GetBytes("screenshot") };
+        private readonly IEnumerable<string> _pendingScreenshotFiles =
+            new List<string> { "screenshot.png"};
 
         [Test]
         public void ShouldExtendFromHooksExecutionProcessor()
@@ -118,7 +118,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             _mockMethodExecutor.VerifyAll();
             Assert.AreEqual(result.ExecutionResult.Message, _pendingMessages);
-            Assert.AreEqual(result.ExecutionResult.Screenshots, _pendingScrennshots);
+            Assert.AreEqual(result.ExecutionResult.ScreenshotFiles, _pendingScreenshotFiles);
         }
     }
 }
