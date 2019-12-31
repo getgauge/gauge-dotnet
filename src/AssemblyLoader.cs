@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
@@ -33,11 +34,14 @@ namespace Gauge.Dotnet
         private readonly IReflectionWrapper _reflectionWrapper;
         private Assembly _targetLibAssembly;
 
+        private readonly IActivatorWrapper _activatorWrapper;
+
         public AssemblyLoader(IAssemblyWrapper assemblyWrapper, IEnumerable<string> assemblyLocations,
-            IReflectionWrapper reflectionWrapper)
+            IReflectionWrapper reflectionWrapper, IActivatorWrapper activatorWrapper)
         {
             _assemblyWrapper = assemblyWrapper;
             _reflectionWrapper = reflectionWrapper;
+            _activatorWrapper = activatorWrapper;
             AssembliesReferencingGaugeLib = new List<Assembly>();
             foreach (var location in assemblyLocations)
                 ScanAndLoad(location);
@@ -47,7 +51,7 @@ namespace Gauge.Dotnet
         }
 
         public List<Assembly> AssembliesReferencingGaugeLib { get; }
-        public Type ScreengrabberType { get; private set; }
+        public Type ScreenshotWriter { get; private set; }
         public Type ClassInstanceManagerType { get; private set; }
 
         public IEnumerable<MethodInfo> GetMethods(LibType type)
@@ -104,10 +108,10 @@ namespace Gauge.Dotnet
             return registry;
         }
 
-        public object GetClassInstanceManager(IActivatorWrapper activatorWrapper)
+        public object GetClassInstanceManager()
         {
             if (ClassInstanceManagerType == null) return null;
-            var classInstanceManager = activatorWrapper.CreateInstance(ClassInstanceManagerType);
+            var classInstanceManager = _activatorWrapper.CreateInstance(ClassInstanceManagerType);
             Logger.Debug("Loaded Instance Manager of Type:" + classInstanceManager.GetType().FullName);
             _reflectionWrapper.InvokeMethod(ClassInstanceManagerType, classInstanceManager, "Initialize",
                 AssembliesReferencingGaugeLib);
@@ -136,7 +140,10 @@ namespace Gauge.Dotnet
 
             try
             {
-                if (ScreengrabberType is null)
+                if (ScreenshotWriter is null)
+                    ScanForCustomScreenshotWriter(assembly.GetTypes());
+
+                if (ScreenshotWriter is null)
                     ScanForCustomScreengrabber(assembly.GetTypes());
 
                 if (ClassInstanceManagerType is null)
@@ -149,12 +156,24 @@ namespace Gauge.Dotnet
             }
         }
 
+        private void ScanForCustomScreenshotWriter(IEnumerable<Type> types)
+        {
+            var implementingTypes = types.Where(type =>
+                type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotWriter"));
+            ScreenshotWriter = implementingTypes.FirstOrDefault();
+            if (ScreenshotWriter is null) return;
+            var csg = (ICustomScreenshotWriter) _activatorWrapper.CreateInstance(ScreenshotWriter);
+            GaugeScreenshots.RegisterCustomScreenshotWriter(csg);
+        }
+
         private void ScanForCustomScreengrabber(IEnumerable<Type> types)
         {
             var implementingTypes = types.Where(type =>
-                type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.IScreenGrabber"
-                                              || t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotGrabber"));
-            ScreengrabberType = implementingTypes.FirstOrDefault();
+                type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotGrabber"));
+            ScreenshotWriter = implementingTypes.FirstOrDefault();
+            if (ScreenshotWriter is null) return;
+            var csg = (ICustomScreenshotGrabber) _activatorWrapper.CreateInstance(ScreenshotWriter);
+            GaugeScreenshots.RegisterCustomScreenshotGrabber(csg);
         }
 
         private void ScanForCustomInstanceManager(IEnumerable<Type> types)
@@ -168,8 +187,8 @@ namespace Gauge.Dotnet
         {
             ClassInstanceManagerType = ClassInstanceManagerType ??
                                        _targetLibAssembly.GetType(LibType.DefaultClassInstanceManager.FullName());
-            ScreengrabberType =
-                ScreengrabberType ?? _targetLibAssembly.GetType(LibType.DefaultScreenGrabber.FullName());
+            ScreenshotWriter =
+                ScreenshotWriter ?? _targetLibAssembly.GetType(LibType.DefaultScreenshotWriter.FullName());
         }
 
         private void LoadTargetLibAssembly()

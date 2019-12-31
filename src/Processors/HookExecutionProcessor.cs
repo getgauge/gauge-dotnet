@@ -53,9 +53,9 @@ namespace Gauge.Dotnet.Processors
             var protoExecutionResult =
                 ExecutionOrchestrator.ExecuteHooks(HookType, Strategy, applicableTags, executionContext);
             var allPendingMessages = ExecutionOrchestrator.GetAllPendingMessages().Where(m => m != null);
-            var allPendingScreenShots = ExecutionOrchestrator.GetAllPendingScreenshots().Select(ByteString.CopyFrom);
+            var allPendingScreenShotFiles = ExecutionOrchestrator.GetAllPendingScreenshotFiles();
             protoExecutionResult.Message.AddRange(allPendingMessages);
-            protoExecutionResult.Screenshots.AddRange(allPendingScreenShots);
+            protoExecutionResult.ScreenshotFiles.AddRange(allPendingScreenShotFiles);
             return new ExecutionStatusResponse { ExecutionResult = protoExecutionResult };
         }
 

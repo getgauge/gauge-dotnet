@@ -30,10 +30,10 @@ namespace Gauge.Dotnet.IntegrationTests
         public void RecoverableIsTrueOnExceptionThrownWhenContinueOnFailure()
         {
             var reflectionWrapper = new ReflectionWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
@@ -49,10 +49,10 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldCreateTableFromTargetType()
         {
             var reflectionWrapper = new ReflectionWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
@@ -70,10 +70,10 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldExecuteMethodAndReturnResult()
         {
             var reflectionWrapper = new ReflectionWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
@@ -91,10 +91,10 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldGetPendingMessages()
         {
             var reflectionWrapper = new ReflectionWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
@@ -112,10 +112,10 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldGetStacktraceForAggregateException()
         {
             var reflectionWrapper = new ReflectionWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
@@ -133,8 +133,9 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldGetStepTextsForMethod()
         {
             var reflectionWrapper = new ReflectionWrapper();
+            var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
             var registry = assemblyLoader.GetStepRegistry();
             var gaugeMethod = registry.MethodFor("and an alias");
             var stepTexts = gaugeMethod.Aliases.ToList();
@@ -148,10 +149,10 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             const string expectedMessage = "I am a custom serializable exception";
             var reflectionWrapper = new ReflectionWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
@@ -171,10 +172,10 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             const string expectedMessage = "I am a custom exception";
             var reflectionWrapper = new ReflectionWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
             var activatorWrapper = new ActivatorWrapper();
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),

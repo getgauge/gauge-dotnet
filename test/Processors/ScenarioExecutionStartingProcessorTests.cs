@@ -103,7 +103,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         }
 
         [Test]
-        public void ShouldExecutreBeforeScenarioHook()
+        public void ShouldExecuteBeforeScenarioHook()
         {
             var scenarioExecutionEndingRequest = new ScenarioExecutionStartingRequest
             {
@@ -122,7 +122,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             };
 
             var pendingMessages = new List<string> {"one", "two"};
-            var pendingScreenshots = new List<byte[]> {Encoding.ASCII.GetBytes("screenshot")};
+            var pendingScreenshotFiles = new List<string> {"screenshot.png"};
 
             mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("BeforeScenario", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
@@ -131,14 +131,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockMethodExecutor.Setup(x =>
                 x.GetAllPendingMessages()).Returns(pendingMessages);
             mockMethodExecutor.Setup(x =>
-                x.GetAllPendingScreenshots()).Returns(pendingScreenshots);
+                x.GetAllPendingScreenshotFiles()).Returns(pendingScreenshotFiles);
 
             var processor = new ScenarioExecutionStartingProcessor(mockMethodExecutor.Object);
 
             var result = processor.Process(scenarioExecutionEndingRequest);
             Assert.False(result.ExecutionResult.Failed);
             Assert.AreEqual(result.ExecutionResult.Message.ToList(), pendingMessages);
-            Assert.AreEqual(result.ExecutionResult.Screenshots.ToList(), pendingScreenshots);
+            Assert.AreEqual(result.ExecutionResult.ScreenshotFiles.ToList(), pendingScreenshotFiles);
         }
     }
 }

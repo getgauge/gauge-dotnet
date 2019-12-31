@@ -24,7 +24,7 @@ namespace Gauge.Dotnet
     public interface IAssemblyLoader
     {
         List<Assembly> AssembliesReferencingGaugeLib { get; }
-        Type ScreengrabberType { get; }
+        Type ScreenshotWriter { get; }
         Type ClassInstanceManagerType { get; }
         IEnumerable<MethodInfo> GetMethods(LibType type);
         Type GetLibType(LibType type);

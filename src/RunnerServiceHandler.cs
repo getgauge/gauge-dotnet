@@ -201,10 +201,10 @@ namespace Gauge.Dotnet
             var activatorWrapper = new ActivatorWrapper();
             var reflectionWrapper = new ReflectionWrapper();
             var assemblies = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), assemblies, reflectionWrapper);
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), assemblies, reflectionWrapper, activatorWrapper);
             _stepRegistry = assemblyLoader.GetStepRegistry();
             var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),

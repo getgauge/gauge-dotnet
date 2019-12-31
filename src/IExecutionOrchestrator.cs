@@ -32,9 +32,9 @@ namespace Gauge.Dotnet
         void ClearCache();
 
         void StartExecutionScope(string tag);
-        void CloseExectionScope();
+        void CloseExecutionScope();
         IEnumerable<string> GetAllPendingMessages();
-        IEnumerable<byte[]> GetAllPendingScreenshots();
+        IEnumerable<string> GetAllPendingScreenshotFiles();
 
     }
 }

@@ -33,8 +33,8 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var mockOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
@@ -87,8 +87,8 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper);
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager(activatorWrapper);
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
 
             var mockOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
@@ -100,18 +100,17 @@ namespace Gauge.Dotnet.IntegrationTests
 
 
             var message = new ExecuteStepRequest
-                {
-                    ParsedStepText = parameterizedStepText,
-                    ActualStepText = stepText
-                };
+            {
+                ParsedStepText = parameterizedStepText,
+                ActualStepText = stepText
+            };
 
             var result = executeStepProcessor.Process(message);
             var protoExecutionResult = result.ExecutionResult;
 
             Assert.IsNotNull(protoExecutionResult);
             Assert.IsTrue(protoExecutionResult.Failed);
-            Assert.AreEqual(Encoding.UTF8.GetString(protoExecutionResult.FailureScreenshot.ToByteArray()),
-                "ScreenShot");
+            Assert.AreEqual(protoExecutionResult.FailureScreenshotFile, "screenshot.png");
         }
     }
 }

@@ -106,11 +106,11 @@ namespace IntegrationTestSample
             }
         }
 
-        public class StringScreenGrabber : IScreenGrabber
+        public class StringScreenshotWriter : ICustomScreenshotWriter
         {
-            public byte[] TakeScreenShot()
+            public string TakeScreenShot()
             {
-                return Encoding.UTF8.GetBytes("ScreenShot");
+                return "screenshot.png";
             }
         }
     }
