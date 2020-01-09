@@ -24,7 +24,8 @@ function package() {
     checkCommand "dotnet"
     checkCommand "zip"
     rm -rf deploy artifacts
-    dotnet publish -c release -o ./deploy/bin src/Gauge.Dotnet.csproj
+    mkdir -p deploy
+    dotnet publish -c release -o ../deploy/bin src/Gauge.Dotnet.csproj
     cp src/launcher.sh deploy
     cp src/launcher.cmd deploy
     cp src/dotnet.json deploy
