@@ -32,7 +32,7 @@ namespace Gauge.Dotnet
             var project = $@"<Project Sdk=""Microsoft.NET.Sdk"">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
