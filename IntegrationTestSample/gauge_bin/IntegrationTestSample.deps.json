@@ -1,11 +1,11 @@
 {
   "runtimeTarget": {
-    "name": ".NETCoreApp,Version=v2.0",
+    "name": ".NETCoreApp,Version=v2.1",
     "signature": ""
   },
   "compilationOptions": {},
   "targets": {
-    ".NETCoreApp,Version=v2.0": {
+    ".NETCoreApp,Version=v2.1": {
       "IntegrationTestSample/1.0.0": {
         "dependencies": {
           "Gauge.CSharp.Lib": "0.7.6"
@@ -16,7 +16,7 @@
       },
       "Gauge.CSharp.Lib/0.7.6": {
         "runtime": {
-          "lib/netstandard2.0/Gauge.CSharp.Lib.dll": {
+          "lib/netstandard2.1/Gauge.CSharp.Lib.dll": {
             "assemblyVersion": "0.7.6.0",
             "fileVersion": "0.7.6.0"
           }

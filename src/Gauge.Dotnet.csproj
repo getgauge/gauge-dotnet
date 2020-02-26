@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-    <PackageId>Runner.NetCore20</PackageId>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <PackageId>Runner.NetCore21</PackageId>
     <Authors>The Gauge Team</Authors>
     <Version>0.1.4</Version>
     <Company>ThoughtWorks Inc.</Company>
