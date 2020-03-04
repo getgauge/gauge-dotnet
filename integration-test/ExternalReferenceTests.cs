@@ -22,10 +22,10 @@ using NUnit.Framework;
 
 namespace Gauge.Dotnet.IntegrationTests
 {
-    public class ExecuteStepProcessorTests : IntegrationTestsBase
+    public class ExternalReferenceTests : IntegrationTestsBase
     {
         [Test]
-        public void ShouldExecuteMethodFromRequest()
+        public void ShouldGetStepsFromDllReference()
         {
             const string parameterizedStepText = "Step that takes a table {}";
             const string stepText = "Step that takes a table <table>";

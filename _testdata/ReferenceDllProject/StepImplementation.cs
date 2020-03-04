@@ -11,7 +11,7 @@ namespace netcore.template
     {
         private HashSet<char> _vowels;
 
-        [Step("Reference: Vowels in English language are <vowelString>.")]
+        [Step("Dll Reference: Vowels in English language are <vowelString>.")]
         public void SetLanguageVowels(string vowelString)
         {
             _vowels = new HashSet<char>();
@@ -21,14 +21,14 @@ namespace netcore.template
             }
         }
 
-        [Step("Reference: The word <word> has <expectedCount> vowels.")]
+        [Step("Dll Reference: The word <word> has <expectedCount> vowels.")]
         public void VerifyVowelsCountInWord(string word, int expectedCount)
         {
             var actualCount = CountVowels(word);
             actualCount.Should().Be(expectedCount);
         }
 
-        [Step("Reference: Almost all words have vowels <wordsTable>")]
+        [Step("Dll Reference: Almost all words have vowels <wordsTable>")]
         public void VerifyVowelsCountInMultipleWords(Table wordsTable)
         {
             var rows = wordsTable.GetTableRows();
