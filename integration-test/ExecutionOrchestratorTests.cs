@@ -78,7 +78,6 @@ namespace Gauge.Dotnet.IntegrationTests
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
-            AssertRunnerDomainDidNotLoadUsersAssembly();
             var gaugeMethod = assemblyLoader.GetStepRegistry()
                 .MethodFor("A context step which gets executed before every scenario");
 
@@ -181,7 +180,6 @@ namespace Gauge.Dotnet.IntegrationTests
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
 
-            AssertRunnerDomainDidNotLoadUsersAssembly();
             var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an unserializable exception");
             var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod);
             Assert.True(executionResult.Failed);

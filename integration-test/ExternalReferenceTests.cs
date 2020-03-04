@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
+using System.IO;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
@@ -24,92 +26,38 @@ namespace Gauge.Dotnet.IntegrationTests
 {
     public class ExternalReferenceTests : IntegrationTestsBase
     {
+        private readonly string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
+
         [Test]
-        public void ShouldGetStepsFromDllReference()
+        [TestCase("Dll Reference: Vowels in English language are {}.", "Dll Reference: Vowels in English language are <vowelString>.", "Dll Reference: Vowels in English language are \"aeiou\".")]
+        [TestCase("Project Reference: Vowels in English language are {}.", "Project Reference: Vowels in English language are <vowelString>.", "Project Reference: Vowels in English language are \"aeiou\".")]
+        public void ShouldGetStepsFromDllReference(string stepText, string stepValue, string parameterizedStepValue)
         {
-            const string parameterizedStepText = "Step that takes a table {}";
-            const string stepText = "Step that takes a table <table>";
-            var reflectionWrapper = new ReflectionWrapper();
-            var activatorWrapper = new ActivatorWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
-            var mockOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
-                classInstanceManager,
-                new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
-                new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", Path.Combine(_testProjectPath, "libs"));
 
-            var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
-                mockOrchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
-
-            var protoTable = new ProtoTable
+            var assemblies = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies();
+            foreach (var item in assemblies)
             {
-                Headers = new ProtoTableRow
+                Console.WriteLine(item);
+            }
+            
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                assemblies, new ReflectionWrapper(), new ActivatorWrapper());
+
+            var stepValidationProcessor = new StepValidationProcessor(assemblyLoader.GetStepRegistry());
+
+
+            var message = new StepValidateRequest
                 {
-                    Cells = {"foo", "bar"}
-                },
-                Rows =
-                {
-                    new ProtoTableRow
-                    {
-                        Cells = {"foorow1", "foorow2"}
-                    }
-                }
-            };
-            var message = new ExecuteStepRequest
-                {
-                    ParsedStepText = parameterizedStepText,
-                    ActualStepText = stepText,
-                    Parameters =
-                    {
-                        new Parameter
-                        {
-                            Name = "table",
-                            ParameterType = Parameter.Types.ParameterType.Table,
-                            Table = protoTable
-                        }
-                    }
+                    StepText = stepText,
+                    StepValue = new ProtoStepValue {StepValue = stepValue, ParameterizedStepValue = parameterizedStepValue},
+                    NumberOfParameters  = 1,
                 };
-            var result = executeStepProcessor.Process(message);
+            var result = stepValidationProcessor.Process(message);
 
-            AssertRunnerDomainDidNotLoadUsersAssembly();
-            var protoExecutionResult = result.ExecutionResult;
-            Assert.IsNotNull(protoExecutionResult);
-            Assert.IsFalse(protoExecutionResult.Failed);
-        }
+            Assert.IsTrue(result.IsValid, $"Expected valid step text, got error: {result.ErrorMessage}");
 
-        [Test]
-        public void ShouldCaptureScreenshotOnFailure()
-        {
-            const string parameterizedStepText = "I throw a serializable exception";
-            const string stepText = "I throw a serializable exception";
-            var reflectionWrapper = new ReflectionWrapper();
-            var activatorWrapper = new ActivatorWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
-
-            var mockOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
-                classInstanceManager,
-                new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
-                new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
-
-            var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
-                mockOrchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
-
-
-            var message = new ExecuteStepRequest
-            {
-                ParsedStepText = parameterizedStepText,
-                ActualStepText = stepText
-            };
-
-            var result = executeStepProcessor.Process(message);
-            var protoExecutionResult = result.ExecutionResult;
-
-            Assert.IsNotNull(protoExecutionResult);
-            Assert.IsTrue(protoExecutionResult.Failed);
-            Assert.AreEqual(protoExecutionResult.FailureScreenshotFile, "screenshot.png");
+            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "");
         }
     }
 }

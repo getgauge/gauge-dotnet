@@ -1,17 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Gauge.CSharp.Lib" Version="0.7.6" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="ReferenceDll">
-      <HintPath>libs\ReferenceDll.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>

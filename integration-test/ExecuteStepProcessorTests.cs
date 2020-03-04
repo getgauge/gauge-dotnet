@@ -72,7 +72,6 @@ namespace Gauge.Dotnet.IntegrationTests
                 };
             var result = executeStepProcessor.Process(message);
 
-            AssertRunnerDomainDidNotLoadUsersAssembly();
             var protoExecutionResult = result.ExecutionResult;
             Assert.IsNotNull(protoExecutionResult);
             Assert.IsFalse(protoExecutionResult.Failed);

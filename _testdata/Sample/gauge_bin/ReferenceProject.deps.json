@@ -6,13 +6,13 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v2.1": {
-      "IntegrationTestSample/1.0.0": {
+      "ReferenceProject/1.0.0": {
         "dependencies": {
-          "Gauge.CSharp.Lib": "0.7.6",
-          "ReferenceProject": "1.0.0"
+          "FluentAssertions": "4.19.4",
+          "Gauge.CSharp.Lib": "0.7.6"
         },
         "runtime": {
-          "IntegrationTestSample.dll": {}
+          "ReferenceProject.dll": {}
         }
       },
       "FluentAssertions/4.19.4": {
@@ -73,20 +73,11 @@
         "dependencies": {
           "System.Runtime": "4.1.0"
         }
-      },
-      "ReferenceProject/1.0.0": {
-        "dependencies": {
-          "FluentAssertions": "4.19.4",
-          "Gauge.CSharp.Lib": "0.7.6"
-        },
-        "runtime": {
-          "ReferenceProject.dll": {}
-        }
       }
     }
   },
   "libraries": {
-    "IntegrationTestSample/1.0.0": {
+    "ReferenceProject/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -153,11 +144,6 @@
       "sha512": "sha512-k1S4Gc6IGwtHGT8188RSeGaX86Qw/wnrgNLshJvsdNUOPP9etMmo8S07c+UlOAx4K/xLuN9ivA1bD0LVurtIxQ==",
       "path": "system.threading.tasks/4.0.11",
       "hashPath": "system.threading.tasks.4.0.11.nupkg.sha512"
-    },
-    "ReferenceProject/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
     }
   }
 }
