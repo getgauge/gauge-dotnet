@@ -8,11 +8,11 @@
     <PackageReference Include="Gauge.CSharp.Lib" Version="0.7.6" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(REFERENCE_MODE)'=='PROJECT'">
     <ProjectReference Include="..\ReferenceProject\ReferenceProject.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(REFERENCE_MODE)'=='DLL'">
     <Reference Include="ReferenceDll">
       <HintPath>libs/ReferenceDll.dll</HintPath>
     </Reference>
