@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Gauge.Dotnet.Models;
 
 namespace Gauge.Dotnet
 {
@@ -28,5 +29,7 @@ namespace Gauge.Dotnet
         Type ClassInstanceManagerType { get; }
         IEnumerable<MethodInfo> GetMethods(LibType type);
         Type GetLibType(LibType type);
+        IStepRegistry GetStepRegistry();
+        object GetClassInstanceManager();
     }
 }

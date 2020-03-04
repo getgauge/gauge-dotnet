@@ -29,7 +29,10 @@ namespace Gauge.Dotnet
     {
         private IStaticLoader _loader;
         private Server _server;
-        private IStepRegistry _stepRegistry;
+        private readonly IActivatorWrapper _activatorWrapper;
+        private readonly IReflectionWrapper _reflectionWrapper;
+        private readonly IAssemblyLoader _assemblyLoader;
+        private readonly IStepRegistry _stepRegistry;
         private StepValidationProcessor stepValidateRequestProcessor;
         private StepNameProcessor stepNameRequestProcessor;
         private RefactorProcessor refactorRequestProcessor;
@@ -51,11 +54,14 @@ namespace Gauge.Dotnet
         private SuiteDataStoreInitProcessor suiteDataStoreInitProcessor;
 
 
-        public RunnerServiceHandler(IStaticLoader loader, Server server)
+        public RunnerServiceHandler(IActivatorWrapper activationWrapper, IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader, IStaticLoader loader, Server server)
         {
-            _loader = loader;
+            this._loader = loader;
             this._server = server;
-            this._stepRegistry = loader.GetStepRegistry();
+            this._activatorWrapper = activationWrapper;
+            this._reflectionWrapper = reflectionWrapper;
+            this._assemblyLoader = assemblyLoader;
+            _stepRegistry = assemblyLoader.GetStepRegistry();
             this.InitializeMessageProcessors();
         }
 
@@ -198,17 +204,12 @@ namespace Gauge.Dotnet
 
         private void InitializeExecutionMessageHandlers()
         {
-            var activatorWrapper = new ActivatorWrapper();
-            var reflectionWrapper = new ReflectionWrapper();
-            var assemblies = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), assemblies, reflectionWrapper, activatorWrapper);
-            _stepRegistry = assemblyLoader.GetStepRegistry();
-            var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
-            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var tableFormatter = new TableFormatter(this._assemblyLoader, this._activatorWrapper);
+            var classInstanceManager = this._assemblyLoader.GetClassInstanceManager();
+            var executionOrchestrator = new ExecutionOrchestrator(this._reflectionWrapper, this._assemblyLoader, this._activatorWrapper,
                 classInstanceManager,
-                new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
-                new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+                new HookExecutor(this._assemblyLoader, this._reflectionWrapper, classInstanceManager),
+                new StepExecutor(this._assemblyLoader, this._reflectionWrapper, classInstanceManager));
 
             this.executionStartingProcessor = new ExecutionStartingProcessor(executionOrchestrator);
             this.executionEndingProcessor = new ExecutionEndingProcessor(executionOrchestrator);
@@ -219,9 +220,9 @@ namespace Gauge.Dotnet
             this.stepExecutionStartingProcessor = new StepExecutionStartingProcessor(executionOrchestrator);
             this.stepExecutionEndingProcessor = new StepExecutionEndingProcessor(executionOrchestrator);
             this.executeStepProcessor = new ExecuteStepProcessor(_stepRegistry, executionOrchestrator, tableFormatter);
-            this.scenarioDataStoreInitProcessor = new ScenarioDataStoreInitProcessor(assemblyLoader);
-            this.specDataStoreInitProcessor = new SpecDataStoreInitProcessor(assemblyLoader);
-            this.suiteDataStoreInitProcessor = new SuiteDataStoreInitProcessor(assemblyLoader);
+            this.scenarioDataStoreInitProcessor = new ScenarioDataStoreInitProcessor(this._assemblyLoader);
+            this.specDataStoreInitProcessor = new SpecDataStoreInitProcessor(this._assemblyLoader);
+            this.suiteDataStoreInitProcessor = new SuiteDataStoreInitProcessor(this._assemblyLoader);
         }
 
     }

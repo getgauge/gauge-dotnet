@@ -28,17 +28,19 @@ namespace Gauge.Dotnet.IntegrationTests
              * We will discover 'up' the IntegrationTestSample project
             */
             var dir = new DirectoryInfo(Directory.GetCurrentDirectory());
+            System.Console.WriteLine(dir.FullName);
             return FindIntegrationTestDirectory(dir).FullName;
         }
 
         private static DirectoryInfo FindIntegrationTestDirectory(DirectoryInfo dir)
         {
-            var found = dir.GetDirectories().FirstOrDefault(d => d.Name.Equals("IntegrationTestSample"));
-            if (found != null)
-                return found;
+            var testdataDir = dir.GetDirectories().FirstOrDefault(d => d.Name.Equals("_testdata"));
+            if (testdataDir != null){
+                return testdataDir.GetDirectories().First(d => d.Name.Equals("Sample"));
+            }
             if (dir.Parent != null) // not on system boundry
                 return FindIntegrationTestDirectory(dir.Parent);
-            throw new DirectoryNotFoundException("Failed to find IntegrationTestSample directory");
+            throw new DirectoryNotFoundException("Failed to find Sample directory");
         }
     }
 }

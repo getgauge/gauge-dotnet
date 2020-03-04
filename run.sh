@@ -6,13 +6,13 @@ function checkCommand() {
 
 function build() {
     checkCommand "dotnet"
-    dotnet build -c release
+    dotnet build -c Release
 }
 
 function test() {
     checkCommand "dotnet"
-    dotnet test --no-build -c release test/Gauge.Dotnet.UnitTests.csproj
-    dotnet test --no-build -c release integration-test/Gauge.Dotnet.IntegrationTests.csproj
+    dotnet test --no-build -c Release test/Gauge.Dotnet.UnitTests.csproj
+    dotnet test --no-build -c Release integration-test/Gauge.Dotnet.IntegrationTests.csproj
 }
 
 function version() {
