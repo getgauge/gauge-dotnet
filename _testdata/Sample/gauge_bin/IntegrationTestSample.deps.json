@@ -9,7 +9,8 @@
       "IntegrationTestSample/1.0.0": {
         "dependencies": {
           "Gauge.CSharp.Lib": "0.7.6",
-          "ReferenceProject": "1.0.0"
+          "ReferenceProject": "1.0.0",
+          "ReferenceDll": "1.0.0.0"
         },
         "runtime": {
           "IntegrationTestSample.dll": {}
@@ -81,6 +82,14 @@
         },
         "runtime": {
           "ReferenceProject.dll": {}
+        }
+      },
+      "ReferenceDll/1.0.0.0": {
+        "runtime": {
+          "ReferenceDll.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }
@@ -156,6 +165,11 @@
     },
     "ReferenceProject/1.0.0": {
       "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ReferenceDll/1.0.0.0": {
+      "type": "reference",
       "serviceable": false,
       "sha512": ""
     }

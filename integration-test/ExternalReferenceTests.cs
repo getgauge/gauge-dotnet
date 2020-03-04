@@ -33,8 +33,6 @@ namespace Gauge.Dotnet.IntegrationTests
         [TestCase("Project Reference: Vowels in English language are {}.", "Project Reference: Vowels in English language are <vowelString>.", "Project Reference: Vowels in English language are \"aeiou\".")]
         public void ShouldGetStepsFromDllReference(string stepText, string stepValue, string parameterizedStepValue)
         {
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", Path.Combine(_testProjectPath, "libs"));
-
             var assemblies = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies();
             foreach (var item in assemblies)
             {
@@ -56,8 +54,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var result = stepValidationProcessor.Process(message);
 
             Assert.IsTrue(result.IsValid, $"Expected valid step text, got error: {result.ErrorMessage}");
-
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "");
         }
     }
 }

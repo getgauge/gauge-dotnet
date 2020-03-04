@@ -11,4 +11,10 @@
   <ItemGroup>
     <ProjectReference Include="..\ReferenceProject\ReferenceProject.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ReferenceDll">
+      <HintPath>libs/ReferenceDll.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>
