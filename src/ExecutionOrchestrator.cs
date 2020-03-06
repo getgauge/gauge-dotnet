@@ -131,21 +131,10 @@ namespace Gauge.Dotnet
 
         private string TryScreenCapture()
         {
-            try
-            {
-                var instance = _activatorWrapper.CreateInstance(_assemblyLoader.ScreenshotWriter);
-                if (instance != null)
-                {
-                    var ScreenshotFile = _reflectionWrapper.InvokeMethod(_assemblyLoader.ScreenshotWriter, instance,
-                                    "TakeScreenShot") as string;
-                    return Path.GetFileName(ScreenshotFile);
-                }
-            }
-            catch
-            {
-                //do nothing, return
-            }
-            return "";
+            GaugeScreenshots.Capture();
+            var messageCollectorType = _assemblyLoader.GetLibType(LibType.ScreenshotFilesCollector);
+            return (_reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingScreenshotFiles",
+                BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>).FirstOrDefault();
         }
     }
 }

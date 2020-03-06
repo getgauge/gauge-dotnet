@@ -80,7 +80,6 @@ namespace Gauge.Dotnet.IntegrationTests
         [Test]
         public void ShouldCaptureScreenshotOnFailure()
         {
-            const string parameterizedStepText = "I throw a serializable exception";
             const string stepText = "I throw a serializable exception";
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
@@ -88,18 +87,18 @@ namespace Gauge.Dotnet.IntegrationTests
                 new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
 
-            var mockOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
 
             var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
-                mockOrchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
+                orchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
 
 
             var message = new ExecuteStepRequest
             {
-                ParsedStepText = parameterizedStepText,
+                ParsedStepText = stepText,
                 ActualStepText = stepText
             };
 
@@ -108,7 +107,7 @@ namespace Gauge.Dotnet.IntegrationTests
 
             Assert.IsNotNull(protoExecutionResult);
             Assert.IsTrue(protoExecutionResult.Failed);
-            Assert.AreEqual(protoExecutionResult.FailureScreenshotFile, "screenshot.png");
+            Assert.AreEqual("screenshot.png", protoExecutionResult.FailureScreenshotFile);
         }
     }
 }
