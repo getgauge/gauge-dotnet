@@ -5,7 +5,7 @@ using FluentAssertions;
 using Gauge.CSharp.Lib;
 using Gauge.CSharp.Lib.Attribute;
 
-namespace netcore.template
+namespace ReferenceProject
 {
     public class StepImplementation
     {
@@ -41,7 +41,7 @@ namespace netcore.template
                 actualCount.Should().Be(expectedCount);
             }
         }
-
+        
         private int CountVowels(string word)
         {
             return word.Count(c => _vowels.Contains(c));
