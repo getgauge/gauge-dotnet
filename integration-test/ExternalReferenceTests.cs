@@ -15,9 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
-using System.Diagnostics;
-using System.IO;
+using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
@@ -30,24 +28,15 @@ namespace Gauge.Dotnet.IntegrationTests
         private readonly string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
 
         [Test]
-        [TestCase("Dll Reference: Vowels in English language are {}.", "Dll Reference: Vowels in English language are <vowelString>.", "Dll Reference: Vowels in English language are \"aeiou\".", "DLL")]
-        [TestCase("Project Reference: Vowels in English language are {}.", "Project Reference: Vowels in English language are <vowelString>.", "Project Reference: Vowels in English language are \"aeiou\".", "PROJECT")]
-        public void ShouldGetStepsFromDllReference(string stepText, string stepValue, string parameterizedStepValue, string referenceMode)
+        [TestCase("Dll Reference: Vowels in English language are {}.", "Dll Reference: Vowels in English language are <vowelString>.", "Dll Reference: Vowels in English language are \"aeiou\".")]
+        [TestCase("Project Reference: Vowels in English language are {}.", "Project Reference: Vowels in English language are <vowelString>.", "Project Reference: Vowels in English language are \"aeiou\".")]
+        public void ShouldGetStepsFromReference(string stepText, string stepValue, string parameterizedStepValue)
         {
-            Environment.SetEnvironmentVariable("REFERENCE_MODE", referenceMode);
-            BuildSample();
             var assemblies = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies();
-            foreach (var item in assemblies)
-            {
-                Console.WriteLine(item);
-            }
-            
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                assemblies, new ReflectionWrapper(), new ActivatorWrapper());
+                assemblies, new ReflectionWrapper(), new ActivatorWrapper(), new StepRegistry());
 
             var stepValidationProcessor = new StepValidationProcessor(assemblyLoader.GetStepRegistry());
-
-
             var message = new StepValidateRequest
                 {
                     StepText = stepText,
@@ -57,22 +46,37 @@ namespace Gauge.Dotnet.IntegrationTests
             var result = stepValidationProcessor.Process(message);
 
             Assert.IsTrue(result.IsValid, $"Expected valid step text, got error: {result.ErrorMessage}");
-            Environment.SetEnvironmentVariable("REFERENCE_MODE", "");
         }
 
-        private void BuildSample() {
-            var info = new ProcessStartInfo {
-                UseShellExecute = false,
-                FileName = "dotnet",
-                Arguments = "build -o gauge_bin",
-                WorkingDirectory = _testProjectPath,
-                CreateNoWindow = true
-            };
-            using (Process dotnet = new Process{StartInfo = info})
+        [Test]
+        [TestCase("Take Screenshot in reference Project", "ReferenceProject-IDoNotExist.png")]
+        [TestCase("Take Screenshot in reference DLL", "ReferenceDll-IDoNotExist.png")]
+        public void ShouldRegisterScreenshotWriterFromReference(string stepText, string expected) {
+            var reflectionWrapper = new ReflectionWrapper();
+            var activatorWrapper = new ActivatorWrapper();
+            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper, new StepRegistry());
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
+
+            var mockOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+                classInstanceManager,
+                new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
+                new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+
+            var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
+                mockOrchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
+
+            var message = new ExecuteStepRequest
             {
-                dotnet.Start();
-                dotnet.WaitForExit();
-            }
+                ParsedStepText = stepText,
+                ActualStepText = stepText
+            };
+
+            var result = executeStepProcessor.Process(message);
+            var protoExecutionResult = result.ExecutionResult;
+
+            Assert.IsNotNull(protoExecutionResult);
+            Assert.AreEqual(protoExecutionResult.ScreenshotFiles[0], expected);
         }
     }
 }

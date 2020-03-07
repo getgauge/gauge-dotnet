@@ -54,7 +54,7 @@ namespace Gauge.Dotnet
         private SuiteDataStoreInitProcessor suiteDataStoreInitProcessor;
 
 
-        public RunnerServiceHandler(IActivatorWrapper activationWrapper, IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader, IStaticLoader loader, Server server)
+        public  RunnerServiceHandler(IActivatorWrapper activationWrapper, IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader, IStaticLoader loader, Server server)
         {
             this._loader = loader;
             this._server = server;
@@ -96,17 +96,17 @@ namespace Gauge.Dotnet
         }
 
 
-        public override Task<ExecutionStatusResponse> InitializeScenarioDataStore(Empty request, ServerCallContext context)
+        public override Task<ExecutionStatusResponse> InitializeScenarioDataStore(ScenarioDataStoreInitRequest request, ServerCallContext context)
         {
             return Task.FromResult(this.scenarioDataStoreInitProcessor.Process());
         }
 
-        public override Task<ExecutionStatusResponse> InitializeSpecDataStore(Empty request, ServerCallContext context)
+        public override Task<ExecutionStatusResponse> InitializeSpecDataStore(SpecDataStoreInitRequest request, ServerCallContext context)
         {
             return Task.FromResult(this.specDataStoreInitProcessor.Process());
         }
 
-        public override Task<ExecutionStatusResponse> InitializeSuiteDataStore(Empty request, ServerCallContext context)
+        public override Task<ExecutionStatusResponse> InitializeSuiteDataStore(SuiteDataStoreInitRequest request, ServerCallContext context)
         {
             InitializeExecutionMessageHandlers();
             return Task.FromResult(this.suiteDataStoreInitProcessor.Process());

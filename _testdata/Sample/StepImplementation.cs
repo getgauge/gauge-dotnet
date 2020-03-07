@@ -49,6 +49,7 @@ namespace IntegrationTestSample
         [Step("I throw a serializable exception")]
         public void ThrowSerializableException()
         {
+            GaugeScreenshots.RegisterCustomScreenshotWriter(new StringScreenshotWriter());
             throw new CustomSerializableException("I am a custom serializable exception");
         }
 
@@ -56,6 +57,7 @@ namespace IntegrationTestSample
         [ContinueOnFailure]
         public void ContinueOnFailure()
         {
+            GaugeScreenshots.RegisterCustomScreenshotWriter(new StringScreenshotWriter());
             throw new CustomSerializableException("I am a custom serializable exception");
         }
 
@@ -84,6 +86,20 @@ namespace IntegrationTestSample
             rows.ForEach(
                 row => Console.WriteLine(columnNames.Select(row.GetCell)
                     .Aggregate((a, b) => string.Format("{0}|{1}", a, b))));
+        }
+
+        [Step("Take Screenshot in reference Project")]
+        public void TakeProjectReferenceScreenshot() {
+            GaugeScreenshots.RegisterCustomScreenshotWriter(new ReferenceProject.ScreenshotWriter());
+            GaugeScreenshots.Capture();
+            GaugeScreenshots.RegisterCustomScreenshotWriter(new StringScreenshotWriter());
+        }
+
+        [Step("Take Screenshot in reference DLL")]
+        public void TakeDllReferenceScreenshot() {
+            GaugeScreenshots.RegisterCustomScreenshotWriter(new ReferenceDll.ScreenshotWriter());
+            GaugeScreenshots.Capture();
+            GaugeScreenshots.RegisterCustomScreenshotWriter(new StringScreenshotWriter());
         }
 
         [Serializable]

@@ -51,7 +51,6 @@ namespace Gauge.Dotnet.Processors
                 errorType = StepValidateResponse.Types.ErrorType.DuplicateStepImplementation;
                 errorMessage = string.Format("Multiple step implementations found for : {0}", stepToValidate);
             }
-
             return GetStepValidateResponseMessage(isValid, errorType, errorMessage, suggestion);
         }
 

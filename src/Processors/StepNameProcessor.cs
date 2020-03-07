@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+
 using Gauge.Dotnet.Models;
 using Gauge.Messages;
 
@@ -31,6 +32,7 @@ namespace Gauge.Dotnet.Processors
 
         public StepNameResponse Process(StepNameRequest request)
         {
+
             var parsedStepText = request.StepValue;
             var isStepPresent = _stepRegistry.ContainsStep(parsedStepText);
             var response = new StepNameResponse
@@ -43,16 +45,19 @@ namespace Gauge.Dotnet.Processors
             var stepText = _stepRegistry.GetStepText(parsedStepText);
             var hasAlias = _stepRegistry.HasAlias(stepText);
             var info = _stepRegistry.MethodFor(parsedStepText);
-
+            response.IsExternal = info.IsExternal;
             response.HasAlias = hasAlias;
-            response.FileName = info.FileName;
-            response.Span = new Span
+            if (!response.IsExternal)
             {
-                Start = info.Span.Span.Start.Line + 1,
-                StartChar = info.Span.StartLinePosition.Character,
-                End = info.Span.EndLinePosition.Line + 1,
-                EndChar = info.Span.EndLinePosition.Character
-            };
+                response.FileName = info.FileName;
+                response.Span = new Span
+                {
+                    Start = info.Span.Span.Start.Line + 1,
+                    StartChar = info.Span.StartLinePosition.Character,
+                    End = info.Span.EndLinePosition.Line + 1,
+                    EndChar = info.Span.EndLinePosition.Character
+                };
+            }
 
             if (hasAlias)
                 response.StepName.AddRange(info.Aliases);

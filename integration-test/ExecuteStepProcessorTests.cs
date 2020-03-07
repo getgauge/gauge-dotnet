@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
@@ -32,7 +33,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var mockOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
@@ -80,26 +81,25 @@ namespace Gauge.Dotnet.IntegrationTests
         [Test]
         public void ShouldCaptureScreenshotOnFailure()
         {
-            const string parameterizedStepText = "I throw a serializable exception";
             const string stepText = "I throw a serializable exception";
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
 
-            var mockOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
 
             var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
-                mockOrchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
+                orchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
 
 
             var message = new ExecuteStepRequest
             {
-                ParsedStepText = parameterizedStepText,
+                ParsedStepText = stepText,
                 ActualStepText = stepText
             };
 
@@ -108,7 +108,7 @@ namespace Gauge.Dotnet.IntegrationTests
 
             Assert.IsNotNull(protoExecutionResult);
             Assert.IsTrue(protoExecutionResult.Failed);
-            Assert.AreEqual(protoExecutionResult.FailureScreenshotFile, "screenshot.png");
+            Assert.AreEqual("screenshot.png", protoExecutionResult.FailureScreenshotFile);
         }
     }
 }

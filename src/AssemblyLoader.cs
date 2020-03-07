@@ -35,14 +35,16 @@ namespace Gauge.Dotnet
         private Assembly _targetLibAssembly;
 
         private readonly IActivatorWrapper _activatorWrapper;
+        private readonly IStepRegistry _registry;
 
         public AssemblyLoader(IAssemblyWrapper assemblyWrapper, IEnumerable<string> assemblyLocations,
-            IReflectionWrapper reflectionWrapper, IActivatorWrapper activatorWrapper)
+            IReflectionWrapper reflectionWrapper, IActivatorWrapper activatorWrapper, IStepRegistry registry)
         {
             _assemblyWrapper = assemblyWrapper;
             _reflectionWrapper = reflectionWrapper;
             _activatorWrapper = activatorWrapper;
             AssembliesReferencingGaugeLib = new List<Assembly>();
+            _registry = registry;
             foreach (var location in assemblyLocations)
                 ScanAndLoad(location);
 
@@ -81,7 +83,6 @@ namespace Gauge.Dotnet
         public IStepRegistry GetStepRegistry()
         {
             var infos = GetMethods(LibType.Step);
-            var registry = new StepRegistry();
             foreach (var info in infos)
             {
                 var stepTexts = info.GetCustomAttributes(GetLibType(LibType.Step))
@@ -89,23 +90,32 @@ namespace Gauge.Dotnet
                 foreach (var stepText in stepTexts)
                 {
                     var stepValue = GetStepValue(stepText);
-                    var hasAlias = stepTexts.Count() > 1;
-                    var stepMethod = new GaugeMethod
+                    if (_registry.ContainsStep(stepValue))
                     {
-                        Name = info.FullyQuallifiedName(),
-                        ParameterCount = info.GetParameters().Length,
-                        StepText = stepText,
-                        HasAlias = hasAlias,
-                        Aliases = stepTexts,
-                        MethodInfo = info,
-                        ContinueOnFailure = info.IsRecoverableStep(this),
-                        StepValue = stepValue
-                    };
-                    registry.AddStep(stepValue, stepMethod);
+                        _registry.MethodFor(stepValue).MethodInfo = info;
+                        _registry.MethodFor(stepValue).ContinueOnFailure = info.IsRecoverableStep(this);
+                    }
+                    else
+                    {
+                        var hasAlias = stepTexts.Count() > 1;
+                        var stepMethod = new GaugeMethod
+                        {
+                            Name = info.FullyQuallifiedName(),
+                            ParameterCount = info.GetParameters().Length,
+                            StepText = stepText,
+                            HasAlias = hasAlias,
+                            Aliases = stepTexts,
+                            MethodInfo = info,
+                            ContinueOnFailure = info.IsRecoverableStep(this),
+                            StepValue = stepValue,
+                            IsExternal = true,
+                        };
+                        _registry.AddStep(stepValue, stepMethod);
+                    }
+
                 }
             }
-
-            return registry;
+            return _registry;
         }
 
         public object GetClassInstanceManager()
@@ -162,7 +172,7 @@ namespace Gauge.Dotnet
                 type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotWriter"));
             ScreenshotWriter = implementingTypes.FirstOrDefault();
             if (ScreenshotWriter is null) return;
-            var csg = (ICustomScreenshotWriter) _activatorWrapper.CreateInstance(ScreenshotWriter);
+            var csg = (ICustomScreenshotWriter)_activatorWrapper.CreateInstance(ScreenshotWriter);
             GaugeScreenshots.RegisterCustomScreenshotWriter(csg);
         }
 
@@ -172,7 +182,7 @@ namespace Gauge.Dotnet
                 type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotGrabber"));
             ScreenshotWriter = implementingTypes.FirstOrDefault();
             if (ScreenshotWriter is null) return;
-            var csg = (ICustomScreenshotGrabber) _activatorWrapper.CreateInstance(ScreenshotWriter);
+            var csg = (ICustomScreenshotGrabber)_activatorWrapper.CreateInstance(ScreenshotWriter);
             GaugeScreenshots.RegisterCustomScreenshotGrabber(csg);
         }
 
