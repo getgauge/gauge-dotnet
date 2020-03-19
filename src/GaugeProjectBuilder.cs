@@ -30,22 +30,20 @@ namespace Gauge.Dotnet
             var csprojEnvVariable = Utils.TryReadEnvValue("GAUGE_CSHARP_PROJECT_FILE");
             var configurationEnvVariable = ReadBuildConfiguration();
             var commandArgs = $"publish --configuration={configurationEnvVariable} --output=\"{gaugeBinDir}\"";
-            if (!string.IsNullOrEmpty(csprojEnvVariable)) commandArgs = $"{commandArgs} \"{csprojEnvVariable}\"";
-            try
+            if (!string.IsNullOrEmpty(csprojEnvVariable))
             {
-                var logLevel = Utils.TryReadEnvValue("GAUGE_LOG_LEVEL");
-                if (string.Compare(logLevel, "DEBUG", true) != 0) commandArgs = $"{commandArgs} --verbosity=quiet";
-                RunDotnetCommand(commandArgs);
+                commandArgs = $"{commandArgs} \"{csprojEnvVariable}\"";
             }
-            catch (Exception ex)
+            var logLevel = Utils.TryReadEnvValue("GAUGE_LOG_LEVEL");
+            if (string.Compare(logLevel, "DEBUG", true) != 0) commandArgs = $"{commandArgs} --verbosity=quiet";
+            if(RunDotnetCommand(commandArgs) !=0)
             {
-                throw new Exception($"dotnet Project build failed.\nRan 'dotnet {commandArgs}'", ex);
+                throw new Exception($"dotnet Project build failed.\nRan 'dotnet {commandArgs}'");
             }
-
             return true;
         }
 
-        public static void RunDotnetCommand(string args)
+        public static int RunDotnetCommand(string args)
         {
             var startInfo = new ProcessStartInfo
             {
@@ -58,6 +56,7 @@ namespace Gauge.Dotnet
             buildProcess.ErrorDataReceived += (sender, e) => { Logger.Error(e.Data); };
             buildProcess.Start();
             buildProcess.WaitForExit();
+            return buildProcess.ExitCode;
         }
 
         private static string ReadBuildConfiguration()

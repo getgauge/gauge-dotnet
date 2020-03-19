@@ -68,8 +68,9 @@ namespace Gauge.Dotnet
                 Logger.Fatal($"Cannot locate a Project File in {Utils.GaugeProjectRoot}");
                 return false;
             }
-            catch (IOException)
+            catch (Exception ex)
             {
+                Logger.Fatal($"Unable to build Project in {Utils.GaugeProjectRoot}\n{ex.Message}\n{ex.StackTrace}");
                 return false;
             }
         }
