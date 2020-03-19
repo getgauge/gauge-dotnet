@@ -69,6 +69,33 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 Assert.AreEqual(response.StepName[1], "step3");
                 Assert.True(response.HasAlias);
             }
+
+            [Test]
+            public void ShouldProcessExternalSteps()
+            {
+                var mockStepRegistry = new Mock<IStepRegistry>();
+                var request = new StepNameRequest
+                {
+                    StepValue = "step1"
+                };
+                var parsedStepText = request.StepValue;
+                const string stepText = "step1";
+                mockStepRegistry.Setup(r => r.ContainsStep(parsedStepText)).Returns(true);
+                mockStepRegistry.Setup(r => r.GetStepText(parsedStepText)).Returns(stepText);
+
+                var gaugeMethod = new GaugeMethod
+                {
+                    FileName = "foo",
+                    IsExternal = true
+                };
+                mockStepRegistry.Setup(r => r.MethodFor(parsedStepText)).Returns(gaugeMethod);
+                var stepNameProcessor = new StepNameProcessor(mockStepRegistry.Object);
+
+                var response = stepNameProcessor.Process(request);
+
+                Assert.True(response.IsExternal);
+                // Assert.AreEqual(response.FileName, null);
+            }
         }
     }
 }

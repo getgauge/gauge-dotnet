@@ -188,5 +188,18 @@ namespace Gauge.Dotnet.UnitTests
             Assert.True(stepRegistry.IsFileCached("Foo.cs"));
             Assert.False(stepRegistry.IsFileCached("Bar.cs"));
         }
+
+        [Test]
+        public void ShouldNotContainStepPositionForExternalSteps()
+        {
+            var stepRegistry = new StepRegistry();
+            stepRegistry.AddStep("Foo", new GaugeMethod {Name = "Foo", StepText = "Foo", FileName = "foo.cs"});
+            stepRegistry.AddStep("Bar", new GaugeMethod {Name = "Bar", StepText = "Bar", IsExternal = true});
+
+            var positions = stepRegistry.GetStepPositions("foo.cs");
+
+            Assert.True(positions.Count() == 1);
+            Assert.AreNotEqual(positions.First().StepValue, "Bar");
+        }
     }
 }
