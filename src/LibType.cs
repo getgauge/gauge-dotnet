@@ -38,7 +38,8 @@ namespace Gauge.Dotnet
         ScreenshotFilesCollector,
         ContinueOnFailure,
         DefaultScreenshotWriter,
-        DefaultClassInstanceManager
+        DefaultClassInstanceManager,
+        GaugeScreenshots
     }
 
     public static class LibTypeExtensions
@@ -62,7 +63,8 @@ namespace Gauge.Dotnet
             {LibType.ScreenshotFilesCollector, "Gauge.CSharp.Lib.ScreenshotFilesCollector"},
             {LibType.ContinueOnFailure, "Gauge.CSharp.Lib.Attribute.ContinueOnFailure"},
             {LibType.DefaultScreenshotWriter, "Gauge.CSharp.Lib.DefaultScreenshotWriter"},
-            {LibType.DefaultClassInstanceManager, "Gauge.CSharp.Lib.DefaultClassInstanceManager"}
+            {LibType.DefaultClassInstanceManager, "Gauge.CSharp.Lib.DefaultClassInstanceManager"},
+            {LibType.GaugeScreenshots, "Gauge.CSharp.Lib.GaugeScreenshots"},
         };
 
         public static string FullName(this LibType type)

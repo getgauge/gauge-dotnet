@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Gauge.CSharp.Lib" Version="0.7.6" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(REFERENCE_MODE)'=='PROJECT'">
+    <ProjectReference Include="..\ReferenceProject\ReferenceProject.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(REFERENCE_MODE)'=='DLL'">
+    <Reference Include="ReferenceDll">
+      <HintPath>libs/ReferenceDll.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

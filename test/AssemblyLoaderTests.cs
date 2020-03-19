@@ -19,6 +19,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
 using Moq;
 using NUnit.Framework;
@@ -84,7 +85,7 @@ namespace Gauge.Dotnet.UnitTests
             mockReflectionWrapper.Setup(r => r.GetMethods(mockType.Object))
                 .Returns(new[] {_mockStepMethod.Object});
             _assemblyLoader = new AssemblyLoader(_mockAssemblyWrapper.Object, new[] {assemblyLocation},
-                mockReflectionWrapper.Object, mockActivationWrapper.Object);
+                mockReflectionWrapper.Object, mockActivationWrapper.Object, new StepRegistry());
         }
 
         [TearDown]
@@ -140,7 +141,7 @@ namespace Gauge.Dotnet.UnitTests
             var mockActivationWrapper = new Mock<IActivatorWrapper>();
             mockAssemblyWrapper.Setup(x => x.LoadFrom(TmpLocation)).Throws<FileNotFoundException>();
             Assert.Throws<FileNotFoundException>(() =>
-                new AssemblyLoader(mockAssemblyWrapper.Object, new[] {TmpLocation}, mockReflectionWrapper.Object, mockActivationWrapper.Object));
+                new AssemblyLoader(mockAssemblyWrapper.Object, new[] {TmpLocation}, mockReflectionWrapper.Object, mockActivationWrapper.Object, new StepRegistry()));
         }
     }
 }

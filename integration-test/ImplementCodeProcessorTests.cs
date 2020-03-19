@@ -49,7 +49,8 @@ namespace Gauge.Dotnet.IntegrationTests
             var result = processor.Process(message);
             Assert.AreEqual("StepImplementation1.cs", Path.GetFileName(result.FilePath));
             Assert.AreEqual(1, result.TextDiffs.Count);
-            Assert.True(result.TextDiffs[0].Content.Contains("namespace IntegrationTestSample"));
+            Console.WriteLine(result.TextDiffs[0].Content);
+            Assert.True(result.TextDiffs[0].Content.Contains("namespace Sample"));
             Assert.True(result.TextDiffs[0].Content.Contains("class StepImplementation1"));
             Assert.AreEqual(result.TextDiffs[0].Span.Start, 0);
         }
@@ -70,7 +71,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var processor = new StubImplementationCodeProcessor();
             var result = processor.Process(message);
             Assert.AreEqual(1, result.TextDiffs.Count);
-            Assert.True(result.TextDiffs[0].Content.Contains("namespace IntegrationTestSample"));
+            Assert.True(result.TextDiffs[0].Content.Contains("namespace Sample"));
             Assert.True(result.TextDiffs[0].Content.Contains("class Empty"));
             StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
             Assert.AreEqual(result.TextDiffs[0].Span.Start, 0);
@@ -93,7 +94,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var result = processor.Process(message);
             Assert.AreEqual(1, result.TextDiffs.Count);
             StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
-            Assert.AreEqual(result.TextDiffs[0].Span.Start, 115);
+            Assert.AreEqual(131, result.TextDiffs[0].Span.Start);
         }
 
         [Test]
@@ -134,7 +135,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var result = processor.Process(message);
             Assert.AreEqual(1, result.TextDiffs.Count);
             StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
-            Assert.True(result.TextDiffs[0].Content.Contains("namespace IntegrationTestSample"));
+            Assert.True(result.TextDiffs[0].Content.Contains("namespace Sample"));
             Assert.True(result.TextDiffs[0].Content.Contains("class CommentFile"));
             Assert.AreEqual(result.TextDiffs[0].Span.Start, 3);
         }

@@ -16,12 +16,10 @@
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using Gauge.CSharp.Lib;
-using Gauge.CSharp.Lib.Attribute;
 using NUnit.Framework;
 
 namespace Gauge.Dotnet.IntegrationTests
@@ -34,15 +32,6 @@ namespace Gauge.Dotnet.IntegrationTests
         public void Setup()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _testProjectPath);
-        }
-
-        public static void AssertRunnerDomainDidNotLoadUsersAssembly()
-        {
-            Assert.AreNotEqual("0.6.999",
-                FileVersionInfo.GetVersionInfo(typeof(AfterScenario).Assembly.Location).ProductVersion,
-                "Runner's test domain should not load the Gauge.CSharp.Lib assembly with 0.6.999 version");
-            // 0.6.999 version should be only loaded in sandbox. 
-            // Runner should have its own version, the one we just built in this project
         }
 
         public static string SerializeTable(Table table)
@@ -59,7 +48,6 @@ namespace Gauge.Dotnet.IntegrationTests
         public void TearDown()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
-            AssertRunnerDomainDidNotLoadUsersAssembly();
         }
     }
 }

@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Gauge.CSharp.Lib;
+using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
 using NUnit.Framework;
 
@@ -32,7 +33,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
@@ -51,7 +52,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
@@ -72,13 +73,12 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
-            AssertRunnerDomainDidNotLoadUsersAssembly();
             var gaugeMethod = assemblyLoader.GetStepRegistry()
                 .MethodFor("A context step which gets executed before every scenario");
 
@@ -93,7 +93,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
@@ -114,7 +114,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
@@ -135,7 +135,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper, new StepRegistry());
             var registry = assemblyLoader.GetStepRegistry();
             var gaugeMethod = registry.MethodFor("and an alias");
             var stepTexts = gaugeMethod.Aliases.ToList();
@@ -151,7 +151,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
@@ -174,14 +174,13 @@ namespace Gauge.Dotnet.IntegrationTests
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper);
+                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
 
-            AssertRunnerDomainDidNotLoadUsersAssembly();
             var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an unserializable exception");
             var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod);
             Assert.True(executionResult.Failed);

@@ -221,7 +221,8 @@ namespace Gauge.Dotnet.UnitTests
         public void ShouldTakeScreenShotOnFailedExecution()
         {
             var pendingMessages = new List<string> {"Foo", "Bar"};
-            var pendingScreenshots = new List<string> {"screenshot.png"};
+            var expectedScreenshot = "Testscreenshot.png";
+            var pendingScreenshots = new List<string> {expectedScreenshot};
             var gaugeMethod = new GaugeMethod {Name = "ShouldExecuteMethod", ParameterCount = 1};
             var executionResult = new ExecutionResult
             {
@@ -229,21 +230,10 @@ namespace Gauge.Dotnet.UnitTests
                 ExceptionMessage = "error",
                 StackTrace = "stacktrace"
             };
-            var expectedScreenshot = "TestScreenshot.png";
-
-            var type = new Mock<Type>().Object;
             var mockInstance = new Mock<object>().Object;
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            mockAssemblyLoader.Setup(x => x.ScreenshotWriter).Returns(type);
-
             var mockActivationWrapper = new Mock<IActivatorWrapper>();
-            mockActivationWrapper.Setup(x => x.CreateInstance(type)).Returns(mockInstance);
-
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            mockReflectionWrapper
-                .Setup(x => x.InvokeMethod(type, mockInstance, "TakeScreenShot"))
-                .Returns(expectedScreenshot);
-
             var mockHookExecuter = new Mock<IHookExecutor>();
             var mockStepExecutor = new Mock<IStepExecutor>();
             mockStepExecutor.Setup(executor => executor.Execute(gaugeMethod, It.IsAny<string[]>()))

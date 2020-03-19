@@ -60,22 +60,26 @@ namespace Gauge.Dotnet.Models
         {
             var positions = new List<StepPosition>();
             foreach (var (stepValue, gaugeMethods) in _registry)
-            foreach (var m in gaugeMethods)
-                if (m.FileName.Equals(filePath))
+            {
+                foreach (var m in gaugeMethods)
                 {
-                    var p = new StepPosition
+                    if (!m.IsExternal && m.FileName.Equals(filePath))
                     {
-                        StepValue = stepValue,
-                        Span = new Span
+                        var p = new StepPosition
                         {
-                            Start = m.Span.StartLinePosition.Line + 1,
-                            StartChar = m.Span.StartLinePosition.Character,
-                            End = m.Span.EndLinePosition.Line + 1,
-                            EndChar = m.Span.EndLinePosition.Character
-                        }
-                    };
-                    positions.Add(p);
+                            StepValue = stepValue,
+                            Span = new Span
+                            {
+                                Start = m.Span.StartLinePosition.Line + 1,
+                                StartChar = m.Span.StartLinePosition.Character,
+                                End = m.Span.EndLinePosition.Line + 1,
+                                EndChar = m.Span.EndLinePosition.Character
+                            }
+                        };
+                        positions.Add(p);
+                    }
                 }
+            }
 
             return positions;
         }

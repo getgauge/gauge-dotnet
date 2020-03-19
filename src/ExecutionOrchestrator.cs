@@ -133,19 +133,30 @@ namespace Gauge.Dotnet
         {
             try
             {
-                var instance = _activatorWrapper.CreateInstance(_assemblyLoader.ScreenshotWriter);
-                if (instance != null)
+                InvokeScreenshotCapture();
+            }
+            catch (System.NullReferenceException)
+            {
+                Logger.Warning("Unable to capture screenshot, CustomScreenshotWriter is probably not set, retrying with DefaultScreenshotWriter");
+                GaugeScreenshots.RegisterCustomScreenshotWriter(new DefaultScreenshotWriter());
+                try
                 {
-                    var ScreenshotFile = _reflectionWrapper.InvokeMethod(_assemblyLoader.ScreenshotWriter, instance,
-                                    "TakeScreenShot") as string;
-                    return Path.GetFileName(ScreenshotFile);
+                    InvokeScreenshotCapture();
+                }
+                catch (System.Exception ex)
+                {
+                    Logger.Warning($"Unable to capture screenshot with DefaultScreenshotWriter, {ex.Message}\n{ex.StackTrace}");
                 }
             }
-            catch
-            {
-                //do nothing, return
-            }
-            return "";
+            var messageCollectorType = _assemblyLoader.GetLibType(LibType.ScreenshotFilesCollector);
+            return (_reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingScreenshotFiles",
+                BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>).FirstOrDefault();
+        }
+
+        private void InvokeScreenshotCapture() {
+            var gaugeScreenshotsType = _assemblyLoader.GetLibType(LibType.GaugeScreenshots);
+            _reflectionWrapper.InvokeMethod(gaugeScreenshotsType, null, "Capture",
+                BindingFlags.Static | BindingFlags.Public);
         }
     }
 }

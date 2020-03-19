@@ -49,7 +49,7 @@ namespace Gauge.Dotnet
         public void LoadStepsFromText(string content, string filepath)
         {
             var steps = GetStepsFrom(content);
-            AddStepsToRegsitry(filepath, steps);
+            AddStepsToRegistry(filepath, steps);
         }
 
         public void ReloadSteps(string content, string filepath)
@@ -87,7 +87,7 @@ namespace Gauge.Dotnet
             foreach (var f in wantedFiles) LoadStepsFromText(File.ReadAllText(f), f);
         }
 
-        private void AddStepsToRegsitry(string fileName, IEnumerable<MethodDeclarationSyntax> stepMethods)
+        private void AddStepsToRegistry(string fileName, IEnumerable<MethodDeclarationSyntax> stepMethods)
         {
             foreach (var stepMethod in stepMethods)
             {
@@ -110,7 +110,8 @@ namespace Gauge.Dotnet
                         StepValue = stepValue,
                         Span = stepMethod.GetLocation().GetLineSpan(),
                         ClassName = classDef.Identifier.ValueText,
-                        FileName = fileName
+                        FileName = fileName,
+                        IsExternal = false
                     };
                     _stepRegistry.AddStep(stepValue, entry);
                 }
