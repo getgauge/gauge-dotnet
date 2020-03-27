@@ -6,3 +6,5 @@ IntegrationTestSample/logs
 deploy
 artifacts
 .ionide
+
+.fake

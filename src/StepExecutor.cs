@@ -42,7 +42,7 @@ namespace Gauge.Dotnet
         {
             {
                 var method = gaugeMethod.MethodInfo;
-                var executionResult = new ExecutionResult {Success = true};
+                var executionResult = new ExecutionResult();
                 try
                 {
                     var parameters = args.Select(o =>
@@ -58,17 +58,17 @@ namespace Gauge.Dotnet
                     }).ToArray();
                     Logger.Debug($"Executing method: {gaugeMethod.Name}");
                     Execute(method, StringParamConverter.TryConvertParams(method, parameters));
+                    executionResult.Success = true;
                 }
                 catch (Exception ex)
                 {
-                    Logger.Debug($"Error executing {method.Name}") ;
+                    Logger.Debug($"Error executing {method.Name} : {ex.Message}") ;
                     var innerException = ex.InnerException ?? ex;
                     executionResult.ExceptionMessage = innerException.Message;
                     executionResult.StackTrace = innerException is AggregateException
                         ? innerException.ToString()
                         : innerException.StackTrace;
                     executionResult.Source = innerException.Source;
-                    executionResult.Success = false;
                     executionResult.Recoverable = gaugeMethod.ContinueOnFailure;
                 }
 

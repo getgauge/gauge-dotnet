@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Threading.Tasks;
 using Gauge.Dotnet.Helpers;
 using Gauge.Dotnet.Models;
@@ -53,7 +54,6 @@ namespace Gauge.Dotnet
         private SpecDataStoreInitProcessor specDataStoreInitProcessor;
         private SuiteDataStoreInitProcessor suiteDataStoreInitProcessor;
 
-
         public  RunnerServiceHandler(IActivatorWrapper activationWrapper, IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader, IStaticLoader loader, Server server)
         {
             this._loader = loader;
@@ -67,82 +67,83 @@ namespace Gauge.Dotnet
 
         public override Task<StepValidateResponse> ValidateStep(StepValidateRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.stepValidateRequestProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.stepValidateRequestProcessor.Process(request)));
         }
 
         public override Task<ExecutionStatusResponse> ExecuteStep(ExecuteStepRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.executeStepProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.executeStepProcessor.Process(request)));
         }
 
         public override Task<ExecutionStatusResponse> FinishExecution(ExecutionEndingRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.executionEndingProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.executionEndingProcessor.Process(request)));
         }
 
         public override Task<ExecutionStatusResponse> FinishScenarioExecution(ScenarioExecutionEndingRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.scenarioExecutionEndingProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.scenarioExecutionEndingProcessor.Process(request)));
         }
 
         public override Task<ExecutionStatusResponse> FinishSpecExecution(SpecExecutionEndingRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.specExecutionEndingProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.specExecutionEndingProcessor.Process(request)));
         }
 
         public override Task<ExecutionStatusResponse> FinishStepExecution(StepExecutionEndingRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.stepExecutionEndingProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.stepExecutionEndingProcessor.Process(request)));
         }
-
 
         public override Task<ExecutionStatusResponse> InitializeScenarioDataStore(ScenarioDataStoreInitRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.scenarioDataStoreInitProcessor.Process());
+            return processAndGetTask(() => Task.FromResult(this.scenarioDataStoreInitProcessor.Process()));
         }
 
         public override Task<ExecutionStatusResponse> InitializeSpecDataStore(SpecDataStoreInitRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.specDataStoreInitProcessor.Process());
+            return processAndGetTask(() => Task.FromResult(this.specDataStoreInitProcessor.Process()));
         }
 
         public override Task<ExecutionStatusResponse> InitializeSuiteDataStore(SuiteDataStoreInitRequest request, ServerCallContext context)
         {
-            InitializeExecutionMessageHandlers();
-            return Task.FromResult(this.suiteDataStoreInitProcessor.Process());
+            return processAndGetTask(() =>
+            {
+                InitializeExecutionMessageHandlers();
+                return Task.FromResult(this.suiteDataStoreInitProcessor.Process());
+            });
         }
 
         public override Task<ExecutionStatusResponse> StartExecution(ExecutionStartingRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.executionStartingProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.executionStartingProcessor.Process(request)));
         }
 
         public override Task<ExecutionStatusResponse> StartScenarioExecution(ScenarioExecutionStartingRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.scenarioExecutionStartingProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.scenarioExecutionStartingProcessor.Process(request)));
         }
 
         public override Task<ExecutionStatusResponse> StartSpecExecution(SpecExecutionStartingRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.specExecutionStartingProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.specExecutionStartingProcessor.Process(request)));
         }
 
         public override Task<ExecutionStatusResponse> StartStepExecution(StepExecutionStartingRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.stepExecutionStartingProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.stepExecutionStartingProcessor.Process(request)));
         }
 
         public override Task<Empty> CacheFile(CacheFileRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.cacheFileRequestProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.cacheFileRequestProcessor.Process(request)));
         }
-
 
         public override Task<ImplementationFileGlobPatternResponse> GetGlobPatterns(Empty request, ServerCallContext context)
         {
             var response = new ImplementationFileGlobPatternResponse();
             response.GlobPatterns.Add(FileHelper.GetImplementationGlobPatterns());
-            return Task.FromResult(response);
+            return processAndGetTask(() => Task.FromResult(response));
         }
 
 
@@ -150,32 +151,32 @@ namespace Gauge.Dotnet
         {
             var response = new ImplementationFileListResponse();
             response.ImplementationFilePaths.AddRange(FileHelper.GetImplementationFiles());
-            return Task.FromResult(response);
+            return processAndGetTask(() => Task.FromResult(response));
         }
 
         public override Task<StepNameResponse> GetStepName(StepNameRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.stepNameRequestProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.stepNameRequestProcessor.Process(request)));
         }
 
         public override Task<StepNamesResponse> GetStepNames(StepNamesRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.stepNamesRequestProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.stepNamesRequestProcessor.Process(request)));
         }
 
         public override Task<StepPositionsResponse> GetStepPositions(StepPositionsRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.stepPositionsRequestProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.stepPositionsRequestProcessor.Process(request)));
         }
 
         public override Task<FileDiff> ImplementStub(StubImplementationCodeRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.stubImplementationCodeRequestProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.stubImplementationCodeRequestProcessor.Process(request)));
         }
 
         public override Task<RefactorResponse> Refactor(RefactorRequest request, ServerCallContext context)
         {
-            return Task.FromResult(this.refactorRequestProcessor.Process(request));
+            return processAndGetTask(() => Task.FromResult(this.refactorRequestProcessor.Process(request)));
         }
 
         private void InitializeMessageProcessors()
@@ -225,5 +226,15 @@ namespace Gauge.Dotnet
             this.suiteDataStoreInitProcessor = new SuiteDataStoreInitProcessor(this._assemblyLoader);
         }
 
+        private Task<TResult> processAndGetTask<TResult>(Func<Task<TResult>> fn)
+        {
+            try {
+                return fn.Invoke();
+            } catch (Exception ex)
+            {
+                var e = ex.InnerException ?? ex;
+                throw new RpcException(new Status(StatusCode.Internal, $"{e.Message}||{e.StackTrace}"));
+            }
+        }
     }
 }

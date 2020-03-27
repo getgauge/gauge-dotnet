@@ -118,12 +118,17 @@ namespace Gauge.Dotnet
             var isScreenShotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
             if (isScreenShotEnabled == null || isScreenShotEnabled.ToLower() != "false")
             {
-                var ScreenshotFile = TryScreenCapture();
-                result.FailureScreenshotFile = ScreenshotFile;
+                var screenshotFile = TryScreenCapture();
+                if(!string.IsNullOrEmpty(screenshotFile)){
+                    result.FailureScreenshotFile = screenshotFile;
+                }
             }
 
             result.ErrorMessage = executionResult.ExceptionMessage;
-            result.StackTrace = executionResult.StackTrace;
+            if (!string.IsNullOrEmpty(executionResult.StackTrace))
+            {
+                result.StackTrace = executionResult.StackTrace;
+            }
             result.RecoverableError = executionResult.Recoverable;
             result.ExecutionTime = elapsedMilliseconds;
             return result;
@@ -135,18 +140,10 @@ namespace Gauge.Dotnet
             {
                 InvokeScreenshotCapture();
             }
-            catch (System.NullReferenceException)
+            catch (System.Exception ex)
             {
-                Logger.Warning("Unable to capture screenshot, CustomScreenshotWriter is probably not set, retrying with DefaultScreenshotWriter");
-                GaugeScreenshots.RegisterCustomScreenshotWriter(new DefaultScreenshotWriter());
-                try
-                {
-                    InvokeScreenshotCapture();
-                }
-                catch (System.Exception ex)
-                {
-                    Logger.Warning($"Unable to capture screenshot with DefaultScreenshotWriter, {ex.Message}\n{ex.StackTrace}");
-                }
+                Logger.Warning($"Unable to capture screenshot, CustomScreenshotWriter is probably not set.({ex.Message})\n{ex.StackTrace}");
+                return null;
             }
             var messageCollectorType = _assemblyLoader.GetLibType(LibType.ScreenshotFilesCollector);
             return (_reflectionWrapper.InvokeMethod(messageCollectorType, null, "GetAllPendingScreenshotFiles",
