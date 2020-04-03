@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Gauge-Dotnet.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
@@ -32,17 +33,35 @@ namespace Gauge.Dotnet.Processors
 
         public ExecutionStatusResponse Process()
         {
-            var initMethod = _assemblyLoader.GetLibType(LibType.DataStoreFactory)
-                .GetMethod($"Initialize{_dataStoreType}DataStore");
-            initMethod.Invoke(null, null);
-            return new ExecutionStatusResponse
+            try
             {
-                ExecutionResult = new ProtoExecutionResult
+                var initMethod = _assemblyLoader.GetLibType(LibType.DataStoreFactory)
+                    .GetMethod($"Initialize{_dataStoreType}DataStore");
+                initMethod.Invoke(null, null);
+                return new ExecutionStatusResponse
                 {
-                    Failed = false,
-                    ExecutionTime = 0
-                }
-            };
+                    ExecutionResult = new ProtoExecutionResult
+                    {
+                        Failed = false,
+                        ExecutionTime = 0
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                var executionResult = new ProtoExecutionResult
+                    {
+                        Failed = true,
+                        ExecutionTime = 0
+                    };
+                var innerException = ex.InnerException ?? ex;
+                executionResult.ErrorMessage = innerException.Message;
+                executionResult.StackTrace = innerException is AggregateException
+                    ? innerException.ToString()
+                    : innerException.StackTrace;
+
+                return new ExecutionStatusResponse { ExecutionResult = executionResult };
+            }
         }
     }
 }

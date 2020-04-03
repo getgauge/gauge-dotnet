@@ -45,7 +45,7 @@ namespace Gauge.Dotnet
             {
                 var error = "Could not load instance type: " + typeToLoad;
                 Logger.Error(error);
-                throw new Exception(error);
+                throw new TypeLoadException(error);
             }
 
             _reflectionWrapper.Invoke(method, instance, parameters);
