@@ -44,7 +44,7 @@ jobs:
 
           echo -e "Gauge Dotnet v$version\n\n" > desc.txt
 
-          release_description=$(ruby -e "$(curl -sSfL https://github.com/getgauge/gauge/raw/master/build/create_release_text.rb)" gauge-dotnet getgauge)
+          release_description=$(ruby -e "$(curl -sSfL https://github.com/getgauge/gauge/raw/master/build/create_release_text.rb)" getgauge gauge-dotnet)
 
           echo "$release_description" >> desc.txt
 
