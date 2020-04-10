@@ -19,6 +19,11 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.0.100
+      
+      - name: Setup git
+        run: |
+          git config --global user.name "$(git --no-pager log --format=format:'%an' -n 1)"
+          git config --global user.email "$(git --no-pager log --format=format:'%ae' -n 1)"    
 
       - name: Build artifacts
         run: |
@@ -28,7 +33,7 @@ jobs:
         run: |
           cd artifacts
           if [ -z "$version" ]; then
-            version=$(ls gauge-dotnet* | head -1 | sed "s/\.[^\.]*$//" | sed "s/gauge-dotnet-//" | sed | sed "s/-[a-z]*\.[a-z0-9_]*$//");
+            version=$(ls gauge-dotnet* | sed "s/\.[^\.]*$//" | sed "s/gauge-dotnet-//");
           fi
           echo "::set-env name=VERSION::$version"
           artifacts=()
@@ -44,7 +49,7 @@ jobs:
 
           echo -e "Gauge Dotnet v$version\n\n" > desc.txt
 
-          release_description=$(ruby -e "$(curl -sSfL https://github.com/getgauge/gauge/raw/master/build/create_release_text.rb)" gauge-dotnet getgauge)
+          release_description=$(ruby -e "$(curl -sSfL https://github.com/getgauge/gauge/raw/master/build/create_release_text.rb)" getgauge gauge-dotnet)
 
           echo "$release_description" >> desc.txt
 
