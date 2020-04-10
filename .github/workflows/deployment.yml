@@ -28,7 +28,7 @@ jobs:
         run: |
           cd artifacts
           if [ -z "$version" ]; then
-            version=$(ls gauge-dotnet* | head -1 | sed "s/\.[^\.]*$//" | sed "s/gauge-dotnet-//" | sed | sed "s/-[a-z]*\.[a-z0-9_]*$//");
+            version=$(ls gauge-dotnet* | sed "s/\.[^\.]*$//" | sed "s/gauge-dotnet-//");
           fi
           echo "::set-env name=VERSION::$version"
           artifacts=()
