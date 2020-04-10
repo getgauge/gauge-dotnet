@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gauge.CSharp.Core" Version="0.4.0" />
+    <PackageReference Include="Gauge.CSharp.Core" Version="0.4.1" />
     <PackageReference Include="Gauge.CSharp.Lib" Version="0.7.6" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.0.0"/>
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.5.0" />
