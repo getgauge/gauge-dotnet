@@ -1,7 +1,7 @@
 {
   "id": "dotnet",
   "version": "0.1.4",
-  "description": "C# support for gauge + .NET Core 2.1",
+  "description": "C# support for gauge + .NET Core 3.0",
   "run": {
     "windows": [
       "launcher.cmd",

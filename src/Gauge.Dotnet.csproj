@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <PackageId>Runner.NetCore21</PackageId>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <PackageId>Runner.NetCore30</PackageId>
     <Authors>The Gauge Team</Authors>
     <Version>0.1.4</Version>
     <Company>ThoughtWorks Inc.</Company>
@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gauge.CSharp.Core" Version="0.4.0" />
-    <PackageReference Include="Gauge.CSharp.Lib" Version="0.7.6" />
+    <PackageReference Include="Gauge.CSharp.Core" Version="0.4.1" />
+    <PackageReference Include="Gauge.CSharp.Lib" Version="0.7.8" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.0.0"/>
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.5.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.5.0" />

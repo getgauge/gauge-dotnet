@@ -70,7 +70,7 @@ namespace Gauge.Dotnet
                 fileLinePositionSpan.StartLinePosition.Character);
             var end = new Position(fileLinePositionSpan.EndLinePosition.Line + 1,
                 fileLinePositionSpan.EndLinePosition.Character);
-            return new Diff(text, new Range(start, end));
+            return new Diff(text, new Gauge.Dotnet.Models.Range(start, end));
         }
 
         private static ParameterListSyntax ReplaceParameters(MethodDeclarationSyntax methodDeclarationSyntax,
