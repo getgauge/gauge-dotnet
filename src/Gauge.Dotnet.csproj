@@ -10,7 +10,7 @@
     <Product>Gauge</Product>
     <Description>C# runner for Gauge. https://gauge.org</Description>
     <Copyright>"Copyright © ThoughtWorks Inc 2017"</Copyright>
-    <PackageLicenseUrl>https://github.com/getgauge/gauge-dotnet/blob/master/COPYING</PackageLicenseUrl>
+    <PackageLicenseUrl>https://github.com/getgauge/gauge-dotnet/blob/master/License.txt</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/getgauge/gauge-dotnet</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/getgauge/gauge-csharp/master/logo-64x64.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/getgauge/gauge-dotnet</RepositoryUrl>

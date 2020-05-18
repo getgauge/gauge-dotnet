@@ -94,8 +94,9 @@ New distribution details need to be updated in the dotnet-install.json file in  
 
 ## License
 
-![GNU Public License version 3.0](http://www.gnu.org/graphics/gplv3-127x51.png)
-Gauge-Dotnet is released under [GNU Public License version 3.0](http://www.gnu.org/licenses/gpl-3.0.txt)
+This program is licensed under:
+
+Apache License, Version 2.0
 
 ## Copyright
 
