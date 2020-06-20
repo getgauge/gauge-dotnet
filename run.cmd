@@ -13,7 +13,9 @@ goto :eof
 
 :test
     dotnet test --no-build -c release test\Gauge.Dotnet.UnitTests.csproj
+    if %ERRORLEVEL% GEQ 1 exit %ERRORLEVEL%
     dotnet test --no-build -c release integration-test\Gauge.Dotnet.IntegrationTests.csproj
+    if %ERRORLEVEL% GEQ 1 exit %ERRORLEVEL%
     goto :eof
 
 :package
