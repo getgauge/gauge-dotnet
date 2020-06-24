@@ -1,6 +1,5 @@
 # Gauge-dotnet
-[![Build Status](https://travis-ci.org/getgauge/gauge-dotnet.svg?branch=master)](https://travis-ci.org/getgauge/gauge-dotnet)
-[![Build status](https://ci.appveyor.com/api/projects/status/t8hjbilxmb6enn4d/branch/master?svg=true)](https://ci.appveyor.com/project/getgauge/gauge-dotnet/branch/master)
+[![tests](https://github.com/getgauge/gauge-dotnet/workflows/tests/badge.svg)](https://github.com/getgauge/gauge-dotnet/actions?query=workflow%3Atests)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 
