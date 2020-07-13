@@ -12,6 +12,11 @@ function build() {
 function test() {
     checkCommand "dotnet"
     dotnet test --no-build -c Release test/Gauge.Dotnet.UnitTests.csproj
+    
+    # Only the last command's exit code is honored unless we exit early
+    testExit=$?
+    if [ $testExit -gt 0 ]; then exit $testExit; fi
+    
     dotnet test --no-build -c Release integration-test/Gauge.Dotnet.IntegrationTests.csproj
 }
 
@@ -53,7 +58,7 @@ function forceinstall() {
 tasks=(build test package install uninstall forceinstall)
 if [[ " ${tasks[@]} " =~ " $1 " ]]; then
     $1
-    exit 0
+    exit $?
 fi
 
 echo Options: [build \| test \| package \| install \| uninstall \| forceinstall]

@@ -23,7 +23,7 @@ namespace Gauge.Dotnet.UnitTests
         public void Setup()
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TmpLocation);
-            var assemblyLocation = "/foo/location";
+            _assemblyLocation = "/foo/location";
             _mockAssembly = new Mock<Assembly>();
             _mockAssemblyWrapper = new Mock<IAssemblyWrapper>();
             var mockActivationWrapper = new Mock<IActivatorWrapper>();
@@ -67,14 +67,14 @@ namespace Gauge.Dotnet.UnitTests
                 .Returns(mockType.Object);
             _mockAssembly.Setup(assembly => assembly.GetReferencedAssemblies())
                 .Returns(new[] {assemblyName});
-            _mockAssemblyWrapper.Setup(x => x.LoadFrom(assemblyLocation))
+            _mockAssemblyWrapper.Setup(x => x.LoadFrom(_assemblyLocation))
                 .Returns(_mockAssembly.Object);
             _mockAssemblyWrapper.Setup(x => x.GetCurrentDomainAssemblies())
                 .Returns(new[] {_mockAssembly.Object});
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             mockReflectionWrapper.Setup(r => r.GetMethods(mockType.Object))
                 .Returns(new[] {_mockStepMethod.Object});
-            _assemblyLoader = new AssemblyLoader(_mockAssemblyWrapper.Object, new[] {assemblyLocation},
+            _assemblyLoader = new AssemblyLoader(_mockAssemblyWrapper.Object, new[] {_assemblyLocation},
                 mockReflectionWrapper.Object, mockActivationWrapper.Object, new StepRegistry());
         }
 
@@ -84,6 +84,7 @@ namespace Gauge.Dotnet.UnitTests
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
 
+        private string _assemblyLocation;
         private Mock<Assembly> _mockAssembly;
         private AssemblyLoader _assemblyLoader;
         private Mock<IAssemblyWrapper> _mockAssemblyWrapper;
@@ -119,7 +120,7 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldGetTargetAssembly()
         {
-            _mockAssemblyWrapper.VerifyAll();
+            _mockAssemblyWrapper.Verify(x => x.LoadFrom(_assemblyLocation));
         }
 
         [Test]

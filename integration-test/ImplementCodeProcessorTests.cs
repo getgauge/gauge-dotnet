@@ -84,7 +84,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var result = processor.Process(message);
             Assert.AreEqual(1, result.TextDiffs.Count);
             StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
-            Assert.AreEqual(131, result.TextDiffs[0].Span.Start);
+            Assert.AreEqual(121, result.TextDiffs[0].Span.Start);
         }
 
         [Test]
