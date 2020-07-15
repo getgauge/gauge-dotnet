@@ -1,6 +1,6 @@
 {
   "id": "dotnet",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "C# support for gauge + .NET Core 3.0",
   "run": {
     "windows": [

@@ -32,7 +32,9 @@ namespace Gauge.Dotnet.Processors
         public ExecutionStatusResponse Process(SpecExecutionEndingRequest request)
         {
             _executionOrchestrator.CloseExecutionScope();
-            return ExecuteHooks(request.CurrentExecutionInfo);
+            var result = ExecuteHooks(request.CurrentExecutionInfo);
+            ClearCacheForConfiguredLevel();
+            return result;
         }
     }
 }

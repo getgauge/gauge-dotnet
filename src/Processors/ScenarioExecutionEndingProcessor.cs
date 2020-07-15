@@ -29,7 +29,9 @@ namespace Gauge.Dotnet.Processors
         public ExecutionStatusResponse Process(ScenarioExecutionEndingRequest request)
         {
             _executionOrchestrator.CloseExecutionScope();
-            return ExecuteHooks(request.CurrentExecutionInfo);
+            var result = ExecuteHooks(request.CurrentExecutionInfo);
+            ClearCacheForConfiguredLevel();
+            return result;
         }
 
         protected override List<string> GetApplicableTags(ExecutionInfo info)
