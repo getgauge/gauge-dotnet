@@ -29,11 +29,13 @@ namespace Gauge.Dotnet
         [DebuggerHidden]
         public void Execute()
         {
-            if (!TryBuild())
+            if (!TryBuild() && !this.ShouldContinueBuildFailure())
+            {
                 return;
+            }
             try
             {
-                _gaugeListener.Invoke().StartServer();
+                _gaugeListener.Invoke().StartServer(!this.ShouldContinueBuildFailure());
             }
             catch (TargetInvocationException e)
             {
@@ -41,6 +43,12 @@ namespace Gauge.Dotnet
                     throw;
                 Logger.Fatal(e.InnerException.Message);
             }
+        }
+
+        private bool ShouldContinueBuildFailure()
+        {
+            var continueOnFailure = Utils.TryReadEnvValue("GAUGE_INGORE_RUNNER_BUILD_FAILURES");
+            return !string.IsNullOrEmpty(continueOnFailure) && continueOnFailure == "true";
         }
 
         private bool TryBuild()
@@ -60,7 +68,8 @@ namespace Gauge.Dotnet
             }
             catch (Exception ex)
             {
-                Logger.Fatal($"Unable to build Project in {Utils.GaugeProjectRoot}\n{ex.Message}\n{ex.StackTrace}");
+                if (!this.ShouldContinueBuildFailure())
+                    Logger.Fatal($"Unable to build Project in {Utils.GaugeProjectRoot}\n{ex.Message}\n{ex.StackTrace}");
                 return false;
             }
         }

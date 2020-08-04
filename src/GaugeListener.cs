@@ -21,15 +21,23 @@ namespace Gauge.Dotnet
             this._staticLoader = loader;
         }
 
-        public void StartServer()
+        public void StartServer(bool scanAssemblies)
         {
             var server = new Server();
-            var assemblies = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies();
-            var reflectionWrapper = new ReflectionWrapper();
-            var activatorWrapper = new ActivatorWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), assemblies, reflectionWrapper, activatorWrapper, _staticLoader.GetStepRegistry());
-            var handler = new RunnerServiceHandler(activatorWrapper,reflectionWrapper, assemblyLoader, _staticLoader, server);
-            server.Services.Add(Runner.BindService(handler));
+
+            if (scanAssemblies)
+            {
+                var assemblies = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies();
+                var reflectionWrapper = new ReflectionWrapper();
+                var activatorWrapper = new ActivatorWrapper();
+                var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), assemblies, reflectionWrapper, activatorWrapper, _staticLoader.GetStepRegistry());
+                var handler = new RunnerServiceHandler(activatorWrapper, reflectionWrapper, assemblyLoader, _staticLoader, server);
+                server.Services.Add(Runner.BindService(handler));
+
+            }else {
+                var handler = new RunnerServiceHandler(_staticLoader, server);
+                server.Services.Add(Runner.BindService(handler));
+            }
             var port = server.Ports.Add(new ServerPort("127.0.0.1", 0, ServerCredentials.Insecure));
             server.Start();
             Console.WriteLine("Listening on port:" + port);
