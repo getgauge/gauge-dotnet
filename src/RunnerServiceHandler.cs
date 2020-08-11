@@ -54,6 +54,13 @@ namespace Gauge.Dotnet
             _stepRegistry = assemblyLoader.GetStepRegistry();
             this.InitializeMessageProcessors();
         }
+        public  RunnerServiceHandler(IStaticLoader loader, Server server)
+        {
+            this._loader = loader;
+            this._server = server;
+            _stepRegistry = loader.GetStepRegistry();
+            this.InitializeMessageProcessors();
+        }
 
         public override Task<StepValidateResponse> ValidateStep(StepValidateRequest request, ServerCallContext context)
         {

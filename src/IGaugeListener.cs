@@ -9,6 +9,6 @@ namespace Gauge.Dotnet
 {
     public interface IGaugeListener
     {
-        void StartServer();
+        void StartServer(bool scanAssemblies);
     }
 }
