@@ -25,7 +25,7 @@ namespace Gauge.Dotnet
         public void StartServer()
         {
             var server = new Server();
-            var assemblyPath = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies().First();
+            var assemblyPath = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             Logger.Debug($"Loading assembly from : {assemblyPath}");
