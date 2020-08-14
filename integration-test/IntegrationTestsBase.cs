@@ -16,7 +16,7 @@ namespace Gauge.Dotnet.IntegrationTests
 {
     public class IntegrationTestsBase
     {
-        private readonly string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
+        protected string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
 
         [SetUp]
         public void Setup()

@@ -29,25 +29,26 @@ namespace Gauge.Dotnet
         public IEnumerable<string> GetAllAssemblies()
         {
             var assemblies = _directoryWrapper
-                .EnumerateFiles(Utils.GetGaugeBinDir(), "*.dll", SearchOption.TopDirectoryOnly)
+                .EnumerateFiles(Utils.GetGaugeBinDir(), "*.deps.json", SearchOption.TopDirectoryOnly)
                 .ToList();
-            var gaugeAdditionalLibsPath = Environment.GetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS");
-            if (string.IsNullOrEmpty(gaugeAdditionalLibsPath))
-                return assemblies;
 
-            var additionalLibPaths = gaugeAdditionalLibsPath.Split(',').Select(s => Path.GetFullPath(s.Trim()));
-            foreach (var libPath in additionalLibPaths)
-            {
-                if (Path.HasExtension(libPath))
-                {
-                    AddFile(libPath, assemblies);
-                    continue;
-                }
+            // var gaugeAdditionalLibsPath = Environment.GetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS");
+            // if (string.IsNullOrEmpty(gaugeAdditionalLibsPath))
+            //     return assemblies;
 
-                AddFilesFromDirectory(libPath, assemblies);
-            }
+            // var additionalLibPaths = gaugeAdditionalLibsPath.Split(',').Select(s => Path.GetFullPath(s.Trim()));
+            // foreach (var libPath in additionalLibPaths)
+            // {
+            //     if (Path.HasExtension(libPath))
+            //     {
+            //         AddFile(libPath, assemblies);
+            //         continue;
+            //     }
 
-            return assemblies;
+            //     AddFilesFromDirectory(libPath, assemblies);
+            // }
+
+            return assemblies.Select(a => a.Replace(".deps.json", ".dll"));
         }
 
         private void AddFilesFromDirectory(string path, List<string> assemblies)

@@ -6,6 +6,7 @@
 
 
 using System;
+using System.Linq;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Grpc.Core;
@@ -24,10 +25,13 @@ namespace Gauge.Dotnet
         public void StartServer()
         {
             var server = new Server();
-            var assemblies = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies();
+            var assemblyPath = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies().First();
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(), assemblies, reflectionWrapper, activatorWrapper, _staticLoader.GetStepRegistry());
+            Logger.Debug($"Loading assembly from : {assemblyPath}");
+            var gaugeLoadContext = new GaugeLoadContext(assemblyPath);
+
+            var assemblyLoader = new AssemblyLoader(assemblyPath, gaugeLoadContext, reflectionWrapper, activatorWrapper, _staticLoader.GetStepRegistry());
             var handler = new RunnerServiceHandler(activatorWrapper,reflectionWrapper, assemblyLoader, _staticLoader, server);
             server.Services.Add(Runner.BindService(handler));
             var port = server.Ports.Add(new ServerPort("127.0.0.1", 0, ServerCredentials.Insecure));

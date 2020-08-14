@@ -15,7 +15,7 @@ using NUnit.Framework;
 
 namespace Gauge.Dotnet.UnitTests
 {
-    [TestFixture]
+    [TestFixture, Ignore("AssemblyLocater is now obsolete, use .net core's AssemblyDependencyResolver")]
     internal class AssemblyLocaterTests
     {
         [SetUp]
@@ -34,7 +34,7 @@ namespace Gauge.Dotnet.UnitTests
         private readonly Mock<IDirectoryWrapper> _mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
         private readonly Mock<IFileWrapper> _mockFileWrapper = new Mock<IFileWrapper>();
 
-        [Test]
+        [Test, Ignore("Prefer project dependency over GAUGE_ADDITIONAL_LIBS")]
         public void ShouldAddAssembliesFromMultipleLocations()
         {
             Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo.dll, foo/");
@@ -54,7 +54,7 @@ namespace Gauge.Dotnet.UnitTests
             Assert.AreEqual(expectedAssemblies, assemblies);
         }
 
-        [Test]
+        [Test, Ignore("Prefer project dependency over GAUGE_ADDITIONAL_LIBS")]
         public void ShouldAddAssembliyFromGaugeAdditionalLibFile()
         {
             Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo.dll");
