@@ -23,7 +23,7 @@ namespace Gauge.Dotnet.IntegrationTests
         public void ShouldGetStepsFromReference(string referenceType, string stepText, string stepValue, string parameterizedStepValue)
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TestUtils.GetIntegrationTestSampleDirectory(referenceType));
-            var path = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies().First();
+            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), new ReflectionWrapper(), new ActivatorWrapper(), new StepRegistry());
 
             var stepValidationProcessor = new StepValidationProcessor(assemblyLoader.GetStepRegistry());
@@ -46,7 +46,7 @@ namespace Gauge.Dotnet.IntegrationTests
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TestUtils.GetIntegrationTestSampleDirectory(referenceType));
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var path = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies().First();
+            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
 

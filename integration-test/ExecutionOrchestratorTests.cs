@@ -22,7 +22,7 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var path = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies().First();
+            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
@@ -41,7 +41,7 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var path = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies().First();
+            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
@@ -62,7 +62,7 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var path = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies().First();
+            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
@@ -82,7 +82,7 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var path = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies().First();
+            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
@@ -103,7 +103,7 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var path = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies().First();
+            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
@@ -124,7 +124,7 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var path = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies().First();
+            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var registry = assemblyLoader.GetStepRegistry();
             var gaugeMethod = registry.MethodFor("and an alias");
@@ -140,7 +140,7 @@ namespace Gauge.Dotnet.IntegrationTests
             const string expectedMessage = "I am a custom serializable exception";
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var path = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies().First();
+            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
@@ -163,7 +163,7 @@ namespace Gauge.Dotnet.IntegrationTests
             const string expectedMessage = "I am a custom exception";
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var path = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies().First();
+            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,

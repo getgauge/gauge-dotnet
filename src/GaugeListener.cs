@@ -27,12 +27,11 @@ namespace Gauge.Dotnet
             var server = new Server();
             if (scanAssemblies)
             {
-                var assemblyPath = new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies().First();
+                var assemblyPath = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
                 var reflectionWrapper = new ReflectionWrapper();
                 var activatorWrapper = new ActivatorWrapper();
                 Logger.Debug($"Loading assembly from : {assemblyPath}");
                 var gaugeLoadContext = new GaugeLoadContext(assemblyPath);
-
                 var assemblyLoader = new AssemblyLoader(assemblyPath, gaugeLoadContext, reflectionWrapper, activatorWrapper, _staticLoader.GetStepRegistry());
                 var handler = new RunnerServiceHandler(activatorWrapper,reflectionWrapper, assemblyLoader, _staticLoader, server);
                 server.Services.Add(Runner.BindService(handler));

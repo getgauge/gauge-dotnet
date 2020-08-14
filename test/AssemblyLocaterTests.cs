@@ -10,12 +10,13 @@ using System.IO;
 using System.Linq;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Wrappers;
+using Gauge.Dotnet.Exceptions;
 using Moq;
 using NUnit.Framework;
 
 namespace Gauge.Dotnet.UnitTests
 {
-    [TestFixture, Ignore("AssemblyLocater is now obsolete, use .net core's AssemblyDependencyResolver")]
+    [TestFixture]
     internal class AssemblyLocaterTests
     {
         [SetUp]
@@ -27,109 +28,35 @@ namespace Gauge.Dotnet.UnitTests
         [TearDown]
         public void TearDown()
         {
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", null);
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
 
         private readonly Mock<IDirectoryWrapper> _mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
-        private readonly Mock<IFileWrapper> _mockFileWrapper = new Mock<IFileWrapper>();
-
-        [Test, Ignore("Prefer project dependency over GAUGE_ADDITIONAL_LIBS")]
-        public void ShouldAddAssembliesFromMultipleLocations()
-        {
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo.dll, foo/");
-            var expectedAssemblies = new[] {Path.GetFullPath("foo.dll"), "fooAssemblyLocation", "barAssemblyLocation"};
-            _mockDirectoryWrapper.Setup(wrapper => wrapper.Exists(Path.GetFullPath("foo/"))).Returns(true);
-            _mockDirectoryWrapper.Setup(wrapper =>
-                    wrapper.EnumerateFiles(Utils.GetGaugeBinDir(), "*.dll", SearchOption.TopDirectoryOnly))
-                .Returns(Enumerable.Empty<string>());
-            _mockDirectoryWrapper.Setup(wrapper =>
-                    wrapper.EnumerateFiles(Path.GetFullPath("foo/"), "*.dll", SearchOption.TopDirectoryOnly))
-                .Returns(new[] {"fooAssemblyLocation", "barAssemblyLocation"});
-            _mockFileWrapper.Setup(wrapper => wrapper.Exists(Path.GetFullPath("foo.dll"))).Returns(true);
-            var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
-
-            var assemblies = assemblyLocater.GetAllAssemblies();
-
-            Assert.AreEqual(expectedAssemblies, assemblies);
-        }
-
-        [Test, Ignore("Prefer project dependency over GAUGE_ADDITIONAL_LIBS")]
-        public void ShouldAddAssembliyFromGaugeAdditionalLibFile()
-        {
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo.dll");
-            var expectedAssemblies = new[] {Path.GetFullPath("foo.dll")};
-            _mockDirectoryWrapper.Setup(wrapper =>
-                    wrapper.EnumerateFiles(Utils.GetGaugeBinDir(), "*.dll", SearchOption.TopDirectoryOnly))
-                .Returns(Enumerable.Empty<string>());
-            _mockFileWrapper.Setup(wrapper => wrapper.Exists(Path.GetFullPath("foo.dll"))).Returns(true);
-            var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
-
-            var assemblies = assemblyLocater.GetAllAssemblies();
-            Assert.AreEqual(expectedAssemblies, assemblies);
-        }
-
-        [Test]
-        public void ShouldGetAssembliesFromGaugeAdditionalLibsEnvVar()
-        {
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo/");
-            var expectedAssemblies = new[] {"fooAssemblyLocation", "barAssemblyLocation"};
-            _mockDirectoryWrapper.Setup(wrapper => wrapper.Exists(Path.GetFullPath("foo/"))).Returns(true);
-            _mockDirectoryWrapper.Setup(wrapper =>
-                    wrapper.EnumerateFiles(Utils.GetGaugeBinDir(), "*.dll", SearchOption.TopDirectoryOnly))
-                .Returns(Enumerable.Empty<string>());
-            _mockDirectoryWrapper.Setup(wrapper =>
-                    wrapper.EnumerateFiles(Path.GetFullPath("foo/"), "*.dll", SearchOption.TopDirectoryOnly))
-                .Returns(expectedAssemblies);
-
-            var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
-
-            var assemblies = assemblyLocater.GetAllAssemblies();
-            Assert.AreEqual(expectedAssemblies, assemblies);
-        }
 
         [Test]
         public void ShouldGetAssembliesFromGaugeBin()
         {
-            var expectedAssemblies = new[] {"fooAssemblyLocation", "barAssemblyLocation"};
+            var expected = "fooAssemblyLocation";
+            var expectedAssemblies = new[] {$"{expected}.deps.json"};
             _mockDirectoryWrapper.Setup(wrapper =>
-                    wrapper.EnumerateFiles(Utils.GetGaugeBinDir(), "*.dll", SearchOption.TopDirectoryOnly))
+                    wrapper.EnumerateFiles(Utils.GetGaugeBinDir(), "*.deps.json", SearchOption.TopDirectoryOnly))
                 .Returns(expectedAssemblies);
-            var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
+            var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object);
 
-            var assemblies = assemblyLocater.GetAllAssemblies();
+            var assembly = assemblyLocater.GetTestAssembly();
 
-            Assert.AreEqual(expectedAssemblies, assemblies);
+            Assert.AreEqual($"{expected}.dll", assembly);
         }
 
         [Test]
         public void ShouldNotAddAssembliesFromInvalidFile()
         {
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo.dll");
-            _mockFileWrapper.Setup(wrapper => wrapper.Exists(Path.GetFullPath("foo.dll"))).Returns(false);
             _mockDirectoryWrapper.Setup(wrapper =>
-                    wrapper.EnumerateFiles(Utils.GetGaugeBinDir(), "*.dll", SearchOption.TopDirectoryOnly))
+                    wrapper.EnumerateFiles(Utils.GetGaugeBinDir(), "*.deps.json", SearchOption.TopDirectoryOnly))
                 .Returns(Enumerable.Empty<string>());
 
-            var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
-
-            var assemblies = assemblyLocater.GetAllAssemblies();
-            Assert.IsEmpty(assemblies);
-        }
-
-        [Test]
-        public void ShoulNotdAddAssembliesFromInvalidDirectory()
-        {
-            Environment.SetEnvironmentVariable("GAUGE_ADDITIONAL_LIBS", "foo/");
-            _mockDirectoryWrapper.Setup(wrapper => wrapper.Exists(Path.GetFullPath("foo/"))).Returns(false);
-            _mockDirectoryWrapper.Setup(wrapper =>
-                    wrapper.EnumerateFiles(Utils.GetGaugeBinDir(), "*.dll", SearchOption.TopDirectoryOnly))
-                .Returns(Enumerable.Empty<string>());
-
-            var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _mockFileWrapper.Object);
-
-            var assemblies = assemblyLocater.GetAllAssemblies();
-            Assert.IsEmpty(assemblies);
+            var expectedMessage = $"Could not locate the target test assembly. Gauge-Dotnet could not find a deps.json file in {Directory.GetCurrentDirectory()}";
+            Assert.Throws<GaugeTestAssemblyNotFoundException>(() => new AssemblyLocater(_mockDirectoryWrapper.Object).GetTestAssembly(), expectedMessage);
         }
     }
 }
