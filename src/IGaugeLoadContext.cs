@@ -4,14 +4,14 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
-
+using System.Collections.Generic;
 using System.Reflection;
 
-namespace Gauge.Dotnet.Wrappers
+namespace Gauge.Dotnet
 {
-    public interface IAssemblyWrapper
+    public interface IGaugeLoadContext
     {
-        Assembly LoadFrom(string location);
-        Assembly[] GetCurrentDomainAssemblies();
+        public Assembly LoadFromAssemblyName(AssemblyName name);
+        public IEnumerable<Assembly> GetAssembliesReferencingGaugeLib();
     }
 }
