@@ -47,7 +47,7 @@ namespace Gauge.Dotnet
 
         private bool ShouldContinueBuildFailure()
         {
-            var continueOnFailure = Utils.TryReadEnvValue("GAUGE_INGORE_RUNNER_BUILD_FAILURES");
+            var continueOnFailure = Utils.TryReadEnvValue("GAUGE_IGNORE_RUNNER_BUILD_FAILURES");
             return !string.IsNullOrEmpty(continueOnFailure) && continueOnFailure == "true";
         }
 
