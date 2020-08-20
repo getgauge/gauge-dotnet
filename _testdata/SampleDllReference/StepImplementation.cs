@@ -78,6 +78,13 @@ namespace IntegrationTestSample
                     .Aggregate((a, b) => string.Format("{0}|{1}", a, b))));
         }
 
+        [Step("Take Screenshot in reference DLL")]
+        public void TakeDllReferenceScreenshot() {
+            GaugeScreenshots.RegisterCustomScreenshotWriter(new ReferenceDll.ScreenshotWriter());
+            GaugeScreenshots.Capture();
+            GaugeScreenshots.RegisterCustomScreenshotWriter(new StringScreenshotWriter());
+        }
+
         [Serializable]
         public class CustomSerializableException : Exception
         {

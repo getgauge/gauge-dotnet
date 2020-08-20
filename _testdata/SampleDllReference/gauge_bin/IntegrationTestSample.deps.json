@@ -8,7 +8,8 @@
     ".NETCoreApp,Version=v3.0": {
       "IntegrationTestSample/1.0.0": {
         "dependencies": {
-          "Gauge.CSharp.Lib": "0.7.6"
+          "Gauge.CSharp.Lib": "0.7.6",
+          "ReferenceDll": "1.0.0.0"
         },
         "runtime": {
           "IntegrationTestSample.dll": {}
@@ -19,6 +20,14 @@
           "lib/netstandard2.0/Gauge.CSharp.Lib.dll": {
             "assemblyVersion": "0.7.6.0",
             "fileVersion": "0.7.6.0"
+          }
+        }
+      },
+      "ReferenceDll/1.0.0.0": {
+        "runtime": {
+          "ReferenceDll.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
           }
         }
       }
@@ -36,6 +45,11 @@
       "sha512": "sha512-VPkNe57TqAXTxA0+UHe35+cpJT2DkqWt1hmWi3eOxTJZy3widdC8GIhRERM34V5G5mQrfM2z4+AvPAbj0nv0+A==",
       "path": "gauge.csharp.lib/0.7.6",
       "hashPath": "gauge.csharp.lib.0.7.6.nupkg.sha512"
+    },
+    "ReferenceDll/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

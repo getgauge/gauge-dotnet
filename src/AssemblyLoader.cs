@@ -7,10 +7,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
@@ -19,26 +19,28 @@ namespace Gauge.Dotnet
 {
     public class AssemblyLoader : IAssemblyLoader
     {
-        private const string GaugeLibAssembleName = "Gauge.CSharp.Lib";
-        private readonly IAssemblyWrapper _assemblyWrapper;
+        private const string GaugeLibAssemblyName = "Gauge.CSharp.Lib";
         private readonly IReflectionWrapper _reflectionWrapper;
+        private readonly IGaugeLoadContext _gaugeLoadContext;
         private Assembly _targetLibAssembly;
 
         private readonly IActivatorWrapper _activatorWrapper;
         private readonly IStepRegistry _registry;
 
-        public AssemblyLoader(IAssemblyWrapper assemblyWrapper, IEnumerable<string> assemblyLocations,
+        public AssemblyLoader(string assemblyPath, IGaugeLoadContext gaugeLoadContext,
             IReflectionWrapper reflectionWrapper, IActivatorWrapper activatorWrapper, IStepRegistry registry)
         {
-            _assemblyWrapper = assemblyWrapper;
             _reflectionWrapper = reflectionWrapper;
             _activatorWrapper = activatorWrapper;
             AssembliesReferencingGaugeLib = new List<Assembly>();
             _registry = registry;
-            foreach (var location in assemblyLocations)
-                ScanAndLoad(location);
-
-            LoadTargetLibAssembly();
+            
+            Logger.Debug($"Loading assembly from : {assemblyPath}");
+            _gaugeLoadContext = gaugeLoadContext;
+            this._targetLibAssembly = _gaugeLoadContext.LoadFromAssemblyName(new AssemblyName(GaugeLibAssemblyName));
+            ScanAndLoad(assemblyPath);
+            AssembliesReferencingGaugeLib = _gaugeLoadContext.GetAssembliesReferencingGaugeLib().ToList();
+            Logger.Debug($"Number of AssembliesReferencingGaugeLib : {AssembliesReferencingGaugeLib.Count()}");
             SetDefaultTypes();
         }
 
@@ -48,45 +50,43 @@ namespace Gauge.Dotnet
 
         public IEnumerable<MethodInfo> GetMethods(LibType type)
         {
-            var attributeType = _targetLibAssembly.GetType(type.FullName());
-
-            bool MethodFilter(MethodInfo info)
-            {
-                return info.GetCustomAttributes(false)
-                    .Any(attributeType.IsInstanceOfType);
-            }
+            var attributeType = _targetLibAssembly.ExportedTypes.First(x => x.FullName == type.FullName());
 
             IEnumerable<MethodInfo> MethodSelector(Type t)
             {
-                return _reflectionWrapper.GetMethods(t).Where(MethodFilter);
+                return _reflectionWrapper.GetMethods(t)
+                    .Where(info => info.GetCustomAttributes(false).Any(attributeType.IsInstanceOfType));
             }
-
-            return AssembliesReferencingGaugeLib.SelectMany(assembly => assembly.GetTypes().SelectMany(MethodSelector));
+            return AssembliesReferencingGaugeLib.SelectMany(assembly => assembly.ExportedTypes.SelectMany(MethodSelector));
         }
 
         public Type GetLibType(LibType type)
         {
-            return _targetLibAssembly.GetType(type.FullName());
+            return _targetLibAssembly.ExportedTypes.First(t => t.FullName == type.FullName());
         }
 
 
         public IStepRegistry GetStepRegistry()
         {
+            Logger.Debug("Building StepRegistry...");
             var infos = GetMethods(LibType.Step);
+            Logger.Debug($"{infos.Count()} Step implementations found. Adding to registry...");
             foreach (var info in infos)
             {
-                var stepTexts = info.GetCustomAttributes(GetLibType(LibType.Step))
+                var stepTexts = info.GetCustomAttributes().Where(x => x.GetType().FullName == LibType.Step.FullName())
                     .SelectMany(x => x.GetType().GetProperty("Names").GetValue(x, null) as string[]);
                 foreach (var stepText in stepTexts)
                 {
                     var stepValue = GetStepValue(stepText);
                     if (_registry.ContainsStep(stepValue))
                     {
+                        Logger.Debug($"'{stepValue}': implementation found in StepRegistry, setting reflected methodInfo");
                         _registry.MethodFor(stepValue).MethodInfo = info;
                         _registry.MethodFor(stepValue).ContinueOnFailure = info.IsRecoverableStep(this);
                     }
                     else
                     {
+                        Logger.Debug($"'{stepValue}': no implementation in StepRegistry, adding via reflection");
                         var hasAlias = stepTexts.Count() > 1;
                         var stepMethod = new GaugeMethod
                         {
@@ -125,29 +125,18 @@ namespace Gauge.Dotnet
 
         private void ScanAndLoad(string path)
         {
-            Logger.Debug($"Loading assembly from : {path}");
-            var assembly = _assemblyWrapper.LoadFrom(path);
-
-            var isReferencingGaugeLib = assembly.GetReferencedAssemblies()
-                .Select(name => name.Name)
-                .Contains(GaugeLibAssembleName);
-
-            if (!isReferencingGaugeLib)
-                return;
-
-            AssembliesReferencingGaugeLib.Add(assembly);
-
-
+            var assembly = _gaugeLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(path)));
+            foreach (var reference in assembly.GetReferencedAssemblies())
+            {
+                _gaugeLoadContext.LoadFromAssemblyName(reference);
+            }
             try
             {
                 if (ScreenshotWriter is null)
-                    ScanForCustomScreenshotWriter(assembly.GetTypes());
-
-                if (ScreenshotWriter is null)
-                    ScanForCustomScreengrabber(assembly.GetTypes());
+                    ScanForCustomScreenshotWriter(assembly.ExportedTypes);
 
                 if (ClassInstanceManagerType is null)
-                    ScanForCustomInstanceManager(assembly.GetTypes());
+                    ScanForCustomInstanceManager(assembly.ExportedTypes);
             }
             catch (ReflectionTypeLoadException ex)
             {
@@ -158,22 +147,20 @@ namespace Gauge.Dotnet
 
         private void ScanForCustomScreenshotWriter(IEnumerable<Type> types)
         {
+            var deprecatedImplementations = types.Where(type => type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotGrabber"));
+            if (deprecatedImplementations.Any())
+            {
+                Logger.Error("These types implement DEPRECATED ICustomScreenshotGrabber interface and will not be used. Use ICustomScreenshotWriter instead.\n" +
+                    deprecatedImplementations.Select(x => x.FullName).Aggregate((a, b) => $"{a}, {b}"));
+            }
             var implementingTypes = types.Where(type =>
                 type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotWriter"));
             ScreenshotWriter = implementingTypes.FirstOrDefault();
             if (ScreenshotWriter is null) return;
-            var csg = (ICustomScreenshotWriter)_activatorWrapper.CreateInstance(ScreenshotWriter);
-            GaugeScreenshots.RegisterCustomScreenshotWriter(csg);
-        }
-
-        private void ScanForCustomScreengrabber(IEnumerable<Type> types)
-        {
-            var implementingTypes = types.Where(type =>
-                type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotGrabber"));
-            ScreenshotWriter = implementingTypes.FirstOrDefault();
-            if (ScreenshotWriter is null) return;
-            var csg = (ICustomScreenshotGrabber)_activatorWrapper.CreateInstance(ScreenshotWriter);
-            GaugeScreenshots.RegisterCustomScreenshotGrabber(csg);
+            var csg = _activatorWrapper.CreateInstance(ScreenshotWriter);
+            var gaugeScreenshotsType = _targetLibAssembly.ExportedTypes.First(x => x.FullName == "Gauge.CSharp.Lib.GaugeScreenshots");
+            _reflectionWrapper.InvokeMethod(gaugeScreenshotsType, null, "RegisterCustomScreenshotWriter",
+                BindingFlags.Static | BindingFlags.Public, new[] {csg});
         }
 
         private void ScanForCustomInstanceManager(IEnumerable<Type> types)
@@ -186,15 +173,9 @@ namespace Gauge.Dotnet
         private void SetDefaultTypes()
         {
             ClassInstanceManagerType = ClassInstanceManagerType ??
-                                       _targetLibAssembly.GetType(LibType.DefaultClassInstanceManager.FullName());
-            ScreenshotWriter =
-                ScreenshotWriter ?? _targetLibAssembly.GetType(LibType.DefaultScreenshotWriter.FullName());
-        }
-
-        private void LoadTargetLibAssembly()
-        {
-            _targetLibAssembly = _assemblyWrapper.GetCurrentDomainAssemblies()
-                .First(x => string.CompareOrdinal(x.GetName().Name, GaugeLibAssembleName) == 0);
+                _targetLibAssembly.GetType(LibType.DefaultClassInstanceManager.FullName());
+            ScreenshotWriter = ScreenshotWriter ?? 
+                _targetLibAssembly.GetType(LibType.DefaultScreenshotWriter.FullName());
         }
     }
 }

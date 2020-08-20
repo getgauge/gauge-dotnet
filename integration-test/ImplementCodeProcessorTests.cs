@@ -13,16 +13,8 @@ using NUnit.Framework;
 
 namespace Gauge.Dotnet.IntegrationTests
 {
-    public class StubImplementationCodeTests
+    public class StubImplementationCodeTests : IntegrationTestsBase
     {
-        private readonly string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
-
-        [SetUp]
-        public void Setup()
-        {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _testProjectPath);
-        }
-
         [Test]
         public void ShouldProcessMessage()
         {
@@ -48,7 +40,7 @@ namespace Gauge.Dotnet.IntegrationTests
         [Test]
         public void ShouldProcessMessageForExistingButEmptyFile()
         {
-            var file = Path.Combine(TestUtils.GetIntegrationTestSampleDirectory(), "Empty.cs");
+            var file = Path.Combine(_testProjectPath, "Empty.cs");
             var message = new StubImplementationCodeRequest
             {
                 ImplementationFilePath = file,
@@ -70,7 +62,7 @@ namespace Gauge.Dotnet.IntegrationTests
         [Test]
         public void ShouldProcessMessageForExistingClass()
         {
-            var file = Path.Combine(TestUtils.GetIntegrationTestSampleDirectory(), "StepImplementation.cs");
+            var file = Path.Combine(_testProjectPath, "StepImplementation.cs");
             var message = new StubImplementationCodeRequest
             {
                 ImplementationFilePath = file,
@@ -84,13 +76,13 @@ namespace Gauge.Dotnet.IntegrationTests
             var result = processor.Process(message);
             Assert.AreEqual(1, result.TextDiffs.Count);
             StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
-            Assert.AreEqual(121, result.TextDiffs[0].Span.Start);
+            Assert.AreEqual(107, result.TextDiffs[0].Span.Start);
         }
 
         [Test]
         public void ShouldProcessMessageForExistingFileWithEmptyClass()
         {
-            var file = Path.Combine(TestUtils.GetIntegrationTestSampleDirectory(), "EmptyClass.cs");
+            var file = Path.Combine(_testProjectPath, "EmptyClass.cs");
             var message = new StubImplementationCodeRequest
             {
                 ImplementationFilePath = file,
@@ -111,7 +103,7 @@ namespace Gauge.Dotnet.IntegrationTests
         [Test]
         public void ShouldProcessMessageForExistingFileWithSomeComments()
         {
-            var file = Path.Combine(TestUtils.GetIntegrationTestSampleDirectory(), "CommentFile.cs");
+            var file = Path.Combine(_testProjectPath, "CommentFile.cs");
             var message = new StubImplementationCodeRequest
                 {
                     ImplementationFilePath = file,
@@ -128,12 +120,6 @@ namespace Gauge.Dotnet.IntegrationTests
             Assert.True(result.TextDiffs[0].Content.Contains("namespace Sample"));
             Assert.True(result.TextDiffs[0].Content.Contains("class CommentFile"));
             Assert.AreEqual(result.TextDiffs[0].Span.Start, 3);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
     }
 }

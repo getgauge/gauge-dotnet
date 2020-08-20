@@ -10,6 +10,7 @@ using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using NUnit.Framework;
+using System.Linq;
 
 namespace Gauge.Dotnet.IntegrationTests
 {
@@ -22,16 +23,16 @@ namespace Gauge.Dotnet.IntegrationTests
             const string stepText = "Step that takes a table <table>";
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper, new StepRegistry());
+            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
+            var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
-            var mockOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
 
             var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
-                mockOrchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
+                orchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
 
             var protoTable = new ProtoTable
             {
@@ -74,8 +75,8 @@ namespace Gauge.Dotnet.IntegrationTests
             const string stepText = "I throw a serializable exception";
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var assemblyLoader = new AssemblyLoader(new AssemblyWrapper(),
-                new AssemblyLocater(new DirectoryWrapper(), new FileWrapper()).GetAllAssemblies(), reflectionWrapper, activatorWrapper, new StepRegistry());
+            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
+            var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
 
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
