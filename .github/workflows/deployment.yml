@@ -53,8 +53,8 @@ jobs:
 
           echo "$release_description" >> desc.txt
 
-          echo "Creating new draft for release v$version"
-          hub release create -d -F ./desc.txt "v$version"
+          echo "Creating new release for v$version"
+          hub release create -F ./desc.txt "v$version"
 
           rm -rf desc.txt
 
