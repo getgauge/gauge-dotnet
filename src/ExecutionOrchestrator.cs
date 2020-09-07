@@ -7,11 +7,9 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using Gauge.CSharp.Core;
-using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
@@ -84,10 +82,10 @@ namespace Gauge.Dotnet
 
         [DebuggerHidden]
         public ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags,
-            ExecutionContext context)
+            ExecutionInfo info)
         {
             var stopwatch = Stopwatch.StartNew();
-            var executionResult = _hookExecutor.Execute(hookType, strategy, applicableTags, context);
+            var executionResult = _hookExecutor.Execute(hookType, strategy, applicableTags, info);
             return BuildResult(stopwatch, executionResult);
         }
 
