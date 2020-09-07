@@ -20,16 +20,15 @@ namespace Gauge.Dotnet
     {
         private readonly IAssemblyLoader _assemblyLoader;
         private IHookRegistry _registry;
-        private ExecutionInfoMapper _executionInfoMapper;
+        private IExecutionInfoMapper _executionInfoMapper;
 
         public HookExecutor(IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper,
-            object claasInstanceManager) :
+            object claasInstanceManager, IExecutionInfoMapper mapper) :
             base(assemblyLoader.ClassInstanceManagerType, reflectionWrapper, claasInstanceManager)
         {
             _assemblyLoader = assemblyLoader;
             _registry = new HookRegistry(assemblyLoader);
-            _executionInfoMapper = new ExecutionInfoMapper(_assemblyLoader);
-
+            _executionInfoMapper = mapper;
         }
 
         public ExecutionResult Execute(string hookType, IHooksStrategy strategy, IList<string> applicableTags,

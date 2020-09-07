@@ -15,9 +15,9 @@ using Gauge.CSharp.Core;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
+using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
-using ExecutionContext = Gauge.CSharp.Lib.ExecutionContext;
 
 namespace Gauge.Dotnet.UnitTests
 {
@@ -50,7 +50,7 @@ namespace Gauge.Dotnet.UnitTests
             var hooksStrategy = new HooksStrategy();
             var mockHookExecuter = new Mock<IHookExecutor>();
             mockHookExecuter.Setup(m =>
-                m.Execute("hooks", hooksStrategy, new List<string>(), It.IsAny<ExecutionContext>())
+                m.Execute("hooks", hooksStrategy, new List<string>(), It.IsAny<ExecutionInfo>())
             ).Returns(executionResult).Verifiable();
             var mockStepExecuter = new Mock<IStepExecutor>();
             var reflectionWrapper = mockReflectionWrapper.Object;
@@ -69,7 +69,7 @@ namespace Gauge.Dotnet.UnitTests
                 mockClassInstanceManager, mockHookExecuter.Object, mockStepExecuter.Object);
 
             var result = executionOrchestrator.ExecuteHooks("hooks", hooksStrategy, new List<string>(),
-                It.IsAny<ExecutionContext>());
+                It.IsAny<ExecutionInfo>());
 
             mockHookExecuter.VerifyAll();
             Assert.False(result.Failed);
@@ -100,7 +100,7 @@ namespace Gauge.Dotnet.UnitTests
                 mockClassInstanceManager,
                 mockHookExecuter.Object, mockStepExecuter.Object);
             mockHookExecuter.Setup(executor =>
-                executor.Execute("hooks", hooksStrategy, new List<string>(), It.IsAny<ExecutionContext>())
+                executor.Execute("hooks", hooksStrategy, new List<string>(), It.IsAny<ExecutionInfo>())
             ).Returns(executionResult).Verifiable();
             var mockType = new Mock<Type>().Object;
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
@@ -116,7 +116,7 @@ namespace Gauge.Dotnet.UnitTests
             Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", "false");
 
             var result = orchestrator.ExecuteHooks("hooks", hooksStrategy, new List<string>(),
-                new ExecutionContext());
+                It.IsAny<ExecutionInfo>());
 
             mockHookExecuter.VerifyAll();
             Assert.True(result.Failed);

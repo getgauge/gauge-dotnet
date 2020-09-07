@@ -11,7 +11,7 @@ using Gauge.Messages;
 
 namespace Gauge.Dotnet
 {
-    public class ExecutionInfoMapper
+    public class ExecutionInfoMapper : IExecutionInfoMapper
     {
         private Type _executionContextType;
 
@@ -50,7 +50,7 @@ namespace Gauge.Dotnet
 
         private dynamic StepFrom(StepInfo currentStep)
         {
-            var executionContextStepType = _executionContextType.GetNestedType("StepDetails");;
+            var executionContextStepType = _executionContextType.GetNestedType("StepDetails"); ;
             if (currentStep == null || currentStep.Step == null)
                 return Activator.CreateInstance(executionContextStepType);
 

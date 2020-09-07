@@ -53,7 +53,20 @@ namespace Gauge.Dotnet.UnitTests.Helpers
             return this;
         }
 
+        public MockMethodBuilder WithNoParameters(params KeyValuePair<string, string>[] methodParams)
+        {
+            mockMethod.Setup(x => x.GetParameters()).Returns(new ParameterInfo[] {});
+            return this;
+        }
+
+
         public MockMethodBuilder WithParameters(params KeyValuePair<string, string>[] methodParams)
+        {
+            mockMethod.Setup(x => x.GetParameters()).Returns(GetParameters(methodParams));
+            return this;
+        }
+
+        public MockMethodBuilder WithParameters(params KeyValuePair<Type, string>[] methodParams)
         {
             mockMethod.Setup(x => x.GetParameters()).Returns(GetParameters(methodParams));
             return this;
@@ -112,6 +125,19 @@ namespace Gauge.Dotnet.UnitTests.Helpers
                 var pType = new Mock<Type>();
                 pType.Setup(x => x.Name).Returns(p.Key);
                 pInfo.Setup(x => x.ParameterType).Returns(pType.Object);
+                pInfo.Setup(x => x.Name).Returns(p.Value);
+                return pInfo.Object;
+            }).ToArray();
+        }
+
+        private static ParameterInfo[] GetParameters(IEnumerable<KeyValuePair<Type, string>> methodParams)
+        {
+            if (methodParams is null)
+                return Enumerable.Empty<ParameterInfo>().ToArray();
+            return methodParams.Select(p =>
+            {
+                var pInfo = new Mock<ParameterInfo>();
+                pInfo.Setup(x => x.ParameterType).Returns(p.Key);
                 pInfo.Setup(x => x.Name).Returns(p.Value);
                 return pInfo.Object;
             }).ToArray();

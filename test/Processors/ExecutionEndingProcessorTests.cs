@@ -53,7 +53,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             };
             _mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("AfterSuite", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
-                        It.IsAny<ExecutionContext>()))
+                        It.IsAny<ExecutionInfo>()))
                 .Returns(_protoExecutionResult);
             _mockMethodExecutor.Setup(x =>
                 x.GetAllPendingMessages()).Returns(_pendingMessages);
