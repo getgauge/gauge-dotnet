@@ -9,10 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
+using Gauge.Messages;
 
 namespace Gauge.Dotnet
 {
@@ -20,17 +20,19 @@ namespace Gauge.Dotnet
     {
         private readonly IAssemblyLoader _assemblyLoader;
         private IHookRegistry _registry;
+        private IExecutionInfoMapper _executionInfoMapper;
 
         public HookExecutor(IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper,
-            object claasInstanceManager) :
+            object claasInstanceManager, IExecutionInfoMapper mapper) :
             base(assemblyLoader.ClassInstanceManagerType, reflectionWrapper, claasInstanceManager)
         {
             _assemblyLoader = assemblyLoader;
             _registry = new HookRegistry(assemblyLoader);
+            _executionInfoMapper = mapper;
         }
 
         public ExecutionResult Execute(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
-            ExecutionContext context)
+            ExecutionInfo info)
         {
             var methods = GetHookMethods(hookType, strategy, applicableTags);
             var executionResult = new ExecutionResult
@@ -42,6 +44,7 @@ namespace Gauge.Dotnet
                 var methodInfo = _registry.MethodFor(method);
                 try
                 {
+                    var context = _executionInfoMapper.ExecutionContextFrom(info);
                     ExecuteHook(methodInfo, context);
                 }
                 catch (Exception ex)

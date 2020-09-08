@@ -5,46 +5,59 @@
  *----------------------------------------------------------------*/
 
 
+using System;
 using System.Linq;
-using Gauge.CSharp.Lib;
+using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet
 {
-    public class ExecutionInfoMapper
+    public class ExecutionInfoMapper : IExecutionInfoMapper
     {
-        public ExecutionContext ExecutionInfoFrom(ExecutionInfo currentExecutionInfo)
+        private Type _executionContextType;
+        private readonly IActivatorWrapper activatorWrapper;
+
+        public ExecutionInfoMapper(IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper)
+        {
+            _executionContextType = assemblyLoader.GetLibType(LibType.ExecutionContext);
+            this.activatorWrapper = activatorWrapper;
+        }
+
+        public dynamic ExecutionContextFrom(ExecutionInfo currentExecutionInfo)
         {
             if (currentExecutionInfo == null)
-                return new ExecutionContext();
+                return activatorWrapper.CreateInstance(_executionContextType);
 
-            return new ExecutionContext(SpecificationFrom(currentExecutionInfo.CurrentSpec),
+            return activatorWrapper.CreateInstance(_executionContextType, SpecificationFrom(currentExecutionInfo.CurrentSpec),
                 ScenarioFrom(currentExecutionInfo.CurrentScenario),
                 StepFrom(currentExecutionInfo.CurrentStep));
         }
 
-        public ExecutionContext.Specification SpecificationFrom(SpecInfo currentSpec)
+        private dynamic SpecificationFrom(SpecInfo currentSpec)
         {
+            var executionContextSpecType = _executionContextType.GetNestedType("Specification");
             return currentSpec != null
-                ? new ExecutionContext.Specification(currentSpec.Name, currentSpec.FileName, currentSpec.IsFailed,
+                ? activatorWrapper.CreateInstance(executionContextSpecType, currentSpec.Name, currentSpec.FileName, currentSpec.IsFailed,
                     currentSpec.Tags.ToArray())
-                : new ExecutionContext.Specification();
+                : activatorWrapper.CreateInstance(executionContextSpecType);
         }
 
-        public ExecutionContext.Scenario ScenarioFrom(ScenarioInfo currentScenario)
+        private dynamic ScenarioFrom(ScenarioInfo currentScenario)
         {
+            var executionContextScenarioType = _executionContextType.GetNestedType("Scenario");
             return currentScenario != null
-                ? new ExecutionContext.Scenario(currentScenario.Name, currentScenario.IsFailed,
+                ? activatorWrapper.CreateInstance(executionContextScenarioType, currentScenario.Name, currentScenario.IsFailed,
                     currentScenario.Tags.ToArray())
-                : new ExecutionContext.Scenario();
+                : activatorWrapper.CreateInstance(executionContextScenarioType);
         }
 
-        public ExecutionContext.StepDetails StepFrom(StepInfo currentStep)
+        private dynamic StepFrom(StepInfo currentStep)
         {
+            var executionContextStepType = _executionContextType.GetNestedType("StepDetails"); ;
             if (currentStep == null || currentStep.Step == null)
-                return new ExecutionContext.StepDetails();
+                return activatorWrapper.CreateInstance(executionContextStepType);
 
-            return new ExecutionContext.StepDetails(currentStep.Step.ActualStepText, currentStep.IsFailed);
+            return activatorWrapper.CreateInstance(executionContextStepType, currentStep.Step.ActualStepText, currentStep.IsFailed);
         }
     }
 }

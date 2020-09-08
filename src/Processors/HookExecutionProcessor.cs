@@ -6,12 +6,10 @@
 
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Strategy;
 using Gauge.Messages;
-using Google.Protobuf;
 
 namespace Gauge.Dotnet.Processors
 {
@@ -38,10 +36,8 @@ namespace Gauge.Dotnet.Processors
         protected virtual ExecutionStatusResponse ExecuteHooks(ExecutionInfo info)
         {
             var applicableTags = GetApplicableTags(info);
-            var mapper = new ExecutionInfoMapper();
-            var executionContext = mapper.ExecutionInfoFrom(info);
             var protoExecutionResult =
-                ExecutionOrchestrator.ExecuteHooks(HookType, Strategy, applicableTags, executionContext);
+                ExecutionOrchestrator.ExecuteHooks(HookType, Strategy, applicableTags, info);
             var allPendingMessages = ExecutionOrchestrator.GetAllPendingMessages().Where(m => m != null);
             var allPendingScreenShotFiles = ExecutionOrchestrator.GetAllPendingScreenshotFiles();
             protoExecutionResult.Message.AddRange(allPendingMessages);

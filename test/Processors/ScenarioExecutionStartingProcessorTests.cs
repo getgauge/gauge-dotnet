@@ -116,7 +116,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("BeforeScenario", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
-                        It.IsAny<ExecutionContext>()))
+                        It.IsAny<ExecutionInfo>()))
                 .Returns(protoExecutionResult);
             mockMethodExecutor.Setup(x =>
                 x.GetAllPendingMessages()).Returns(pendingMessages);
