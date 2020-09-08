@@ -18,8 +18,7 @@ namespace Gauge.Dotnet
                 default:
                     return new StartCommand(() =>
                         {
-                            var attributesLoader = new AttributesLoader();
-                            var loader = new StaticLoader(attributesLoader);
+                            var loader = new StaticLoader(new System.Lazy<IAttributesLoader>(() => new AttributesLoader()));
                             loader.LoadImplementations();
                             return new GaugeListener(loader);
                         },

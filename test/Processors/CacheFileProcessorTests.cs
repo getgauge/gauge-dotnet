@@ -4,6 +4,7 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
+using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using Gauge.Dotnet.Processors;
@@ -21,7 +22,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(mockAttributesLoader.Object);
+            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
 
             var processor = new CacheFileProcessor(loader);
             var request = new CacheFileRequest
@@ -51,7 +52,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(mockAttributesLoader.Object);
+            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
             const string content = "using Gauge.CSharp.Lib.Attributes;\n" +
                                    "namespace foobar\n" +
                                    "{\n" +

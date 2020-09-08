@@ -5,6 +5,7 @@
  *----------------------------------------------------------------*/
 
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,11 +21,11 @@ namespace Gauge.Dotnet
 {
     public sealed class StaticLoader : IStaticLoader
     {
-        private readonly IAttributesLoader _attributesLoader;
+        private readonly Lazy<IAttributesLoader> _attributesLoader;
         private readonly IStepRegistry _stepRegistry;
 
 
-        public StaticLoader(IAttributesLoader attributesLoader)
+        public StaticLoader(Lazy<IAttributesLoader> attributesLoader)
         {
             _stepRegistry = new StepRegistry();
             _attributesLoader = attributesLoader;
@@ -56,7 +57,7 @@ namespace Gauge.Dotnet
 
         private bool IsFileRemoved(string file)
         {
-            var attributes = _attributesLoader.GetRemovedAttributes();
+            var attributes = _attributesLoader.Value.GetRemovedAttributes();
             var removedFiles = FileHelper.GetRemovedDirFiles();
 
             var isFileRemoved =
@@ -69,7 +70,7 @@ namespace Gauge.Dotnet
         {
             var classFiles = Directory.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs",
                 SearchOption.AllDirectories).ToList();
-            var attributes = _attributesLoader.GetRemovedAttributes();
+            var attributes = _attributesLoader.Value.GetRemovedAttributes();
             foreach (var attribute in attributes)
                 classFiles.Remove(Path.Combine(Utils.GaugeProjectRoot, attribute.Value));
             var removedFiles = FileHelper.GetRemovedDirFiles();

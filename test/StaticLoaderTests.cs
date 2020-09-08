@@ -24,7 +24,7 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(mockAttributesLoader.Object);
+            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
                                 "{\n" +
@@ -50,7 +50,7 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(mockAttributesLoader.Object);
+            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
 
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
@@ -73,7 +73,7 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(mockAttributesLoader.Object);
+            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
             const string file1 = @"Foo.cs";
 
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
@@ -121,7 +121,7 @@ namespace Gauge.Dotnet.UnitTests
             var list = new List<XAttribute>();
             list.AddRange(attributes);
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(list);
-            var loader = new StaticLoader(mockAttributesLoader.Object);
+            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
 
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
@@ -146,7 +146,7 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(mockAttributesLoader.Object);
+            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
                                 "{\n" +
@@ -188,7 +188,7 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(mockAttributesLoader.Object);
+            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
             const string file1 = @"Foo.cs";
 
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
