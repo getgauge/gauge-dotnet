@@ -44,7 +44,7 @@ namespace Gauge.Dotnet
                 var methodInfo = _registry.MethodFor(method);
                 try
                 {
-                    var context = _executionInfoMapper.ExecutionInfoFrom(info);
+                    var context = _executionInfoMapper.ExecutionContextFrom(info);
                     ExecuteHook(methodInfo, context);
                 }
                 catch (Exception ex)

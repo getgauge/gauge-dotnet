@@ -47,7 +47,7 @@ namespace Gauge.Dotnet.UnitTests
             mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance, new List<object>()));
 
             var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
-            mockExecutionInfoMapper.Setup(x => x.ExecutionInfoFrom(It.IsAny<ExecutionInfo>())).Returns(new {});
+            mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>())).Returns(new {});
 
             var executor = new HookExecutor(mockAssemblyLoader.Object, mockReflectionWrapper.Object,
                 mockClassInstanceManager, mockExecutionInfoMapper.Object);
@@ -84,7 +84,7 @@ namespace Gauge.Dotnet.UnitTests
             var expectedExecutionInfo = new ExecutionContext();
 
             var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
-            mockExecutionInfoMapper.Setup(x => x.ExecutionInfoFrom(executionInfo))
+            mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(executionInfo))
                 .Returns(expectedExecutionInfo);
 
             mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance, expectedExecutionInfo))
@@ -123,7 +123,7 @@ namespace Gauge.Dotnet.UnitTests
                 .Returns(mockInstance);
 
             var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
-            mockExecutionInfoMapper.Setup(x => x.ExecutionInfoFrom(It.IsAny<ExecutionInfo>()))
+            mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>()))
                 .Returns(new {Foo = "bar"});
             var executor = new HookExecutor(mockAssemblyLoader.Object, mockReflectionWrapper.Object,
                 mockClassInstanceManager, mockExecutionInfoMapper.Object);

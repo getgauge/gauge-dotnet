@@ -25,7 +25,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var activatorWrapper = new ActivatorWrapper();
             var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
-            var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader);
+            var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
@@ -79,7 +79,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
-            var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader);
+            var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),

@@ -11,6 +11,6 @@ namespace Gauge.Dotnet
 {
     public interface IExecutionInfoMapper
     {
-        dynamic ExecutionInfoFrom(ExecutionInfo currentExecutionInfo);
+        dynamic ExecutionContextFrom(ExecutionInfo currentExecutionInfo);
     }
 }

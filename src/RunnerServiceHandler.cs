@@ -204,7 +204,7 @@ namespace Gauge.Dotnet
         {
             var tableFormatter = new TableFormatter(this._assemblyLoader, this._activatorWrapper);
             var classInstanceManager = this._assemblyLoader.GetClassInstanceManager();
-            var executionInfoMapper = new ExecutionInfoMapper(this._assemblyLoader);
+            var executionInfoMapper = new ExecutionInfoMapper(this._assemblyLoader, this._activatorWrapper);
             var executionOrchestrator = new ExecutionOrchestrator(this._reflectionWrapper, this._assemblyLoader, this._activatorWrapper,
                 classInstanceManager,
                 new HookExecutor(this._assemblyLoader, this._reflectionWrapper, classInstanceManager, executionInfoMapper),
