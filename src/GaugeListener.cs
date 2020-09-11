@@ -31,10 +31,11 @@ namespace Gauge.Dotnet
                 var reflectionWrapper = new ReflectionWrapper();
                 var activatorWrapper = new ActivatorWrapper();
                 Logger.Debug($"Loading assembly from : {assemblyPath}");
-                var gaugeLoadContext = new GaugeLoadContext(assemblyPath);
-                var assemblyLoader = new AssemblyLoader(assemblyPath, gaugeLoadContext, reflectionWrapper, activatorWrapper, _staticLoader.GetStepRegistry());
-                var handler = new RunnerServiceHandler(activatorWrapper,reflectionWrapper, assemblyLoader, _staticLoader, server);
-                server.Services.Add(Runner.BindService(handler));
+                using (var gaugeLoadContext = new GaugeLoadContext(assemblyPath)) {
+                    var assemblyLoader = new AssemblyLoader(assemblyPath, gaugeLoadContext, reflectionWrapper, activatorWrapper, _staticLoader.GetStepRegistry());
+                    var handler = new RunnerServiceHandler(activatorWrapper,reflectionWrapper, assemblyLoader, _staticLoader, server);
+                    server.Services.Add(Runner.BindService(handler));
+                }
             } else {
                 var handler = new RunnerServiceHandler(_staticLoader, server);
                 server.Services.Add(Runner.BindService(handler));

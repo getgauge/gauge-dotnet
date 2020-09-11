@@ -11,13 +11,20 @@ using System.Runtime.Loader;
 
 namespace Gauge.Dotnet
 {
-    public class GaugeLoadContext: AssemblyLoadContext, IGaugeLoadContext {
+    public class GaugeLoadContext: AssemblyLoadContext, IGaugeLoadContext, System.IDisposable
+    {
         private const string GaugeLibAssemblyName = "Gauge.CSharp.Lib";
         private AssemblyDependencyResolver _resolver;
 
         public GaugeLoadContext(string pluginPath)
         {
             _resolver = new AssemblyDependencyResolver(pluginPath);
+        }
+
+        public void Dispose()
+        {
+            Logger.Debug("Unloading GaugeLoadContext, assemblies should be freed up.");
+            base.Unload();
         }
 
         public IEnumerable<Assembly> GetAssembliesReferencingGaugeLib()
