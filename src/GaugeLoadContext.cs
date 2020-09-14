@@ -11,19 +11,23 @@ using System.Runtime.Loader;
 
 namespace Gauge.Dotnet
 {
-    public class GaugeLoadContext: AssemblyLoadContext, IGaugeLoadContext
+    public class GaugeLoadContext: AssemblyLoadContext, IGaugeLoadContext, System.IDisposable
     {
         private const string GaugeLibAssemblyName = "Gauge.CSharp.Lib";
         private AssemblyDependencyResolver _resolver;
 
-        public GaugeLoadContext(string pluginPath)
+        public GaugeLoadContext(string pluginPath, bool collectibe = false) : base(collectibe)
         {
             _resolver = new AssemblyDependencyResolver(pluginPath);
         }
 
-        protected GaugeLoadContext(string pluginPath, bool collectible) : base(collectible)
+        public void Dispose()
         {
-            _resolver = new AssemblyDependencyResolver(pluginPath);
+            if (IsCollectible)
+            {
+                Logger.Debug("Unloading GaugeLoadContext, assemblies should be freed up.");
+                base.Unload();
+            }
         }
 
         public IEnumerable<Assembly> GetAssembliesReferencingGaugeLib()
@@ -41,19 +45,5 @@ namespace Gauge.Dotnet
             }
             return null;
         }
-    }
-
-    public class DisposableGaugeLoadContext : GaugeLoadContext, System.IDisposable
-    {
-        public DisposableGaugeLoadContext(string pluginPath) : base(pluginPath, true)
-        {
-        }
-
-        public void Dispose()
-        {
-            Logger.Debug("Unloading GaugeLoadContext, assemblies should be freed up.");
-            base.Unload();
-        }
-
     }
 }
