@@ -62,7 +62,14 @@ namespace Gauge.Dotnet
 
         public Type GetLibType(LibType type)
         {
-            return _targetLibAssembly.ExportedTypes.First(t => t.FullName == type.FullName());
+            try
+            {
+                return _targetLibAssembly.ExportedTypes.First(t => t.FullName == type.FullName());
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new InvalidOperationException($"Cannot locate {type.FullName()} in Gauge.CSharp.Lib", ex);
+            }
         }
 
 
