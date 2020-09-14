@@ -16,7 +16,7 @@ namespace Gauge.Dotnet
         private const string GaugeLibAssemblyName = "Gauge.CSharp.Lib";
         private AssemblyDependencyResolver _resolver;
 
-        public GaugeLoadContext(string pluginPath, bool collectibe = false) : base(collectibe)
+        public GaugeLoadContext(string pluginPath, bool collectible = false) : base(collectible)
         {
             _resolver = new AssemblyDependencyResolver(pluginPath);
         }
