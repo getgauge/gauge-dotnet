@@ -7,6 +7,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
@@ -28,11 +29,11 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var stepValidationProcessor = new StepValidationProcessor(assemblyLoader.GetStepRegistry());
             var message = new StepValidateRequest
-                {
-                    StepText = stepText,
-                    StepValue = new ProtoStepValue {StepValue = stepValue, ParameterizedStepValue = parameterizedStepValue},
-                    NumberOfParameters  = 1,
-                };
+            {
+                StepText = stepText,
+                StepValue = new ProtoStepValue { StepValue = stepValue, ParameterizedStepValue = parameterizedStepValue },
+                NumberOfParameters = 1,
+            };
             var result = stepValidationProcessor.Process(message);
 
             Assert.IsTrue(result.IsValid, $"Expected valid step text, got error: {result.ErrorMessage}");
@@ -42,15 +43,16 @@ namespace Gauge.Dotnet.IntegrationTests
         [Test]
         [TestCase("ProjectReference", "Take Screenshot in reference Project", "ReferenceProject-IDoNotExist.png")]
         [TestCase("DllReference", "Take Screenshot in reference DLL", "ReferenceDll-IDoNotExist.png")]
-        public void ShouldRegisterScreenshotWriterFromReference(string referenceType, string stepText, string expected) {
+        public void ShouldRegisterScreenshotWriterFromReference(string referenceType, string stepText, string expected)
+        {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TestUtils.GetIntegrationTestSampleDirectory(referenceType));
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
             var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
+            var classInstanceManager = new ThreadLocal<object>(() => assemblyLoader.GetClassInstanceManager()).Value;
             var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
-            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));

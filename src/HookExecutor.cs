@@ -23,8 +23,8 @@ namespace Gauge.Dotnet
         private IExecutionInfoMapper _executionInfoMapper;
 
         public HookExecutor(IAssemblyLoader assemblyLoader, IReflectionWrapper reflectionWrapper,
-            object claasInstanceManager, IExecutionInfoMapper mapper) :
-            base(assemblyLoader.ClassInstanceManagerType, reflectionWrapper, claasInstanceManager)
+            object classInstanceManager, IExecutionInfoMapper mapper) :
+            base(assemblyLoader.ClassInstanceManagerType, reflectionWrapper, classInstanceManager)
         {
             _assemblyLoader = assemblyLoader;
             _registry = new HookRegistry(assemblyLoader);

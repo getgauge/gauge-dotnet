@@ -35,5 +35,6 @@
     "maximum": ""
   },
   "lspLangId": "csharp",
-  "gRPCSupport": true
+  "gRPCSupport": true,
+  "multithreaded": true
 }

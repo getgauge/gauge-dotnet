@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
@@ -19,7 +20,6 @@ namespace Gauge.Dotnet
 {
     public class ExecutionOrchestrator : IExecutionOrchestrator
     {
-        private readonly IActivatorWrapper _activatorWrapper;
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly object _classInstanceManager;
         private readonly IHookExecutor _hookExecutor;
@@ -27,12 +27,11 @@ namespace Gauge.Dotnet
         private readonly IStepExecutor _stepExecutor;
 
         public ExecutionOrchestrator(IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader,
-            IActivatorWrapper activatorWrapper, object classInstanceManager, IHookExecutor hookExecutor,
+            object classInstanceManager, IHookExecutor hookExecutor,
             IStepExecutor stepExecutor)
         {
             _reflectionWrapper = reflectionWrapper;
             _assemblyLoader = assemblyLoader;
-            _activatorWrapper = activatorWrapper;
             _classInstanceManager = classInstanceManager;
             _hookExecutor = hookExecutor;
             _stepExecutor = stepExecutor;

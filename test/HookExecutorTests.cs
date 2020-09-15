@@ -15,6 +15,8 @@ using Gauge.CSharp.Lib;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
+using System.Threading;
+using ExecutionContext = Gauge.CSharp.Lib.ExecutionContext;
 
 namespace Gauge.Dotnet.UnitTests
 {
@@ -26,7 +28,7 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockInstance = new Mock<object>().Object;
             var mockClassInstanceManagerType = new Mock<Type>().Object;
-            var mockClassInstanceManager = new Mock<object>().Object;
+            var mockClassInstanceManager = new ThreadLocal<object>(() => new Mock<object>().Object);
 
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var type = LibType.BeforeSuite;
@@ -62,7 +64,7 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockInstance = new Mock<object>().Object;
             var mockClassInstanceManagerType = new Mock<Type>().Object;
-            var mockClassInstanceManager = new Mock<object>().Object;
+            var mockClassInstanceManager = new ThreadLocal<object>(() => new Mock<object>().Object);
 
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var type = LibType.BeforeSuite;
@@ -104,7 +106,7 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockInstance = new Mock<object>().Object;
             var mockClassInstanceManagerType = new Mock<Type>().Object;
-            var mockClassInstanceManager = new Mock<object>().Object;
+            var mockClassInstanceManager = new ThreadLocal<object>(() => new Mock<object>().Object);
 
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var type = LibType.BeforeSuite;

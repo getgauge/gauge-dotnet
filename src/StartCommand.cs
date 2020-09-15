@@ -7,7 +7,6 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Exceptions;

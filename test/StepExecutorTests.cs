@@ -6,6 +6,7 @@
 
 
 using System;
+using System.Threading;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.UnitTests.Helpers;
 using Gauge.Dotnet.Wrappers;
@@ -22,7 +23,7 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockInstance = new Mock<object>().Object;
             var mockClassInstanceManagerType = new Mock<Type>().Object;
-            var mockClassInstanceManager = new Mock<object>().Object;
+            var mockClassInstanceManager = new ThreadLocal<object>(() => new Mock<object>().Object);
 
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
@@ -58,7 +59,7 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockInstance = new Mock<object>().Object;
             var mockClassInstanceManagerType = new Mock<Type>().Object;
-            var mockClassInstanceManager = new Mock<object>().Object;
+            var mockClassInstanceManager = new ThreadLocal<object>(() => new Mock<object>().Object);
 
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
@@ -94,7 +95,7 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockInstance = new Mock<object>().Object;
             var mockClassInstanceManagerType = new Mock<Type>().Object;
-            var mockClassInstanceManager = new Mock<object>().Object;
+            var mockClassInstanceManager = new ThreadLocal<object>(() => new Mock<object>().Object);
 
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             var methodInfo = new MockMethodBuilder(mockAssemblyLoader)

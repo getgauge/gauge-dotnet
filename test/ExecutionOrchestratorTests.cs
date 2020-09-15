@@ -40,12 +40,11 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldExecuteHooks()
         {
-            var pendingMessages = new List<string> {"Foo", "Bar"};
-            var pendingScreenshots = new List<string> {"screenshot.png"};
-            var executionResult = new ExecutionResult {Success = true};
+            var pendingMessages = new List<string> { "Foo", "Bar" };
+            var pendingScreenshots = new List<string> { "screenshot.png" };
+            var executionResult = new ExecutionResult { Success = true };
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockActivationWrapper = new Mock<IActivatorWrapper>();
             var mockClassInstanceManager = new Mock<object>().Object;
             var hooksStrategy = new HooksStrategy();
             var mockHookExecuter = new Mock<IHookExecutor>();
@@ -65,7 +64,6 @@ namespace Gauge.Dotnet.UnitTests
                 .Returns(pendingScreenshots);
             var assemblyLoader = mockAssemblyLoader.Object;
             var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-                mockActivationWrapper.Object,
                 mockClassInstanceManager, mockHookExecuter.Object, mockStepExecuter.Object);
 
             var result = executionOrchestrator.ExecuteHooks("hooks", hooksStrategy, new List<string>(),
@@ -78,8 +76,8 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldExecuteHooksAndNotTakeScreenshotOnFailureWhenDisabled()
         {
-            var pendingMessages = new List<string> {"Foo", "Bar"};
-            var pendingScreenshots = new List<string> {"screenshot.png"};
+            var pendingMessages = new List<string> { "Foo", "Bar" };
+            var pendingScreenshots = new List<string> { "screenshot.png" };
             var hooksStrategy = new HooksStrategy();
             var executionResult = new ExecutionResult
             {
@@ -90,13 +88,11 @@ namespace Gauge.Dotnet.UnitTests
             var mockClassInstanceManager = new Mock<object>().Object;
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockActivationWrapper = new Mock<IActivatorWrapper>();
             var mockHookExecuter = new Mock<IHookExecutor>();
             var mockStepExecuter = new Mock<IStepExecutor>();
             var reflectionWrapper = mockReflectionWrapper.Object;
             var assemblyLoader = mockAssemblyLoader.Object;
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-                mockActivationWrapper.Object,
                 mockClassInstanceManager,
                 mockHookExecuter.Object, mockStepExecuter.Object);
             mockHookExecuter.Setup(executor =>
@@ -127,25 +123,23 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldExecuteMethod()
         {
-            var pendingMessages = new List<string> {"Foo", "Bar"};
-            var pendingScreenshots = new List<string> {"screenshot.png"};
-            var gaugeMethod = new GaugeMethod {Name = "ShouldExecuteMethod", ParameterCount = 1};
-            var args = new[] {"Bar", "String"};
+            var pendingMessages = new List<string> { "Foo", "Bar" };
+            var pendingScreenshots = new List<string> { "screenshot.png" };
+            var gaugeMethod = new GaugeMethod { Name = "ShouldExecuteMethod", ParameterCount = 1 };
+            var args = new[] { "Bar", "String" };
 
             var mockClassInstanceManager = new Mock<object>().Object;
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockActivationWrapper = new Mock<IActivatorWrapper>();
             var mockHookExecuter = new Mock<IHookExecutor>();
             var mockStepExecutor = new Mock<IStepExecutor>();
 
             mockStepExecutor.Setup(executor => executor.Execute(gaugeMethod, It.IsAny<string[]>()))
-                .Returns(() => new ExecutionResult {Success = true})
+                .Returns(() => new ExecutionResult { Success = true })
                 .Callback(() => Thread.Sleep(1)); // Simulate a delay in method execution
 
             var orchestrator = new ExecutionOrchestrator(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
-                mockActivationWrapper.Object, mockClassInstanceManager,
-                mockHookExecuter.Object, mockStepExecutor.Object);
+                mockClassInstanceManager, mockHookExecuter.Object, mockStepExecutor.Object);
 
             var mockType = new Mock<Type>().Object;
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
@@ -165,9 +159,9 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldNotTakeScreenShotWhenDisabled()
         {
-            var pendingMessages = new List<string> {"Foo", "Bar"};
-            var pendingScreenshots = new List<string> {"screenshot.png"};
-            var gaugeMethod = new GaugeMethod {Name = "ShouldNotTakeScreenShotWhenDisabled", ParameterCount = 1};
+            var pendingMessages = new List<string> { "Foo", "Bar" };
+            var pendingScreenshots = new List<string> { "screenshot.png" };
+            var gaugeMethod = new GaugeMethod { Name = "ShouldNotTakeScreenShotWhenDisabled", ParameterCount = 1 };
 
             var executionResult = new ExecutionResult
             {
@@ -178,7 +172,6 @@ namespace Gauge.Dotnet.UnitTests
             var mockClassInstanceManager = new Mock<object>().Object;
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockActivationWrapper = new Mock<IActivatorWrapper>();
             var mockHookExecuter = new Mock<IHookExecutor>();
             var mockStepExecutor = new Mock<IStepExecutor>();
             mockStepExecutor.Setup(executor => executor.Execute(gaugeMethod, It.IsAny<string[]>()))
@@ -194,8 +187,7 @@ namespace Gauge.Dotnet.UnitTests
                 .Returns(pendingScreenshots);
 
             var orchestrator = new ExecutionOrchestrator(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
-                mockActivationWrapper.Object, mockClassInstanceManager,
-                mockHookExecuter.Object, mockStepExecutor.Object);
+                mockClassInstanceManager, mockHookExecuter.Object, mockStepExecutor.Object);
 
             var screenshotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
             Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", "false");
@@ -210,10 +202,10 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldTakeScreenShotOnFailedExecution()
         {
-            var pendingMessages = new List<string> {"Foo", "Bar"};
+            var pendingMessages = new List<string> { "Foo", "Bar" };
             var expectedScreenshot = "Testscreenshot.png";
-            var pendingScreenshots = new List<string> {expectedScreenshot};
-            var gaugeMethod = new GaugeMethod {Name = "ShouldExecuteMethod", ParameterCount = 1};
+            var pendingScreenshots = new List<string> { expectedScreenshot };
+            var gaugeMethod = new GaugeMethod { Name = "ShouldExecuteMethod", ParameterCount = 1 };
             var executionResult = new ExecutionResult
             {
                 Success = false,
@@ -222,7 +214,6 @@ namespace Gauge.Dotnet.UnitTests
             };
             var mockInstance = new Mock<object>().Object;
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockActivationWrapper = new Mock<IActivatorWrapper>();
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockHookExecuter = new Mock<IHookExecutor>();
             var mockStepExecutor = new Mock<IStepExecutor>();
@@ -239,8 +230,7 @@ namespace Gauge.Dotnet.UnitTests
                 .Returns(pendingScreenshots);
 
             var orchestrator = new ExecutionOrchestrator(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
-                mockActivationWrapper.Object, mockInstance,
-                mockHookExecuter.Object, mockStepExecutor.Object);
+                mockInstance, mockHookExecuter.Object, mockStepExecutor.Object);
 
             var result = orchestrator.ExecuteStep(gaugeMethod, "Bar", "String");
             mockStepExecutor.VerifyAll();
