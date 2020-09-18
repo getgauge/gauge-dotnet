@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;

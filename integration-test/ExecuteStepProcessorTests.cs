@@ -10,7 +10,6 @@ using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using NUnit.Framework;
-using System.Linq;
 using System.Threading;
 
 namespace Gauge.Dotnet.IntegrationTests

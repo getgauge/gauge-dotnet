@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
-using System.Threading;
 using Gauge.Dotnet.Converters;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;

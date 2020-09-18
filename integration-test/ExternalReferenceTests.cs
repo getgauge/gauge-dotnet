@@ -6,7 +6,6 @@
 
 
 using System;
-using System.Linq;
 using System.Threading;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
