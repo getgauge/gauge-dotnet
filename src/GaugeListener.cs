@@ -75,9 +75,10 @@ namespace Gauge.Dotnet
 
         private bool IsMultithreading()
         {
-            var multithreading = Boolean.Parse(Utils.TryReadEnvValue(ENABLE_MULTITHREADING_ENV));
-            Logger.Debug("multithreading is set to " + multithreading);
-            return multithreading;
+            var multithreaded = Environment.GetEnvironmentVariable("enable_multithreading");
+            if (String.IsNullOrEmpty(multithreaded))
+                return false;
+            return Boolean.Parse(multithreaded);
         }
 
     }
