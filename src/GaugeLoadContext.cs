@@ -11,23 +11,14 @@ using System.Runtime.Loader;
 
 namespace Gauge.Dotnet
 {
-    public class GaugeLoadContext: AssemblyLoadContext, IGaugeLoadContext, System.IDisposable
+    public class GaugeLoadContext: AssemblyLoadContext, IGaugeLoadContext
     {
         private const string GaugeLibAssemblyName = "Gauge.CSharp.Lib";
-        private AssemblyDependencyResolver _resolver;
+        protected AssemblyDependencyResolver _resolver;
 
-        public GaugeLoadContext(string pluginPath, bool collectible = false) : base(collectible)
+        public GaugeLoadContext(string pluginPath)
         {
             _resolver = new AssemblyDependencyResolver(pluginPath);
-        }
-
-        public void Dispose()
-        {
-            if (IsCollectible)
-            {
-                Logger.Debug("Unloading GaugeLoadContext, assemblies should be freed up.");
-                base.Unload();
-            }
         }
 
         public IEnumerable<Assembly> GetAssembliesReferencingGaugeLib()
@@ -38,7 +29,7 @@ namespace Gauge.Dotnet
         protected override Assembly Load(AssemblyName assemblyName)
         {
             var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
-            Logger.Debug($"Try load {assemblyName.Name}");
+            Logger.Debug($"Try load {assemblyName.Name} in GaugeLoadContext");
             if (assemblyPath != null)
             {
                 return LoadFromAssemblyPath(assemblyPath);

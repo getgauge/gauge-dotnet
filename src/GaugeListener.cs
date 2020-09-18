@@ -32,12 +32,10 @@ namespace Gauge.Dotnet
                 var activatorWrapper = new ActivatorWrapper();
                 Logger.Debug($"Loading assembly from : {assemblyPath}");
                 var isDaemon = string.Compare(Environment.GetEnvironmentVariable("IS_DAEMON"), "true", true) == 0;
-                using (var gaugeLoadContext = new GaugeLoadContext(assemblyPath, isDaemon))
-                {
-                    var assemblyLoader = new AssemblyLoader(assemblyPath, gaugeLoadContext, reflectionWrapper, activatorWrapper, _staticLoader.GetStepRegistry());
-                    var handler = new RunnerServiceHandler(activatorWrapper,reflectionWrapper, assemblyLoader, _staticLoader, server);
-                    server.Services.Add(Runner.BindService(handler));
-                }
+                var gaugeLoadContext = isDaemon ? new LockFreeGaugeLoadContext(assemblyPath) : new GaugeLoadContext(assemblyPath);
+                var assemblyLoader = new AssemblyLoader(assemblyPath, gaugeLoadContext, reflectionWrapper, activatorWrapper, _staticLoader.GetStepRegistry());
+                var handler = new RunnerServiceHandler(activatorWrapper,reflectionWrapper, assemblyLoader, _staticLoader, server);
+                server.Services.Add(Runner.BindService(handler));
             } else {
                 var handler = new RunnerServiceHandler(_staticLoader, server);
                 server.Services.Add(Runner.BindService(handler));
