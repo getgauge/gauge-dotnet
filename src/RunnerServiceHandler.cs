@@ -163,10 +163,11 @@ namespace Gauge.Dotnet
 
         public override Task<ImplementationFileListResponse> GetImplementationFiles(Empty request, ServerCallContext context)
         {
-            var response = new ImplementationFileListResponse();
-            response.ImplementationFilePaths.AddRange(FileHelper.GetImplementationFiles());
-            return _pool.Execute(DefaultExecutionStream, () => response);
-
+            return _pool.Execute(DefaultExecutionStream,() => {
+                var response = new ImplementationFileListResponse();
+                response.ImplementationFilePaths.AddRange(FileHelper.GetImplementationFiles());
+                return response;
+            });
         }
 
         public override Task<StepNameResponse> GetStepName(StepNameRequest request, ServerCallContext context)

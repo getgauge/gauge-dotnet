@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Gauge.CSharp.Core;
+using Gauge.Dotnet.Wrappers;
 using Moq;
 using NUnit.Framework;
 
@@ -24,7 +25,8 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
+            var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+            var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
                                 "{\n" +
@@ -50,7 +52,8 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
+            var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+            var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
 
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
@@ -73,7 +76,8 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
+            var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+            var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
             const string file1 = @"Foo.cs";
 
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
@@ -121,7 +125,8 @@ namespace Gauge.Dotnet.UnitTests
             var list = new List<XAttribute>();
             list.AddRange(attributes);
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(list);
-            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
+            var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+            var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
 
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
@@ -146,7 +151,8 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
+            var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+            var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
                                 "{\n" +
@@ -188,7 +194,8 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
+            var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+            var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
             const string file1 = @"Foo.cs";
 
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
@@ -226,6 +233,39 @@ namespace Gauge.Dotnet.UnitTests
             loader.RemoveSteps(file2);
 
             Assert.False(loader.GetStepRegistry().ContainsStep("hola"));
+        }
+
+        public class LoadImplementationsTest
+        {
+            private const string GaugeCustomBuildPathEnv = "GAUGE_CUSTOM_BUILD_PATH";
+            private string old;
+
+            [SetUp]
+            public void Setup()
+            {
+                old = Utils.TryReadEnvValue(GaugeCustomBuildPathEnv);
+                Environment.SetEnvironmentVariable(GaugeCustomBuildPathEnv, "foo");
+            }
+
+            [Test]
+            public void ShouldNotLoadWhenCustomBuildPathIsSet()
+            {
+                var mockAttributesLoader = new Mock<IAttributesLoader>();
+                mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Verifiable();
+                var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+                mockDirectoryWrapper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), "*.cs", SearchOption.AllDirectories));
+
+                var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
+
+                mockAttributesLoader.Verify(x => x.GetRemovedAttributes(), Times.Never());
+                Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", old);
+            }
+
+            [TearDown]
+            public void TearDown()
+            {
+                Environment.SetEnvironmentVariable(GaugeCustomBuildPathEnv, old);
+            }
         }
     }
 }
