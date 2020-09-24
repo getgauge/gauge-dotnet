@@ -26,7 +26,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
-            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
@@ -46,14 +46,14 @@ namespace Gauge.Dotnet.IntegrationTests
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
-            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
             var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("Step that takes a table {}");
-            var table = new Table(new List<string> {"foo", "bar"});
-            table.AddRow(new List<string> {"foorow1", "barrow1"});
-            table.AddRow(new List<string> {"foorow2", "barrow2"});
+            var table = new Table(new List<string> { "foo", "bar" });
+            table.AddRow(new List<string> { "foorow1", "barrow1" });
+            table.AddRow(new List<string> { "foorow2", "barrow2" });
 
             var executionResult = orchestrator.ExecuteStep(gaugeMethod, SerializeTable(table));
             Assert.False(executionResult.Failed);
@@ -68,7 +68,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
-            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
@@ -89,7 +89,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
-            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
@@ -111,7 +111,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
-            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
@@ -149,7 +149,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
-            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
@@ -173,7 +173,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
-            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));

@@ -1,6 +1,6 @@
 {
   "id": "dotnet",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "description": "C# support for gauge + .NET Core 3.0",
   "run": {
     "windows": [
@@ -35,5 +35,6 @@
     "maximum": ""
   },
   "lspLangId": "csharp",
-  "gRPCSupport": true
+  "gRPCSupport": true,
+  "multithreaded": true
 }

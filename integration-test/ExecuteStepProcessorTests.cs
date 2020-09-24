@@ -10,7 +10,7 @@ using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using NUnit.Framework;
-using System.Linq;
+using System.Threading;
 
 namespace Gauge.Dotnet.IntegrationTests
 {
@@ -27,7 +27,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
             var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
-            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
@@ -39,7 +39,7 @@ namespace Gauge.Dotnet.IntegrationTests
             {
                 Headers = new ProtoTableRow
                 {
-                    Cells = {"foo", "bar"}
+                    Cells = { "foo", "bar" }
                 },
                 Rows =
                 {
@@ -50,10 +50,10 @@ namespace Gauge.Dotnet.IntegrationTests
                 }
             };
             var message = new ExecuteStepRequest
-                {
-                    ParsedStepText = parameterizedStepText,
-                    ActualStepText = stepText,
-                    Parameters =
+            {
+                ParsedStepText = parameterizedStepText,
+                ActualStepText = stepText,
+                Parameters =
                     {
                         new Parameter
                         {
@@ -62,7 +62,7 @@ namespace Gauge.Dotnet.IntegrationTests
                             Table = protoTable
                         }
                     }
-                };
+            };
             var result = executeStepProcessor.Process(message);
 
             var protoExecutionResult = result.ExecutionResult;
@@ -78,9 +78,9 @@ namespace Gauge.Dotnet.IntegrationTests
             var activatorWrapper = new ActivatorWrapper();
             var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
+            var classInstanceManager = new ThreadLocal<object>(() => assemblyLoader.GetClassInstanceManager());
             var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
-            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader, activatorWrapper,
+            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
                 classInstanceManager,
                 new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
                 new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
