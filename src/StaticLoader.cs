@@ -14,6 +14,7 @@ using Gauge.CSharp.Core;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Helpers;
 using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Wrappers;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -21,14 +22,16 @@ namespace Gauge.Dotnet
 {
     public sealed class StaticLoader : IStaticLoader
     {
-        private readonly Lazy<IAttributesLoader> _attributesLoader;
+        private readonly IAttributesLoader _attributesLoader;
+        private readonly IDirectoryWrapper _directoryWrapper;
         private readonly IStepRegistry _stepRegistry;
 
 
-        public StaticLoader(Lazy<IAttributesLoader> attributesLoader)
+        public StaticLoader(IAttributesLoader attributesLoader, IDirectoryWrapper directoryWrapper)
         {
             _stepRegistry = new StepRegistry();
             _attributesLoader = attributesLoader;
+            _directoryWrapper = directoryWrapper;
         }
 
         public IStepRegistry GetStepRegistry()
@@ -57,7 +60,7 @@ namespace Gauge.Dotnet
 
         private bool IsFileRemoved(string file)
         {
-            var attributes = _attributesLoader.Value.GetRemovedAttributes();
+            var attributes = _attributesLoader.GetRemovedAttributes();
             var removedFiles = FileHelper.GetRemovedDirFiles();
 
             var isFileRemoved =
@@ -68,14 +71,25 @@ namespace Gauge.Dotnet
 
         internal void LoadImplementations()
         {
-            var classFiles = Directory.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs",
+            if (!string.IsNullOrEmpty(Utils.TryReadEnvValue("GAUGE_CUSTOM_BUILD_PATH")))
+            {
+                Logger.Debug("GAUGE_CUSTOM_BUILD_PATH is set, skipping static loading");
+                return;
+            }
+
+            var classFiles = _directoryWrapper.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs",
                 SearchOption.AllDirectories).ToList();
-            var attributes = _attributesLoader.Value.GetRemovedAttributes();
+            var attributes = _attributesLoader.GetRemovedAttributes();
             foreach (var attribute in attributes)
+            {
                 classFiles.Remove(Path.Combine(Utils.GaugeProjectRoot, attribute.Value));
+            }
             var removedFiles = FileHelper.GetRemovedDirFiles();
             var wantedFiles = classFiles.Except(removedFiles);
-            foreach (var f in wantedFiles) LoadStepsFromText(File.ReadAllText(f), f);
+            foreach (var f in wantedFiles)
+            {
+                LoadStepsFromText(File.ReadAllText(f), f);
+            }
         }
 
         private void AddStepsToRegistry(string fileName, IEnumerable<MethodDeclarationSyntax> stepMethods)

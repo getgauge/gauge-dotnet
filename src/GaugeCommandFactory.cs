@@ -5,6 +5,8 @@
  *----------------------------------------------------------------*/
 
 
+using Gauge.Dotnet.Wrappers;
+
 namespace Gauge.Dotnet
 {
     public class GaugeCommandFactory
@@ -18,7 +20,7 @@ namespace Gauge.Dotnet
                 default:
                     return new StartCommand(() =>
                         {
-                            var loader = new StaticLoader(new System.Lazy<IAttributesLoader>(() => new AttributesLoader()));
+                            var loader = new StaticLoader(new AttributesLoader(), new DirectoryWrapper());
                             loader.LoadImplementations();
                             return new GaugeListener(loader);
                         },

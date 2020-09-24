@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Gauge.Dotnet.Processors;
+using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
@@ -23,7 +24,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
+            var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+            var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
             const string content = "using Gauge.CSharp.Lib.Attributes;\n" +
                                    "namespace foobar\n" +
                                    "{\n" +
@@ -54,7 +56,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var loader = new StaticLoader(new Lazy<IAttributesLoader>(() => mockAttributesLoader.Object));
+            var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+            var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
             const string content = "using Gauge.CSharp.Lib.Attributes;\n" +
                                    "namespace foobar\n" +
                                    "{\n" +
