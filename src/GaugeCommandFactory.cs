@@ -15,7 +15,7 @@ namespace Gauge.Dotnet
                 case "--init":
                     return new SetupCommand();
                 default:
-                    return new StartCommand(new System.Lazy<IGaugeProjectBuilder>(() => new GaugeProjectBuilder()));
+                    return new StartCommand(new GaugeProjectBuilder(), typeof(GaugeListener));
             }
         }
     }

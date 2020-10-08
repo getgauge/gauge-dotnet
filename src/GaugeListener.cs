@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using System.Linq;
 using Gauge.Dotnet.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet
 {
@@ -30,14 +31,16 @@ namespace Gauge.Dotnet
 
         public IConfiguration Configuration { get; }
 
-        public void ConfigureServices(IServiceCollection services)
+        public virtual void ConfigureServices(IServiceCollection services)
         {
             var assemblyPath = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             Logger.Debug($"Loading assembly from : {assemblyPath}");
             services.AddGrpc();
             services.AddLogging(logConfig => {
-                // disable microsoft logging, it interferes with machine readable logs that gauge expects.
-                // logConfig.AddFilter("Microsoft", LogLevel.None);
+                if (Utils.TryReadEnvValue("GAUGE_LOG_LEVEL") == "DEBUG")
+                {
+                    logConfig.AddFilter("Microsoft", LogLevel.None);
+                }
             });
             services.AddSingleton<IReflectionWrapper, ReflectionWrapper>();
             services.AddSingleton<IActivatorWrapper, ActivatorWrapper>();
@@ -65,7 +68,7 @@ namespace Gauge.Dotnet
             }
         }
 
-        public void Configure(IApplicationBuilder app, IHostApplicationLifetime lifetime)
+        public virtual void Configure(IApplicationBuilder app, IHostApplicationLifetime lifetime)
         {
             app.UseRouting();
             lifetime.ApplicationStarted.Register(() => {

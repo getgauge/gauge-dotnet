@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Reflection;
+using System.Threading.Tasks;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Exceptions;
 using Microsoft.AspNetCore.Hosting;
@@ -19,36 +20,37 @@ namespace Gauge.Dotnet
 {
     public class StartCommand : IGaugeCommand
     {
-        private readonly Lazy<IGaugeProjectBuilder> _projectBuilder;
+        private readonly IGaugeProjectBuilder _projectBuilder;
+        private readonly Type _startupType;
 
-        public StartCommand(Lazy<IGaugeProjectBuilder> projectBuilder)
+        public StartCommand(IGaugeProjectBuilder projectBuilder, Type startupType)
         {
             Environment.CurrentDirectory = Utils.GaugeProjectRoot;
             _projectBuilder = projectBuilder;
+            this._startupType = startupType;
         }
 
         [DebuggerHidden]
-        public void Execute()
+        public async Task<bool> Execute()
         {
             var buildSucceeded = TryBuild();
             if (!buildSucceeded && !this.ShouldContinueBuildFailure())
             {
-                return;
+                return false;
             }
             try
             {
                 var builder = Host.CreateDefaultBuilder()
                     .ConfigureWebHostDefaults(wb => {
                         wb.UseShutdownTimeout(TimeSpan.FromMilliseconds(0));
-                        wb.UseStartup<GaugeListener>();
+                        wb.UseStartup(this._startupType);
                         wb.UseSetting("ReflectionScanAssemblies", buildSucceeded.ToString());
                         wb.ConfigureKestrel(options => 
                             options.Listen(IPAddress.Parse("127.0.0.1"), 0, lo => lo.Protocols = HttpProtocols.Http2));
                     });
 
                 using(var host = builder.Build()){
-                    host.Run();
-                    Environment.Exit(0);
+                    await host.RunAsync();
                 };
             }
             catch (TargetInvocationException e)
@@ -57,6 +59,7 @@ namespace Gauge.Dotnet
                     throw;
                 Logger.Fatal(e.InnerException.Message);
             }
+            return true;
         }
 
         private bool ShouldContinueBuildFailure()
@@ -73,7 +76,7 @@ namespace Gauge.Dotnet
 
             try
             {
-                return _projectBuilder.Value.BuildTargetGaugeProject();
+                return _projectBuilder.BuildTargetGaugeProject();
             }
             catch (NotAValidGaugeProjectException)
             {
