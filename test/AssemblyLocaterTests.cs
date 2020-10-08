@@ -45,7 +45,7 @@ namespace Gauge.Dotnet.UnitTests
 
             var assembly = assemblyLocater.GetTestAssembly();
 
-            Assert.AreEqual($"{expected}.dll", assembly);
+            Assert.AreEqual($"{expected}.dll", (string)assembly);
         }
 
         [Test]

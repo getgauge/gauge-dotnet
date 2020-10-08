@@ -9,34 +9,19 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Gauge.Dotnet.Executor;
-using Gauge.Dotnet.Helpers;
-using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Grpc.Core;
+using Microsoft.Extensions.Hosting;
 
 namespace Gauge.Dotnet
 {
-    internal class RunnerServiceHandler : Runner.RunnerBase
+    internal class ExecutableRunnerServiceHandler : AuthoringRunnerServiceHandler
     {
-        private readonly int DefaultExecutionStream = 1;
-
-        private readonly IStaticLoader _loader;
-        private readonly Server _server;
-        private readonly ExecutorPool _pool;
         private readonly IActivatorWrapper _activatorWrapper;
         private readonly IReflectionWrapper _reflectionWrapper;
         private readonly IAssemblyLoader _assemblyLoader;
-        private readonly IStepRegistry _stepRegistry;
-
-        private StepValidationProcessor stepValidateRequestProcessor;
-        private StepNameProcessor stepNameRequestProcessor;
-        private RefactorProcessor refactorRequestProcessor;
-        private CacheFileProcessor cacheFileRequestProcessor;
-        private StubImplementationCodeProcessor stubImplementationCodeRequestProcessor;
-        private StepPositionsProcessor stepPositionsRequestProcessor;
-        private StepNamesProcessor stepNamesRequestProcessor;
         private ExecutionStartingProcessor executionStartingProcessor;
         private ExecutionEndingProcessor executionEndingProcessor;
         private SpecExecutionStartingProcessor specExecutionStartingProcessor;
@@ -48,34 +33,23 @@ namespace Gauge.Dotnet
         private ExecuteStepProcessor executeStepProcessor;
         private ScenarioDataStoreInitProcessor scenarioDataStoreInitProcessor;
         private SpecDataStoreInitProcessor specDataStoreInitProcessor;
-        private SuiteDataStoreInitProcessor suiteDataStoreInitProcessor;
-
-        public RunnerServiceHandler(IActivatorWrapper activationWrapper, IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader, IStaticLoader loader, Server server, ExecutorPool pool)
+        private SuiteDataStoreInitProcessor suiteDataStoreInitProcessor; 
+       public ExecutableRunnerServiceHandler(IActivatorWrapper activationWrapper, IReflectionWrapper reflectionWrapper, 
+            IAssemblyLoader assemblyLoader, IStaticLoader loader, ExecutorPool pool, IHostApplicationLifetime lifetime)
+            : base(loader, pool, lifetime)
         {
-            this._pool = pool;
-            this._loader = loader;
-            this._server = server;
             this._activatorWrapper = activationWrapper;
             this._reflectionWrapper = reflectionWrapper;
             this._assemblyLoader = assemblyLoader;
             _stepRegistry = assemblyLoader.GetStepRegistry();
-            this.InitializeMessageProcessors();
+            InitializeExecutionMessageHandlers();
         }
-        public RunnerServiceHandler(IStaticLoader loader, Server server, ExecutorPool pool)
+        public override Task<ExecutionStatusResponse> InitializeSuiteDataStore(SuiteDataStoreInitRequest request, ServerCallContext context)
         {
-            this._pool = pool;
-            this._loader = loader;
-            this._server = server;
-            _stepRegistry = loader.GetStepRegistry();
-            this.InitializeMessageProcessors();
+            return _pool.Execute(getStream(request.Stream), () => this.suiteDataStoreInitProcessor.Process());
         }
 
-        public override Task<StepValidateResponse> ValidateStep(StepValidateRequest request, ServerCallContext context)
-        {
-            return _pool.Execute(DefaultExecutionStream, () => this.stepValidateRequestProcessor.Process(request));
-        }
-
-        public override Task<ExecutionStatusResponse> ExecuteStep(ExecuteStepRequest request, ServerCallContext context)
+         public override Task<ExecutionStatusResponse> ExecuteStep(ExecuteStepRequest request, ServerCallContext context)
         {
             return _pool.Execute(getStream(request.Stream), () => this.executeStepProcessor.Process(request));
         }
@@ -119,15 +93,6 @@ namespace Gauge.Dotnet
             return null;
         }
 
-        public override Task<ExecutionStatusResponse> InitializeSuiteDataStore(SuiteDataStoreInitRequest request, ServerCallContext context)
-        {
-            return _pool.Execute(getStream(request.Stream), () =>
-            {
-                InitializeExecutionMessageHandlers();
-                return this.suiteDataStoreInitProcessor.Process();
-            });
-        }
-
         public override Task<ExecutionStatusResponse> StartExecution(ExecutionStartingRequest request, ServerCallContext context)
         {
             return _pool.Execute(getStream(request.Stream), () => this.executionStartingProcessor.Process(request));
@@ -148,80 +113,9 @@ namespace Gauge.Dotnet
             return _pool.Execute(getStream(request.Stream), () => this.stepExecutionStartingProcessor.Process(request));
         }
 
-        public override Task<Empty> CacheFile(CacheFileRequest request, ServerCallContext context)
-        {
-            return _pool.Execute(1, () => this.cacheFileRequestProcessor.Process(request));
-        }
-
-        public override Task<ImplementationFileGlobPatternResponse> GetGlobPatterns(Empty request, ServerCallContext context)
-        {
-            var response = new ImplementationFileGlobPatternResponse();
-            response.GlobPatterns.Add(FileHelper.GetImplementationGlobPatterns());
-            return _pool.Execute(1, () => response);
-        }
-
-
-        public override Task<ImplementationFileListResponse> GetImplementationFiles(Empty request, ServerCallContext context)
-        {
-            return _pool.Execute(DefaultExecutionStream,() => {
-                var response = new ImplementationFileListResponse();
-                response.ImplementationFilePaths.AddRange(FileHelper.GetImplementationFiles());
-                return response;
-            });
-        }
-
-        public override Task<StepNameResponse> GetStepName(StepNameRequest request, ServerCallContext context)
-        {
-            return _pool.Execute(DefaultExecutionStream, () => this.stepNameRequestProcessor.Process(request));
-        }
-
-        public override Task<StepNamesResponse> GetStepNames(StepNamesRequest request, ServerCallContext context)
-        {
-            return _pool.Execute(DefaultExecutionStream, () => this.stepNamesRequestProcessor.Process(request));
-        }
-
-        public override Task<StepPositionsResponse> GetStepPositions(StepPositionsRequest request, ServerCallContext context)
-        {
-            return _pool.Execute(DefaultExecutionStream, () => this.stepPositionsRequestProcessor.Process(request));
-        }
-
-        public override Task<FileDiff> ImplementStub(StubImplementationCodeRequest request, ServerCallContext context)
-        {
-            return _pool.Execute(DefaultExecutionStream, () => this.stubImplementationCodeRequestProcessor.Process(request));
-        }
-
-        public override Task<RefactorResponse> Refactor(RefactorRequest request, ServerCallContext context)
-        {
-            return _pool.Execute(DefaultExecutionStream, () => this.refactorRequestProcessor.Process(request));
-        }
-
-        private void InitializeMessageProcessors()
-        {
-            this.stepValidateRequestProcessor = new StepValidationProcessor(_stepRegistry);
-            this.stepNameRequestProcessor = new StepNameProcessor(_stepRegistry);
-            this.refactorRequestProcessor = new RefactorProcessor(_stepRegistry);
-            this.cacheFileRequestProcessor = new CacheFileProcessor(_loader);
-            this.stubImplementationCodeRequestProcessor = new StubImplementationCodeProcessor();
-            this.stepPositionsRequestProcessor = new StepPositionsProcessor(_stepRegistry);
-            this.stepNamesRequestProcessor = new StepNamesProcessor(_stepRegistry);
-        }
-
-        public override Task<Empty> Kill(KillProcessRequest request, ServerCallContext context)
-        {
-            try
-            {
-                Logger.Debug("KillProcessrequest received");
-                return Task.FromResult(new Empty());
-            }
-            finally
-            {
-                _pool.Dispose();
-                _server.ShutdownAsync();
-            }
-        }
-
         private void InitializeExecutionMessageHandlers()
         {
+            Console.WriteLine("InitializeExecutionMessageHandlers");
             var tableFormatter = new TableFormatter(this._assemblyLoader, this._activatorWrapper);
             var classInstanceManager = new ThreadLocal<object>(() =>
             {

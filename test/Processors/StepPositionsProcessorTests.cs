@@ -5,15 +5,16 @@
  *----------------------------------------------------------------*/
 
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
+using static Gauge.Messages.StepPositionsResponse.Types;
 
 namespace Gauge.Dotnet.UnitTests.Processors
 {
@@ -22,25 +23,11 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldProcessRequest()
         {
-            var mockAttributesLoader = new Mock<IAttributesLoader>();
-            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
-            var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
-            const string content = "using Gauge.CSharp.Lib.Attributes;\n" +
-                                   "namespace foobar\n" +
-                                   "{\n" +
-                                   "    public class FooBar\n" +
-                                   "    {\n" +
-                                   "        [Step(\"goodbye\")]\n" +
-                                   "        public void farewell()\n" +
-                                   "        {\n" +
-                                   "        }\n" +
-                                   "    }\n" +
-                                   "}\n";
-            const string file = "Foo.cs";
-            loader.LoadStepsFromText(content, file);
-
-            var processor = new StepPositionsProcessor(loader.GetStepRegistry());
+            var filePath = "Foo.cs";
+            var mockStepRegistry = new Mock<IStepRegistry>();
+            mockStepRegistry.Setup(x => x.GetStepPositions(filePath))
+                .Returns(new[] {new StepPosition{StepValue = "goodbye", Span = new Span{Start= 6, End= 16}}});
+            var processor = new StepPositionsProcessor(mockStepRegistry.Object);
             var request = new StepPositionsRequest {FilePath = "Foo.cs"};
 
             var response = processor.Process(request);
@@ -54,26 +41,15 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldProcessRequestForAliasSteps()
         {
-            var mockAttributesLoader = new Mock<IAttributesLoader>();
-            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
-            var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
-            const string content = "using Gauge.CSharp.Lib.Attributes;\n" +
-                                   "namespace foobar\n" +
-                                   "{\n" +
-                                   "    public class FooBar\n" +
-                                   "    {\n" +
-                                   "        [Step(\"goodbye\",\"sayonara\")]\n" +
-                                   "        public void farewell()\n" +
-                                   "        {\n" +
-                                   "        }\n" +
-                                   "    }\n" +
-                                   "}\n";
-            const string file = "Foo.cs";
-            loader.LoadStepsFromText(content, file);
-
-            var processor = new StepPositionsProcessor(loader.GetStepRegistry());
-            var request = new StepPositionsRequest {FilePath = "Foo.cs"};
+            var filePath = "Foo.cs";
+            var mockStepRegistry = new Mock<IStepRegistry>();
+            mockStepRegistry.Setup(x => x.GetStepPositions(filePath))
+                .Returns(new[] {
+                    new StepPosition{StepValue = "goodbye", Span = new Span{Start= 6, End= 16}},
+                    new StepPosition{StepValue = "Sayonara", Span = new Span{Start= 6, End= 16}},
+                });
+            var processor = new StepPositionsProcessor(mockStepRegistry.Object);
+            var request = new StepPositionsRequest {FilePath = filePath};
 
             var response = processor.Process(request);
 

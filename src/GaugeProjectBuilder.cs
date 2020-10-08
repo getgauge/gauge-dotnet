@@ -14,7 +14,6 @@ namespace Gauge.Dotnet
 {
     public class GaugeProjectBuilder : IGaugeProjectBuilder
     {
-
         public bool BuildTargetGaugeProject()
         {
             var gaugeBinDir = Utils.GetGaugeBinDir();
@@ -50,7 +49,7 @@ namespace Gauge.Dotnet
             return true;
         }
 
-        public static int RunDotnetCommand(string args)
+        private static int RunDotnetCommand(string args)
         {
             var startInfo = new ProcessStartInfo
             {

@@ -20,12 +20,28 @@ namespace Gauge.Dotnet.UnitTests
     [TestFixture]
     public class StaticLoaderTests
     {
+        private string oldEnv;
+        private readonly string dummyProjectRoot = Path.Combine("non", "existent", "path");
+        [SetUp]
+        public void Setup()
+        {
+            oldEnv = Environment.GetEnvironmentVariable("GAUGE_PROJECT_ROOT");
+            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", dummyProjectRoot);
+        }
+
+        [TearDown]
+        public void Teardown()
+        {
+            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", oldEnv);
+        }
+
         [Test]
         public void ShouldAddAliasesSteps()
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
             var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+            mockDirectoryWrapper.Setup(x => x.EnumerateFiles(dummyProjectRoot, "*.cs", SearchOption.AllDirectories)).Returns(Enumerable.Empty<string>);
             var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
@@ -53,6 +69,7 @@ namespace Gauge.Dotnet.UnitTests
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
             var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+            mockDirectoryWrapper.Setup(x => x.EnumerateFiles(dummyProjectRoot, "*.cs", SearchOption.AllDirectories)).Returns(Enumerable.Empty<string>);
             var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
 
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
@@ -72,11 +89,12 @@ namespace Gauge.Dotnet.UnitTests
         }
 
         [Test]
-        public void ShouldLoadStepsWithPositoin()
+        public void ShouldLoadStepsWithPosition()
         {
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
             var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+            mockDirectoryWrapper.Setup(x => x.EnumerateFiles(dummyProjectRoot, "*.cs", SearchOption.AllDirectories)).Returns(Enumerable.Empty<string>);
             var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
             const string file1 = @"Foo.cs";
 
@@ -152,6 +170,7 @@ namespace Gauge.Dotnet.UnitTests
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
             var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+            mockDirectoryWrapper.Setup(x => x.EnumerateFiles(dummyProjectRoot, "*.cs", SearchOption.AllDirectories)).Returns(Enumerable.Empty<string>);
             var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
             const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
                                 "namespace foobar\n" +
@@ -195,6 +214,7 @@ namespace Gauge.Dotnet.UnitTests
             var mockAttributesLoader = new Mock<IAttributesLoader>();
             mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
             var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+            mockDirectoryWrapper.Setup(x => x.EnumerateFiles(dummyProjectRoot, "*.cs", SearchOption.AllDirectories)).Returns(Enumerable.Empty<string>);
             var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
             const string file1 = @"Foo.cs";
 

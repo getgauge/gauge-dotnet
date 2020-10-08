@@ -32,6 +32,7 @@ namespace Gauge.Dotnet
             _stepRegistry = new StepRegistry();
             _attributesLoader = attributesLoader;
             _directoryWrapper = directoryWrapper;
+            LoadImplementations();
         }
 
         public IStepRegistry GetStepRegistry()
@@ -69,7 +70,7 @@ namespace Gauge.Dotnet
             return isFileRemoved;
         }
 
-        internal void LoadImplementations()
+        public void LoadImplementations()
         {
             if (!string.IsNullOrEmpty(Utils.TryReadEnvValue("GAUGE_CUSTOM_BUILD_PATH")))
             {

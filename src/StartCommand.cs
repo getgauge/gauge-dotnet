@@ -7,34 +7,49 @@
 
 using System;
 using System.Diagnostics;
+using System.Net;
 using System.Reflection;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Exceptions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Hosting;
 
 namespace Gauge.Dotnet
 {
     public class StartCommand : IGaugeCommand
     {
-        private readonly Func<IGaugeListener> _gaugeListener;
-        private readonly Func<IGaugeProjectBuilder> _projectBuilder;
+        private readonly Lazy<IGaugeProjectBuilder> _projectBuilder;
 
-        public StartCommand(Func<IGaugeListener> gaugeListener, Func<IGaugeProjectBuilder> projectBuilder)
+        public StartCommand(Lazy<IGaugeProjectBuilder> projectBuilder)
         {
             Environment.CurrentDirectory = Utils.GaugeProjectRoot;
-            _gaugeListener = gaugeListener;
             _projectBuilder = projectBuilder;
         }
 
         [DebuggerHidden]
         public void Execute()
         {
-            if (!TryBuild() && !this.ShouldContinueBuildFailure())
+            var buildSucceeded = TryBuild();
+            if (!buildSucceeded && !this.ShouldContinueBuildFailure())
             {
                 return;
             }
             try
             {
-                _gaugeListener.Invoke().StartServer(!this.ShouldContinueBuildFailure());
+                var builder = Host.CreateDefaultBuilder()
+                    .ConfigureWebHostDefaults(wb => {
+                        wb.UseShutdownTimeout(TimeSpan.FromMilliseconds(0));
+                        wb.UseStartup<GaugeListener>();
+                        wb.UseSetting("ReflectionScanAssemblies", buildSucceeded.ToString());
+                        wb.ConfigureKestrel(options => 
+                            options.Listen(IPAddress.Parse("127.0.0.1"), 0, lo => lo.Protocols = HttpProtocols.Http2));
+                    });
+
+                using(var host = builder.Build()){
+                    host.Run();
+                    Environment.Exit(0);
+                };
             }
             catch (TargetInvocationException e)
             {
@@ -58,7 +73,7 @@ namespace Gauge.Dotnet
 
             try
             {
-                return _projectBuilder.Invoke().BuildTargetGaugeProject();
+                return _projectBuilder.Value.BuildTargetGaugeProject();
             }
             catch (NotAValidGaugeProjectException)
             {

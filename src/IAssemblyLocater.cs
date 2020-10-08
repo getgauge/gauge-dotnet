@@ -8,6 +8,6 @@ namespace Gauge.Dotnet
 {
     public interface IAssemblyLocater
     {
-        string GetTestAssembly();
+        AssemblyPath GetTestAssembly();
     }
 }
