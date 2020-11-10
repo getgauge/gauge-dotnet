@@ -27,7 +27,7 @@ namespace Gauge.Dotnet
         private readonly IActivatorWrapper _activatorWrapper;
         private readonly IStepRegistry _registry;
 
-        public AssemblyLoader(string assemblyPath, IGaugeLoadContext gaugeLoadContext,
+        public AssemblyLoader(AssemblyPath assemblyPath, IGaugeLoadContext gaugeLoadContext,
             IReflectionWrapper reflectionWrapper, IActivatorWrapper activatorWrapper, IStepRegistry registry)
         {
             _reflectionWrapper = reflectionWrapper;

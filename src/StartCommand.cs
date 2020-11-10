@@ -7,34 +7,51 @@
 
 using System;
 using System.Diagnostics;
+using System.Net;
 using System.Reflection;
+using System.Threading.Tasks;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Exceptions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Hosting;
 
 namespace Gauge.Dotnet
 {
     public class StartCommand : IGaugeCommand
     {
-        private readonly Func<IGaugeListener> _gaugeListener;
-        private readonly Func<IGaugeProjectBuilder> _projectBuilder;
+        private readonly IGaugeProjectBuilder _projectBuilder;
+        private readonly Type _startupType;
 
-        public StartCommand(Func<IGaugeListener> gaugeListener, Func<IGaugeProjectBuilder> projectBuilder)
+        public StartCommand(IGaugeProjectBuilder projectBuilder, Type startupType)
         {
             Environment.CurrentDirectory = Utils.GaugeProjectRoot;
-            _gaugeListener = gaugeListener;
             _projectBuilder = projectBuilder;
+            this._startupType = startupType;
         }
 
         [DebuggerHidden]
-        public void Execute()
+        public async Task<bool> Execute()
         {
-            if (!TryBuild() && !this.ShouldContinueBuildFailure())
+            var buildSucceeded = TryBuild();
+            if (!buildSucceeded && !this.ShouldContinueBuildFailure())
             {
-                return;
+                return false;
             }
             try
             {
-                _gaugeListener.Invoke().StartServer(!this.ShouldContinueBuildFailure());
+                var builder = Host.CreateDefaultBuilder()
+                    .ConfigureWebHostDefaults(wb => {
+                        wb.UseShutdownTimeout(TimeSpan.FromMilliseconds(0));
+                        wb.UseStartup(this._startupType);
+                        wb.UseSetting("ReflectionScanAssemblies", buildSucceeded.ToString());
+                        wb.ConfigureKestrel(options => 
+                            options.Listen(IPAddress.Parse("127.0.0.1"), 0, lo => lo.Protocols = HttpProtocols.Http2));
+                    });
+
+                using(var host = builder.Build()){
+                    await host.RunAsync();
+                };
             }
             catch (TargetInvocationException e)
             {
@@ -42,6 +59,7 @@ namespace Gauge.Dotnet
                     throw;
                 Logger.Fatal(e.InnerException.Message);
             }
+            return true;
         }
 
         private bool ShouldContinueBuildFailure()
@@ -58,7 +76,7 @@ namespace Gauge.Dotnet
 
             try
             {
-                return _projectBuilder.Invoke().BuildTargetGaugeProject();
+                return _projectBuilder.BuildTargetGaugeProject();
             }
             catch (NotAValidGaugeProjectException)
             {

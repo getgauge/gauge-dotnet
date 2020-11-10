@@ -5,10 +5,12 @@
  *----------------------------------------------------------------*/
 
 
+using System.Threading.Tasks;
+
 namespace Gauge.Dotnet
 {
     public interface IGaugeCommand
     {
-        void Execute();
+        Task<bool> Execute();
     }
 }

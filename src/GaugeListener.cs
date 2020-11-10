@@ -9,50 +9,84 @@ using System;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Executor;
 using Gauge.Dotnet.Wrappers;
-using Gauge.Messages;
-using Grpc.Core;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using System.Linq;
+using Gauge.Dotnet.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet
 {
-    public class GaugeListener : IGaugeListener
+    public class GaugeListener
     {
         private readonly string STREAMS_COUNT_ENV = "GAUGE_PARALLEL_STREAMS_COUNT";
         private readonly string ENABLE_MULTITHREADING_ENV = "enable_multithreading";
-
-        private readonly IStaticLoader _staticLoader;
-
-        public GaugeListener(IStaticLoader loader)
+        public GaugeListener(IConfiguration configuration)
         {
-            this._staticLoader = loader;
+            Configuration = configuration;
         }
 
-        public void StartServer(bool scanAssemblies)
+        public IConfiguration Configuration { get; }
+
+        public virtual void ConfigureServices(IServiceCollection services)
         {
-            var server = new Server();
-            var pool = new ExecutorPool(GetNoOfStreams(), IsMultithreading());
-            if (scanAssemblies)
-            {
-                var assemblyPath = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
-                var reflectionWrapper = new ReflectionWrapper();
-                var activatorWrapper = new ActivatorWrapper();
-                Logger.Debug($"Loading assembly from : {assemblyPath}");
+            var assemblyPath = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
+            Logger.Debug($"Loading assembly from : {assemblyPath}");
+            services.AddGrpc();
+            services.AddLogging(logConfig => {
+                if (Utils.TryReadEnvValue("GAUGE_LOG_LEVEL") == "DEBUG")
+                {
+                    logConfig.AddFilter("Microsoft", LogLevel.None);
+                }
+            });
+            services.AddSingleton<IReflectionWrapper, ReflectionWrapper>();
+            services.AddSingleton<IActivatorWrapper, ActivatorWrapper>();
+            services.AddSingleton<ExecutorPool>(new ExecutorPool(GetNoOfStreams(), IsMultithreading()));
+            services.AddSingleton<IGaugeLoadContext>((sp) => {
                 var isDaemon = string.Compare(Environment.GetEnvironmentVariable("IS_DAEMON"), "true", true) == 0;
-                var gaugeLoadContext = isDaemon ? new LockFreeGaugeLoadContext(assemblyPath) : new GaugeLoadContext(assemblyPath);
-                var assemblyLoader = new AssemblyLoader(assemblyPath, gaugeLoadContext, reflectionWrapper, activatorWrapper, _staticLoader.GetStepRegistry());
-                var handler = new RunnerServiceHandler(activatorWrapper, reflectionWrapper, assemblyLoader, _staticLoader, server, pool);
-                server.Services.Add(Runner.BindService(handler));
+                return isDaemon ? new LockFreeGaugeLoadContext(assemblyPath) : new GaugeLoadContext(assemblyPath);
+            });
+            services.AddSingleton<AssemblyPath>(s => assemblyPath);
+            services.AddSingleton<IAssemblyLoader, AssemblyLoader>();
+            services.AddSingleton<IDirectoryWrapper, DirectoryWrapper>();
+            services.AddSingleton<IStaticLoader, StaticLoader>();
+            services.AddSingleton<IAttributesLoader, AttributesLoader>();
+            services.AddSingleton<IStepRegistry>(s => s.GetRequiredService<IStaticLoader>().GetStepRegistry());
+
+            if(Configuration.GetValue<string>("ReflectionScanAssemblies") == "True")
+            {
+                Logger.Debug("Using ExecutableRunnerServiceHandler");
+                services.AddSingleton<Gauge.Messages.Runner.RunnerBase, ExecutableRunnerServiceHandler>();
             }
             else
             {
-                var handler = new RunnerServiceHandler(_staticLoader, server, pool);
-                server.Services.Add(Runner.BindService(handler));
+                Logger.Debug("Using AuthoringRunnerServiceHandler");
+                services.AddSingleton<Gauge.Messages.Runner.RunnerBase, AuthoringRunnerServiceHandler>();
             }
-            var port = server.Ports.Add(new ServerPort("127.0.0.1", 0, ServerCredentials.Insecure));
-            server.Start();
-            Console.WriteLine("Listening on port:" + port);
-            server.ShutdownTask.Wait();
-            Environment.Exit(Environment.ExitCode);
         }
+
+        public virtual void Configure(IApplicationBuilder app, IHostApplicationLifetime lifetime)
+        {
+            app.UseRouting();
+            lifetime.ApplicationStarted.Register(() => {
+                var ports = app.ServerFeatures
+                    .Get<IServerAddressesFeature>().Addresses
+                    .Select(x => new Uri(x).Port).Distinct();
+                foreach(var port in ports)
+                {
+                    Console.WriteLine($"Listening on port:{port}");
+                }        
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGrpcService<Gauge.Messages.Runner.RunnerBase>();
+            });
+        }
+
         private int GetNoOfStreams()
         {
             int numberOfStreams = 1;
@@ -75,7 +109,7 @@ namespace Gauge.Dotnet
 
         private bool IsMultithreading()
         {
-            var multithreaded = Environment.GetEnvironmentVariable("enable_multithreading");
+            var multithreaded = Environment.GetEnvironmentVariable(ENABLE_MULTITHREADING_ENV);
             if (String.IsNullOrEmpty(multithreaded))
                 return false;
             return Boolean.Parse(multithreaded);

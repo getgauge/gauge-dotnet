@@ -15,5 +15,7 @@ namespace Gauge.Dotnet
         void ReloadSteps(string content, string file);
         void RemoveSteps(string file);
         void LoadStepsFromText(string content, string file);
+
+        void LoadImplementations();
     }
 }

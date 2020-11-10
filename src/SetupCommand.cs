@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Extensions;
 
@@ -14,7 +15,7 @@ namespace Gauge.Dotnet
 {
     public class SetupCommand : IGaugeCommand
     {
-        void IGaugeCommand.Execute()
+        Task<bool> IGaugeCommand.Execute()
         {
             var gaugeProjectRoot = Utils.GaugeProjectRoot;
             var projName = new DirectoryInfo(gaugeProjectRoot).Name.ToValidCSharpIdentifier();
@@ -95,6 +96,7 @@ namespace {projName}
 
             Logger.Info($"create  {Path.Combine("env", "default", "dotnet.properties")}");
             File.WriteAllText(Path.Combine(envPath, "dotnet.properties"), properties);
+            return Task.FromResult<bool>(true);
         }
 
         private static string GenerateDefaultProperties(string projName)

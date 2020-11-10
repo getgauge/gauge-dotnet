@@ -18,18 +18,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
     [TestFixture]
     public class CacheFileProcessorTests
     {
-        [Test]
-        public void ShouldProcessMessage()
-        {
-            var mockAttributesLoader = new Mock<IAttributesLoader>();
-            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
-            var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
-
-            var processor = new CacheFileProcessor(loader);
-            var request = new CacheFileRequest
-            {
-                Content = "using Gauge.CSharp.Lib.Attributes;\n" +
+        private const string content = "using Gauge.CSharp.Lib.Attributes;\n" +
                               "namespace foobar\n" +
                               "{\n" +
                               "    public class FooBar\n" +
@@ -39,48 +28,46 @@ namespace Gauge.Dotnet.UnitTests.Processors
                               "        {\n" +
                               "        }\n" +
                               "    }\n" +
-                              "}\n",
-                FilePath = "Foo.cs",
+                              "}\n";
+        private const string fileName = "foo.cs";
+
+        [Test]
+        public void ShouldProcessMessage()
+        {
+            var mockLoader = new Mock<IStaticLoader>();
+            mockLoader.Setup(x => x.LoadImplementations());
+            mockLoader.Setup(x => x.ReloadSteps(content, fileName)).Verifiable();
+            var processor = new CacheFileProcessor(mockLoader.Object);
+            var request = new CacheFileRequest
+            {
+                Content = content,
+                FilePath = fileName,
                 Status = CacheFileRequest.Types.FileStatus.Opened
             };
 
             processor.Process(request);
 
-            Assert.True(loader.GetStepRegistry().ContainsStep("goodbye"));
+            mockLoader.Verify();
+            mockLoader.VerifyNoOtherCalls();
         }
 
         [Test]
         public void ShouldProcessRequestWithDeleteStatus()
         {
-            var mockAttributesLoader = new Mock<IAttributesLoader>();
-            mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
-            var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
-            var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object);
-            const string content = "using Gauge.CSharp.Lib.Attributes;\n" +
-                                   "namespace foobar\n" +
-                                   "{\n" +
-                                   "    public class FooBar\n" +
-                                   "    {\n" +
-                                   "        [Step(\"goodbye\",\"adieu\", \"sayonara\")]\n" +
-                                   "        public void farewell()\n" +
-                                   "        {\n" +
-                                   "        }\n" +
-                                   "    }\n" +
-                                   "}\n";
-            loader.LoadStepsFromText(content, "Foo.cs");
-
-            var processor = new CacheFileProcessor(loader);
+            var mockLoader = new Mock<IStaticLoader>();
+            mockLoader.Setup(x => x.LoadImplementations());
+            mockLoader.Setup(x => x.RemoveSteps(fileName)).Verifiable();
+            var processor = new CacheFileProcessor(mockLoader.Object);
             var request = new CacheFileRequest
             {
-                FilePath = "Foo.cs",
+                FilePath = fileName,
                 Status = CacheFileRequest.Types.FileStatus.Deleted
             };
 
-            Assert.True(loader.GetStepRegistry().ContainsStep("goodbye"));
-
             processor.Process(request);
 
-            Assert.False(loader.GetStepRegistry().ContainsStep("goodbye"));
+            mockLoader.Verify();
+            mockLoader.VerifyNoOtherCalls();
         }
     }
 }

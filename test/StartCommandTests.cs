@@ -8,6 +8,10 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using NUnit.Framework;
 
@@ -16,13 +20,22 @@ namespace Gauge.Dotnet.UnitTests
     [TestFixture]
     internal class StartCommandTests
     {
+        class FakeGaugeListener : GaugeListener
+        {
+            public FakeGaugeListener(IConfiguration configuration) : base(configuration)
+            {
+            }
+
+            public override void ConfigureServices(IServiceCollection services) {}
+            public override void Configure(IApplicationBuilder app, IHostApplicationLifetime lifetime) {}
+        }
+
         [SetUp]
         public void Setup()
         {
-            _mockGaugeListener = new Mock<IGaugeListener>();
             _mockGaugeProjectBuilder = new Mock<IGaugeProjectBuilder>();
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TempPath);
-            _startCommand = new StartCommand(() => _mockGaugeListener.Object, () => _mockGaugeProjectBuilder.Object);
+            _startCommand = new StartCommand(_mockGaugeProjectBuilder.Object, typeof(FakeGaugeListener));
         }
 
         [TearDown]
@@ -34,35 +47,33 @@ namespace Gauge.Dotnet.UnitTests
 
         private readonly string TempPath = Path.GetTempPath();
 
-        private Mock<IGaugeListener> _mockGaugeListener;
         private Mock<IGaugeProjectBuilder> _mockGaugeProjectBuilder;
         private StartCommand _startCommand;
 
         [Test]
         public void ShouldInvokeProjectBuild()
         {
-            _startCommand.Execute();
-
-            _mockGaugeProjectBuilder.Verify(builder => builder.BuildTargetGaugeProject(), Times.Once);
+            _startCommand.Execute().ContinueWith(b => {
+                _mockGaugeProjectBuilder.Verify(builder => builder.BuildTargetGaugeProject(), Times.Once);
+            });
         }
 
         [Test]
-        public void ShouldNotBuildWhenCustomBuildPathIsSet()
+        public void ShouldNotBuildWhenCustomBuildPathIsSetAsync()
         {
             Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", "GAUGE_CUSTOM_BUILD_PATH");
-            _startCommand.Execute();
+            _startCommand.Execute().ContinueWith(b => {
+                _mockGaugeProjectBuilder.Verify(builder => builder.BuildTargetGaugeProject(), Times.Never);
+            });
 
-            _mockGaugeProjectBuilder.Verify(builder => builder.BuildTargetGaugeProject(), Times.Never);
         }
 
         [Test]
         public void ShouldNotPollForMessagesWhenBuildFails()
         {
             _mockGaugeProjectBuilder.Setup(builder => builder.BuildTargetGaugeProject()).Returns(false);
-
-            _startCommand.Execute();
-
-            _mockGaugeListener.Verify(listener => listener.StartServer(true), Times.Never);
+            _startCommand.Execute()
+                .ContinueWith(b => Assert.False(b.Result, "Should not start server when build fails"));
         }
 
         [Test]
@@ -70,18 +81,17 @@ namespace Gauge.Dotnet.UnitTests
         {
             _mockGaugeProjectBuilder.Setup(builder => builder.BuildTargetGaugeProject()).Returns(true);
 
-            _startCommand.Execute();
-
-            _mockGaugeListener.Verify(listener => listener.StartServer(true), Times.Once);
+            _startCommand.Execute()
+                .ContinueWith(b => Assert.True(b.Result, "Should start server using GaugeListener when build passes"));
         }
 
         [Test]
         public void ShouldPollForMessagesWhenCustomBuildPathIsSet()
         {
             Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", "GAUGE_CUSTOM_BUILD_PATH");
-            _startCommand.Execute();
 
-            _mockGaugeListener.Verify(listener => listener.StartServer(true), Times.Once);
+            _startCommand.Execute()
+                .ContinueWith(b => Assert.True(b.Result, "Should start server using GaugeListener when GAUGE_CUSTOM_BUILD_PATH is set"));
         }
 
         [Test]
