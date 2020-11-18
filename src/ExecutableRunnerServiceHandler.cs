@@ -115,7 +115,6 @@ namespace Gauge.Dotnet
 
         private void InitializeExecutionMessageHandlers()
         {
-            Console.WriteLine("InitializeExecutionMessageHandlers");
             var tableFormatter = new TableFormatter(this._assemblyLoader, this._activatorWrapper);
             var classInstanceManager = new ThreadLocal<object>(() =>
             {
