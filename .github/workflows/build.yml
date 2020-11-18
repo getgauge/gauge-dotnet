@@ -65,7 +65,7 @@ jobs:
           cd gauge
           go run build/make.go --verbose
           go run build/make.go --install --prefix=/tmp/
-          echo "::add-path::/tmp/bin"
+          echo "/tmp/bin" >> $GITHUB_PATH
 
       - name: Install gauge on windows
         if: matrix.os == 'windows-latest'
@@ -74,7 +74,8 @@ jobs:
           cd gauge
           go run build/make.go --verbose
           go run build/make.go --install
-          echo "::add-path::C:\Program Files\gauge\bin"
+          echo "C:\\Program Files\\gauge\\bin" >> $GITHUB_PATH
+        shell: bash
 
       - name: Install html report
         run: |
@@ -139,7 +140,7 @@ jobs:
           cd gauge
           go run build/make.go --verbose
           go run build/make.go --install --prefix=/tmp/
-          echo "::add-path::/tmp/bin"
+          echo "/tmp/bin" >> $GITHUB_PATH
 
       - name: Install gauge on windows
         if: matrix.os == 'windows-latest'
@@ -148,7 +149,8 @@ jobs:
           cd gauge
           go run build/make.go --verbose
           go run build/make.go --install
-          echo "::add-path::C:\Program Files\gauge\bin"
+          echo "C:\\Program Files\\gauge\\bin" >> $GITHUB_PATH
+        shell: bash
 
       - name: Install Gauge Dotnet plugin from source on windows
         if: matrix.os == 'windows-latest'
