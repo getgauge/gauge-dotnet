@@ -6,5 +6,5 @@ IntegrationTestSample/logs
 deploy
 artifacts
 .ionide
-
+.DS_Store
 .fake
