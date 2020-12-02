@@ -37,7 +37,7 @@ namespace Gauge.Dotnet
             Logger.Debug($"Loading assembly from : {assemblyPath}");
             services.AddGrpc();
             services.AddLogging(logConfig => {
-                if (Utils.TryReadEnvValue("GAUGE_LOG_LEVEL") == "DEBUG")
+                if (Utils.TryReadEnvValue("GAUGE_LOG_LEVEL") != "DEBUG")
                 {
                     logConfig.AddFilter("Microsoft", LogLevel.None);
                 }
