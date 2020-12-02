@@ -28,14 +28,17 @@ jobs:
       - name: Build artifacts
         run: |
           ./run.sh package
-
-      - name: update
+      - name: Set Version env
         run: |
           cd artifacts
           if [ -z "$version" ]; then
             version=$(ls gauge-dotnet* | sed "s/\.[^\.]*$//" | sed "s/gauge-dotnet-//");
           fi
-          echo "::set-env name=VERSION::$version"
+          echo "VERSION=$version" >> $GITHUB_ENV
+      - name: update
+        run: |
+          cd artifacts
+          echo "::set-env name=::"
           artifacts=()
           dir=`pwd`
           for i in `ls`; do

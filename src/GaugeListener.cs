@@ -36,16 +36,20 @@ namespace Gauge.Dotnet
             var assemblyPath = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             Logger.Debug($"Loading assembly from : {assemblyPath}");
             services.AddGrpc();
-            services.AddLogging(logConfig => {
-                if (Utils.TryReadEnvValue("GAUGE_LOG_LEVEL") == "DEBUG")
+            services.AddLogging(logConfig =>
+            {
+                logConfig.SetMinimumLevel(LogLevel.Error);
+                var logLevel = Utils.TryReadEnvValue("GAUGE_LOG_LEVEL");
+                if (logLevel != null && logLevel.ToUpper() == "DEBUG")
                 {
-                    logConfig.AddFilter("Microsoft", LogLevel.None);
+                    logConfig.SetMinimumLevel(LogLevel.Debug);
                 }
             });
             services.AddSingleton<IReflectionWrapper, ReflectionWrapper>();
             services.AddSingleton<IActivatorWrapper, ActivatorWrapper>();
             services.AddSingleton<ExecutorPool>(new ExecutorPool(GetNoOfStreams(), IsMultithreading()));
-            services.AddSingleton<IGaugeLoadContext>((sp) => {
+            services.AddSingleton<IGaugeLoadContext>((sp) =>
+            {
                 var isDaemon = string.Compare(Environment.GetEnvironmentVariable("IS_DAEMON"), "true", true) == 0;
                 return isDaemon ? new LockFreeGaugeLoadContext(assemblyPath) : new GaugeLoadContext(assemblyPath);
             });
@@ -56,7 +60,7 @@ namespace Gauge.Dotnet
             services.AddSingleton<IAttributesLoader, AttributesLoader>();
             services.AddSingleton<IStepRegistry>(s => s.GetRequiredService<IStaticLoader>().GetStepRegistry());
 
-            if(Configuration.GetValue<string>("ReflectionScanAssemblies") == "True")
+            if (Configuration.GetValue<string>("ReflectionScanAssemblies") == "True")
             {
                 Logger.Debug("Using ExecutableRunnerServiceHandler");
                 services.AddSingleton<Gauge.Messages.Runner.RunnerBase, ExecutableRunnerServiceHandler>();
@@ -71,14 +75,15 @@ namespace Gauge.Dotnet
         public virtual void Configure(IApplicationBuilder app, IHostApplicationLifetime lifetime)
         {
             app.UseRouting();
-            lifetime.ApplicationStarted.Register(() => {
+            lifetime.ApplicationStarted.Register(() =>
+            {
                 var ports = app.ServerFeatures
                     .Get<IServerAddressesFeature>().Addresses
                     .Select(x => new Uri(x).Port).Distinct();
-                foreach(var port in ports)
+                foreach (var port in ports)
                 {
                     Console.WriteLine($"Listening on port:{port}");
-                }        
+                }
             });
 
             app.UseEndpoints(endpoints =>
