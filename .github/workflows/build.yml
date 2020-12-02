@@ -58,24 +58,9 @@ jobs:
         with:
           java-version: 12.x.x     
 
-      - name: Install gauge on linux
-        if: matrix.os != 'windows-latest'
-        run: |
-          git clone https://github.com/getgauge/gauge
-          cd gauge
-          go run build/make.go --verbose
-          go run build/make.go --install --prefix=/tmp/
-          echo "/tmp/bin" >> $GITHUB_PATH
-
-      - name: Install gauge on windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          git clone https://github.com/getgauge/gauge
-          cd gauge
-          go run build/make.go --verbose
-          go run build/make.go --install
-          echo "C:\\Program Files\\gauge\\bin" >> $GITHUB_PATH
-        shell: bash
+      - uses: getgauge/setup-gauge@master
+        with:
+          gauge-version: master
 
       - name: Install html report
         run: |
@@ -133,24 +118,9 @@ jobs:
         with:
           go-version: 1.13.1
 
-      - name: Install gauge on linux
-        if: matrix.os != 'windows-latest'
-        run: |
-          git clone https://github.com/getgauge/gauge
-          cd gauge
-          go run build/make.go --verbose
-          go run build/make.go --install --prefix=/tmp/
-          echo "/tmp/bin" >> $GITHUB_PATH
-
-      - name: Install gauge on windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          git clone https://github.com/getgauge/gauge
-          cd gauge
-          go run build/make.go --verbose
-          go run build/make.go --install
-          echo "C:\\Program Files\\gauge\\bin" >> $GITHUB_PATH
-        shell: bash
+      - uses: getgauge/setup-gauge@master
+        with:
+          gauge-version: master
 
       - name: Install Gauge Dotnet plugin from source on windows
         if: matrix.os == 'windows-latest'
