@@ -29,10 +29,10 @@ function package() {
     checkCommand "dotnet"
     checkCommand "zip"
     rm -rf deploy artifacts
-    if [[ "$(dotnet --version)" == *"3"* ]]; then
-        dotnet publish -c release -o ./deploy/bin src/Gauge.Dotnet.csproj
-    else
+    if [[ "$(dotnet --version)" == *"2"* ]]; then
         dotnet publish -c release -o ../deploy/bin src/Gauge.Dotnet.csproj
+    else
+        dotnet publish -c release -o ./deploy/bin src/Gauge.Dotnet.csproj
     fi
     cp src/launcher.sh deploy
     cp src/launcher.cmd deploy
