@@ -35,7 +35,6 @@ jobs:
       - name: update
         run: |
           cd artifacts
-          echo "::set-env name=::"
           artifacts=()
           dir=`pwd`
           for i in `ls`; do
