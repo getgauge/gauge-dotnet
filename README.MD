@@ -3,7 +3,7 @@
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 
-This project adds dotnet-core [language plugin](https://docs.gauge.org/latest/installation.html#language-runner) for [gauge](http://gauge.org).
+This project adds dotnet-core [language plugin](https://gauge.org/plugins/) for [gauge](https://gauge.org).
 
 The plugin is authored in [c#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)).
 
@@ -52,7 +52,7 @@ gauge install dotnet --file gauge-dotnet-0.0.1.zip
 
 ##### Requirements
 * [Dotnet Core](https://docs.microsoft.com/en-us/dotnet/core/index)
-* [Gauge](http://getgauge.io)
+* [Gauge](https://gauge.org/)
 * [JQ](https://stedolan.github.io/jq/) (for unix)
 
 
