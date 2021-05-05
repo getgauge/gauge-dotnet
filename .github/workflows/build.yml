@@ -10,19 +10,18 @@ on:
 
 jobs:
   build:
-    name: Dotnet build ${{ matrix.dotnet }}
+    name: Dotnet build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        dotnet: [5.0.x, 3.1.x]
 
     steps:
     - uses: actions/checkout@v1
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{ matrix.dotnet }}
+        dotnet-version: 5.0.x
 
     - name: Dotnet unit test on windows
       if: matrix.os == 'windows-latest'
