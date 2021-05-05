@@ -10,9 +10,8 @@ on:
 
 jobs:
   build:
-    name: Dotnet build
-
-    runs-on: ${{ matrix.os }} dotnet ${{ matrix.dotnet }}
+    name: Dotnet build ${{ matrix.dotnet }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
