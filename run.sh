@@ -29,7 +29,7 @@ function package() {
     checkCommand "dotnet"
     checkCommand "zip"
     rm -rf deploy artifacts
-    dotnet publish -c release -o ./deploy/bin/netcoreapp3.0 src/Gauge.Dotnet.csproj -f netcoreapp3.0
+    dotnet publish -c release -o ./deploy/bin/netcoreapp3.1 src/Gauge.Dotnet.csproj -f netcoreapp3.1
     dotnet publish -c release -o ./deploy/bin/net6.0 src/Gauge.Dotnet.csproj -f net6.0
     cp src/launcher.sh deploy
     cp src/launcher.cmd deploy

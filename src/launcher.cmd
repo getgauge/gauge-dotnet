@@ -8,5 +8,5 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 goto :eof
 
 :net3
-    dotnet bin\netcoreapp3.0\Gauge.Dotnet.dll %*
+    dotnet bin\netcoreapp3.1\Gauge.Dotnet.dll %*
     if %errorlevel% neq 0 exit /b %errorlevel%
