@@ -113,14 +113,17 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: Setup go 1.13.1
-        uses: actions/setup-go@v1
+      - name: Setup go
+        uses: actions/setup-go@v2
         with:
-          go-version: 1.13.1
+          go-version: '^1.17.6' # The Go version to download (if necessary) and use.
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
 
-      - uses: getgauge/setup-gauge@master
-        with:
-          gauge-version: master
+      - name: Setup Gauge
+        run: go install github.com/getgauge/gauge@master
 
       - name: Install Gauge Dotnet plugin from source on windows
         if: matrix.os == 'windows-latest'
