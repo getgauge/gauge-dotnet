@@ -123,7 +123,7 @@ jobs:
           dotnet-version: 6.0.x
 
       - name: Setup Gauge
-        run: go install github.com/getgauge/gauge@1.4.3
+        run: go install github.com/getgauge/gauge@v1.4.3
 
       - name: Install Gauge Dotnet plugin from source on windows
         if: matrix.os == 'windows-latest'
