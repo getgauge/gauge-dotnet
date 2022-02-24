@@ -108,6 +108,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
+        versions: [head, latest]
 
     steps:
       - uses: actions/checkout@v1
@@ -126,14 +127,19 @@ jobs:
         run: go install github.com/getgauge/gauge@v1.4.3
 
       - name: Install Gauge Dotnet plugin from source on windows
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-latest' && matrix.version == 'head'
         run: |
           ./run.cmd install
 
       - name: Install Gauge Dotnet plugin from source on linux
-        if: matrix.os != 'windows-latest'
+        if: matrix.os != 'windows-latest' && matrix.version == 'head'
         run: |
           ./run.sh install
+
+      - name: Install latest released Gauge Dotnet plugin
+        if: matrix.version == 'latest'
+        run: |
+          gauge install dotnet
 
       - name: Use Node.js
         uses: actions/setup-node@v2
