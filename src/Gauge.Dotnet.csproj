@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.0;net5.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
     <PackageId>Runner.NetCore30</PackageId>
     <Authors>The Gauge Team</Authors>
-    <Version>0.4.1</Version>
+    <Version>0.5.0</Version>
     <Company>ThoughtWorks Inc.</Company>
     <Product>Gauge</Product>
     <Description>C# runner for Gauge. https://gauge.org</Description>

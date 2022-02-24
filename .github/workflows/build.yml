@@ -23,7 +23,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 6.0.x
 
     - name: Dotnet unit test on windows
       if: matrix.os == 'windows-latest'
@@ -45,20 +45,19 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        dotnet: [5.0.x, 3.1.x]
+        dotnet: [6.0.x, 3.1.x]
 
     steps:
       - uses: actions/checkout@v1
 
-      - name: Setup go 1.13.1
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.13.1
+      - name: Setup go
+        uses: actions/setup-go@v2
 
-      - name: Setup java 12.x.x
-        uses: actions/setup-java@v1
+      - name: Setup java 17
+        uses: actions/setup-java@v2
         with:
-          java-version: 12.x.x     
+          distribution: 'temurin'
+          java-version: 17
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
@@ -117,6 +116,7 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '^1.17.6' # The Go version to download (if necessary) and use.
+
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
@@ -136,7 +136,7 @@ jobs:
           ./run.sh install
 
       - name: Use Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
 
       - name: Prep LSP tests
         run: |
