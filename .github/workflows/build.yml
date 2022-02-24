@@ -102,7 +102,7 @@ jobs:
           path: gauge-tests/testLogs
 
   LSP-tests:
-    name: Dotnet LSP tests ${{ matrix.os }}
+    name: Dotnet LSP tests ${{ matrix.os }} - ${{ matrix.version }}
     runs-on: ${{ matrix.os }}
     needs: build
     strategy:
@@ -135,11 +135,6 @@ jobs:
         if: matrix.os != 'windows-latest' && matrix.version == 'head'
         run: |
           ./run.sh install
-
-      - name: Install latest released Gauge Dotnet plugin
-        if: matrix.version == 'latest'
-        run: |
-          gauge install dotnet
 
       - name: Use Node.js
         uses: actions/setup-node@v2
