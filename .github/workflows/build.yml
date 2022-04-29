@@ -11,100 +11,100 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
 jobs:
-  build:
-    name: Dotnet build
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
+  # build:
+  #   name: Dotnet build
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, windows-latest]
 
-    steps:
-    - uses: actions/checkout@v1
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 6.0.x
+  #   steps:
+  #   - uses: actions/checkout@v1
+  #   - name: Setup .NET Core
+  #     uses: actions/setup-dotnet@v1
+  #     with:
+  #       dotnet-version: 6.0.x
 
-    - name: Dotnet unit test on windows
-      if: matrix.os == 'windows-latest'
-      run: |
-        ./run.cmd build
-        ./run.cmd test
+  #   - name: Dotnet unit test on windows
+  #     if: matrix.os == 'windows-latest'
+  #     run: |
+  #       ./run.cmd build
+  #       ./run.cmd test
 
-    - name: Dotnet unit test on ubuntu
-      if: matrix.os != 'windows-latest'
-      run: |
-        ./run.sh build
-        ./run.sh test
+  #   - name: Dotnet unit test on ubuntu
+  #     if: matrix.os != 'windows-latest'
+  #     run: |
+  #       ./run.sh build
+  #       ./run.sh test
 
-  Functional-tests:
+  # Functional-tests:
 
-    name: Dotnet FTs on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    needs: build
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        dotnet: [6.0.x, 3.1.x]
+  #   name: Dotnet FTs on ${{ matrix.os }}
+  #   runs-on: ${{ matrix.os }}
+  #   needs: build
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, windows-latest]
+  #       dotnet: [6.0.x, 3.1.x]
 
-    steps:
-      - uses: actions/checkout@v1
+  #   steps:
+  #     - uses: actions/checkout@v1
 
-      - name: Setup go
-        uses: actions/setup-go@v2
+  #     - name: Setup go
+  #       uses: actions/setup-go@v2
 
-      - name: Setup java 17
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'temurin'
-          java-version: 17
+  #     - name: Setup java 17
+  #       uses: actions/setup-java@v2
+  #       with:
+  #         distribution: 'temurin'
+  #         java-version: 17
 
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ matrix.dotnet }}
+  #     - name: Setup .NET Core
+  #       uses: actions/setup-dotnet@v1
+  #       with:
+  #         dotnet-version: ${{ matrix.dotnet }}
 
-      - uses: getgauge/setup-gauge@master
-        with:
-          gauge-version: master
+  #     - uses: getgauge/setup-gauge@master
+  #       with:
+  #         gauge-version: master
 
-      - name: Install Gauge Dotnet plugin from source on windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          ./run.cmd install
+  #     - name: Install Gauge Dotnet plugin from source on windows
+  #       if: matrix.os == 'windows-latest'
+  #       run: |
+  #         ./run.cmd install
 
-      - name: Install Gauge Dotnet plugin from source on linux
-        if: matrix.os != 'windows-latest'
-        run: |
-          ./run.sh install
+  #     - name: Install Gauge Dotnet plugin from source on linux
+  #       if: matrix.os != 'windows-latest'
+  #       run: |
+  #         ./run.sh install
 
-      - name: Clone gauge-tests
-        run: |
-          git clone --depth=1 https://github.com/getgauge/gauge-tests
+  #     - name: Clone gauge-tests
+  #       run: |
+  #         git clone --depth=1 https://github.com/getgauge/gauge-tests
 
-      - name: Run FTs on linux
-        if: matrix.os != 'windows-latest'
-        run: |
-          cd gauge-tests
-          ./gradlew clean dotnetFT
+  #     - name: Run FTs on linux
+  #       if: matrix.os != 'windows-latest'
+  #       run: |
+  #         cd gauge-tests
+  #         ./gradlew clean dotnetFT
 
-      - name: Run FTs on windows
-        if: matrix.os == 'windows-latest'
-        shell: pwsh
-        run: |
-          cd gauge-tests
-          .\gradlew.bat clean dotnetFT
+  #     - name: Run FTs on windows
+  #       if: matrix.os == 'windows-latest'
+  #       shell: pwsh
+  #       run: |
+  #         cd gauge-tests
+  #         .\gradlew.bat clean dotnetFT
 
-      - uses: actions/upload-artifact@v1
-        if: failure()
-        with:
-          name: ft-logs-${{ matrix.os }}
-          path: gauge-tests/testLogs
+  #     - uses: actions/upload-artifact@v1
+  #       if: failure()
+  #       with:
+  #         name: ft-logs-${{ matrix.os }}
+  #         path: gauge-tests/testLogs
 
   LSP-tests:
     name: Dotnet LSP tests ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    needs: build
+    # needs: build
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
