@@ -108,13 +108,11 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        gauge_version: [latest, head]
 
     steps:
       - uses: actions/checkout@v1
 
       - name: Setup go
-        if: matrix.gauge_version == 'head'
         uses: actions/setup-go@v2
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
@@ -122,13 +120,8 @@ jobs:
           dotnet-version: 6.0.x
 
       - uses: getgauge/setup-gauge@master
-        if: matrix.gauge_version == 'head'
         with:
           gauge-version: master
-
-      - name: Install Latest Gauge
-        if: matrix.gauge_version == 'latest'
-        run: curl -SsL https://downloads.gauge.org/stable | sh
 
       - name: Install Gauge Dotnet plugin from source on windows
         if: matrix.os == 'windows-latest'
