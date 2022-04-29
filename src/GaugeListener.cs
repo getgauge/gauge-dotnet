@@ -36,6 +36,7 @@ namespace Gauge.Dotnet
             var assemblyPath = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
             Logger.Debug($"Loading assembly from : {assemblyPath}");
             services.AddGrpc();
+            services.Configure<HostOptions>(opts => opts.ShutdownTimeout = TimeSpan.FromSeconds(5));
             services.AddLogging(logConfig =>
             {
                 logConfig.SetMinimumLevel(LogLevel.Error);
