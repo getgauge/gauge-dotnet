@@ -111,14 +111,12 @@ namespace Gauge.Dotnet
             try
             {
                 Logger.Debug("KillProcessrequest received");
-                return Task.Run<Empty>(() => {
-                    lifetime.StopApplication();
-                    return new Empty();
-                });
+                return Task.FromResult(new Empty());
             }
             finally
             {
                 _pool.Dispose();
+                lifetime.StopApplication();
             }
         }
     }
