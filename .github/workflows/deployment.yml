@@ -47,20 +47,20 @@ jobs:
           echo "Updating release v$version"
           echo "---------------------------"
 
-          echo -e "Gauge Dotnet v$version\n\n" > desc.txt
+          echo -e "Gauge Dotnet v$VERSION\n\n" > desc.txt
 
           release_description=$(ruby -e "$(curl -sSfL https://github.com/getgauge/gauge/raw/master/build/create_release_text.rb)" getgauge gauge-dotnet)
 
           echo "$release_description" >> desc.txt
 
-          echo "Creating new release for v$version"
-          hub release create -F ./desc.txt "v$version"
+          echo "Creating new release for v$VERSION"
+          hub release create -F ./desc.txt "v$VERSION"
 
           rm -rf desc.txt
 
           echo "Start uploading assets..."
           for i in `ls $artifacts`; do
-              hub release edit -m "" -a $i "v$version"
+              hub release edit -m "" -a $i "v$VERSION"
               if [ $? -ne 0 ];then
                   exit 1
               fi
