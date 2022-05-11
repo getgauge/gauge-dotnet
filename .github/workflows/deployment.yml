@@ -44,7 +44,7 @@ jobs:
           cd ..
 
           echo "---------------------------"
-          echo "Updating release v$version"
+          echo "Updating release v$VERSION"
           echo "---------------------------"
 
           echo -e "Gauge Dotnet v$VERSION\n\n" > desc.txt
@@ -57,6 +57,7 @@ jobs:
           hub release create -F ./desc.txt "v$VERSION"
 
           rm -rf desc.txt
+          sleep 10
 
           echo "Start uploading assets..."
           for i in `ls $artifacts`; do
