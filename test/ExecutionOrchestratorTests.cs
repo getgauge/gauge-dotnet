@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using Castle.Core.Internal;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
@@ -116,7 +115,7 @@ namespace Gauge.Dotnet.UnitTests
 
             mockHookExecuter.VerifyAll();
             Assert.True(result.Failed);
-            Assert.True(result.FailureScreenshotFile.IsNullOrEmpty());
+            Assert.True(string.IsNullOrEmpty(result.FailureScreenshotFile));
             Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", screenshotEnabled);
         }
 
@@ -195,7 +194,7 @@ namespace Gauge.Dotnet.UnitTests
             var result = orchestrator.ExecuteStep(gaugeMethod, "Bar", "string");
 
             mockStepExecutor.VerifyAll();
-            Assert.True(result.FailureScreenshotFile.IsNullOrEmpty());
+            Assert.True(string.IsNullOrEmpty(result.FailureScreenshotFile));
             Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", screenshotEnabled);
         }
 

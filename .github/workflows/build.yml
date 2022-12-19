@@ -23,7 +23,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 7.0.x
 
     - name: Dotnet unit test on windows
       if: matrix.os == 'windows-latest'
@@ -45,7 +45,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        dotnet: [6.0.x, 3.1.x]
+        dotnet: [7.0.x, 6.0.x]
 
     steps:
       - uses: actions/checkout@v1
@@ -117,7 +117,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 7.0.x
 
       - uses: getgauge/setup-gauge@master
         with:
