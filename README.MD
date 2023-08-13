@@ -1,19 +1,18 @@
 # Gauge-dotnet
+
 [![tests](https://github.com/getgauge/gauge-dotnet/workflows/tests/badge.svg)](https://github.com/getgauge/gauge-dotnet/actions?query=workflow%3Atests)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
+This project adds a .NET [language plugin](https://gauge.org/plugins/) for [Gauge](https://gauge.org).
 
-This project adds dotnet-core [language plugin](https://gauge.org/plugins/) for [gauge](https://gauge.org).
-
-The plugin is authored in [c#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)).
+The plugin is authored in [C#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)).
 
 ## Getting started
 
-### Pre-requisite
+### Pre-requisites
 
-- [Gauge](https://gauge.org)
-- [Dotnet Core](https://docs.microsoft.com/en-us/dotnet/core/index)
-
+- [Gauge](https://gauge.org/)
+- [.NET](https://learn.microsoft.com/en-us/dotnet/fundamentals/)
 
 ### Installation
 
@@ -21,7 +20,7 @@ The plugin is authored in [c#](https://en.wikipedia.org/wiki/C_Sharp_(programmin
 gauge install dotnet
 ```
 
-### Create a gauge-dotnet project
+### Create a Gauge .NET project
 
 ```
 gauge init dotnet
@@ -36,35 +35,36 @@ gauge run specs
 ### Alternate Installation options
 
 #### Install specific version
-* Installing specific version
+
 ```
-gauge install dotnet --version 0.5.0
+gauge install dotnet --version 0.5.2
 ```
 
 #### Offline installation
 
-* Download the plugin from [Releases](https://github.com/getgauge/gauge-dotnet/releases)
+Download the plugin from [Releases](https://github.com/getgauge/gauge-dotnet/releases)
+
 ```
-gauge install dotnet --file gauge-dotnet-0.5.0.zip
+gauge install dotnet --file gauge-dotnet-0.5.2.zip
 ```
 
 #### Build from Source
 
 ##### Requirements
-* [Dotnet Core](https://docs.microsoft.com/en-us/dotnet/core/index)
+* [.NET](https://learn.microsoft.com/en-us/dotnet/fundamentals/)
 * [Gauge](https://gauge.org/)
 * [JQ](https://stedolan.github.io/jq/) (for unix)
-
 
 Running `run.sh` or `run.cmd` should give the list of all tasks available. Below sections detail some commonly used tasks.
 
 ##### Compiling
 
-To build the project dlls:
+To build the project DLLs:
 
 ````
 ./run.cmd|./run.sh build
 ````
+
 ##### Testing
 
 After compiling
@@ -77,7 +77,7 @@ To run tests (unit and integration):
 
 ##### Installing
 
-To install the the dotnet plugin use(Note, this will uninstall gauge-dotnet before installing the compiled version):
+To install the dotnet plugin use (note, this will uninstall `gauge-dotnet` before installing the compiled version):
 
 ````
 ./run.cmd|./run.sh forceinstall
@@ -89,7 +89,7 @@ To install the the dotnet plugin use(Note, this will uninstall gauge-dotnet befo
 ./run.cmd|./run.sh package
 ````
 
-New distribution details need to be updated in the dotnet-install.json file in  [gauge plugin repository](https://github.com/getgauge/gauge-repository) for a new verison update.
+New distribution details need to be updated in the `dotnet-install.json` file in the [gauge plugin repository](https://github.com/getgauge/gauge-repository) for a new version update.
 
 ## License
 
