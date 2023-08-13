@@ -27,7 +27,7 @@ namespace Gauge.Dotnet
             }
 
             var configurationEnvVariable = ReadBuildConfiguration();
-            var commandArgs = $"publish --runtime={runtime} --configuration={configurationEnvVariable} --output=\"{gaugeBinDir}\" {additionalBuildArgs}";
+            var commandArgs = $"publish --runtime={runtime} --no-self-contained --configuration={configurationEnvVariable} --output=\"{gaugeBinDir}\" {additionalBuildArgs}";
 
             if (!string.IsNullOrEmpty(csprojEnvVariable))
             {
