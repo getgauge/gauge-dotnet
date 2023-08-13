@@ -7,6 +7,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Gauge.Dotnet
 {
@@ -14,7 +15,7 @@ namespace Gauge.Dotnet
     {
         [STAThread]
         [DebuggerHidden]
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             if (args.Length == 0)
             {
@@ -24,7 +25,7 @@ namespace Gauge.Dotnet
 
             var phase = args[0];
             var command = GaugeCommandFactory.GetExecutor(phase);
-            command.Execute();
+            await command.Execute();
         }
     }
 }
