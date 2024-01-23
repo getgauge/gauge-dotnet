@@ -12,6 +12,7 @@ using Gauge.Dotnet.Models;
 using Gauge.Dotnet.UnitTests.Helpers;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests
 {
@@ -50,73 +51,73 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShoulddGetAfterScenarioHook()
         {
-            var expectedMethods = new[] {"my.foo.type.AfterScenarioHook"};
+            var expectedMethods = new[] { "my.foo.type.AfterScenarioHook" };
             var hooks = _hookRegistry.AfterScenarioHooks.Select(mi => mi.Method);
 
-            Assert.AreEqual(expectedMethods, hooks);
+            ClassicAssert.AreEqual(expectedMethods, hooks);
         }
 
         [Test]
         public void ShouldGetAfterSpecHook()
         {
-            var expectedMethods = new[] {"my.foo.type.AfterSpecHook"};
+            var expectedMethods = new[] { "my.foo.type.AfterSpecHook" };
             var hooks = _hookRegistry.AfterSpecHooks.Select(mi => mi.Method);
 
-            Assert.AreEqual(expectedMethods, hooks);
+            ClassicAssert.AreEqual(expectedMethods, hooks);
         }
 
         [Test]
         public void ShouldGetAfterStepHook()
         {
-            var expectedMethods = new[] {"my.foo.type.AfterStepHook"};
+            var expectedMethods = new[] { "my.foo.type.AfterStepHook" };
             var hooks = _hookRegistry.AfterStepHooks.Select(mi => mi.Method);
 
-            Assert.AreEqual(expectedMethods, hooks);
+            ClassicAssert.AreEqual(expectedMethods, hooks);
         }
 
         [Test]
         public void ShouldGetAfterSuiteHook()
         {
-            var expectedMethods = new[] {"my.foo.type.AfterSuiteHook"};
+            var expectedMethods = new[] { "my.foo.type.AfterSuiteHook" };
             var hooks = _hookRegistry.AfterSuiteHooks.Select(mi => mi.Method);
 
-            Assert.AreEqual(expectedMethods, hooks);
+            ClassicAssert.AreEqual(expectedMethods, hooks);
         }
 
         [Test]
         public void ShouldGetBeforeScenarioHook()
         {
-            var expectedMethods = new[] {"my.foo.type.BeforeScenarioHook"};
+            var expectedMethods = new[] { "my.foo.type.BeforeScenarioHook" };
             var hooks = _hookRegistry.BeforeScenarioHooks.Select(mi => mi.Method);
 
-            Assert.AreEqual(expectedMethods, hooks);
+            ClassicAssert.AreEqual(expectedMethods, hooks);
         }
 
         [Test]
         public void ShouldGetBeforeSpecHook()
         {
-            var expectedMethods = new[] {"my.foo.type.BeforeSpecHook"};
+            var expectedMethods = new[] { "my.foo.type.BeforeSpecHook" };
             var hooks = _hookRegistry.BeforeSpecHooks.Select(mi => mi.Method);
 
-            Assert.AreEqual(expectedMethods, hooks);
+            ClassicAssert.AreEqual(expectedMethods, hooks);
         }
 
         [Test]
         public void ShouldGetBeforeStepHook()
         {
-            var expectedMethods = new[] {"my.foo.type.BeforeStepHook"};
+            var expectedMethods = new[] { "my.foo.type.BeforeStepHook" };
             var hooks = _hookRegistry.BeforeStepHooks.Select(mi => mi.Method);
 
-            Assert.AreEqual(expectedMethods, hooks);
+            ClassicAssert.AreEqual(expectedMethods, hooks);
         }
 
         [Test]
         public void ShouldGetBeforeSuiteHook()
         {
-            var expectedMethods = new[] {"my.foo.type.BeforeSuiteHook"};
+            var expectedMethods = new[] { "my.foo.type.BeforeSuiteHook" };
             var hooks = _hookRegistry.BeforeSuiteHooks.Select(mi => mi.Method);
 
-            Assert.AreEqual(expectedMethods, hooks);
+            ClassicAssert.AreEqual(expectedMethods, hooks);
         }
     }
 }

@@ -10,6 +10,7 @@ using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.UnitTests.Helpers;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests.Extensions
 {
@@ -41,7 +42,7 @@ namespace Gauge.Dotnet.UnitTests.Extensions
                 .WithStep("Foo")
                 .Build();
 
-            Assert.AreEqual("My.Test.Type.Foo", fooMethod.FullyQuallifiedName());
+            ClassicAssert.AreEqual("My.Test.Type.Foo", fooMethod.FullyQuallifiedName());
         }
 
         [Test]
@@ -56,7 +57,7 @@ namespace Gauge.Dotnet.UnitTests.Extensions
                 .WithParameters(new KeyValuePair<string, string>("String", "bar"))
                 .Build();
 
-            Assert.AreEqual("My.Test.Type.Bar-Stringbar", barMethod.FullyQuallifiedName());
+            ClassicAssert.AreEqual("My.Test.Type.Bar-Stringbar", barMethod.FullyQuallifiedName());
         }
 
         [Test]
@@ -68,7 +69,7 @@ namespace Gauge.Dotnet.UnitTests.Extensions
                 .WithStep("Foo")
                 .Build();
 
-            Assert.False(fooMethod.IsRecoverableStep(assemblyLoader.Object));
+            ClassicAssert.False(fooMethod.IsRecoverableStep(assemblyLoader.Object));
         }
 
         [Test]
@@ -82,7 +83,7 @@ namespace Gauge.Dotnet.UnitTests.Extensions
                 .WithParameters(new KeyValuePair<string, string>("string", "Bar"))
                 .Build();
 
-            Assert.True(barMethod.IsRecoverableStep(assemblyLoader.Object));
+            ClassicAssert.True(barMethod.IsRecoverableStep(assemblyLoader.Object));
         }
 
         [Test]
@@ -95,7 +96,7 @@ namespace Gauge.Dotnet.UnitTests.Extensions
                 .WithParameters(new KeyValuePair<string, string>("string", "Bar"))
                 .Build();
 
-            Assert.False(bazMethod.IsRecoverableStep(assemblyLoader.Object),
+            ClassicAssert.False(bazMethod.IsRecoverableStep(assemblyLoader.Object),
                 "Recoverable is true only when method is a Step");
         }
     }

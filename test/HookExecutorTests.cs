@@ -8,14 +8,14 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.UnitTests.Helpers;
 using Gauge.Dotnet.Wrappers;
-using Gauge.CSharp.Lib;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
-using System.Threading;
+using NUnit.Framework.Legacy;
 using ExecutionContext = Gauge.CSharp.Lib.ExecutionContext;
 
 namespace Gauge.Dotnet.UnitTests
@@ -38,7 +38,7 @@ namespace Gauge.Dotnet.UnitTests
                 .WithDeclaringTypeName("my.foo.type")
                 .WithNoParameters()
                 .Build();
-            mockAssemblyLoader.Setup(x => x.GetMethods(type)).Returns(new List<MethodInfo> {methodInfo});
+            mockAssemblyLoader.Setup(x => x.GetMethods(type)).Returns(new List<MethodInfo> { methodInfo });
             mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(mockClassInstanceManagerType);
 
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
@@ -49,14 +49,14 @@ namespace Gauge.Dotnet.UnitTests
             mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance, new List<object>()));
 
             var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
-            mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>())).Returns(new {});
+            mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>())).Returns(new { });
 
             var executor = new HookExecutor(mockAssemblyLoader.Object, mockReflectionWrapper.Object,
                 mockClassInstanceManager, mockExecutionInfoMapper.Object);
 
             var result = executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(),
                 new ExecutionInfo());
-            Assert.True(result.Success, $"Hook execution failed: {result.ExceptionMessage}\n{result.StackTrace}");
+            ClassicAssert.True(result.Success, $"Hook execution failed: {result.ExceptionMessage}\n{result.StackTrace}");
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace Gauge.Dotnet.UnitTests
                 .WithDeclaringTypeName("my.foo.type")
                 .WithParameters(new KeyValuePair<Type, string>(typeof(ExecutionContext), "context"))
                 .Build();
-            mockAssemblyLoader.Setup(x => x.GetMethods(type)).Returns(new List<MethodInfo> {methodInfo});
+            mockAssemblyLoader.Setup(x => x.GetMethods(type)).Returns(new List<MethodInfo> { methodInfo });
             mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(mockClassInstanceManagerType);
 
             var executionInfo = new ExecutionInfo();
@@ -97,7 +97,7 @@ namespace Gauge.Dotnet.UnitTests
 
             var result = executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(),
                 executionInfo);
-            Assert.True(result.Success, $"Hook execution failed: {result.ExceptionMessage}\n{result.StackTrace}");
+            ClassicAssert.True(result.Success, $"Hook execution failed: {result.ExceptionMessage}\n{result.StackTrace}");
             mockReflectionWrapper.VerifyAll();
         }
 
@@ -115,7 +115,7 @@ namespace Gauge.Dotnet.UnitTests
                 .WithFilteredHook(type)
                 .WithDeclaringTypeName("my.foo.type")
                 .Build();
-            mockAssemblyLoader.Setup(x => x.GetMethods(type)).Returns(new List<MethodInfo> {methodInfo});
+            mockAssemblyLoader.Setup(x => x.GetMethods(type)).Returns(new List<MethodInfo> { methodInfo });
             mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(mockClassInstanceManagerType);
 
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
@@ -126,7 +126,7 @@ namespace Gauge.Dotnet.UnitTests
 
             var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
             mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>()))
-                .Returns(new {Foo = "bar"});
+                .Returns(new { Foo = "bar" });
             var executor = new HookExecutor(mockAssemblyLoader.Object, mockReflectionWrapper.Object,
                 mockClassInstanceManager, mockExecutionInfoMapper.Object);
             mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance))
@@ -134,8 +134,8 @@ namespace Gauge.Dotnet.UnitTests
 
             var result = executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(),
                 new ExecutionInfo());
-            Assert.False(result.Success, "Hook execution passed, expected failure");
-            Assert.AreEqual(result.ExceptionMessage, "hook failed");
+            ClassicAssert.False(result.Success, "Hook execution passed, expected failure");
+            ClassicAssert.AreEqual(result.ExceptionMessage, "hook failed");
         }
     }
 }

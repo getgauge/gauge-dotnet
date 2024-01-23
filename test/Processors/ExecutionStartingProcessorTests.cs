@@ -6,8 +6,6 @@
 
 
 using System.Collections.Generic;
-using System.Text;
-using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
@@ -15,6 +13,7 @@ using Gauge.Dotnet.UnitTests.Helpers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests.Processors
 {
@@ -63,7 +62,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         private readonly IEnumerable<string> _pendingMessages = new List<string> { "Foo", "Bar" };
 
         private readonly IEnumerable<string> _pendingScreenshotFiles =
-            new List<string> { "screenshot.png"};
+            new List<string> { "screenshot.png" };
 
         [Test]
         public void ShouldExtendFromHooksExecutionProcessor()
@@ -97,7 +96,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
 
             var tags = AssertEx.ExecuteProtectedMethod<ExecutionStartingProcessor>("GetApplicableTags", currentScenario);
-            Assert.IsEmpty(tags);
+            ClassicAssert.IsEmpty(tags);
         }
 
         [Test]
@@ -107,8 +106,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var result = _executionStartingProcessor.Process(executionStartingRequest);
 
             _mockMethodExecutor.VerifyAll();
-            Assert.AreEqual(result.ExecutionResult.Message, _pendingMessages);
-            Assert.AreEqual(result.ExecutionResult.ScreenshotFiles, _pendingScreenshotFiles);
+            ClassicAssert.AreEqual(result.ExecutionResult.Message, _pendingMessages);
+            ClassicAssert.AreEqual(result.ExecutionResult.ScreenshotFiles, _pendingScreenshotFiles);
         }
     }
 }

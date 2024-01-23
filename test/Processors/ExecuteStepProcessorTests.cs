@@ -10,6 +10,7 @@ using Gauge.Dotnet.Processors;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests.Processors
 {
@@ -51,7 +52,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var processor = new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object);
             var response = processor.Process(request);
 
-            Assert.False(response.ExecutionResult.Failed);
+            ClassicAssert.False(response.ExecutionResult.Failed);
         }
 
         [Test]
@@ -98,7 +99,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             mockOrchestrator.Verify(executor =>
                 executor.ExecuteStep(fooMethodInfo, It.Is<string[]>(strings => strings[0] == tableJSON)));
-            Assert.False(response.ExecutionResult.Failed);
+            ClassicAssert.False(response.ExecutionResult.Failed);
         }
 
         [Test]
@@ -121,8 +122,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var processor = new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object);
             var response = processor.Process(request);
 
-            Assert.True(response.ExecutionResult.Failed);
-            Assert.AreEqual(response.ExecutionResult.ErrorMessage,
+            ClassicAssert.True(response.ExecutionResult.Failed);
+            ClassicAssert.AreEqual(response.ExecutionResult.ErrorMessage,
                 "Argument length mismatch for Foo. Actual Count: 0, Expected Count: 1");
         }
 
@@ -143,8 +144,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var processor = new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object);
             var response = processor.Process(request);
 
-            Assert.True(response.ExecutionResult.Failed);
-            Assert.AreEqual(response.ExecutionResult.ErrorMessage,
+            ClassicAssert.True(response.ExecutionResult.Failed);
+            ClassicAssert.AreEqual(response.ExecutionResult.ErrorMessage,
                 "Step Implementation not found");
         }
     }

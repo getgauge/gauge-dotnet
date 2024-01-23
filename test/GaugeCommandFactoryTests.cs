@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests
 {
@@ -30,14 +31,14 @@ namespace Gauge.Dotnet.UnitTests
         public void ShouldGetSetupPhaseExecutorForInit()
         {
             var command = GaugeCommandFactory.GetExecutor("--init");
-            Assert.AreEqual(command.GetType(), typeof(SetupCommand));
+            ClassicAssert.AreEqual(command.GetType(), typeof(SetupCommand));
         }
 
         [Test]
         public void ShouldGetStartPhaseExecutorByDefault()
         {
             var command = GaugeCommandFactory.GetExecutor(default(string));
-            Assert.AreEqual(command.GetType(), typeof(StartCommand));
+            ClassicAssert.AreEqual(command.GetType(), typeof(StartCommand));
         }
     }
 }

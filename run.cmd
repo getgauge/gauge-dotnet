@@ -1,9 +1,13 @@
 @echo off
-set tasks=build test package install uninstall forceinstall
+set tasks=build, test, package, install, uninstall, forceinstall
+
+if [%1] == [] goto :usage
+
 for %%a in (%tasks%) do (
-    if %1==%%a goto %1
+	if %%a==%1 goto %1
 )
 
+:usage
 echo Options: "[build | test | package | install | uninstall | forceinstall]"
 goto :eof
 
@@ -22,6 +26,7 @@ goto :eof
     rmdir /s /q deploy artifacts
     dotnet publish -c release -o .\deploy\bin\net6.0 src\Gauge.Dotnet.csproj -f net6.0
     dotnet publish -c release -o .\deploy\bin\net7.0 src\Gauge.Dotnet.csproj -f net7.0
+    dotnet publish -c release -o .\deploy\bin\net8.0 src\Gauge.Dotnet.csproj -f net8.0
     copy src\launcher.sh deploy\
     copy src\launcher.cmd deploy\
     copy src\dotnet.json deploy\

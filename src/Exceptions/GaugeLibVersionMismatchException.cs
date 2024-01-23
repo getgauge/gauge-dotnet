@@ -6,7 +6,6 @@
 
 
 using System;
-using System.Runtime.Serialization;
 
 namespace Gauge.Dotnet.Exceptions
 {
@@ -22,10 +21,6 @@ namespace Gauge.Dotnet.Exceptions
         }
 
         public GaugeLibVersionMismatchException()
-        {
-        }
-
-        public GaugeLibVersionMismatchException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

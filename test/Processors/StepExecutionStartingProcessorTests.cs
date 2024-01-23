@@ -7,14 +7,13 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests.Processors
 {
@@ -62,8 +61,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             var processor = new StepExecutionStartingProcessor(mockExecutionHelper.Object);
             var result = processor.Process(request);
-            Assert.AreEqual(result.ExecutionResult.Message, pendingMessages);
-            Assert.AreEqual(result.ExecutionResult.ScreenshotFiles, pendingScreenshotFiles);
+            ClassicAssert.AreEqual(result.ExecutionResult.Message, pendingMessages);
+            ClassicAssert.AreEqual(result.ExecutionResult.ScreenshotFiles, pendingScreenshotFiles);
         }
 
         [Test]
@@ -90,10 +89,10 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             var tags = AssertEx.ExecuteProtectedMethod<StepExecutionStartingProcessor>("GetApplicableTags", currentScenario)
                 .ToList();
-            Assert.IsNotEmpty(tags);
-            Assert.AreEqual(2, tags.Count);
-            Assert.Contains("foo", tags);
-            Assert.Contains("bar", tags);
+            ClassicAssert.IsNotEmpty(tags);
+            ClassicAssert.AreEqual(2, tags.Count);
+            ClassicAssert.Contains("foo", tags);
+            ClassicAssert.Contains("bar", tags);
         }
 
         [Test]
@@ -124,9 +123,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             var tags = AssertEx.ExecuteProtectedMethod<StepExecutionStartingProcessor>("GetApplicableTags", currentScenario)
                 .ToList();
-            Assert.IsNotEmpty(tags);
-            Assert.AreEqual(1, tags.Count);
-            Assert.Contains("foo", tags);
+            ClassicAssert.IsNotEmpty(tags);
+            ClassicAssert.AreEqual(1, tags.Count);
+            ClassicAssert.Contains("foo", tags);
         }
     }
 }

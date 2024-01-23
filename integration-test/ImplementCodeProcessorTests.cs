@@ -10,6 +10,7 @@ using System.IO;
 using Gauge.Dotnet.Processors;
 using Gauge.Messages;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.IntegrationTests
 {
@@ -29,12 +30,12 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var processor = new StubImplementationCodeProcessor();
             var result = processor.Process(message);
-            Assert.AreEqual("StepImplementation1.cs", Path.GetFileName(result.FilePath));
-            Assert.AreEqual(1, result.TextDiffs.Count);
+            ClassicAssert.AreEqual("StepImplementation1.cs", Path.GetFileName(result.FilePath));
+            ClassicAssert.AreEqual(1, result.TextDiffs.Count);
             Console.WriteLine(result.TextDiffs[0].Content);
-            Assert.True(result.TextDiffs[0].Content.Contains("namespace Sample"));
-            Assert.True(result.TextDiffs[0].Content.Contains("class StepImplementation1"));
-            Assert.AreEqual(result.TextDiffs[0].Span.Start, 0);
+            ClassicAssert.True(result.TextDiffs[0].Content.Contains("namespace Sample"));
+            ClassicAssert.True(result.TextDiffs[0].Content.Contains("class StepImplementation1"));
+            ClassicAssert.AreEqual(result.TextDiffs[0].Span.Start, 0);
         }
 
         [Test]
@@ -52,11 +53,11 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var processor = new StubImplementationCodeProcessor();
             var result = processor.Process(message);
-            Assert.AreEqual(1, result.TextDiffs.Count);
-            Assert.True(result.TextDiffs[0].Content.Contains("namespace Sample"));
-            Assert.True(result.TextDiffs[0].Content.Contains("class Empty"));
+            ClassicAssert.AreEqual(1, result.TextDiffs.Count);
+            ClassicAssert.True(result.TextDiffs[0].Content.Contains("namespace Sample"));
+            ClassicAssert.True(result.TextDiffs[0].Content.Contains("class Empty"));
             StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
-            Assert.AreEqual(result.TextDiffs[0].Span.Start, 0);
+            ClassicAssert.AreEqual(result.TextDiffs[0].Span.Start, 0);
         }
 
         [Test]
@@ -74,9 +75,9 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var processor = new StubImplementationCodeProcessor();
             var result = processor.Process(message);
-            Assert.AreEqual(1, result.TextDiffs.Count);
+            ClassicAssert.AreEqual(1, result.TextDiffs.Count);
             StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
-            Assert.AreEqual(107, result.TextDiffs[0].Span.Start);
+            ClassicAssert.AreEqual(107, result.TextDiffs[0].Span.Start);
         }
 
         [Test]
@@ -94,10 +95,10 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var processor = new StubImplementationCodeProcessor();
             var result = processor.Process(message);
-            Assert.AreEqual(1, result.TextDiffs.Count);
+            ClassicAssert.AreEqual(1, result.TextDiffs.Count);
             StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
-            Assert.True(result.TextDiffs[0].Content.Contains("Step Method"));
-            Assert.AreEqual(result.TextDiffs[0].Span.Start, 8);
+            ClassicAssert.True(result.TextDiffs[0].Content.Contains("Step Method"));
+            ClassicAssert.AreEqual(result.TextDiffs[0].Span.Start, 8);
         }
 
         [Test]
@@ -105,21 +106,21 @@ namespace Gauge.Dotnet.IntegrationTests
         {
             var file = Path.Combine(_testProjectPath, "CommentFile.cs");
             var message = new StubImplementationCodeRequest
-                {
-                    ImplementationFilePath = file,
-                    Codes =
+            {
+                ImplementationFilePath = file,
+                Codes =
                     {
                         "Step Method"
                     }
-                };
+            };
 
             var processor = new StubImplementationCodeProcessor();
             var result = processor.Process(message);
-            Assert.AreEqual(1, result.TextDiffs.Count);
+            ClassicAssert.AreEqual(1, result.TextDiffs.Count);
             StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
-            Assert.True(result.TextDiffs[0].Content.Contains("namespace Sample"));
-            Assert.True(result.TextDiffs[0].Content.Contains("class CommentFile"));
-            Assert.AreEqual(result.TextDiffs[0].Span.Start, 3);
+            ClassicAssert.True(result.TextDiffs[0].Content.Contains("namespace Sample"));
+            ClassicAssert.True(result.TextDiffs[0].Content.Contains("class CommentFile"));
+            ClassicAssert.AreEqual(result.TextDiffs[0].Span.Start, 3);
         }
     }
 }

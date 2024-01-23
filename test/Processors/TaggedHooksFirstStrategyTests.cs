@@ -13,6 +13,7 @@ using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.UnitTests.Helpers;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests.Processors
 {
@@ -87,36 +88,36 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         public void ShouldFetchTaggedHooksInSortedOrder()
         {
-            var untaggedHooks = new[] {"my.foo.type.Blah", "my.foo.type.Zed"};
+            var untaggedHooks = new[] { "my.foo.type.Blah", "my.foo.type.Zed" };
 
             var applicableHooks = new TaggedHooksFirstStrategy()
-                .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToArray();
+                .GetApplicableHooks(new List<string> { "Foo" }, _hookMethods).ToArray();
             var actual = new ArraySegment<string>(applicableHooks, 2, untaggedHooks.Count());
 
-            Assert.AreEqual(untaggedHooks, actual);
+            ClassicAssert.AreEqual(untaggedHooks, actual);
         }
 
         [Test]
         public void ShouldFetchUntaggedHooksAfterTaggedHooks()
         {
-            var taggedHooks = new[] {"my.foo.type.Baz", "my.foo.type.Foo"};
-            var untaggedHooks = new[] {"my.foo.type.Blah", "my.foo.type.Zed"};
+            var taggedHooks = new[] { "my.foo.type.Baz", "my.foo.type.Foo" };
+            var untaggedHooks = new[] { "my.foo.type.Blah", "my.foo.type.Zed" };
             var expected = taggedHooks.Concat(untaggedHooks);
 
             var applicableHooks = new TaggedHooksFirstStrategy()
-                .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToList();
+                .GetApplicableHooks(new List<string> { "Foo" }, _hookMethods).ToList();
 
-            Assert.AreEqual(expected, applicableHooks);
+            ClassicAssert.AreEqual(expected, applicableHooks);
         }
 
         [Test]
         public void ShouldFetchUntaggedHooksInSortedOrder()
         {
             var applicableHooks = new TaggedHooksFirstStrategy()
-                .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToList();
+                .GetApplicableHooks(new List<string> { "Foo" }, _hookMethods).ToList();
 
-            Assert.That(applicableHooks[0], Is.EqualTo("my.foo.type.Baz"));
-            Assert.That(applicableHooks[1], Is.EqualTo("my.foo.type.Foo"));
+            ClassicAssert.That(applicableHooks[0], Is.EqualTo("my.foo.type.Baz"));
+            ClassicAssert.That(applicableHooks[1], Is.EqualTo("my.foo.type.Foo"));
         }
     }
 }

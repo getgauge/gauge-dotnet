@@ -11,6 +11,7 @@ using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.IntegrationTests
 {
@@ -33,8 +34,8 @@ namespace Gauge.Dotnet.IntegrationTests
             var gaugeMethod = assemblyLoader.GetStepRegistry()
                 .MethodFor("I throw a serializable exception and continue");
             var executionResult = orchestrator.ExecuteStep(gaugeMethod);
-            Assert.IsTrue(executionResult.Failed);
-            Assert.IsTrue(executionResult.RecoverableError);
+            ClassicAssert.IsTrue(executionResult.Failed);
+            ClassicAssert.IsTrue(executionResult.RecoverableError);
         }
 
         [Test]
@@ -56,7 +57,7 @@ namespace Gauge.Dotnet.IntegrationTests
             table.AddRow(new List<string> { "foorow2", "barrow2" });
 
             var executionResult = orchestrator.ExecuteStep(gaugeMethod, SerializeTable(table));
-            Assert.False(executionResult.Failed);
+            ClassicAssert.False(executionResult.Failed);
         }
 
         [Test]
@@ -76,7 +77,7 @@ namespace Gauge.Dotnet.IntegrationTests
                 .MethodFor("A context step which gets executed before every scenario");
 
             var executionResult = orchestrator.ExecuteStep(gaugeMethod);
-            Assert.False(executionResult.Failed);
+            ClassicAssert.False(executionResult.Failed);
         }
 
 
@@ -98,8 +99,8 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod, "hello", "world");
 
-            Assert.False(executionResult.Failed);
-            Assert.Contains("hello, world!", executionResult.Message);
+            ClassicAssert.False(executionResult.Failed);
+            ClassicAssert.Contains("hello, world!", executionResult.Message);
         }
 
         [Test]
@@ -119,9 +120,9 @@ namespace Gauge.Dotnet.IntegrationTests
             var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an AggregateException");
             var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod);
 
-            Assert.True(executionResult.Failed);
-            Assert.True(executionResult.StackTrace.Contains("First Exception"));
-            Assert.True(executionResult.StackTrace.Contains("Second Exception"));
+            ClassicAssert.True(executionResult.Failed);
+            ClassicAssert.True(executionResult.StackTrace.Contains("First Exception"));
+            ClassicAssert.True(executionResult.StackTrace.Contains("Second Exception"));
         }
 
         [Test]
@@ -135,8 +136,8 @@ namespace Gauge.Dotnet.IntegrationTests
             var gaugeMethod = registry.MethodFor("and an alias");
             var stepTexts = gaugeMethod.Aliases.ToList();
 
-            Assert.Contains("Step with text", stepTexts);
-            Assert.Contains("and an alias", stepTexts);
+            ClassicAssert.Contains("Step with text", stepTexts);
+            ClassicAssert.Contains("and an alias", stepTexts);
         }
 
         [Test]
@@ -157,8 +158,8 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod);
 
-            Assert.True(executionResult.Failed);
-            Assert.AreEqual(expectedMessage, executionResult.ErrorMessage);
+            ClassicAssert.True(executionResult.Failed);
+            ClassicAssert.AreEqual(expectedMessage, executionResult.ErrorMessage);
             StringAssert.Contains("IntegrationTestSample.StepImplementation.ThrowSerializableException",
                 executionResult.StackTrace);
         }
@@ -180,8 +181,8 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an unserializable exception");
             var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod);
-            Assert.True(executionResult.Failed);
-            Assert.AreEqual(expectedMessage, executionResult.ErrorMessage);
+            ClassicAssert.True(executionResult.Failed);
+            ClassicAssert.AreEqual(expectedMessage, executionResult.ErrorMessage);
             StringAssert.Contains("IntegrationTestSample.StepImplementation.ThrowUnserializableException",
                 executionResult.StackTrace);
         }

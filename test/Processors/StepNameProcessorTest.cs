@@ -4,6 +4,7 @@ using Gauge.Dotnet.Processors;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests.Processors
 {
@@ -34,9 +35,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
                 var response = stepNameProcessor.Process(request);
 
-                Assert.AreEqual(response.FileName, "foo");
-                Assert.AreEqual(response.StepName[0], "step1");
-                Assert.False(response.HasAlias);
+                ClassicAssert.AreEqual(response.FileName, "foo");
+                ClassicAssert.AreEqual(response.StepName[0], "step1");
+                ClassicAssert.False(response.HasAlias);
             }
 
             [Test]
@@ -64,10 +65,10 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
                 var response = stepNameProcessor.Process(request);
 
-                Assert.AreEqual(response.FileName, "foo");
-                Assert.AreEqual(response.StepName[0], "step2");
-                Assert.AreEqual(response.StepName[1], "step3");
-                Assert.True(response.HasAlias);
+                ClassicAssert.AreEqual(response.FileName, "foo");
+                ClassicAssert.AreEqual(response.StepName[0], "step2");
+                ClassicAssert.AreEqual(response.StepName[1], "step3");
+                ClassicAssert.True(response.HasAlias);
             }
 
             [Test]
@@ -93,8 +94,8 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
                 var response = stepNameProcessor.Process(request);
 
-                Assert.True(response.IsExternal);
-                // Assert.AreEqual(response.FileName, null);
+                ClassicAssert.True(response.IsExternal);
+                // ClassicAssert.AreEqual(response.FileName, null);
             }
         }
     }

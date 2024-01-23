@@ -16,6 +16,7 @@ using Gauge.Dotnet.UnitTests.Processors.Stubs;
 using Gauge.Dotnet.Wrappers;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests.Processors
 {
@@ -104,34 +105,34 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
 
             var beforeScenarioHook = new HookMethod(LibType.BeforeScenario, mockMethod, mockAssemblyLoader.Object);
-            Assert.AreEqual("MultipleHookMethod", beforeScenarioHook.Method);
+            ClassicAssert.AreEqual("MultipleHookMethod", beforeScenarioHook.Method);
 
             var beforeSpecHook = new HookMethod(LibType.BeforeSpec, mockMethod, mockAssemblyLoader.Object);
-            Assert.AreEqual("MultipleHookMethod", beforeSpecHook.Method);
+            ClassicAssert.AreEqual("MultipleHookMethod", beforeSpecHook.Method);
         }
 
         [Test]
         public void ShouldFetchAHooksWithSpecifiedTagsWhenDoingAnd()
         {
-            var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> {"Baz", "Bar"}, _hookMethods)
+            var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> { "Baz", "Bar" }, _hookMethods)
                 .ToList();
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.AreEqual(2, applicableHooks.Count);
-            Assert.Contains(mockBarMethod.FullyQuallifiedName(), applicableHooks);
-            Assert.Contains(mockBazMethod.FullyQuallifiedName(), applicableHooks);
+            ClassicAssert.IsNotNull(applicableHooks);
+            ClassicAssert.AreEqual(2, applicableHooks.Count);
+            ClassicAssert.Contains(mockBarMethod.FullyQuallifiedName(), applicableHooks);
+            ClassicAssert.Contains(mockBazMethod.FullyQuallifiedName(), applicableHooks);
         }
 
         [Test]
         public void ShouldFetchAHooksWithSpecifiedTagsWhenDoingOr()
         {
             var applicableHooks =
-                new HooksStrategy().GetTaggedHooks(new List<string> {"Baz", "Foo"}, _hookMethods).ToList();
+                new HooksStrategy().GetTaggedHooks(new List<string> { "Baz", "Foo" }, _hookMethods).ToList();
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.AreEqual(2, applicableHooks.Count);
-            Assert.Contains(mockFooMethod.FullyQuallifiedName(), applicableHooks);
-            Assert.Contains(mockBazMethod.FullyQuallifiedName(), applicableHooks);
+            ClassicAssert.IsNotNull(applicableHooks);
+            ClassicAssert.AreEqual(2, applicableHooks.Count);
+            ClassicAssert.Contains(mockFooMethod.FullyQuallifiedName(), applicableHooks);
+            ClassicAssert.Contains(mockBazMethod.FullyQuallifiedName(), applicableHooks);
         }
 
         [Test]
@@ -139,46 +140,46 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var applicableHooks = new HooksStrategy().GetApplicableHooks(new List<string>(), _hookMethods);
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.AreEqual(1, applicableHooks.Count());
+            ClassicAssert.IsNotNull(applicableHooks);
+            ClassicAssert.AreEqual(1, applicableHooks.Count());
         }
 
         [Test]
         public void ShouldFetchAllHooksWithSpecifiedTags()
         {
-            var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> {"Foo"}, _hookMethods).ToList();
+            var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> { "Foo" }, _hookMethods).ToList();
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.AreEqual(2, applicableHooks.Count);
-            Assert.Contains(mockFooMethod.FullyQuallifiedName(), applicableHooks);
+            ClassicAssert.IsNotNull(applicableHooks);
+            ClassicAssert.AreEqual(2, applicableHooks.Count);
+            ClassicAssert.Contains(mockFooMethod.FullyQuallifiedName(), applicableHooks);
         }
 
         [Test]
         public void ShouldFetchAllHooksWithSpecifiedTagsWhenDoingAnd()
         {
-            var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> {"Bar"}, _hookMethods);
+            var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> { "Bar" }, _hookMethods);
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.IsEmpty(applicableHooks);
+            ClassicAssert.IsNotNull(applicableHooks);
+            ClassicAssert.IsEmpty(applicableHooks);
         }
 
         [Test]
         public void ShouldFetchAnyHooksWithSpecifiedTagsWhenDoingOr()
         {
-            var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> {"Baz"}, _hookMethods).ToList();
+            var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> { "Baz" }, _hookMethods).ToList();
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.AreEqual(1, applicableHooks.Count);
-            Assert.Contains(mockBazMethod.FullyQuallifiedName(), applicableHooks);
+            ClassicAssert.IsNotNull(applicableHooks);
+            ClassicAssert.AreEqual(1, applicableHooks.Count);
+            ClassicAssert.Contains(mockBazMethod.FullyQuallifiedName(), applicableHooks);
         }
 
         [Test]
         public void ShouldNotFetchAnyTaggedHooksWhenTagsAreASuperSet()
         {
-            var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> {"Bar", "Blah"}, _hookMethods);
+            var applicableHooks = new HooksStrategy().GetTaggedHooks(new List<string> { "Bar", "Blah" }, _hookMethods);
 
-            Assert.IsNotNull(applicableHooks);
-            Assert.IsEmpty(applicableHooks);
+            ClassicAssert.IsNotNull(applicableHooks);
+            ClassicAssert.IsEmpty(applicableHooks);
         }
 
         [Test]
@@ -190,7 +191,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var hooksStrategy = new TestHooksExecutionProcessor(null)
                 .GetHooksStrategy();
 
-            Assert.IsInstanceOf<HooksStrategy>(hooksStrategy);
+            ClassicAssert.IsInstanceOf<HooksStrategy>(hooksStrategy);
         }
 
         [Test]
@@ -203,7 +204,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 new TestTaggedHooksFirstExecutionProcessor(null)
                     .GetHooksStrategy();
 
-            Assert.IsInstanceOf<TaggedHooksFirstStrategy>(hooksStrategy);
+            ClassicAssert.IsInstanceOf<TaggedHooksFirstStrategy>(hooksStrategy);
         }
 
         [Test]
@@ -216,7 +217,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 new TestUntaggedHooksFirstExecutionProcessor(null)
                     .GetHooksStrategy();
 
-            Assert.IsInstanceOf<UntaggedHooksFirstStrategy>(hooksStrategy);
+            ClassicAssert.IsInstanceOf<UntaggedHooksFirstStrategy>(hooksStrategy);
         }
     }
 }

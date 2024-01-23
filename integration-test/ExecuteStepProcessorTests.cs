@@ -5,12 +5,13 @@
  *----------------------------------------------------------------*/
 
 
+using System.Threading;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using NUnit.Framework;
-using System.Threading;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.IntegrationTests
 {
@@ -66,8 +67,8 @@ namespace Gauge.Dotnet.IntegrationTests
             var result = executeStepProcessor.Process(message);
 
             var protoExecutionResult = result.ExecutionResult;
-            Assert.IsNotNull(protoExecutionResult);
-            Assert.IsFalse(protoExecutionResult.Failed);
+            ClassicAssert.IsNotNull(protoExecutionResult);
+            ClassicAssert.IsFalse(protoExecutionResult.Failed);
         }
 
         [Test]
@@ -98,9 +99,9 @@ namespace Gauge.Dotnet.IntegrationTests
             var result = executeStepProcessor.Process(message);
             var protoExecutionResult = result.ExecutionResult;
 
-            Assert.IsNotNull(protoExecutionResult);
-            Assert.IsTrue(protoExecutionResult.Failed);
-            Assert.AreEqual("screenshot.png", protoExecutionResult.FailureScreenshotFile);
+            ClassicAssert.IsNotNull(protoExecutionResult);
+            ClassicAssert.IsTrue(protoExecutionResult.Failed);
+            ClassicAssert.AreEqual("screenshot.png", protoExecutionResult.FailureScreenshotFile);
         }
     }
 }
