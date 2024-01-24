@@ -23,12 +23,12 @@ namespace Gauge.Dotnet
             var project = $@"<Project Sdk=""Microsoft.NET.Sdk"">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include=""FluentAssertions"" Version=""5.1.0"" />
-    <PackageReference Include=""Gauge.CSharp.Lib"" Version=""0.7.6"" />
+    <PackageReference Include=""FluentAssertions"" Version=""6.12.0"" />
+    <PackageReference Include=""Gauge.CSharp.Lib"" Version=""0.9.0"" />
   </ItemGroup>
 
 </Project>
