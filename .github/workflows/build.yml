@@ -85,14 +85,14 @@ jobs:
         if: matrix.os != 'windows-latest'
         run: |
           cd gauge-tests
-          ./gradlew clean dotnetFT
+          ./gradlew -Pnodes=2 clean dotnetFT
 
       - name: Run FTs on windows
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
           cd gauge-tests
-          .\gradlew.bat clean dotnetFT
+          .\gradlew.bat -Pnodes=2 clean dotnetFT
 
       - uses: actions/upload-artifact@v3
         if: failure()
