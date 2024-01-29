@@ -6,7 +6,9 @@
 
 
 using System;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Gauge.Dotnet.Wrappers;
 
 namespace Gauge.Dotnet
@@ -36,6 +38,12 @@ namespace Gauge.Dotnet
                 var error = "Could not load instance type: " + typeToLoad;
                 Logger.Error(error);
                 throw new TypeLoadException(error);
+            }
+
+            if (method.GetCustomAttributes(typeof(AsyncStateMachineAttribute), false).Any())
+            {
+                ((dynamic)_reflectionWrapper.Invoke(method, instance, parameters)).GetAwaiter().GetResult();
+                return;
             }
 
             _reflectionWrapper.Invoke(method, instance, parameters);

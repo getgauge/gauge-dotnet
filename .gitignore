@@ -8,3 +8,8 @@ artifacts
 .ionide
 .DS_Store
 .fake
+.idea
+Gauge.Dotnet.sln.DotSettings.user
+_testdata/Sample/.gauge/
+_testdata/Sample/logs/
+_testdata/Sample/reports/

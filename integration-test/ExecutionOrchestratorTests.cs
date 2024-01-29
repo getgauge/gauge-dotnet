@@ -80,7 +80,6 @@ namespace Gauge.Dotnet.IntegrationTests
             ClassicAssert.False(executionResult.Failed);
         }
 
-
         [Test]
         public void ShouldGetPendingMessages()
         {
@@ -103,6 +102,28 @@ namespace Gauge.Dotnet.IntegrationTests
             ClassicAssert.Contains("hello, world!", executionResult.Message);
         }
 
+        [Test]
+        public void ShouldExecuteAsyncStepImplementation()
+        {
+            var reflectionWrapper = new ReflectionWrapper();
+            var activatorWrapper = new ActivatorWrapper();
+            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
+            var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
+            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
+            var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
+            var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
+                classInstanceManager,
+                new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
+                new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+
+            var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("Say {} to {} async");
+
+            var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod, "hello", "async world");
+
+            Assert.False(executionResult.Failed, executionResult.ErrorMessage);
+            Assert.Contains("hello, async world!", executionResult.Message);
+        }
+        
         [Test]
         public void ShouldGetStacktraceForAggregateException()
         {
