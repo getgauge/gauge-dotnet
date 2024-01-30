@@ -120,8 +120,8 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod, "hello", "async world");
 
-            Assert.False(executionResult.Failed, executionResult.ErrorMessage);
-            Assert.Contains("hello, async world!", executionResult.Message);
+            Assert.That(executionResult.Failed, Is.False, executionResult.ErrorMessage);
+            StringAssert.Contains("hello, async world!", executionResult.Message.ToString());
         }
         
         [Test]
