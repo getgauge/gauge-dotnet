@@ -12,6 +12,7 @@ using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.UnitTests.Helpers;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests.Processors
 {
@@ -88,7 +89,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         public void ShouldFetchTaggedHooksAfterUntaggedHooks()
         {
             var applicableHooks = new UntaggedHooksFirstStrategy()
-                .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToList();
+                .GetApplicableHooks(new List<string> { "Foo" }, _hookMethods).ToList();
 
             var expectedMethods = new[]
             {
@@ -99,14 +100,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
             };
 
 
-            Assert.AreEqual(expectedMethods, applicableHooks);
+            ClassicAssert.AreEqual(expectedMethods, applicableHooks);
         }
 
         [Test]
         public void ShouldFetchTaggedHooksInSortedOrder()
         {
             var applicableHooks = new UntaggedHooksFirstStrategy()
-                .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToList();
+                .GetApplicableHooks(new List<string> { "Foo" }, _hookMethods).ToList();
 
             var expectedMethods = new[]
             {
@@ -116,17 +117,17 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 "my.foo.type.Foo"
             };
 
-            Assert.AreEqual(expectedMethods, applicableHooks);
+            ClassicAssert.AreEqual(expectedMethods, applicableHooks);
         }
 
         [Test]
         public void ShouldFetchUntaggedHooksInSortedOrder()
         {
             var applicableHooks = new UntaggedHooksFirstStrategy()
-                .GetApplicableHooks(new List<string> {"Foo"}, _hookMethods).ToList();
+                .GetApplicableHooks(new List<string> { "Foo" }, _hookMethods).ToList();
 
-            Assert.AreEqual(applicableHooks[2], "my.foo.type.Zed");
-            Assert.AreEqual(applicableHooks[3], "my.foo.type.Foo");
+            ClassicAssert.AreEqual(applicableHooks[2], "my.foo.type.Zed");
+            ClassicAssert.AreEqual(applicableHooks[3], "my.foo.type.Foo");
         }
     }
 }

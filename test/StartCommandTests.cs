@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests
 {
@@ -26,8 +27,8 @@ namespace Gauge.Dotnet.UnitTests
             {
             }
 
-            public override void ConfigureServices(IServiceCollection services) {}
-            public override void Configure(IApplicationBuilder app, IHostApplicationLifetime lifetime) {}
+            public override void ConfigureServices(IServiceCollection services) { }
+            public override void Configure(IApplicationBuilder app, IHostApplicationLifetime lifetime) { }
         }
 
         [SetUp]
@@ -53,7 +54,8 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void ShouldInvokeProjectBuild()
         {
-            _startCommand.Execute().ContinueWith(b => {
+            _startCommand.Execute().ContinueWith(b =>
+            {
                 _mockGaugeProjectBuilder.Verify(builder => builder.BuildTargetGaugeProject(), Times.Once);
             });
         }
@@ -62,7 +64,8 @@ namespace Gauge.Dotnet.UnitTests
         public void ShouldNotBuildWhenCustomBuildPathIsSetAsync()
         {
             Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", "GAUGE_CUSTOM_BUILD_PATH");
-            _startCommand.Execute().ContinueWith(b => {
+            _startCommand.Execute().ContinueWith(b =>
+            {
                 _mockGaugeProjectBuilder.Verify(builder => builder.BuildTargetGaugeProject(), Times.Never);
             });
 
@@ -73,7 +76,7 @@ namespace Gauge.Dotnet.UnitTests
         {
             _mockGaugeProjectBuilder.Setup(builder => builder.BuildTargetGaugeProject()).Returns(false);
             _startCommand.Execute()
-                .ContinueWith(b => Assert.False(b.Result, "Should not start server when build fails"));
+                .ContinueWith(b => ClassicAssert.False(b.Result, "Should not start server when build fails"));
         }
 
         [Test]
@@ -82,7 +85,7 @@ namespace Gauge.Dotnet.UnitTests
             _mockGaugeProjectBuilder.Setup(builder => builder.BuildTargetGaugeProject()).Returns(true);
 
             _startCommand.Execute()
-                .ContinueWith(b => Assert.True(b.Result, "Should start server using GaugeListener when build passes"));
+                .ContinueWith(b => ClassicAssert.True(b.Result, "Should start server using GaugeListener when build passes"));
         }
 
         [Test]
@@ -91,7 +94,7 @@ namespace Gauge.Dotnet.UnitTests
             Environment.SetEnvironmentVariable("GAUGE_CUSTOM_BUILD_PATH", "GAUGE_CUSTOM_BUILD_PATH");
 
             _startCommand.Execute()
-                .ContinueWith(b => Assert.True(b.Result, "Should start server using GaugeListener when GAUGE_CUSTOM_BUILD_PATH is set"));
+                .ContinueWith(b => ClassicAssert.True(b.Result, "Should start server using GaugeListener when GAUGE_CUSTOM_BUILD_PATH is set"));
         }
 
         [Test]
@@ -103,7 +106,7 @@ namespace Gauge.Dotnet.UnitTests
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 expected = $"/private{expected}";
 
-            Assert.That(actual, Is.SamePath(expected));
+            ClassicAssert.That(actual, Is.SamePath(expected));
         }
     }
 }

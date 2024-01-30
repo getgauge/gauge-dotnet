@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Gauge.Dotnet.Models;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests
 {
@@ -27,8 +28,8 @@ namespace Gauge.Dotnet.UnitTests
             foreach (var pair in methods)
                 stepRegistry.AddStep(pair.Key, pair.Value);
 
-            Assert.True(stepRegistry.ContainsStep("Foo"));
-            Assert.True(stepRegistry.ContainsStep("Bar"));
+            ClassicAssert.True(stepRegistry.ContainsStep("Foo"));
+            ClassicAssert.True(stepRegistry.ContainsStep("Bar"));
         }
 
         [Test]
@@ -57,7 +58,7 @@ namespace Gauge.Dotnet.UnitTests
             foreach (var pair in methods)
                 stepRegistry.AddStep(pair.Key, pair.Value);
 
-            Assert.True(stepRegistry.HasAlias("foo {}"));
+            ClassicAssert.True(stepRegistry.HasAlias("foo {}"));
         }
 
         [Test]
@@ -74,9 +75,9 @@ namespace Gauge.Dotnet.UnitTests
 
             var allSteps = stepRegistry.AllSteps().ToList();
 
-            Assert.AreEqual(allSteps.Count, 2);
-            Assert.True(allSteps.Contains("Foo"));
-            Assert.True(allSteps.Contains("Bar"));
+            ClassicAssert.AreEqual(allSteps.Count, 2);
+            ClassicAssert.True(allSteps.Contains("Foo"));
+            ClassicAssert.True(allSteps.Contains("Bar"));
         }
 
         [Test]
@@ -91,7 +92,7 @@ namespace Gauge.Dotnet.UnitTests
             foreach (var pair in methods)
                 stepRegistry.AddStep(pair.Key, pair.Value);
 
-            Assert.AreEqual(stepRegistry.GetStepText("random"), string.Empty);
+            ClassicAssert.AreEqual(stepRegistry.GetStepText("random"), string.Empty);
         }
 
         [Test]
@@ -108,7 +109,7 @@ namespace Gauge.Dotnet.UnitTests
 
             var method = stepRegistry.MethodFor("Foo");
 
-            Assert.AreEqual(method.Name, "Foo");
+            ClassicAssert.AreEqual(method.Name, "Foo");
         }
 
         [Test]
@@ -130,7 +131,7 @@ namespace Gauge.Dotnet.UnitTests
                 stepRegistry.AddStep(pair.Key, pair.Value);
 
 
-            Assert.AreEqual(stepRegistry.GetStepText("Foo {}"), "Foo <something>");
+            ClassicAssert.AreEqual(stepRegistry.GetStepText("Foo {}"), "Foo <something>");
         }
 
         [Test]
@@ -147,8 +148,8 @@ namespace Gauge.Dotnet.UnitTests
             foreach (var pair in methods)
                 stepRegistry.AddStep(pair.Key, pair.Value);
 
-            Assert.False(stepRegistry.HasAlias("Foo"));
-            Assert.False(stepRegistry.HasAlias("Bar"));
+            ClassicAssert.False(stepRegistry.HasAlias("Foo"));
+            ClassicAssert.False(stepRegistry.HasAlias("Bar"));
         }
 
         [Test]
@@ -166,30 +167,30 @@ namespace Gauge.Dotnet.UnitTests
                 stepRegistry.AddStep(pair.Key, pair.Value);
 
             stepRegistry.RemoveSteps("Foo.cs");
-            Assert.False(stepRegistry.ContainsStep("Foo"));
+            ClassicAssert.False(stepRegistry.ContainsStep("Foo"));
         }
 
         [Test]
         public void ShouldCheckIfFileIsCached()
         {
             var stepRegistry = new StepRegistry();
-            stepRegistry.AddStep("Foo", new GaugeMethod {Name = "Foo", StepText = "Foo", FileName = "Foo.cs"});
+            stepRegistry.AddStep("Foo", new GaugeMethod { Name = "Foo", StepText = "Foo", FileName = "Foo.cs" });
 
-            Assert.True(stepRegistry.IsFileCached("Foo.cs"));
-            Assert.False(stepRegistry.IsFileCached("Bar.cs"));
+            ClassicAssert.True(stepRegistry.IsFileCached("Foo.cs"));
+            ClassicAssert.False(stepRegistry.IsFileCached("Bar.cs"));
         }
 
         [Test]
         public void ShouldNotContainStepPositionForExternalSteps()
         {
             var stepRegistry = new StepRegistry();
-            stepRegistry.AddStep("Foo", new GaugeMethod {Name = "Foo", StepText = "Foo", FileName = "foo.cs"});
-            stepRegistry.AddStep("Bar", new GaugeMethod {Name = "Bar", StepText = "Bar", IsExternal = true});
+            stepRegistry.AddStep("Foo", new GaugeMethod { Name = "Foo", StepText = "Foo", FileName = "foo.cs" });
+            stepRegistry.AddStep("Bar", new GaugeMethod { Name = "Bar", StepText = "Bar", IsExternal = true });
 
             var positions = stepRegistry.GetStepPositions("foo.cs");
 
-            Assert.True(positions.Count() == 1);
-            Assert.AreNotEqual(positions.First().StepValue, "Bar");
+            ClassicAssert.True(positions.Count() == 1);
+            ClassicAssert.AreNotEqual(positions.First().StepValue, "Bar");
         }
     }
 }

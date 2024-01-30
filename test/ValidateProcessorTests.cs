@@ -9,6 +9,7 @@ using Gauge.Dotnet.Processors;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests
 {
@@ -21,7 +22,7 @@ namespace Gauge.Dotnet.UnitTests
             _mockStepRegistry = new Mock<IStepRegistry>();
 
         }
- 
+
         private Mock<IStepRegistry> _mockStepRegistry;
 
         [Test]
@@ -38,12 +39,12 @@ namespace Gauge.Dotnet.UnitTests
             var processor = new StepValidationProcessor(_mockStepRegistry.Object);
             var response = processor.Process(request);
 
-            Assert.AreEqual(false, response.IsValid);
-            Assert.AreEqual(StepValidateResponse.Types.ErrorType.DuplicateStepImplementation,
+            ClassicAssert.AreEqual(false, response.IsValid);
+            ClassicAssert.AreEqual(StepValidateResponse.Types.ErrorType.DuplicateStepImplementation,
                 response.ErrorType);
-            Assert.AreEqual("Multiple step implementations found for : step_text_1",
+            ClassicAssert.AreEqual("Multiple step implementations found for : step_text_1",
                 response.ErrorMessage);
-            Assert.IsEmpty(response.Suggestion);
+            ClassicAssert.IsEmpty(response.Suggestion);
         }
 
         [Test]
@@ -62,8 +63,8 @@ namespace Gauge.Dotnet.UnitTests
             var processor = new StepValidationProcessor(_mockStepRegistry.Object);
             var response = processor.Process(request);
 
-            Assert.AreEqual(false, response.IsValid);
-            Assert.AreEqual(StepValidateResponse.Types.ErrorType.StepImplementationNotFound,
+            ClassicAssert.AreEqual(false, response.IsValid);
+            ClassicAssert.AreEqual(StepValidateResponse.Types.ErrorType.StepImplementationNotFound,
                 response.ErrorType);
             StringAssert.Contains("No implementation found for : step_text_1.",
                 response.ErrorMessage);
@@ -86,7 +87,7 @@ namespace Gauge.Dotnet.UnitTests
             var processor = new StepValidationProcessor(_mockStepRegistry.Object);
             var response = processor.Process(request);
 
-            Assert.AreEqual(true, response.IsValid);
+            ClassicAssert.AreEqual(true, response.IsValid);
         }
     }
 }

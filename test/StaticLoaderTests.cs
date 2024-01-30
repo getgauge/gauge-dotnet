@@ -14,6 +14,7 @@ using Gauge.CSharp.Core;
 using Gauge.Dotnet.Wrappers;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests
 {
@@ -58,9 +59,9 @@ namespace Gauge.Dotnet.UnitTests
             loader.LoadStepsFromText(text, fileName);
             var registry = loader.GetStepRegistry();
 
-            Assert.True(registry.ContainsStep("goodbye"));
-            Assert.True(registry.ContainsStep("adieu"));
-            Assert.True(registry.ContainsStep("sayonara"));
+            ClassicAssert.True(registry.ContainsStep("goodbye"));
+            ClassicAssert.True(registry.ContainsStep("adieu"));
+            ClassicAssert.True(registry.ContainsStep("sayonara"));
         }
 
         [Test]
@@ -85,7 +86,7 @@ namespace Gauge.Dotnet.UnitTests
                                 "}\n";
             const string fileName = @"foo.cs";
             loader.LoadStepsFromText(text, fileName);
-            Assert.True(loader.GetStepRegistry().ContainsStep("hello"));
+            ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
         }
 
         [Test]
@@ -128,9 +129,9 @@ namespace Gauge.Dotnet.UnitTests
             loader.ReloadSteps(newText, file2);
 
             var positions = loader.GetStepRegistry().GetStepPositions(file1).ToList();
-            Assert.AreEqual(1, positions.Count);
-            Assert.AreEqual(6, positions.First().Span.Start);
-            Assert.AreEqual(9, positions.First().Span.End);
+            ClassicAssert.AreEqual(1, positions.Count);
+            ClassicAssert.AreEqual(6, positions.First().Span.Start);
+            ClassicAssert.AreEqual(9, positions.First().Span.End);
         }
 
         [Test]
@@ -160,7 +161,7 @@ namespace Gauge.Dotnet.UnitTests
             const string fileName = @"foo.cs";
             var filePath = Path.Combine(Utils.GaugeProjectRoot, fileName);
             loader.ReloadSteps(text, filePath);
-            Assert.False(loader.GetStepRegistry().ContainsStep("hello"));
+            ClassicAssert.False(loader.GetStepRegistry().ContainsStep("hello"));
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
 
@@ -185,7 +186,7 @@ namespace Gauge.Dotnet.UnitTests
                                 "}\n";
             const string fileName = @"foo.cs";
             loader.LoadStepsFromText(text, fileName);
-            Assert.True(loader.GetStepRegistry().ContainsStep("hello"));
+            ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
 
             const string newText = "using Gauge.CSharp.Lib.Attributes;\n" +
                                    "namespace foobar\n" +
@@ -205,7 +206,7 @@ namespace Gauge.Dotnet.UnitTests
 
             loader.ReloadSteps(newText, fileName);
 
-            Assert.True(loader.GetStepRegistry().ContainsStep("hola"));
+            ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hola"));
         }
 
         [Test]
@@ -247,12 +248,12 @@ namespace Gauge.Dotnet.UnitTests
 
             loader.ReloadSteps(newText, file2);
 
-            Assert.True(loader.GetStepRegistry().ContainsStep("hello"));
-            Assert.True(loader.GetStepRegistry().ContainsStep("hola"));
+            ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
+            ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hola"));
 
             loader.RemoveSteps(file2);
 
-            Assert.False(loader.GetStepRegistry().ContainsStep("hola"));
+            ClassicAssert.False(loader.GetStepRegistry().ContainsStep("hola"));
         }
 
         public class LoadImplementationsTest

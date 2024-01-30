@@ -7,13 +7,12 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests.Processors
 {
@@ -43,9 +42,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var tags = AssertEx.ExecuteProtectedMethod<SpecExecutionEndingProcessor>("GetApplicableTags", executionInfo)
                 .ToList();
 
-            Assert.IsNotEmpty(tags);
-            Assert.AreEqual(1, tags.Count);
-            Assert.Contains("foo", tags);
+            ClassicAssert.IsNotEmpty(tags);
+            ClassicAssert.AreEqual(1, tags.Count);
+            ClassicAssert.Contains("foo", tags);
         }
 
         [Test]
@@ -67,7 +66,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             };
 
             var pendingMessages = new List<string> { "one", "two" };
-            var pendingScreenshotFiles = new List<string> { "screenshot.png"};
+            var pendingScreenshotFiles = new List<string> { "screenshot.png" };
 
             mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("AfterSpec", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
@@ -80,9 +79,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var processor = new SpecExecutionEndingProcessor(mockMethodExecutor.Object);
 
             var result = processor.Process(request);
-            Assert.False(result.ExecutionResult.Failed);
-            Assert.AreEqual(result.ExecutionResult.Message.ToList(), pendingMessages);
-            Assert.AreEqual(result.ExecutionResult.ScreenshotFiles.ToList(), pendingScreenshotFiles);
+            ClassicAssert.False(result.ExecutionResult.Failed);
+            ClassicAssert.AreEqual(result.ExecutionResult.Message.ToList(), pendingMessages);
+            ClassicAssert.AreEqual(result.ExecutionResult.ScreenshotFiles.ToList(), pendingScreenshotFiles);
         }
     }
 }

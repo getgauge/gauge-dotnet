@@ -11,6 +11,7 @@ using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Messages;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.IntegrationTests
 {
@@ -65,7 +66,7 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var refactorProcessor = new RefactorProcessor(stepRegistry);
             var result = refactorProcessor.Process(message);
-            Assert.IsTrue(result.Success);
+            ClassicAssert.IsTrue(result.Success);
         }
 
         [TearDown]

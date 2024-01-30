@@ -17,6 +17,7 @@ using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests
 {
@@ -69,7 +70,7 @@ namespace Gauge.Dotnet.UnitTests
                 It.IsAny<ExecutionInfo>());
 
             mockHookExecuter.VerifyAll();
-            Assert.False(result.Failed);
+            ClassicAssert.False(result.Failed);
         }
 
         [Test]
@@ -114,8 +115,8 @@ namespace Gauge.Dotnet.UnitTests
                 It.IsAny<ExecutionInfo>());
 
             mockHookExecuter.VerifyAll();
-            Assert.True(result.Failed);
-            Assert.True(string.IsNullOrEmpty(result.FailureScreenshotFile));
+            ClassicAssert.True(result.Failed);
+            ClassicAssert.True(string.IsNullOrEmpty(result.FailureScreenshotFile));
             Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", screenshotEnabled);
         }
 
@@ -151,8 +152,8 @@ namespace Gauge.Dotnet.UnitTests
                 .Returns(pendingScreenshots);
             var result = orchestrator.ExecuteStep(gaugeMethod, args);
             mockStepExecutor.VerifyAll();
-            Assert.False(result.Failed);
-            Assert.True(result.ExecutionTime > 0);
+            ClassicAssert.False(result.Failed);
+            ClassicAssert.True(result.ExecutionTime > 0);
         }
 
         [Test]
@@ -194,7 +195,7 @@ namespace Gauge.Dotnet.UnitTests
             var result = orchestrator.ExecuteStep(gaugeMethod, "Bar", "string");
 
             mockStepExecutor.VerifyAll();
-            Assert.True(string.IsNullOrEmpty(result.FailureScreenshotFile));
+            ClassicAssert.True(string.IsNullOrEmpty(result.FailureScreenshotFile));
             Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", screenshotEnabled);
         }
 
@@ -235,8 +236,8 @@ namespace Gauge.Dotnet.UnitTests
             mockStepExecutor.VerifyAll();
 
 
-            Assert.True(result.Failed);
-            Assert.AreEqual(expectedScreenshot, result.FailureScreenshotFile);
+            ClassicAssert.True(result.Failed);
+            ClassicAssert.AreEqual(expectedScreenshot, result.FailureScreenshotFile);
         }
     }
 }

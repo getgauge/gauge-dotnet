@@ -23,7 +23,7 @@ jobs:
     - name: Setup .NET Core 
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
 
     - name: Dotnet unit test on windows
       if: matrix.os == 'windows-latest'
@@ -45,7 +45,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        dotnet: [7.0.x, 6.0.x]
 
     steps:
       - uses: actions/checkout@v3
@@ -62,7 +61,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: 8.0.x
 
       - uses: getgauge/setup-gauge@master
         with:
@@ -86,14 +85,14 @@ jobs:
         if: matrix.os != 'windows-latest'
         run: |
           cd gauge-tests
-          ./gradlew clean dotnetFT
+          ./gradlew -Pnodes=2 clean dotnetFT
 
       - name: Run FTs on windows
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
           cd gauge-tests
-          .\gradlew.bat clean dotnetFT
+          .\gradlew.bat -Pnodes=2 clean dotnetFT
 
       - uses: actions/upload-artifact@v3
         if: failure()
@@ -118,7 +117,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: 8.0.x
 
       - uses: getgauge/setup-gauge@master
         with:

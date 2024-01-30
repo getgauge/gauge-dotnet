@@ -12,6 +12,7 @@ using Gauge.Dotnet.UnitTests.Helpers;
 using Gauge.Dotnet.Wrappers;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests
 {
@@ -51,7 +52,7 @@ namespace Gauge.Dotnet.UnitTests
 
 
             var result = executor.Execute(gaugeMethod);
-            Assert.True(result.Success);
+            ClassicAssert.True(result.Success);
         }
 
         [Test]
@@ -86,8 +87,8 @@ namespace Gauge.Dotnet.UnitTests
                 .Throws(new Exception("step execution failure"));
 
             var result = executor.Execute(gaugeMethod);
-            Assert.False(result.Success);
-            Assert.AreEqual(result.ExceptionMessage, "step execution failure");
+            ClassicAssert.False(result.Success);
+            ClassicAssert.AreEqual(result.ExceptionMessage, "step execution failure");
         }
 
         [Test]
@@ -124,9 +125,9 @@ namespace Gauge.Dotnet.UnitTests
                 .Throws(new Exception("step execution failure"));
 
             var result = executor.Execute(gaugeMethod);
-            Assert.False(result.Success);
-            Assert.True(result.Recoverable);
-            Assert.AreEqual(result.ExceptionMessage, "step execution failure");
+            ClassicAssert.False(result.Success);
+            ClassicAssert.True(result.Recoverable);
+            ClassicAssert.AreEqual(result.ExceptionMessage, "step execution failure");
         }
     }
 }

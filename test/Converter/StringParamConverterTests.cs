@@ -9,6 +9,7 @@ using System.Linq;
 using Gauge.Dotnet.Converters;
 using Gauge.Messages;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests.Converter
 {
@@ -46,7 +47,7 @@ namespace Gauge.Dotnet.UnitTests.Converter
 
             var actual = new StringParamConverter().Convert(parameter);
 
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -55,8 +56,8 @@ namespace Gauge.Dotnet.UnitTests.Converter
             var type = new TestTypeConversion().GetType();
             var method = type.GetMethod("Bool");
 
-            var getParams = StringParamConverter.TryConvertParams(method, new object[] {"false"});
-            Assert.AreEqual(typeof(bool), getParams.First().GetType());
+            var getParams = StringParamConverter.TryConvertParams(method, new object[] { "false" });
+            ClassicAssert.AreEqual(typeof(bool), getParams.First().GetType());
         }
 
         [Test]
@@ -65,8 +66,8 @@ namespace Gauge.Dotnet.UnitTests.Converter
             var type = new TestTypeConversion().GetType();
             var method = type.GetMethod("Float");
 
-            var getParams = StringParamConverter.TryConvertParams(method, new object[] {"3.1412"});
-            Assert.AreEqual(typeof(float), getParams.First().GetType());
+            var getParams = StringParamConverter.TryConvertParams(method, new object[] { "3.1412" });
+            ClassicAssert.AreEqual(typeof(float), getParams.First().GetType());
         }
 
         [Test]
@@ -75,8 +76,8 @@ namespace Gauge.Dotnet.UnitTests.Converter
             var type = new TestTypeConversion().GetType();
             var method = type.GetMethod("Int");
 
-            var getParams = StringParamConverter.TryConvertParams(method, new object[] {"1"});
-            Assert.AreEqual(typeof(int), getParams.First().GetType());
+            var getParams = StringParamConverter.TryConvertParams(method, new object[] { "1" });
+            ClassicAssert.AreEqual(typeof(int), getParams.First().GetType());
         }
 
         [Test]
@@ -85,8 +86,8 @@ namespace Gauge.Dotnet.UnitTests.Converter
             var type = new TestTypeConversion().GetType();
             var method = type.GetMethod("Int");
 
-            var getParams = StringParamConverter.TryConvertParams(method, new object[] {"hahaha"});
-            Assert.AreEqual(typeof(string), getParams.First().GetType());
+            var getParams = StringParamConverter.TryConvertParams(method, new object[] { "hahaha" });
+            ClassicAssert.AreEqual(typeof(string), getParams.First().GetType());
         }
     }
 }

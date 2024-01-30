@@ -6,6 +6,7 @@
 
 using Gauge.Dotnet.Extensions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests
 {
@@ -25,7 +26,7 @@ namespace Gauge.Dotnet.UnitTests
         [Test]
         public void GeneratesValidIdentifiers(string input, string expected, bool camelCase)
         {
-            Assert.AreEqual(expected, input.ToValidCSharpIdentifier(camelCase));
+            ClassicAssert.AreEqual(expected, input.ToValidCSharpIdentifier(camelCase));
         }
     }
 }

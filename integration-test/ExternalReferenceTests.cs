@@ -12,6 +12,7 @@ using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.IntegrationTests
 {
@@ -35,7 +36,7 @@ namespace Gauge.Dotnet.IntegrationTests
             };
             var result = stepValidationProcessor.Process(message);
 
-            Assert.IsTrue(result.IsValid, $"Expected valid step text, got error: {result.ErrorMessage}");
+            ClassicAssert.IsTrue(result.IsValid, $"Expected valid step text, got error: {result.ErrorMessage}");
         }
 
 
@@ -68,9 +69,9 @@ namespace Gauge.Dotnet.IntegrationTests
             var result = executeStepProcessor.Process(message);
             var protoExecutionResult = result.ExecutionResult;
 
-            Assert.IsNotNull(protoExecutionResult);
+            ClassicAssert.IsNotNull(protoExecutionResult);
             Console.WriteLine(protoExecutionResult.ScreenshotFiles[0]);
-            Assert.AreEqual(protoExecutionResult.ScreenshotFiles[0], expected);
+            ClassicAssert.AreEqual(protoExecutionResult.ScreenshotFiles[0], expected);
         }
 
         [TearDown]

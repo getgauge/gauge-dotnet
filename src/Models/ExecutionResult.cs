@@ -23,6 +23,7 @@ namespace Gauge.Dotnet.Models
 
         public bool Recoverable { get; set; }
 
+        [Obsolete]
         public override object InitializeLifetimeService()
         {
             return null;

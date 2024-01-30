@@ -14,6 +14,7 @@ using Gauge.Dotnet.Models;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.IntegrationTests
 {
@@ -40,7 +41,7 @@ namespace Gauge.Dotnet.IntegrationTests
 
         private readonly string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
 
-        private void AssertStepAttributeWithTextExists(RefactoringChange result, string methodName, string text)
+        private void ClassicAssertStepAttributeWithTextExists(RefactoringChange result, string methodName, string text)
         {
             var name = methodName.Split('.').Last().Split('-').First();
             var tree =
@@ -49,7 +50,7 @@ namespace Gauge.Dotnet.IntegrationTests
 
             var stepTexts = root.DescendantNodes().OfType<MethodDeclarationSyntax>()
                 .Select(
-                    node => new {node, attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes)})
+                    node => new { node, attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes) })
                 .Where(t => string.CompareOrdinal(t.node.Identifier.ValueText, name) == 0
                             &&
                             t.attributeSyntaxes.Any(
@@ -57,10 +58,10 @@ namespace Gauge.Dotnet.IntegrationTests
                 .SelectMany(t => t.node.AttributeLists.SelectMany(syntax => syntax.Attributes))
                 .SelectMany(syntax => syntax.ArgumentList.Arguments)
                 .Select(syntax => syntax.GetText().ToString().Trim('"'));
-            Assert.True(stepTexts.Contains(text));
+            ClassicAssert.True(stepTexts.Contains(text));
         }
 
-        private void AssertParametersExist(RefactoringChange result, string methodName,
+        private void ClassicAssertParametersExist(RefactoringChange result, string methodName,
             IReadOnlyList<string> parameters)
         {
             var name = methodName.Split('.').Last().Split('-').First();
@@ -75,7 +76,7 @@ namespace Gauge.Dotnet.IntegrationTests
                 .ToArray();
 
             for (var i = 0; i < parameters.Count; i++)
-                Assert.AreEqual(parameters[i], methodParameters[i]);
+                ClassicAssert.AreEqual(parameters[i], methodParameters[i]);
         }
 
         [Test]
@@ -92,10 +93,10 @@ namespace Gauge.Dotnet.IntegrationTests
             var parameterPositions = new[]
                 {new Tuple<int, int>(0, 0), new Tuple<int, int>(1, 1), new Tuple<int, int>(-1, 2)};
             var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions,
-                new List<string> {"what", "who", "where"},
+                new List<string> { "what", "who", "where" },
                 newStepValue);
-            AssertStepAttributeWithTextExists(changes, gaugeMethod.Name, newStepValue);
-            AssertParametersExist(changes, gaugeMethod.Name, new[] {"what", "who", "where"});
+            ClassicAssertStepAttributeWithTextExists(changes, gaugeMethod.Name, newStepValue);
+            ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "what", "who", "where" });
         }
 
         [Test]
@@ -108,13 +109,13 @@ namespace Gauge.Dotnet.IntegrationTests
                 ClassName = "RefactoringSample",
                 FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
             };
-            var parameterPositions = new[] {new Tuple<int, int>(-1, 0)};
+            var parameterPositions = new[] { new Tuple<int, int>(-1, 0) };
 
             var changes =
-                RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> {"foo"}, newStepValue);
+                RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> { "foo" }, newStepValue);
 
-            AssertStepAttributeWithTextExists(changes, gaugeMethod.Name, newStepValue);
-            AssertParametersExist(changes, gaugeMethod.Name, new[] {"foo"});
+            ClassicAssertStepAttributeWithTextExists(changes, gaugeMethod.Name, newStepValue);
+            ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "foo" });
         }
 
         [Test]
@@ -128,13 +129,13 @@ namespace Gauge.Dotnet.IntegrationTests
                 ClassName = "RefactoringSample",
                 FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
             };
-            var parameterPositions = new[] {new Tuple<int, int>(-1, 0)};
+            var parameterPositions = new[] { new Tuple<int, int>(-1, 0) };
 
-            var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> {"class"},
+            var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> { "class" },
                 newStepValue);
 
-            AssertStepAttributeWithTextExists(changes, gaugeMethod.Name, newStepValue);
-            AssertParametersExist(changes, gaugeMethod.Name, new[] {"@class"});
+            ClassicAssertStepAttributeWithTextExists(changes, gaugeMethod.Name, newStepValue);
+            ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "@class" });
         }
 
         [Test]
@@ -152,7 +153,7 @@ namespace Gauge.Dotnet.IntegrationTests
             var changes =
                 RefactorHelper.Refactor(gaugeMethod, new List<Tuple<int, int>>(), new List<string>(), "foo");
 
-            Assert.AreEqual(expectedPath, changes.FileName);
+            ClassicAssert.AreEqual(expectedPath, changes.FileName);
         }
 
         [Test]
@@ -166,7 +167,7 @@ namespace Gauge.Dotnet.IntegrationTests
             };
             var changes = RefactorHelper.Refactor(gaugeMethod, new List<Tuple<int, int>>(), new List<string>(), "foo");
 
-            AssertStepAttributeWithTextExists(changes, gaugeMethod.Name, "foo");
+            ClassicAssertStepAttributeWithTextExists(changes, gaugeMethod.Name, "foo");
         }
 
         [Test]
@@ -178,12 +179,12 @@ namespace Gauge.Dotnet.IntegrationTests
                 ClassName = "RefactoringSample",
                 FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
             };
-            var parameterPositions = new[] {new Tuple<int, int>(0, 0)};
+            var parameterPositions = new[] { new Tuple<int, int>(0, 0) };
 
             var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string>(),
                 "Refactoring Say <what> to someone");
 
-            AssertParametersExist(changes, gaugeMethod.Name, new[] {"what"});
+            ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "what" });
         }
 
         [Test]
@@ -196,12 +197,12 @@ namespace Gauge.Dotnet.IntegrationTests
                 FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
             };
 
-            var parameterPositions = new[] {new Tuple<int, int>(1, 0)};
+            var parameterPositions = new[] { new Tuple<int, int>(1, 0) };
 
             var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string>(),
                 "Refactoring Say something to <who>");
 
-            AssertParametersExist(changes, gaugeMethod.Name, new[] {"who"});
+            ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "who" });
         }
 
         [Test]
@@ -216,14 +217,14 @@ namespace Gauge.Dotnet.IntegrationTests
                 FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
             };
 
-            var parameterPositions = new[] {new Tuple<int, int>(0, 1), new Tuple<int, int>(1, 0)};
-            var result = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> {"who", "what"},
+            var parameterPositions = new[] { new Tuple<int, int>(0, 1), new Tuple<int, int>(1, 0) };
+            var result = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> { "who", "what" },
                 newStepValue);
 
-            AssertStepAttributeWithTextExists(result, gaugeMethod.Name, newStepValue);
-            AssertParametersExist(result, gaugeMethod.Name, new[] {"who", "what"});
-            Assert.True(result.Diffs.Any(d => d.Content == "\"Refactoring Say <who> to <what>\""));
-            Assert.True(result.Diffs.Any(d => d.Content == "(string who,string what)"));
+            ClassicAssertStepAttributeWithTextExists(result, gaugeMethod.Name, newStepValue);
+            ClassicAssertParametersExist(result, gaugeMethod.Name, new[] { "who", "what" });
+            ClassicAssert.True(result.Diffs.Any(d => d.Content == "\"Refactoring Say <who> to <what>\""));
+            ClassicAssert.True(result.Diffs.Any(d => d.Content == "(string who,string what)"));
         }
     }
 }

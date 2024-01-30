@@ -5,15 +5,13 @@
  *----------------------------------------------------------------*/
 
 
-using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using static Gauge.Messages.StepPositionsResponse.Types;
 
 namespace Gauge.Dotnet.UnitTests.Processors
@@ -26,15 +24,15 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var filePath = "Foo.cs";
             var mockStepRegistry = new Mock<IStepRegistry>();
             mockStepRegistry.Setup(x => x.GetStepPositions(filePath))
-                .Returns(new[] {new StepPosition{StepValue = "goodbye", Span = new Span{Start= 6, End= 16}}});
+                .Returns(new[] { new StepPosition { StepValue = "goodbye", Span = new Span { Start = 6, End = 16 } } });
             var processor = new StepPositionsProcessor(mockStepRegistry.Object);
-            var request = new StepPositionsRequest {FilePath = "Foo.cs"};
+            var request = new StepPositionsRequest { FilePath = "Foo.cs" };
 
             var response = processor.Process(request);
 
-            Assert.AreEqual(response.StepPositions.Count, 1);
-            Assert.AreEqual(response.StepPositions.First().StepValue, "goodbye");
-            Assert.AreEqual(response.StepPositions.First().Span.Start, 6);
+            ClassicAssert.AreEqual(response.StepPositions.Count, 1);
+            ClassicAssert.AreEqual(response.StepPositions.First().StepValue, "goodbye");
+            ClassicAssert.AreEqual(response.StepPositions.First().Span.Start, 6);
         }
 
 
@@ -49,11 +47,11 @@ namespace Gauge.Dotnet.UnitTests.Processors
                     new StepPosition{StepValue = "Sayonara", Span = new Span{Start= 6, End= 16}},
                 });
             var processor = new StepPositionsProcessor(mockStepRegistry.Object);
-            var request = new StepPositionsRequest {FilePath = filePath};
+            var request = new StepPositionsRequest { FilePath = filePath };
 
             var response = processor.Process(request);
 
-            Assert.AreEqual(response.StepPositions.Count, 2);
+            ClassicAssert.AreEqual(response.StepPositions.Count, 2);
         }
     }
 }

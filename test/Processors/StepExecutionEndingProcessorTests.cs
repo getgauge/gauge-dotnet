@@ -8,8 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
@@ -17,6 +15,7 @@ using Gauge.Dotnet.UnitTests.Helpers;
 using Gauge.Messages;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests.Processors
 {
@@ -90,13 +89,13 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var response = _stepExecutionEndingProcessor.Process(_stepExecutionEndingRequest);
 
-            Assert.True(response != null);
-            Assert.True(response.ExecutionResult != null);
-            Assert.AreEqual(2, response.ExecutionResult.Message.Count);
-            Assert.AreEqual(1, response.ExecutionResult.ScreenshotFiles.Count);
+            ClassicAssert.True(response != null);
+            ClassicAssert.True(response.ExecutionResult != null);
+            ClassicAssert.AreEqual(2, response.ExecutionResult.Message.Count);
+            ClassicAssert.AreEqual(1, response.ExecutionResult.ScreenshotFiles.Count);
 
             foreach (var pendingMessage in _pendingMessages)
-                Assert.Contains(pendingMessage, response.ExecutionResult.Message.ToList());
+                ClassicAssert.Contains(pendingMessage, response.ExecutionResult.Message.ToList());
         }
 
         [Test]
@@ -104,14 +103,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 FileName = "",
                 IsFailed = false
             };
             var scenarioInfo = new ScenarioInfo
             {
-                Tags = {"bar"},
+                Tags = { "bar" },
                 Name = "",
                 IsFailed = false
             };
@@ -123,10 +122,10 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             var tags = AssertEx.ExecuteProtectedMethod<StepExecutionEndingProcessor>("GetApplicableTags", currentScenario)
                 .ToList();
-            Assert.IsNotEmpty(tags);
-            Assert.AreEqual(2, tags.Count);
-            Assert.Contains("foo", tags);
-            Assert.Contains("bar", tags);
+            ClassicAssert.IsNotEmpty(tags);
+            ClassicAssert.AreEqual(2, tags.Count);
+            ClassicAssert.Contains("foo", tags);
+            ClassicAssert.Contains("bar", tags);
         }
 
         [Test]
@@ -134,14 +133,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
         {
             var specInfo = new SpecInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 FileName = "",
                 IsFailed = false
             };
             var scenarioInfo = new ScenarioInfo
             {
-                Tags = {"foo"},
+                Tags = { "foo" },
                 Name = "",
                 IsFailed = false
             };
@@ -157,9 +156,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             var tags = AssertEx.ExecuteProtectedMethod<StepExecutionEndingProcessor>("GetApplicableTags", currentScenario)
                 .ToList();
-            Assert.IsNotEmpty(tags);
-            Assert.AreEqual(1, tags.Count);
-            Assert.Contains("foo", tags);
+            ClassicAssert.IsNotEmpty(tags);
+            ClassicAssert.AreEqual(1, tags.Count);
+            ClassicAssert.Contains("foo", tags);
         }
     }
 }

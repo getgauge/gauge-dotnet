@@ -7,6 +7,7 @@
 using Gauge.Dotnet.Processors;
 using Gauge.Messages;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.UnitTests.Processors
 {
@@ -25,9 +26,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var response = new DefaultProcessor().Process(request);
             var executionStatusResponse = response.ExecutionStatusResponse;
 
-            Assert.AreEqual(response.MessageId, 20);
-            Assert.AreEqual(response.MessageType, Message.Types.MessageType.ExecutionStatusResponse);
-            Assert.AreEqual(executionStatusResponse.ExecutionResult.ExecutionTime, 0);
+            ClassicAssert.AreEqual(response.MessageId, 20);
+            ClassicAssert.AreEqual(response.MessageType, Message.Types.MessageType.ExecutionStatusResponse);
+            ClassicAssert.AreEqual(executionStatusResponse.ExecutionResult.ExecutionTime, 0);
         }
     }
 }
