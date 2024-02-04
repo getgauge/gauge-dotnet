@@ -48,7 +48,7 @@ namespace Gauge.Dotnet.UnitTests
         }
 
         [Test]
-        public void ShouldGetErrorResponseForStepValidateRequestWhennNoImplFound()
+        public void ShouldGetErrorResponseForStepValidateRequestWhenNoImplFound()
         {
             var request = new StepValidateRequest
             {
@@ -73,7 +73,7 @@ namespace Gauge.Dotnet.UnitTests
 
 
         [Test]
-        public void ShouldGetVaildResponseForStepValidateRequest()
+        public void ShouldGetValidResponseForStepValidateRequest()
         {
             var request = new StepValidateRequest
             {
@@ -83,11 +83,38 @@ namespace Gauge.Dotnet.UnitTests
 
             _mockStepRegistry.Setup(registry => registry.ContainsStep("step_text_1")).Returns(true);
             _mockStepRegistry.Setup(registry => registry.HasMultipleImplementations("step_text_1")).Returns(false);
+            _mockStepRegistry.Setup(registry => registry.HasAsyncVoidImplementation("step_text_1")).Returns(false);
+
+            var response = new StepValidationProcessor(_mockStepRegistry.Object).Process(request);
+
+            Assert.True(response.IsValid, $"Expected true, got error: {response.ErrorMessage}");
+        }
+        [Test]
+        public void ShouldGetErrorResponseForStepValidateRequestWhenAsyncVoidImplFound()
+        {
+            var request = new StepValidateRequest
+            {
+                StepText = "step_text_1",
+                NumberOfParameters = 0,
+                StepValue = new ProtoStepValue
+                {
+                    ParameterizedStepValue = "step_text_1",
+                    StepValue = "step_text_1"
+                }
+            };
+            _mockStepRegistry.Setup(registry => registry.ContainsStep("step_text_1")).Returns(true);
+            _mockStepRegistry.Setup(registry => registry.HasMultipleImplementations("step_text_1")).Returns(false);
+            _mockStepRegistry.Setup(registry => registry.HasAsyncVoidImplementation("step_text_1")).Returns(true);
 
             var processor = new StepValidationProcessor(_mockStepRegistry.Object);
             var response = processor.Process(request);
 
-            ClassicAssert.AreEqual(true, response.IsValid);
+            ClassicAssert.AreEqual(false, response.IsValid);
+            ClassicAssert.AreEqual(StepValidateResponse.Types.ErrorType.StepImplementationNotFound,
+                response.ErrorType);
+            StringAssert.StartsWith("Found a potential step implementation with 'async void' return for : step_text_1.",
+                response.ErrorMessage);
+            StringAssert.Contains("Usage of 'async void' is discouraged", response.ErrorMessage);
         }
     }
 }

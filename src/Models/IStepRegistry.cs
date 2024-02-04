@@ -21,5 +21,6 @@ namespace Gauge.Dotnet.Models
         void RemoveSteps(string filepath);
         IEnumerable<StepPosition> GetStepPositions(string filePath);
         bool IsFileCached(string file);
+        bool HasAsyncVoidImplementation(string parsedStepText);
     }
 }

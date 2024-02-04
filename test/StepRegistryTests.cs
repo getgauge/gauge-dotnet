@@ -8,6 +8,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Gauge.Dotnet.Models;
+using Gauge.Dotnet.UnitTests.Helpers;
+using Moq;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
@@ -191,6 +193,19 @@ namespace Gauge.Dotnet.UnitTests
 
             ClassicAssert.True(positions.Count() == 1);
             ClassicAssert.AreNotEqual(positions.First().StepValue, "Bar");
+        }
+
+        [Test]
+        public void ShouldCheckForAsyncVoidImplementation()
+        {
+            var stepRegistry = new StepRegistry();
+            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+            var mockMethodBuilder = new MockMethodBuilder(mockAssemblyLoader);
+            var impl = new GaugeMethod { MethodInfo = mockMethodBuilder.WithName("Foo").WithStep("Foo").WithAsyncVoidReturn().Build() };
+
+            stepRegistry.AddStep("Foo", impl);
+            
+            Assert.IsTrue(stepRegistry.HasAsyncVoidImplementation("Foo"));
         }
     }
 }

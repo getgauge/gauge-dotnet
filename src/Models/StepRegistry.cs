@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Gauge.Dotnet.Extensions;
 using Gauge.Messages;
 using static Gauge.Messages.StepPositionsResponse.Types;
 
@@ -118,6 +119,11 @@ namespace Gauge.Dotnet.Models
                     return true;
             }
             return false;
+        }
+
+        public bool HasAsyncVoidImplementation(string parsedStepText)
+        {
+            return !ContainsStep(parsedStepText) || _registry[parsedStepText].Any(x => x.MethodInfo.IsAsyncVoid());
         }
     }
 }
