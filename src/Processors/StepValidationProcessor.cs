@@ -39,10 +39,10 @@ namespace Gauge.Dotnet.Processors
             if (_stepRegistry.HasAsyncVoidImplementation(request.StepText))
             {
                 return GetStepValidateResponseMessage(false, StepValidateResponse.Types.ErrorType.StepImplementationNotFound,
-                    $"Found a potential step implementation with 'async void' return for : {request.StepText}. Usage of 'async void' is discouraged (https://learn.microsoft.com/en-us/archive/msdn-magazine/2013/march/async-await-best-practices-in-asynchronous-programming#avoid-async-void). Use `async Task` instead. Full Step Text :", GetSuggestion(request.StepValue));
+                    string.Empty, $"Found a potential step implementation with 'async void' return for : {request.StepText}. Usage of 'async void' is discouraged (https://learn.microsoft.com/en-us/archive/msdn-magazine/2013/march/async-await-best-practices-in-asynchronous-programming#avoid-async-void). Use `async Task` instead.");
             }
             return GetStepValidateResponseMessage(true,
-                StepValidateResponse.Types.ErrorType.DuplicateStepImplementation, string.Empty, string.Empty);
+                StepValidateResponse.Types.ErrorType.StepImplementationNotFound, string.Empty, string.Empty);
         }
 
         private string GetSuggestion(ProtoStepValue stepValue)

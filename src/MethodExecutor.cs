@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Gauge.Dotnet.Wrappers;
 
 namespace Gauge.Dotnet
@@ -42,7 +43,9 @@ namespace Gauge.Dotnet
 
             if (method.GetCustomAttributes(typeof(AsyncStateMachineAttribute), false).Any())
             {
-                ((dynamic)_reflectionWrapper.Invoke(method, instance, parameters)).GetAwaiter().GetResult();
+                Task.Run(() => _reflectionWrapper.Invoke(method, instance, parameters)).GetAwaiter().GetResult();
+                // dynamic awaitable = _reflectionWrapper.Invoke(method, instance, parameters);
+                // await awaitable.GetAwaiter().GetResult();
                 return;
             }
 
