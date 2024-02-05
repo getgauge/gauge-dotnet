@@ -109,7 +109,7 @@ namespace Gauge.Dotnet.UnitTests.Extensions
                 .WithAsyncVoidReturn()
                 .Build();
             
-            Assert.True(fooMethod.IsAsyncVoid(), "Async void method was not detected.");
+            Assert.That(fooMethod.IsAsyncVoid(), Is.True, "Async void method was not detected.");
         }
         
         [Test]
@@ -120,7 +120,7 @@ namespace Gauge.Dotnet.UnitTests.Extensions
                 .WithName("Foo")
                 .Build();
             
-            Assert.False(fooMethod.IsAsyncVoid(), "Async void method was detected incorrectly.");
+            Assert.That(fooMethod.IsAsyncVoid(), Is.False, "Async void method was detected incorrectly.");
         }
         
     }

@@ -189,10 +189,10 @@ namespace Gauge.Dotnet.UnitTests
             stepRegistry.AddStep("Foo", new GaugeMethod { Name = "Foo", StepText = "Foo", FileName = "foo.cs" });
             stepRegistry.AddStep("Bar", new GaugeMethod { Name = "Bar", StepText = "Bar", IsExternal = true });
 
-            var positions = stepRegistry.GetStepPositions("foo.cs");
+            var positions = stepRegistry.GetStepPositions("foo.cs").ToArray();
 
-            ClassicAssert.True(positions.Count() == 1);
-            ClassicAssert.AreNotEqual(positions.First().StepValue, "Bar");
+            Assert.That(positions.Length, Is.EqualTo(1));
+            Assert.That(positions.First().StepValue, Is.Not.EqualTo("Bar"));
         }
 
         [Test]
@@ -205,7 +205,7 @@ namespace Gauge.Dotnet.UnitTests
 
             stepRegistry.AddStep("Foo", impl);
             
-            Assert.IsTrue(stepRegistry.HasAsyncVoidImplementation("Foo"));
+            Assert.That(stepRegistry.HasAsyncVoidImplementation("Foo"), Is.True);
         }
     }
 }

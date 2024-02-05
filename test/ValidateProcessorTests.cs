@@ -87,7 +87,7 @@ namespace Gauge.Dotnet.UnitTests
 
             var response = new StepValidationProcessor(_mockStepRegistry.Object).Process(request);
 
-            Assert.True(response.IsValid, $"Expected true, got error: {response.ErrorMessage}");
+            Assert.That(response.IsValid, Is.True, $"Expected true, got error: {response.ErrorMessage}");
         }
         [Test]
         public void ShouldGetErrorResponseForStepValidateRequestWhenAsyncVoidImplFound()
@@ -113,8 +113,8 @@ namespace Gauge.Dotnet.UnitTests
             ClassicAssert.AreEqual(StepValidateResponse.Types.ErrorType.StepImplementationNotFound,
                 response.ErrorType);
             StringAssert.StartsWith("Found a potential step implementation with 'async void' return for : step_text_1.",
-                response.ErrorMessage);
-            StringAssert.Contains("Usage of 'async void' is discouraged", response.ErrorMessage);
+                response.Suggestion);
+            StringAssert.Contains("Usage of 'async void' is discouraged", response.Suggestion);
         }
     }
 }
