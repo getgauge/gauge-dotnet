@@ -40,9 +40,10 @@ namespace Gauge.Dotnet.Processors
 
         protected override string HookType => "AfterStep";
 
-        public void Process(ConceptExecutionEndingRequest request)
+        public Empty Process(ConceptExecutionEndingRequest request)
         {
             base.ExecuteHooks(request.CurrentExecutionInfo);
+            return new Empty();
         }
 
         protected override List<string> GetApplicableTags(ExecutionInfo info)
