@@ -5,7 +5,7 @@
     <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
     <PackageId>Runner.NetCore30</PackageId>
     <Authors>The Gauge Team</Authors>
-    <Version>0.5.3</Version>
+    <Version>0.5.5</Version>
     <Company>ThoughtWorks Inc.</Company>
     <Product>Gauge</Product>
     <Description>C# runner for Gauge. https://gauge.org</Description>
@@ -23,12 +23,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gauge.CSharp.Core" Version="0.6.0" />
     <PackageReference Include="Gauge.CSharp.Lib" Version="0.9.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Google.Protobuf" Version="3.19.4" />
+    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.44.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

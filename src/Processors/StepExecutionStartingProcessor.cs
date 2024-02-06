@@ -30,4 +30,24 @@ namespace Gauge.Dotnet.Processors
             return info.CurrentScenario.Tags.Union(info.CurrentSpec.Tags).ToList();
         }
     }
+
+    public class ConceptExecutionStartingProcessor : UntaggedHooksFirstExecutionProcessor
+    {
+        public ConceptExecutionStartingProcessor(IExecutionOrchestrator executionOrchestrator)
+            : base(executionOrchestrator)
+        {
+        }
+
+        protected override string HookType => "BeforeStep";
+
+        public void Process(ConceptExecutionStartingRequest request)
+        {
+            ExecuteHooks(request.CurrentExecutionInfo);
+        }
+
+        protected override List<string> GetApplicableTags(ExecutionInfo info)
+        {
+            return info.CurrentScenario.Tags.Union(info.CurrentSpec.Tags).ToList();
+        }
+    }
 }
