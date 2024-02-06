@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
@@ -31,7 +32,8 @@ namespace Gauge.Dotnet
             _executionInfoMapper = mapper;
         }
 
-        public ExecutionResult Execute(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
+        public async Task<ExecutionResult> Execute(string hookType, IHooksStrategy strategy,
+            IList<string> applicableTags,
             ExecutionInfo info)
         {
             var methods = GetHookMethods(hookType, strategy, applicableTags);
@@ -45,7 +47,7 @@ namespace Gauge.Dotnet
                 try
                 {
                     var context = _executionInfoMapper.ExecutionContextFrom(info);
-                    ExecuteHook(methodInfo, context);
+                    await Execute(methodInfo, context);
                 }
                 catch (Exception ex)
                 {
@@ -60,32 +62,14 @@ namespace Gauge.Dotnet
 
             return executionResult;
         }
-
-        private void ExecuteHook(MethodInfo method, params object[] objects)
-        {
-            if (HasArguments(method, objects))
-                Execute(method, objects);
-            else
-                Execute(method);
-        }
-
-
-        private static bool HasArguments(MethodInfo method, object[] args)
-        {
-            if (method.GetParameters().Length != args.Length)
-                return false;
-            return !args.Where((t, i) => t.GetType() != method.GetParameters()[i].ParameterType).Any();
-        }
-
-
+        
         private IEnumerable<string> GetHookMethods(string hookType, IHooksStrategy strategy,
             IEnumerable<string> applicableTags)
         {
             var hooksFromRegistry = GetHooksFromRegistry(hookType);
             return strategy.GetApplicableHooks(applicableTags, hooksFromRegistry);
         }
-
-
+        
         private IEnumerable<IHookMethod> GetHooksFromRegistry(string hookType)
         {
             _registry = _registry ?? new HookRegistry(_assemblyLoader);

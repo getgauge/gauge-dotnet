@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
@@ -70,7 +71,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             _mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("AfterStep", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
                         It.IsAny<ExecutionInfo>()))
-                .Returns(_protoExecutionResult);
+                .Returns(Task.FromResult(_protoExecutionResult));
             _mockMethodExecutor.Setup(x =>
                 x.GetAllPendingMessages()).Returns(_pendingMessages);
             _mockMethodExecutor.Setup(x =>
@@ -85,9 +86,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
         }
 
         [Test]
-        public void ShouldReadPendingMessages()
+        public async Task ShouldReadPendingMessages()
         {
-            var response = _stepExecutionEndingProcessor.Process(_stepExecutionEndingRequest);
+            var response = await _stepExecutionEndingProcessor.Process(_stepExecutionEndingRequest);
 
             ClassicAssert.True(response != null);
             ClassicAssert.True(response.ExecutionResult != null);

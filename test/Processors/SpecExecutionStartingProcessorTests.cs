@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
 using Gauge.Messages;
@@ -48,7 +49,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         }
 
         [Test]
-        public void ShouldExecutreBeforeSpecHook()
+        public async Task ShouldExecutreBeforeSpecHook()
         {
             var specExecutionStartingRequest = new SpecExecutionStartingRequest
             {
@@ -72,7 +73,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("BeforeSpec", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
                         It.IsAny<ExecutionInfo>()))
-                .Returns(protoExecutionResult);
+                .Returns(Task.FromResult(protoExecutionResult));
             mockMethodExecutor.Setup(x =>
                 x.GetAllPendingMessages()).Returns(pendingMessages);
             mockMethodExecutor.Setup(x =>
@@ -80,7 +81,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             var processor = new SpecExecutionStartingProcessor(mockMethodExecutor.Object);
 
-            var result = processor.Process(request);
+            var result = await processor.Process(request);
             ClassicAssert.False(result.ExecutionResult.Failed);
             ClassicAssert.AreEqual(result.ExecutionResult.Message.ToList(), pendingMessages);
             ClassicAssert.AreEqual(result.ExecutionResult.ScreenshotFiles.ToList(), pendingScreenshotFiles);

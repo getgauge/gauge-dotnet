@@ -5,12 +5,13 @@
  *----------------------------------------------------------------*/
 
 
+using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 
 namespace Gauge.Dotnet
 {
     public interface IStepExecutor
     {
-        ExecutionResult Execute(GaugeMethod gaugeMethod, string[] args);
+        Task<ExecutionResult> Execute(GaugeMethod gaugeMethod, string[] args);
     }
 }

@@ -7,6 +7,7 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
@@ -43,7 +44,7 @@ namespace Gauge.Dotnet.IntegrationTests
         [Test]
         [TestCase("ProjectReference", "Take Screenshot in reference Project", "ReferenceProject-IDoNotExist.png")]
         [TestCase("DllReference", "Take Screenshot in reference DLL", "ReferenceDll-IDoNotExist.png")]
-        public void ShouldRegisterScreenshotWriterFromReference(string referenceType, string stepText, string expected)
+        public async Task ShouldRegisterScreenshotWriterFromReference(string referenceType, string stepText, string expected)
         {
             Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TestUtils.GetIntegrationTestSampleDirectory(referenceType));
             var reflectionWrapper = new ReflectionWrapper();
@@ -66,7 +67,7 @@ namespace Gauge.Dotnet.IntegrationTests
                 ActualStepText = stepText
             };
 
-            var result = executeStepProcessor.Process(message);
+            var result = await executeStepProcessor.Process(message);
             var protoExecutionResult = result.ExecutionResult;
 
             ClassicAssert.IsNotNull(protoExecutionResult);

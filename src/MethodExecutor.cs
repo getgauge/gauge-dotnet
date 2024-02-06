@@ -29,7 +29,7 @@ namespace Gauge.Dotnet
             _classInstanceManager = classInstanceManager;
         }
 
-        protected void Execute(MethodInfo method, params object[] parameters)
+        protected Task Execute(MethodInfo method, params object[] parameters)
         {
             var typeToLoad = method.DeclaringType;
             var instance =
@@ -43,13 +43,10 @@ namespace Gauge.Dotnet
 
             if (method.GetCustomAttributes(typeof(AsyncStateMachineAttribute), false).Any())
             {
-                Task.Run(() => _reflectionWrapper.Invoke(method, instance, parameters)).GetAwaiter().GetResult();
-                // dynamic awaitable = _reflectionWrapper.Invoke(method, instance, parameters);
-                // await awaitable.GetAwaiter().GetResult();
-                return;
+                return (Task)_reflectionWrapper.Invoke(method, instance, parameters);
             }
 
-            _reflectionWrapper.Invoke(method, instance, parameters);
+            return Task.Run(() => _reflectionWrapper.Invoke(method, instance, parameters));
         }
     }
 }

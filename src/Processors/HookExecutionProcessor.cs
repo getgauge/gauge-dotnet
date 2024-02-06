@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Strategy;
 using Gauge.Messages;
@@ -33,11 +34,11 @@ namespace Gauge.Dotnet.Processors
 
         protected virtual string CacheClearLevel => null;
 
-        protected virtual ExecutionStatusResponse ExecuteHooks(ExecutionInfo info)
+        protected virtual async Task<ExecutionStatusResponse> ExecuteHooks(ExecutionInfo info)
         {
             var applicableTags = GetApplicableTags(info);
             var protoExecutionResult =
-                ExecutionOrchestrator.ExecuteHooks(HookType, Strategy, applicableTags, info);
+                await ExecutionOrchestrator.ExecuteHooks(HookType, Strategy, applicableTags, info);
             var allPendingMessages = ExecutionOrchestrator.GetAllPendingMessages().Where(m => m != null);
             var allPendingScreenShotFiles = ExecutionOrchestrator.GetAllPendingScreenshotFiles();
             protoExecutionResult.Message.AddRange(allPendingMessages);

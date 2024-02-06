@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Threading.Tasks;
 using Gauge.Dotnet.Converters;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
@@ -28,7 +29,7 @@ namespace Gauge.Dotnet
             _assemblyLoader = assemblyLoader;
         }
 
-        public ExecutionResult Execute(GaugeMethod gaugeMethod, params string[] args)
+        public async Task<ExecutionResult> Execute(GaugeMethod gaugeMethod, params string[] args)
         {
             {
                 var method = gaugeMethod.MethodInfo;
@@ -47,7 +48,7 @@ namespace Gauge.Dotnet
                         }
                     }).ToArray();
                     Logger.Debug($"Executing method: {gaugeMethod.Name}");
-                    Execute(method, StringParamConverter.TryConvertParams(method, parameters));
+                    await base.Execute(method, StringParamConverter.TryConvertParams(method, parameters));
                     executionResult.Success = true;
                 }
                 catch (Exception ex)
