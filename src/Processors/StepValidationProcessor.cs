@@ -24,24 +24,25 @@ namespace Gauge.Dotnet.Processors
 
         public StepValidateResponse Process(StepValidateRequest request)
         {
-            var stepToValidate = request.StepText;
-            var isValid = true;
-            var errorMessage = "";
-            var suggestion = "";
-            var errorType = StepValidateResponse.Types.ErrorType.StepImplementationNotFound;
-            if (!_stepRegistry.ContainsStep(stepToValidate))
+            if (!_stepRegistry.ContainsStep(request.StepText))
             {
-                isValid = false;
-                errorMessage = string.Format("No implementation found for : {0}. Full Step Text :", stepToValidate);
-                suggestion = GetSuggestion(request.StepValue);
+                return GetStepValidateResponseMessage(false, StepValidateResponse.Types.ErrorType.StepImplementationNotFound,
+                    $"No implementation found for : {request.StepText}. Full Step Text :", GetSuggestion(request.StepValue));
             }
-            else if (_stepRegistry.HasMultipleImplementations(stepToValidate))
+            
+            if (_stepRegistry.HasMultipleImplementations(request.StepText))
             {
-                isValid = false;
-                errorType = StepValidateResponse.Types.ErrorType.DuplicateStepImplementation;
-                errorMessage = string.Format("Multiple step implementations found for : {0}", stepToValidate);
+                return GetStepValidateResponseMessage(false, StepValidateResponse.Types.ErrorType.DuplicateStepImplementation, 
+                    $"Multiple step implementations found for : {request.StepText}", string.Empty);
             }
-            return GetStepValidateResponseMessage(isValid, errorType, errorMessage, suggestion);
+
+            if (_stepRegistry.HasAsyncVoidImplementation(request.StepText))
+            {
+                return GetStepValidateResponseMessage(false, StepValidateResponse.Types.ErrorType.StepImplementationNotFound,
+                    string.Empty, $"Found a potential step implementation with 'async void' return for : {request.StepText}. Usage of 'async void' is discouraged (https://learn.microsoft.com/en-us/archive/msdn-magazine/2013/march/async-await-best-practices-in-asynchronous-programming#avoid-async-void). Use `async Task` instead.");
+            }
+            return GetStepValidateResponseMessage(true,
+                StepValidateResponse.Types.ErrorType.StepImplementationNotFound, string.Empty, string.Empty);
         }
 
         private string GetSuggestion(ProtoStepValue stepValue)

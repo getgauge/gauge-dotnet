@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
@@ -31,7 +32,7 @@ namespace Gauge.Dotnet
             _executionInfoMapper = mapper;
         }
 
-        public ExecutionResult Execute(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
+        public async Task<ExecutionResult> Execute(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
             ExecutionInfo info)
         {
             var methods = GetHookMethods(hookType, strategy, applicableTags);
@@ -45,7 +46,7 @@ namespace Gauge.Dotnet
                 try
                 {
                     var context = _executionInfoMapper.ExecutionContextFrom(info);
-                    ExecuteHook(methodInfo, context);
+                    await ExecuteHook(methodInfo, context);
                 }
                 catch (Exception ex)
                 {
@@ -61,12 +62,12 @@ namespace Gauge.Dotnet
             return executionResult;
         }
 
-        private void ExecuteHook(MethodInfo method, params object[] objects)
+        private async Task ExecuteHook(MethodInfo method, params object[] objects)
         {
             if (HasArguments(method, objects))
-                Execute(method, objects);
+                await Execute(method, objects);
             else
-                Execute(method);
+                await Execute(method);
         }
 
 

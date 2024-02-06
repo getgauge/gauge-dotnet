@@ -6,7 +6,10 @@
 
 
 using System;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Gauge.Dotnet.Wrappers;
 
 namespace Gauge.Dotnet
@@ -26,7 +29,7 @@ namespace Gauge.Dotnet
             _classInstanceManager = classInstanceManager;
         }
 
-        protected void Execute(MethodInfo method, params object[] parameters)
+        protected Task Execute(MethodInfo method, params object[] parameters)
         {
             var typeToLoad = method.DeclaringType;
             var instance =
@@ -38,7 +41,12 @@ namespace Gauge.Dotnet
                 throw new TypeLoadException(error);
             }
 
-            _reflectionWrapper.Invoke(method, instance, parameters);
+            if (method.GetCustomAttributes(typeof(AsyncStateMachineAttribute), false).Any())
+            {
+                return (Task)_reflectionWrapper.Invoke(method, instance, parameters);
+            }
+
+            return Task.Run(() => _reflectionWrapper.Invoke(method, instance, parameters));
         }
     }
 }

@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
@@ -20,9 +21,9 @@ namespace Gauge.Dotnet.Processors
         }
 
         [DebuggerHidden]
-        public virtual ExecutionStatusResponse Process(ExecutionEndingRequest request)
+        public virtual async Task<ExecutionStatusResponse> Process(ExecutionEndingRequest request)
         {
-            var result = ExecuteHooks(request.CurrentExecutionInfo);
+            var result = await ExecuteHooks(request.CurrentExecutionInfo);
             ClearCacheForConfiguredLevel();
             return result;
         }

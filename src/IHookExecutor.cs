@@ -6,6 +6,7 @@
 
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Gauge.Messages;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
@@ -14,7 +15,7 @@ namespace Gauge.Dotnet
 {
     public interface IHookExecutor
     {
-        ExecutionResult Execute(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
+        Task<ExecutionResult> Execute(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
             ExecutionInfo context);
     }
 }

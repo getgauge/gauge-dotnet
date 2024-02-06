@@ -7,6 +7,7 @@
 
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 using Gauge.Messages;
 
@@ -27,7 +28,7 @@ namespace Gauge.Dotnet.Processors
         }
 
         [DebuggerHidden]
-        public ExecutionStatusResponse Process(ExecuteStepRequest request)
+        public async Task<ExecutionStatusResponse> Process(ExecuteStepRequest request)
         {
             if (!_stepRegistry.ContainsStep(request.ParsedStepText))
                 return ExecutionError("Step Implementation not found");
@@ -53,7 +54,7 @@ namespace Gauge.Dotnet.Processors
                 args[i] = validTableParamTypes.Contains(stepParameter[i].ParameterType)
                     ? _tableFormatter.GetJSON(stepParameter[i].Table)
                     : stepParameter[i].Value;
-            var protoExecutionResult = _executionOrchestrator.ExecuteStep(method, args);
+            var protoExecutionResult = await _executionOrchestrator.ExecuteStep(method, args);
             return new ExecutionStatusResponse { ExecutionResult = protoExecutionResult };
         }
 
