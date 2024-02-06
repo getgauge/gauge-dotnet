@@ -32,8 +32,7 @@ namespace Gauge.Dotnet
             _executionInfoMapper = mapper;
         }
 
-        public async Task<ExecutionResult> Execute(string hookType, IHooksStrategy strategy,
-            IList<string> applicableTags,
+        public async Task<ExecutionResult> Execute(string hookType, IHooksStrategy strategy, IList<string> applicableTags,
             ExecutionInfo info)
         {
             var methods = GetHookMethods(hookType, strategy, applicableTags);
@@ -47,7 +46,7 @@ namespace Gauge.Dotnet
                 try
                 {
                     var context = _executionInfoMapper.ExecutionContextFrom(info);
-                    await Execute(methodInfo, context);
+                    await ExecuteHook(methodInfo, context);
                 }
                 catch (Exception ex)
                 {
@@ -62,14 +61,32 @@ namespace Gauge.Dotnet
 
             return executionResult;
         }
-        
+
+        private async Task ExecuteHook(MethodInfo method, params object[] objects)
+        {
+            if (HasArguments(method, objects))
+                await Execute(method, objects);
+            else
+                await Execute(method);
+        }
+
+
+        private static bool HasArguments(MethodInfo method, object[] args)
+        {
+            if (method.GetParameters().Length != args.Length)
+                return false;
+            return !args.Where((t, i) => t.GetType() != method.GetParameters()[i].ParameterType).Any();
+        }
+
+
         private IEnumerable<string> GetHookMethods(string hookType, IHooksStrategy strategy,
             IEnumerable<string> applicableTags)
         {
             var hooksFromRegistry = GetHooksFromRegistry(hookType);
             return strategy.GetApplicableHooks(applicableTags, hooksFromRegistry);
         }
-        
+
+
         private IEnumerable<IHookMethod> GetHooksFromRegistry(string hookType)
         {
             _registry = _registry ?? new HookRegistry(_assemblyLoader);
