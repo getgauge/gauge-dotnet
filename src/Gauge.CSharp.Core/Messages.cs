@@ -75,156 +75,156 @@ namespace Gauge.Messages {
             "SWQYCCABKAUiSgoIU3BlY0luZm8SDAoEbmFtZRgBIAEoCRIQCghmaWxlTmFt",
             "ZRgCIAEoCRIQCghpc0ZhaWxlZBgDIAEoCBIMCgR0YWdzGAQgAygJIjwKDFNj",
             "ZW5hcmlvSW5mbxIMCgRuYW1lGAEgASgJEhAKCGlzRmFpbGVkGAIgASgIEgwK",
-            "BHRhZ3MYAyADKAkieAoIU3RlcEluZm8SMAoEc3RlcBgBIAEoCzIiLmdhdWdl",
-            "Lm1lc3NhZ2VzLkV4ZWN1dGVTdGVwUmVxdWVzdBIQCghpc0ZhaWxlZBgCIAEo",
-            "CBISCgpzdGFja1RyYWNlGAMgASgJEhQKDGVycm9yTWVzc2FnZRgEIAEoCSKc",
-            "AQoSRXhlY3V0ZVN0ZXBSZXF1ZXN0EhYKDmFjdHVhbFN0ZXBUZXh0GAEgASgJ",
-            "EhYKDnBhcnNlZFN0ZXBUZXh0GAIgASgJEhcKD3NjZW5hcmlvRmFpbGluZxgD",
-            "IAEoCBItCgpwYXJhbWV0ZXJzGAQgAygLMhkuZ2F1Z2UubWVzc2FnZXMuUGFy",
-            "YW1ldGVyEg4KBnN0cmVhbRgFIAEoBSJ2ChNTdGVwVmFsaWRhdGVSZXF1ZXN0",
-            "EhAKCHN0ZXBUZXh0GAEgASgJEhoKEm51bWJlck9mUGFyYW1ldGVycxgCIAEo",
-            "BRIxCglzdGVwVmFsdWUYAyABKAsyHi5nYXVnZS5tZXNzYWdlcy5Qcm90b1N0",
-            "ZXBWYWx1ZSLnAQoUU3RlcFZhbGlkYXRlUmVzcG9uc2USDwoHaXNWYWxpZBgB",
-            "IAEoCBIUCgxlcnJvck1lc3NhZ2UYAiABKAkSQQoJZXJyb3JUeXBlGAMgASgO",
-            "Mi4uZ2F1Z2UubWVzc2FnZXMuU3RlcFZhbGlkYXRlUmVzcG9uc2UuRXJyb3JU",
-            "eXBlEhIKCnN1Z2dlc3Rpb24YBCABKAkiUQoJRXJyb3JUeXBlEiEKHVNURVBf",
-            "SU1QTEVNRU5UQVRJT05fTk9UX0ZPVU5EEAASIQodRFVQTElDQVRFX1NURVBf",
-            "SU1QTEVNRU5UQVRJT04QASJNChRTdWl0ZUV4ZWN1dGlvblJlc3VsdBI1Cgtz",
-            "dWl0ZVJlc3VsdBgBIAEoCzIgLmdhdWdlLm1lc3NhZ2VzLlByb3RvU3VpdGVS",
-            "ZXN1bHQiSQoYU3VpdGVFeGVjdXRpb25SZXN1bHRJdGVtEi0KCnJlc3VsdEl0",
-            "ZW0YASABKAsyGS5nYXVnZS5tZXNzYWdlcy5Qcm90b0l0ZW0iEgoQU3RlcE5h",
-            "bWVzUmVxdWVzdCIiChFTdGVwTmFtZXNSZXNwb25zZRINCgVzdGVwcxgBIAMo",
-            "CSIuChxTY2VuYXJpb0RhdGFTdG9yZUluaXRSZXF1ZXN0Eg4KBnN0cmVhbRgB",
-            "IAEoBSIqChhTcGVjRGF0YVN0b3JlSW5pdFJlcXVlc3QSDgoGc3RyZWFtGAEg",
-            "ASgFIisKGVN1aXRlRGF0YVN0b3JlSW5pdFJlcXVlc3QSDgoGc3RyZWFtGAEg",
-            "ASgFIj0KEVBhcmFtZXRlclBvc2l0aW9uEhMKC29sZFBvc2l0aW9uGAEgASgF",
-            "EhMKC25ld1Bvc2l0aW9uGAIgASgFIs0BCg9SZWZhY3RvclJlcXVlc3QSNAoM",
-            "b2xkU3RlcFZhbHVlGAEgASgLMh4uZ2F1Z2UubWVzc2FnZXMuUHJvdG9TdGVw",
-            "VmFsdWUSNAoMbmV3U3RlcFZhbHVlGAIgASgLMh4uZ2F1Z2UubWVzc2FnZXMu",
-            "UHJvdG9TdGVwVmFsdWUSOQoOcGFyYW1Qb3NpdGlvbnMYAyADKAsyIS5nYXVn",
-            "ZS5tZXNzYWdlcy5QYXJhbWV0ZXJQb3NpdGlvbhITCgtzYXZlQ2hhbmdlcxgE",
-            "IAEoCCJhCgtGaWxlQ2hhbmdlcxIQCghmaWxlTmFtZRgBIAEoCRIXCgtmaWxl",
-            "Q29udGVudBgCIAEoCUICGAESJwoFZGlmZnMYAyADKAsyGC5nYXVnZS5tZXNz",
-            "YWdlcy5UZXh0RGlmZiJ6ChBSZWZhY3RvclJlc3BvbnNlEg8KB3N1Y2Nlc3MY",
-            "ASABKAgSDQoFZXJyb3IYAiABKAkSFAoMZmlsZXNDaGFuZ2VkGAMgAygJEjAK",
-            "C2ZpbGVDaGFuZ2VzGAQgAygLMhsuZ2F1Z2UubWVzc2FnZXMuRmlsZUNoYW5n",
-            "ZXMiJAoPU3RlcE5hbWVSZXF1ZXN0EhEKCXN0ZXBWYWx1ZRgBIAEoCSKXAQoQ",
-            "U3RlcE5hbWVSZXNwb25zZRIVCg1pc1N0ZXBQcmVzZW50GAEgASgIEhAKCHN0",
-            "ZXBOYW1lGAIgAygJEhAKCGhhc0FsaWFzGAMgASgIEhAKCGZpbGVOYW1lGAQg",
-            "ASgJEiIKBHNwYW4YBSABKAsyFC5nYXVnZS5tZXNzYWdlcy5TcGFuEhIKCmlz",
-            "RXh0ZXJuYWwYBiABKAgiLQoaVW5zdXBwb3J0ZWRNZXNzYWdlUmVzcG9uc2US",
-            "DwoHbWVzc2FnZRgBIAEoCSLRAQoQQ2FjaGVGaWxlUmVxdWVzdBIPCgdjb250",
-            "ZW50GAEgASgJEhAKCGZpbGVQYXRoGAIgASgJEhAKCGlzQ2xvc2VkGAMgASgI",
-            "EjsKBnN0YXR1cxgEIAEoDjIrLmdhdWdlLm1lc3NhZ2VzLkNhY2hlRmlsZVJl",
-            "cXVlc3QuRmlsZVN0YXR1cyJLCgpGaWxlU3RhdHVzEgsKB0NIQU5HRUQQABIK",
-            "CgZDTE9TRUQQARILCgdDUkVBVEVEEAISCwoHREVMRVRFRBADEgoKBk9QRU5F",
-            "RBAEIigKFFN0ZXBQb3NpdGlvbnNSZXF1ZXN0EhAKCGZpbGVQYXRoGAEgASgJ",
-            "IrgBChVTdGVwUG9zaXRpb25zUmVzcG9uc2USSQoNc3RlcFBvc2l0aW9ucxgB",
-            "IAMoCzIyLmdhdWdlLm1lc3NhZ2VzLlN0ZXBQb3NpdGlvbnNSZXNwb25zZS5T",
-            "dGVwUG9zaXRpb24SDQoFZXJyb3IYAiABKAkaRQoMU3RlcFBvc2l0aW9uEhEK",
-            "CXN0ZXBWYWx1ZRgBIAEoCRIiCgRzcGFuGAIgASgLMhQuZ2F1Z2UubWVzc2Fn",
-            "ZXMuU3BhbiImCiRJbXBsZW1lbnRhdGlvbkZpbGVHbG9iUGF0dGVyblJlcXVl",
-            "c3QiPQolSW1wbGVtZW50YXRpb25GaWxlR2xvYlBhdHRlcm5SZXNwb25zZRIU",
-            "CgxnbG9iUGF0dGVybnMYASADKAkiHwodSW1wbGVtZW50YXRpb25GaWxlTGlz",
-            "dFJlcXVlc3QiQQoeSW1wbGVtZW50YXRpb25GaWxlTGlzdFJlc3BvbnNlEh8K",
-            "F2ltcGxlbWVudGF0aW9uRmlsZVBhdGhzGAEgAygJIk4KHVN0dWJJbXBsZW1l",
-            "bnRhdGlvbkNvZGVSZXF1ZXN0Eh4KFmltcGxlbWVudGF0aW9uRmlsZVBhdGgY",
-            "ASABKAkSDQoFY29kZXMYAiADKAkiPwoIVGV4dERpZmYSIgoEc3BhbhgBIAEo",
-            "CzIULmdhdWdlLm1lc3NhZ2VzLlNwYW4SDwoHY29udGVudBgCIAEoCSJJCghG",
-            "aWxlRGlmZhIQCghmaWxlUGF0aBgBIAEoCRIrCgl0ZXh0RGlmZnMYAiADKAsy",
-            "GC5nYXVnZS5tZXNzYWdlcy5UZXh0RGlmZiIdCglLZWVwQWxpdmUSEAoIcGx1",
-            "Z2luSWQYASABKAkiqQEKC1NwZWNEZXRhaWxzEjcKB2RldGFpbHMYASADKAsy",
-            "Ji5nYXVnZS5tZXNzYWdlcy5TcGVjRGV0YWlscy5TcGVjRGV0YWlsGmEKClNw",
-            "ZWNEZXRhaWwSJwoEc3BlYxgBIAEoCzIZLmdhdWdlLm1lc3NhZ2VzLlByb3Rv",
-            "U3BlYxIqCgtwYXJzZUVycm9ycxgCIAMoCzIVLmdhdWdlLm1lc3NhZ2VzLkVy",
-            "cm9yIgcKBUVtcHR5IucdCgdNZXNzYWdlEjgKC21lc3NhZ2VUeXBlGAEgASgO",
-            "MiMuZ2F1Z2UubWVzc2FnZXMuTWVzc2FnZS5NZXNzYWdlVHlwZRIRCgltZXNz",
-            "YWdlSWQYAiABKAMSSgoYZXhlY3V0aW9uU3RhcnRpbmdSZXF1ZXN0GAMgASgL",
-            "MiguZ2F1Z2UubWVzc2FnZXMuRXhlY3V0aW9uU3RhcnRpbmdSZXF1ZXN0ElIK",
-            "HHNwZWNFeGVjdXRpb25TdGFydGluZ1JlcXVlc3QYBCABKAsyLC5nYXVnZS5t",
-            "ZXNzYWdlcy5TcGVjRXhlY3V0aW9uU3RhcnRpbmdSZXF1ZXN0Ek4KGnNwZWNF",
-            "eGVjdXRpb25FbmRpbmdSZXF1ZXN0GAUgASgLMiouZ2F1Z2UubWVzc2FnZXMu",
-            "U3BlY0V4ZWN1dGlvbkVuZGluZ1JlcXVlc3QSWgogc2NlbmFyaW9FeGVjdXRp",
-            "b25TdGFydGluZ1JlcXVlc3QYBiABKAsyMC5nYXVnZS5tZXNzYWdlcy5TY2Vu",
-            "YXJpb0V4ZWN1dGlvblN0YXJ0aW5nUmVxdWVzdBJWCh5zY2VuYXJpb0V4ZWN1",
-            "dGlvbkVuZGluZ1JlcXVlc3QYByABKAsyLi5nYXVnZS5tZXNzYWdlcy5TY2Vu",
-            "YXJpb0V4ZWN1dGlvbkVuZGluZ1JlcXVlc3QSUgocc3RlcEV4ZWN1dGlvblN0",
-            "YXJ0aW5nUmVxdWVzdBgIIAEoCzIsLmdhdWdlLm1lc3NhZ2VzLlN0ZXBFeGVj",
-            "dXRpb25TdGFydGluZ1JlcXVlc3QSTgoac3RlcEV4ZWN1dGlvbkVuZGluZ1Jl",
-            "cXVlc3QYCSABKAsyKi5nYXVnZS5tZXNzYWdlcy5TdGVwRXhlY3V0aW9uRW5k",
-            "aW5nUmVxdWVzdBI+ChJleGVjdXRlU3RlcFJlcXVlc3QYCiABKAsyIi5nYXVn",
-            "ZS5tZXNzYWdlcy5FeGVjdXRlU3RlcFJlcXVlc3QSRgoWZXhlY3V0aW9uRW5k",
-            "aW5nUmVxdWVzdBgLIAEoCzImLmdhdWdlLm1lc3NhZ2VzLkV4ZWN1dGlvbkVu",
-            "ZGluZ1JlcXVlc3QSQAoTc3RlcFZhbGlkYXRlUmVxdWVzdBgMIAEoCzIjLmdh",
-            "dWdlLm1lc3NhZ2VzLlN0ZXBWYWxpZGF0ZVJlcXVlc3QSQgoUc3RlcFZhbGlk",
-            "YXRlUmVzcG9uc2UYDSABKAsyJC5nYXVnZS5tZXNzYWdlcy5TdGVwVmFsaWRh",
-            "dGVSZXNwb25zZRJIChdleGVjdXRpb25TdGF0dXNSZXNwb25zZRgOIAEoCzIn",
-            "LmdhdWdlLm1lc3NhZ2VzLkV4ZWN1dGlvblN0YXR1c1Jlc3BvbnNlEjoKEHN0",
-            "ZXBOYW1lc1JlcXVlc3QYDyABKAsyIC5nYXVnZS5tZXNzYWdlcy5TdGVwTmFt",
-            "ZXNSZXF1ZXN0EjwKEXN0ZXBOYW1lc1Jlc3BvbnNlGBAgASgLMiEuZ2F1Z2Uu",
-            "bWVzc2FnZXMuU3RlcE5hbWVzUmVzcG9uc2USQgoUc3VpdGVFeGVjdXRpb25S",
-            "ZXN1bHQYESABKAsyJC5nYXVnZS5tZXNzYWdlcy5TdWl0ZUV4ZWN1dGlvblJl",
-            "c3VsdBI+ChJraWxsUHJvY2Vzc1JlcXVlc3QYEiABKAsyIi5nYXVnZS5tZXNz",
-            "YWdlcy5LaWxsUHJvY2Vzc1JlcXVlc3QSUgocc2NlbmFyaW9EYXRhU3RvcmVJ",
-            "bml0UmVxdWVzdBgTIAEoCzIsLmdhdWdlLm1lc3NhZ2VzLlNjZW5hcmlvRGF0",
-            "YVN0b3JlSW5pdFJlcXVlc3QSSgoYc3BlY0RhdGFTdG9yZUluaXRSZXF1ZXN0",
-            "GBQgASgLMiguZ2F1Z2UubWVzc2FnZXMuU3BlY0RhdGFTdG9yZUluaXRSZXF1",
-            "ZXN0EkwKGXN1aXRlRGF0YVN0b3JlSW5pdFJlcXVlc3QYFSABKAsyKS5nYXVn",
-            "ZS5tZXNzYWdlcy5TdWl0ZURhdGFTdG9yZUluaXRSZXF1ZXN0EjgKD3N0ZXBO",
-            "YW1lUmVxdWVzdBgWIAEoCzIfLmdhdWdlLm1lc3NhZ2VzLlN0ZXBOYW1lUmVx",
-            "dWVzdBI6ChBzdGVwTmFtZVJlc3BvbnNlGBcgASgLMiAuZ2F1Z2UubWVzc2Fn",
-            "ZXMuU3RlcE5hbWVSZXNwb25zZRI4Cg9yZWZhY3RvclJlcXVlc3QYGCABKAsy",
-            "Hy5nYXVnZS5tZXNzYWdlcy5SZWZhY3RvclJlcXVlc3QSOgoQcmVmYWN0b3JS",
-            "ZXNwb25zZRgZIAEoCzIgLmdhdWdlLm1lc3NhZ2VzLlJlZmFjdG9yUmVzcG9u",
-            "c2USTgoadW5zdXBwb3J0ZWRNZXNzYWdlUmVzcG9uc2UYGiABKAsyKi5nYXVn",
-            "ZS5tZXNzYWdlcy5VbnN1cHBvcnRlZE1lc3NhZ2VSZXNwb25zZRI6ChBjYWNo",
-            "ZUZpbGVSZXF1ZXN0GBsgASgLMiAuZ2F1Z2UubWVzc2FnZXMuQ2FjaGVGaWxl",
-            "UmVxdWVzdBJCChRzdGVwUG9zaXRpb25zUmVxdWVzdBgcIAEoCzIkLmdhdWdl",
-            "Lm1lc3NhZ2VzLlN0ZXBQb3NpdGlvbnNSZXF1ZXN0EkQKFXN0ZXBQb3NpdGlv",
-            "bnNSZXNwb25zZRgdIAEoCzIlLmdhdWdlLm1lc3NhZ2VzLlN0ZXBQb3NpdGlv",
-            "bnNSZXNwb25zZRJUCh1pbXBsZW1lbnRhdGlvbkZpbGVMaXN0UmVxdWVzdBge",
-            "IAEoCzItLmdhdWdlLm1lc3NhZ2VzLkltcGxlbWVudGF0aW9uRmlsZUxpc3RS",
-            "ZXF1ZXN0ElYKHmltcGxlbWVudGF0aW9uRmlsZUxpc3RSZXNwb25zZRgfIAEo",
-            "CzIuLmdhdWdlLm1lc3NhZ2VzLkltcGxlbWVudGF0aW9uRmlsZUxpc3RSZXNw",
-            "b25zZRJUCh1zdHViSW1wbGVtZW50YXRpb25Db2RlUmVxdWVzdBggIAEoCzIt",
-            "LmdhdWdlLm1lc3NhZ2VzLlN0dWJJbXBsZW1lbnRhdGlvbkNvZGVSZXF1ZXN0",
-            "EioKCGZpbGVEaWZmGCEgASgLMhguZ2F1Z2UubWVzc2FnZXMuRmlsZURpZmYS",
-            "YgokaW1wbGVtZW50YXRpb25GaWxlR2xvYlBhdHRlcm5SZXF1ZXN0GCIgASgL",
-            "MjQuZ2F1Z2UubWVzc2FnZXMuSW1wbGVtZW50YXRpb25GaWxlR2xvYlBhdHRl",
-            "cm5SZXF1ZXN0EmQKJWltcGxlbWVudGF0aW9uRmlsZUdsb2JQYXR0ZXJuUmVz",
-            "cG9uc2UYIyABKAsyNS5nYXVnZS5tZXNzYWdlcy5JbXBsZW1lbnRhdGlvbkZp",
-            "bGVHbG9iUGF0dGVyblJlc3BvbnNlEkoKGHN1aXRlRXhlY3V0aW9uUmVzdWx0",
-            "SXRlbRgkIAEoCzIoLmdhdWdlLm1lc3NhZ2VzLlN1aXRlRXhlY3V0aW9uUmVz",
-            "dWx0SXRlbRIsCglrZWVwQWxpdmUYJSABKAsyGS5nYXVnZS5tZXNzYWdlcy5L",
-            "ZWVwQWxpdmUSWAofY29uY2VwdEV4ZWN1dGlvblN0YXJ0aW5nUmVxdWVzdBgm",
-            "IAEoCzIvLmdhdWdlLm1lc3NhZ2VzLkNvbmNlcHRFeGVjdXRpb25TdGFydGlu",
-            "Z1JlcXVlc3QSVAodY29uY2VwdEV4ZWN1dGlvbkVuZGluZ1JlcXVlc3QYJyAB",
-            "KAsyLS5nYXVnZS5tZXNzYWdlcy5Db25jZXB0RXhlY3V0aW9uRW5kaW5nUmVx",
-            "dWVzdCLcBwoLTWVzc2FnZVR5cGUSFQoRRXhlY3V0aW9uU3RhcnRpbmcQABIZ",
-            "ChVTcGVjRXhlY3V0aW9uU3RhcnRpbmcQARIXChNTcGVjRXhlY3V0aW9uRW5k",
-            "aW5nEAISHQoZU2NlbmFyaW9FeGVjdXRpb25TdGFydGluZxADEhsKF1NjZW5h",
-            "cmlvRXhlY3V0aW9uRW5kaW5nEAQSGQoVU3RlcEV4ZWN1dGlvblN0YXJ0aW5n",
-            "EAUSFwoTU3RlcEV4ZWN1dGlvbkVuZGluZxAGEg8KC0V4ZWN1dGVTdGVwEAcS",
-            "EwoPRXhlY3V0aW9uRW5kaW5nEAgSFwoTU3RlcFZhbGlkYXRlUmVxdWVzdBAJ",
-            "EhgKFFN0ZXBWYWxpZGF0ZVJlc3BvbnNlEAoSGwoXRXhlY3V0aW9uU3RhdHVz",
-            "UmVzcG9uc2UQCxIUChBTdGVwTmFtZXNSZXF1ZXN0EAwSFQoRU3RlcE5hbWVz",
-            "UmVzcG9uc2UQDRIWChJLaWxsUHJvY2Vzc1JlcXVlc3QQDhIYChRTdWl0ZUV4",
-            "ZWN1dGlvblJlc3VsdBAPEhkKFVNjZW5hcmlvRGF0YVN0b3JlSW5pdBAQEhUK",
-            "EVNwZWNEYXRhU3RvcmVJbml0EBESFgoSU3VpdGVEYXRhU3RvcmVJbml0EBIS",
-            "EwoPU3RlcE5hbWVSZXF1ZXN0EBMSFAoQU3RlcE5hbWVSZXNwb25zZRAUEhMK",
-            "D1JlZmFjdG9yUmVxdWVzdBAVEhQKEFJlZmFjdG9yUmVzcG9uc2UQFhIeChpV",
-            "bnN1cHBvcnRlZE1lc3NhZ2VSZXNwb25zZRAXEhQKEENhY2hlRmlsZVJlcXVl",
-            "c3QQGBIYChRTdGVwUG9zaXRpb25zUmVxdWVzdBAZEhkKFVN0ZXBQb3NpdGlv",
-            "bnNSZXNwb25zZRAaEiEKHUltcGxlbWVudGF0aW9uRmlsZUxpc3RSZXF1ZXN0",
-            "EBsSIgoeSW1wbGVtZW50YXRpb25GaWxlTGlzdFJlc3BvbnNlEBwSIQodU3R1",
-            "YkltcGxlbWVudGF0aW9uQ29kZVJlcXVlc3QQHRIMCghGaWxlRGlmZhAeEigK",
-            "JEltcGxlbWVudGF0aW9uRmlsZUdsb2JQYXR0ZXJuUmVxdWVzdBAfEikKJUlt",
-            "cGxlbWVudGF0aW9uRmlsZUdsb2JQYXR0ZXJuUmVzcG9uc2UQIBIcChhTdWl0",
-            "ZUV4ZWN1dGlvblJlc3VsdEl0ZW0QIRINCglLZWVwQWxpdmUQIhIcChhDb25j",
-            "ZXB0RXhlY3V0aW9uU3RhcnRpbmcQIxIaChZDb25jZXB0RXhlY3V0aW9uRW5k",
-            "aW5nECRCXAoWY29tLnRob3VnaHR3b3Jrcy5nYXVnZVoxZ2l0aHViLmNvbS9n",
-            "ZXRnYXVnZS9nYXVnZS1wcm90by9nby9nYXVnZV9tZXNzYWdlc6oCDkdhdWdl",
-            "Lk1lc3NhZ2VzYgZwcm90bzM="));
+            "BHRhZ3MYAyADKAkiiwEKCFN0ZXBJbmZvEjAKBHN0ZXAYASABKAsyIi5nYXVn",
+            "ZS5tZXNzYWdlcy5FeGVjdXRlU3RlcFJlcXVlc3QSEAoIaXNGYWlsZWQYAiAB",
+            "KAgSEgoKc3RhY2tUcmFjZRgDIAEoCRIUCgxlcnJvck1lc3NhZ2UYBCABKAkS",
+            "EQoJaXNDb25jZXB0GAUgASgIIpwBChJFeGVjdXRlU3RlcFJlcXVlc3QSFgoO",
+            "YWN0dWFsU3RlcFRleHQYASABKAkSFgoOcGFyc2VkU3RlcFRleHQYAiABKAkS",
+            "FwoPc2NlbmFyaW9GYWlsaW5nGAMgASgIEi0KCnBhcmFtZXRlcnMYBCADKAsy",
+            "GS5nYXVnZS5tZXNzYWdlcy5QYXJhbWV0ZXISDgoGc3RyZWFtGAUgASgFInYK",
+            "E1N0ZXBWYWxpZGF0ZVJlcXVlc3QSEAoIc3RlcFRleHQYASABKAkSGgoSbnVt",
+            "YmVyT2ZQYXJhbWV0ZXJzGAIgASgFEjEKCXN0ZXBWYWx1ZRgDIAEoCzIeLmdh",
+            "dWdlLm1lc3NhZ2VzLlByb3RvU3RlcFZhbHVlIucBChRTdGVwVmFsaWRhdGVS",
+            "ZXNwb25zZRIPCgdpc1ZhbGlkGAEgASgIEhQKDGVycm9yTWVzc2FnZRgCIAEo",
+            "CRJBCgllcnJvclR5cGUYAyABKA4yLi5nYXVnZS5tZXNzYWdlcy5TdGVwVmFs",
+            "aWRhdGVSZXNwb25zZS5FcnJvclR5cGUSEgoKc3VnZ2VzdGlvbhgEIAEoCSJR",
+            "CglFcnJvclR5cGUSIQodU1RFUF9JTVBMRU1FTlRBVElPTl9OT1RfRk9VTkQQ",
+            "ABIhCh1EVVBMSUNBVEVfU1RFUF9JTVBMRU1FTlRBVElPThABIk0KFFN1aXRl",
+            "RXhlY3V0aW9uUmVzdWx0EjUKC3N1aXRlUmVzdWx0GAEgASgLMiAuZ2F1Z2Uu",
+            "bWVzc2FnZXMuUHJvdG9TdWl0ZVJlc3VsdCJJChhTdWl0ZUV4ZWN1dGlvblJl",
+            "c3VsdEl0ZW0SLQoKcmVzdWx0SXRlbRgBIAEoCzIZLmdhdWdlLm1lc3NhZ2Vz",
+            "LlByb3RvSXRlbSISChBTdGVwTmFtZXNSZXF1ZXN0IiIKEVN0ZXBOYW1lc1Jl",
+            "c3BvbnNlEg0KBXN0ZXBzGAEgAygJIi4KHFNjZW5hcmlvRGF0YVN0b3JlSW5p",
+            "dFJlcXVlc3QSDgoGc3RyZWFtGAEgASgFIioKGFNwZWNEYXRhU3RvcmVJbml0",
+            "UmVxdWVzdBIOCgZzdHJlYW0YASABKAUiKwoZU3VpdGVEYXRhU3RvcmVJbml0",
+            "UmVxdWVzdBIOCgZzdHJlYW0YASABKAUiPQoRUGFyYW1ldGVyUG9zaXRpb24S",
+            "EwoLb2xkUG9zaXRpb24YASABKAUSEwoLbmV3UG9zaXRpb24YAiABKAUizQEK",
+            "D1JlZmFjdG9yUmVxdWVzdBI0CgxvbGRTdGVwVmFsdWUYASABKAsyHi5nYXVn",
+            "ZS5tZXNzYWdlcy5Qcm90b1N0ZXBWYWx1ZRI0CgxuZXdTdGVwVmFsdWUYAiAB",
+            "KAsyHi5nYXVnZS5tZXNzYWdlcy5Qcm90b1N0ZXBWYWx1ZRI5Cg5wYXJhbVBv",
+            "c2l0aW9ucxgDIAMoCzIhLmdhdWdlLm1lc3NhZ2VzLlBhcmFtZXRlclBvc2l0",
+            "aW9uEhMKC3NhdmVDaGFuZ2VzGAQgASgIImEKC0ZpbGVDaGFuZ2VzEhAKCGZp",
+            "bGVOYW1lGAEgASgJEhcKC2ZpbGVDb250ZW50GAIgASgJQgIYARInCgVkaWZm",
+            "cxgDIAMoCzIYLmdhdWdlLm1lc3NhZ2VzLlRleHREaWZmInoKEFJlZmFjdG9y",
+            "UmVzcG9uc2USDwoHc3VjY2VzcxgBIAEoCBINCgVlcnJvchgCIAEoCRIUCgxm",
+            "aWxlc0NoYW5nZWQYAyADKAkSMAoLZmlsZUNoYW5nZXMYBCADKAsyGy5nYXVn",
+            "ZS5tZXNzYWdlcy5GaWxlQ2hhbmdlcyIkCg9TdGVwTmFtZVJlcXVlc3QSEQoJ",
+            "c3RlcFZhbHVlGAEgASgJIpcBChBTdGVwTmFtZVJlc3BvbnNlEhUKDWlzU3Rl",
+            "cFByZXNlbnQYASABKAgSEAoIc3RlcE5hbWUYAiADKAkSEAoIaGFzQWxpYXMY",
+            "AyABKAgSEAoIZmlsZU5hbWUYBCABKAkSIgoEc3BhbhgFIAEoCzIULmdhdWdl",
+            "Lm1lc3NhZ2VzLlNwYW4SEgoKaXNFeHRlcm5hbBgGIAEoCCItChpVbnN1cHBv",
+            "cnRlZE1lc3NhZ2VSZXNwb25zZRIPCgdtZXNzYWdlGAEgASgJItEBChBDYWNo",
+            "ZUZpbGVSZXF1ZXN0Eg8KB2NvbnRlbnQYASABKAkSEAoIZmlsZVBhdGgYAiAB",
+            "KAkSEAoIaXNDbG9zZWQYAyABKAgSOwoGc3RhdHVzGAQgASgOMisuZ2F1Z2Uu",
+            "bWVzc2FnZXMuQ2FjaGVGaWxlUmVxdWVzdC5GaWxlU3RhdHVzIksKCkZpbGVT",
+            "dGF0dXMSCwoHQ0hBTkdFRBAAEgoKBkNMT1NFRBABEgsKB0NSRUFURUQQAhIL",
+            "CgdERUxFVEVEEAMSCgoGT1BFTkVEEAQiKAoUU3RlcFBvc2l0aW9uc1JlcXVl",
+            "c3QSEAoIZmlsZVBhdGgYASABKAkiuAEKFVN0ZXBQb3NpdGlvbnNSZXNwb25z",
+            "ZRJJCg1zdGVwUG9zaXRpb25zGAEgAygLMjIuZ2F1Z2UubWVzc2FnZXMuU3Rl",
+            "cFBvc2l0aW9uc1Jlc3BvbnNlLlN0ZXBQb3NpdGlvbhINCgVlcnJvchgCIAEo",
+            "CRpFCgxTdGVwUG9zaXRpb24SEQoJc3RlcFZhbHVlGAEgASgJEiIKBHNwYW4Y",
+            "AiABKAsyFC5nYXVnZS5tZXNzYWdlcy5TcGFuIiYKJEltcGxlbWVudGF0aW9u",
+            "RmlsZUdsb2JQYXR0ZXJuUmVxdWVzdCI9CiVJbXBsZW1lbnRhdGlvbkZpbGVH",
+            "bG9iUGF0dGVyblJlc3BvbnNlEhQKDGdsb2JQYXR0ZXJucxgBIAMoCSIfCh1J",
+            "bXBsZW1lbnRhdGlvbkZpbGVMaXN0UmVxdWVzdCJBCh5JbXBsZW1lbnRhdGlv",
+            "bkZpbGVMaXN0UmVzcG9uc2USHwoXaW1wbGVtZW50YXRpb25GaWxlUGF0aHMY",
+            "ASADKAkiTgodU3R1YkltcGxlbWVudGF0aW9uQ29kZVJlcXVlc3QSHgoWaW1w",
+            "bGVtZW50YXRpb25GaWxlUGF0aBgBIAEoCRINCgVjb2RlcxgCIAMoCSI/CghU",
+            "ZXh0RGlmZhIiCgRzcGFuGAEgASgLMhQuZ2F1Z2UubWVzc2FnZXMuU3BhbhIP",
+            "Cgdjb250ZW50GAIgASgJIkkKCEZpbGVEaWZmEhAKCGZpbGVQYXRoGAEgASgJ",
+            "EisKCXRleHREaWZmcxgCIAMoCzIYLmdhdWdlLm1lc3NhZ2VzLlRleHREaWZm",
+            "Ih0KCUtlZXBBbGl2ZRIQCghwbHVnaW5JZBgBIAEoCSKpAQoLU3BlY0RldGFp",
+            "bHMSNwoHZGV0YWlscxgBIAMoCzImLmdhdWdlLm1lc3NhZ2VzLlNwZWNEZXRh",
+            "aWxzLlNwZWNEZXRhaWwaYQoKU3BlY0RldGFpbBInCgRzcGVjGAEgASgLMhku",
+            "Z2F1Z2UubWVzc2FnZXMuUHJvdG9TcGVjEioKC3BhcnNlRXJyb3JzGAIgAygL",
+            "MhUuZ2F1Z2UubWVzc2FnZXMuRXJyb3IiBwoFRW1wdHki5x0KB01lc3NhZ2US",
+            "OAoLbWVzc2FnZVR5cGUYASABKA4yIy5nYXVnZS5tZXNzYWdlcy5NZXNzYWdl",
+            "Lk1lc3NhZ2VUeXBlEhEKCW1lc3NhZ2VJZBgCIAEoAxJKChhleGVjdXRpb25T",
+            "dGFydGluZ1JlcXVlc3QYAyABKAsyKC5nYXVnZS5tZXNzYWdlcy5FeGVjdXRp",
+            "b25TdGFydGluZ1JlcXVlc3QSUgocc3BlY0V4ZWN1dGlvblN0YXJ0aW5nUmVx",
+            "dWVzdBgEIAEoCzIsLmdhdWdlLm1lc3NhZ2VzLlNwZWNFeGVjdXRpb25TdGFy",
+            "dGluZ1JlcXVlc3QSTgoac3BlY0V4ZWN1dGlvbkVuZGluZ1JlcXVlc3QYBSAB",
+            "KAsyKi5nYXVnZS5tZXNzYWdlcy5TcGVjRXhlY3V0aW9uRW5kaW5nUmVxdWVz",
+            "dBJaCiBzY2VuYXJpb0V4ZWN1dGlvblN0YXJ0aW5nUmVxdWVzdBgGIAEoCzIw",
+            "LmdhdWdlLm1lc3NhZ2VzLlNjZW5hcmlvRXhlY3V0aW9uU3RhcnRpbmdSZXF1",
+            "ZXN0ElYKHnNjZW5hcmlvRXhlY3V0aW9uRW5kaW5nUmVxdWVzdBgHIAEoCzIu",
+            "LmdhdWdlLm1lc3NhZ2VzLlNjZW5hcmlvRXhlY3V0aW9uRW5kaW5nUmVxdWVz",
+            "dBJSChxzdGVwRXhlY3V0aW9uU3RhcnRpbmdSZXF1ZXN0GAggASgLMiwuZ2F1",
+            "Z2UubWVzc2FnZXMuU3RlcEV4ZWN1dGlvblN0YXJ0aW5nUmVxdWVzdBJOChpz",
+            "dGVwRXhlY3V0aW9uRW5kaW5nUmVxdWVzdBgJIAEoCzIqLmdhdWdlLm1lc3Nh",
+            "Z2VzLlN0ZXBFeGVjdXRpb25FbmRpbmdSZXF1ZXN0Ej4KEmV4ZWN1dGVTdGVw",
+            "UmVxdWVzdBgKIAEoCzIiLmdhdWdlLm1lc3NhZ2VzLkV4ZWN1dGVTdGVwUmVx",
+            "dWVzdBJGChZleGVjdXRpb25FbmRpbmdSZXF1ZXN0GAsgASgLMiYuZ2F1Z2Uu",
+            "bWVzc2FnZXMuRXhlY3V0aW9uRW5kaW5nUmVxdWVzdBJAChNzdGVwVmFsaWRh",
+            "dGVSZXF1ZXN0GAwgASgLMiMuZ2F1Z2UubWVzc2FnZXMuU3RlcFZhbGlkYXRl",
+            "UmVxdWVzdBJCChRzdGVwVmFsaWRhdGVSZXNwb25zZRgNIAEoCzIkLmdhdWdl",
+            "Lm1lc3NhZ2VzLlN0ZXBWYWxpZGF0ZVJlc3BvbnNlEkgKF2V4ZWN1dGlvblN0",
+            "YXR1c1Jlc3BvbnNlGA4gASgLMicuZ2F1Z2UubWVzc2FnZXMuRXhlY3V0aW9u",
+            "U3RhdHVzUmVzcG9uc2USOgoQc3RlcE5hbWVzUmVxdWVzdBgPIAEoCzIgLmdh",
+            "dWdlLm1lc3NhZ2VzLlN0ZXBOYW1lc1JlcXVlc3QSPAoRc3RlcE5hbWVzUmVz",
+            "cG9uc2UYECABKAsyIS5nYXVnZS5tZXNzYWdlcy5TdGVwTmFtZXNSZXNwb25z",
+            "ZRJCChRzdWl0ZUV4ZWN1dGlvblJlc3VsdBgRIAEoCzIkLmdhdWdlLm1lc3Nh",
+            "Z2VzLlN1aXRlRXhlY3V0aW9uUmVzdWx0Ej4KEmtpbGxQcm9jZXNzUmVxdWVz",
+            "dBgSIAEoCzIiLmdhdWdlLm1lc3NhZ2VzLktpbGxQcm9jZXNzUmVxdWVzdBJS",
+            "ChxzY2VuYXJpb0RhdGFTdG9yZUluaXRSZXF1ZXN0GBMgASgLMiwuZ2F1Z2Uu",
+            "bWVzc2FnZXMuU2NlbmFyaW9EYXRhU3RvcmVJbml0UmVxdWVzdBJKChhzcGVj",
+            "RGF0YVN0b3JlSW5pdFJlcXVlc3QYFCABKAsyKC5nYXVnZS5tZXNzYWdlcy5T",
+            "cGVjRGF0YVN0b3JlSW5pdFJlcXVlc3QSTAoZc3VpdGVEYXRhU3RvcmVJbml0",
+            "UmVxdWVzdBgVIAEoCzIpLmdhdWdlLm1lc3NhZ2VzLlN1aXRlRGF0YVN0b3Jl",
+            "SW5pdFJlcXVlc3QSOAoPc3RlcE5hbWVSZXF1ZXN0GBYgASgLMh8uZ2F1Z2Uu",
+            "bWVzc2FnZXMuU3RlcE5hbWVSZXF1ZXN0EjoKEHN0ZXBOYW1lUmVzcG9uc2UY",
+            "FyABKAsyIC5nYXVnZS5tZXNzYWdlcy5TdGVwTmFtZVJlc3BvbnNlEjgKD3Jl",
+            "ZmFjdG9yUmVxdWVzdBgYIAEoCzIfLmdhdWdlLm1lc3NhZ2VzLlJlZmFjdG9y",
+            "UmVxdWVzdBI6ChByZWZhY3RvclJlc3BvbnNlGBkgASgLMiAuZ2F1Z2UubWVz",
+            "c2FnZXMuUmVmYWN0b3JSZXNwb25zZRJOChp1bnN1cHBvcnRlZE1lc3NhZ2VS",
+            "ZXNwb25zZRgaIAEoCzIqLmdhdWdlLm1lc3NhZ2VzLlVuc3VwcG9ydGVkTWVz",
+            "c2FnZVJlc3BvbnNlEjoKEGNhY2hlRmlsZVJlcXVlc3QYGyABKAsyIC5nYXVn",
+            "ZS5tZXNzYWdlcy5DYWNoZUZpbGVSZXF1ZXN0EkIKFHN0ZXBQb3NpdGlvbnNS",
+            "ZXF1ZXN0GBwgASgLMiQuZ2F1Z2UubWVzc2FnZXMuU3RlcFBvc2l0aW9uc1Jl",
+            "cXVlc3QSRAoVc3RlcFBvc2l0aW9uc1Jlc3BvbnNlGB0gASgLMiUuZ2F1Z2Uu",
+            "bWVzc2FnZXMuU3RlcFBvc2l0aW9uc1Jlc3BvbnNlElQKHWltcGxlbWVudGF0",
+            "aW9uRmlsZUxpc3RSZXF1ZXN0GB4gASgLMi0uZ2F1Z2UubWVzc2FnZXMuSW1w",
+            "bGVtZW50YXRpb25GaWxlTGlzdFJlcXVlc3QSVgoeaW1wbGVtZW50YXRpb25G",
+            "aWxlTGlzdFJlc3BvbnNlGB8gASgLMi4uZ2F1Z2UubWVzc2FnZXMuSW1wbGVt",
+            "ZW50YXRpb25GaWxlTGlzdFJlc3BvbnNlElQKHXN0dWJJbXBsZW1lbnRhdGlv",
+            "bkNvZGVSZXF1ZXN0GCAgASgLMi0uZ2F1Z2UubWVzc2FnZXMuU3R1YkltcGxl",
+            "bWVudGF0aW9uQ29kZVJlcXVlc3QSKgoIZmlsZURpZmYYISABKAsyGC5nYXVn",
+            "ZS5tZXNzYWdlcy5GaWxlRGlmZhJiCiRpbXBsZW1lbnRhdGlvbkZpbGVHbG9i",
+            "UGF0dGVyblJlcXVlc3QYIiABKAsyNC5nYXVnZS5tZXNzYWdlcy5JbXBsZW1l",
+            "bnRhdGlvbkZpbGVHbG9iUGF0dGVyblJlcXVlc3QSZAolaW1wbGVtZW50YXRp",
+            "b25GaWxlR2xvYlBhdHRlcm5SZXNwb25zZRgjIAEoCzI1LmdhdWdlLm1lc3Nh",
+            "Z2VzLkltcGxlbWVudGF0aW9uRmlsZUdsb2JQYXR0ZXJuUmVzcG9uc2USSgoY",
+            "c3VpdGVFeGVjdXRpb25SZXN1bHRJdGVtGCQgASgLMiguZ2F1Z2UubWVzc2Fn",
+            "ZXMuU3VpdGVFeGVjdXRpb25SZXN1bHRJdGVtEiwKCWtlZXBBbGl2ZRglIAEo",
+            "CzIZLmdhdWdlLm1lc3NhZ2VzLktlZXBBbGl2ZRJYCh9jb25jZXB0RXhlY3V0",
+            "aW9uU3RhcnRpbmdSZXF1ZXN0GCYgASgLMi8uZ2F1Z2UubWVzc2FnZXMuQ29u",
+            "Y2VwdEV4ZWN1dGlvblN0YXJ0aW5nUmVxdWVzdBJUCh1jb25jZXB0RXhlY3V0",
+            "aW9uRW5kaW5nUmVxdWVzdBgnIAEoCzItLmdhdWdlLm1lc3NhZ2VzLkNvbmNl",
+            "cHRFeGVjdXRpb25FbmRpbmdSZXF1ZXN0ItwHCgtNZXNzYWdlVHlwZRIVChFF",
+            "eGVjdXRpb25TdGFydGluZxAAEhkKFVNwZWNFeGVjdXRpb25TdGFydGluZxAB",
+            "EhcKE1NwZWNFeGVjdXRpb25FbmRpbmcQAhIdChlTY2VuYXJpb0V4ZWN1dGlv",
+            "blN0YXJ0aW5nEAMSGwoXU2NlbmFyaW9FeGVjdXRpb25FbmRpbmcQBBIZChVT",
+            "dGVwRXhlY3V0aW9uU3RhcnRpbmcQBRIXChNTdGVwRXhlY3V0aW9uRW5kaW5n",
+            "EAYSDwoLRXhlY3V0ZVN0ZXAQBxITCg9FeGVjdXRpb25FbmRpbmcQCBIXChNT",
+            "dGVwVmFsaWRhdGVSZXF1ZXN0EAkSGAoUU3RlcFZhbGlkYXRlUmVzcG9uc2UQ",
+            "ChIbChdFeGVjdXRpb25TdGF0dXNSZXNwb25zZRALEhQKEFN0ZXBOYW1lc1Jl",
+            "cXVlc3QQDBIVChFTdGVwTmFtZXNSZXNwb25zZRANEhYKEktpbGxQcm9jZXNz",
+            "UmVxdWVzdBAOEhgKFFN1aXRlRXhlY3V0aW9uUmVzdWx0EA8SGQoVU2NlbmFy",
+            "aW9EYXRhU3RvcmVJbml0EBASFQoRU3BlY0RhdGFTdG9yZUluaXQQERIWChJT",
+            "dWl0ZURhdGFTdG9yZUluaXQQEhITCg9TdGVwTmFtZVJlcXVlc3QQExIUChBT",
+            "dGVwTmFtZVJlc3BvbnNlEBQSEwoPUmVmYWN0b3JSZXF1ZXN0EBUSFAoQUmVm",
+            "YWN0b3JSZXNwb25zZRAWEh4KGlVuc3VwcG9ydGVkTWVzc2FnZVJlc3BvbnNl",
+            "EBcSFAoQQ2FjaGVGaWxlUmVxdWVzdBAYEhgKFFN0ZXBQb3NpdGlvbnNSZXF1",
+            "ZXN0EBkSGQoVU3RlcFBvc2l0aW9uc1Jlc3BvbnNlEBoSIQodSW1wbGVtZW50",
+            "YXRpb25GaWxlTGlzdFJlcXVlc3QQGxIiCh5JbXBsZW1lbnRhdGlvbkZpbGVM",
+            "aXN0UmVzcG9uc2UQHBIhCh1TdHViSW1wbGVtZW50YXRpb25Db2RlUmVxdWVz",
+            "dBAdEgwKCEZpbGVEaWZmEB4SKAokSW1wbGVtZW50YXRpb25GaWxlR2xvYlBh",
+            "dHRlcm5SZXF1ZXN0EB8SKQolSW1wbGVtZW50YXRpb25GaWxlR2xvYlBhdHRl",
+            "cm5SZXNwb25zZRAgEhwKGFN1aXRlRXhlY3V0aW9uUmVzdWx0SXRlbRAhEg0K",
+            "CUtlZXBBbGl2ZRAiEhwKGENvbmNlcHRFeGVjdXRpb25TdGFydGluZxAjEhoK",
+            "FkNvbmNlcHRFeGVjdXRpb25FbmRpbmcQJEJcChZjb20udGhvdWdodHdvcmtz",
+            "LmdhdWdlWjFnaXRodWIuY29tL2dldGdhdWdlL2dhdWdlLXByb3RvL2dvL2dh",
+            "dWdlX21lc3NhZ2VzqgIOR2F1Z2UuTWVzc2FnZXNiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Gauge.Messages.SpecReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -244,7 +244,7 @@ namespace Gauge.Messages {
             new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.ExecutionInfo), global::Gauge.Messages.ExecutionInfo.Parser, new[]{ "CurrentSpec", "CurrentScenario", "CurrentStep", "Stacktrace", "ProjectName", "ExecutionArgs", "NumberOfExecutionStreams", "RunnerId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.SpecInfo), global::Gauge.Messages.SpecInfo.Parser, new[]{ "Name", "FileName", "IsFailed", "Tags" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.ScenarioInfo), global::Gauge.Messages.ScenarioInfo.Parser, new[]{ "Name", "IsFailed", "Tags" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.StepInfo), global::Gauge.Messages.StepInfo.Parser, new[]{ "Step", "IsFailed", "StackTrace", "ErrorMessage" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.StepInfo), global::Gauge.Messages.StepInfo.Parser, new[]{ "Step", "IsFailed", "StackTrace", "ErrorMessage", "IsConcept" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.ExecuteStepRequest), global::Gauge.Messages.ExecuteStepRequest.Parser, new[]{ "ActualStepText", "ParsedStepText", "ScenarioFailing", "Parameters", "Stream" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.StepValidateRequest), global::Gauge.Messages.StepValidateRequest.Parser, new[]{ "StepText", "NumberOfParameters", "StepValue" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.StepValidateResponse), global::Gauge.Messages.StepValidateResponse.Parser, new[]{ "IsValid", "ErrorMessage", "ErrorType", "Suggestion" }, null, new[]{ typeof(global::Gauge.Messages.StepValidateResponse.Types.ErrorType) }, null, null),
@@ -4886,6 +4886,7 @@ namespace Gauge.Messages {
       isFailed_ = other.isFailed_;
       stackTrace_ = other.stackTrace_;
       errorMessage_ = other.errorMessage_;
+      isConcept_ = other.isConcept_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -4955,6 +4956,21 @@ namespace Gauge.Messages {
       }
     }
 
+    /// <summary>Field number for the "isConcept" field.</summary>
+    public const int IsConceptFieldNumber = 5;
+    private bool isConcept_;
+    /// <summary>
+    //// Flag to indicate if the current Step is a concept
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool IsConcept {
+      get { return isConcept_; }
+      set {
+        isConcept_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -4974,6 +4990,7 @@ namespace Gauge.Messages {
       if (IsFailed != other.IsFailed) return false;
       if (StackTrace != other.StackTrace) return false;
       if (ErrorMessage != other.ErrorMessage) return false;
+      if (IsConcept != other.IsConcept) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -4985,6 +5002,7 @@ namespace Gauge.Messages {
       if (IsFailed != false) hash ^= IsFailed.GetHashCode();
       if (StackTrace.Length != 0) hash ^= StackTrace.GetHashCode();
       if (ErrorMessage.Length != 0) hash ^= ErrorMessage.GetHashCode();
+      if (IsConcept != false) hash ^= IsConcept.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -5019,6 +5037,10 @@ namespace Gauge.Messages {
         output.WriteRawTag(34);
         output.WriteString(ErrorMessage);
       }
+      if (IsConcept != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(IsConcept);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -5045,6 +5067,10 @@ namespace Gauge.Messages {
         output.WriteRawTag(34);
         output.WriteString(ErrorMessage);
       }
+      if (IsConcept != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(IsConcept);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -5066,6 +5092,9 @@ namespace Gauge.Messages {
       }
       if (ErrorMessage.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(ErrorMessage);
+      }
+      if (IsConcept != false) {
+        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -5093,6 +5122,9 @@ namespace Gauge.Messages {
       }
       if (other.ErrorMessage.Length != 0) {
         ErrorMessage = other.ErrorMessage;
+      }
+      if (other.IsConcept != false) {
+        IsConcept = other.IsConcept;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -5128,6 +5160,10 @@ namespace Gauge.Messages {
             ErrorMessage = input.ReadString();
             break;
           }
+          case 40: {
+            IsConcept = input.ReadBool();
+            break;
+          }
         }
       }
     #endif
@@ -5160,6 +5196,10 @@ namespace Gauge.Messages {
           }
           case 34: {
             ErrorMessage = input.ReadString();
+            break;
+          }
+          case 40: {
+            IsConcept = input.ReadBool();
             break;
           }
         }
