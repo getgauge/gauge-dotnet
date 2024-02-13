@@ -6,7 +6,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
@@ -28,10 +27,10 @@ namespace Gauge.Dotnet.Processors
             return info.CurrentSpec.Tags.ToList();
         }
 
-        public async Task<ExecutionStatusResponse> Process(SpecExecutionStartingRequest request)
+        public ExecutionStatusResponse Process(SpecExecutionStartingRequest request)
         {
             _executionOrchestrator.StartExecutionScope("spec");
-            return await ExecuteHooks(request.CurrentExecutionInfo);
+            return ExecuteHooks(request.CurrentExecutionInfo);
         }
     }
 }

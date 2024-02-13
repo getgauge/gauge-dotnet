@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Moq;
 
 namespace Gauge.Dotnet.UnitTests.Helpers
@@ -116,13 +115,6 @@ namespace Gauge.Dotnet.UnitTests.Helpers
             return this;
         }
 
-        public MockMethodBuilder WithAsyncVoidReturn()
-        {
-            mockMethod.Setup(x => x.ReturnType).Returns(typeof(void));
-            mockMethod.Setup(x => x.GetCustomAttributes(typeof(AsyncStateMachineAttribute),true)).Returns(new []{new AsyncStateMachineAttribute(null)});
-            return this;
-        }
-        
         private static ParameterInfo[] GetParameters(IEnumerable<KeyValuePair<string, string>> methodParams)
         {
             if (methodParams is null)

@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
@@ -21,9 +20,9 @@ namespace Gauge.Dotnet.Processors
 
         protected override string HookType => "BeforeStep";
 
-        public async Task<ExecutionStatusResponse> Process(StepExecutionStartingRequest request)
+        public ExecutionStatusResponse Process(StepExecutionStartingRequest request)
         {
-            return await ExecuteHooks(request.CurrentExecutionInfo);
+            return ExecuteHooks(request.CurrentExecutionInfo);
         }
 
         protected override List<string> GetApplicableTags(ExecutionInfo info)

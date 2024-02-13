@@ -14,16 +14,16 @@ namespace Gauge.Dotnet.Executor
     public class ExecutorPool : IDisposable
     {
         public bool IsMultithreading { get; internal set; }
-        private ConcurrentDictionary<string, TaskFactory> _workers = new ConcurrentDictionary<string, TaskFactory>();
-        
+        private ConcurrentDictionary<string, CustomTaskScheduler> _workers = new ConcurrentDictionary<string, CustomTaskScheduler>();
+
         public ExecutorPool(int size, bool isMultithreading)
         {
             for (int i = 1; i <= size; i++)
             {
-                bool added = _workers.TryAdd(GetName(i), new TaskFactory(CancellationToken.None, TaskCreationOptions.None, TaskContinuationOptions.None, new CustomTaskScheduler()));
+                bool added = _workers.TryAdd(GetName(i), new CustomTaskScheduler());
                 if (!added)
                 {
-                    Logger.Fatal("Failed to add Worker for stream " + i);
+                    Logger.Fatal("Failed to add Wroker for stream " + i);
                 }
             }
 
@@ -34,25 +34,16 @@ namespace Gauge.Dotnet.Executor
         {
             foreach (var w in _workers)
             {
-                ((CustomTaskScheduler)w.Value.Scheduler)?.Dispose();
+                w.Value.Dispose();
             }
         }
 
         public Task<T> Execute<T>(int stream, Func<T> fn)
         {
-            bool found = _workers.TryGetValue(GetName(stream), out TaskFactory taskFactory);
+            bool found = _workers.TryGetValue(GetName(stream), out CustomTaskScheduler scheduler);
             if (found)
             {
-                return taskFactory.StartNew(fn);
-            }
-            throw new StreamNotFountException(stream);
-        }
-        public Task<T> Execute<T>(int stream, Func<Task<T>> fn)
-        {
-            bool found = _workers.TryGetValue(GetName(stream), out TaskFactory taskFactory);
-            if (found)
-            {
-                return taskFactory.StartNew(fn).Unwrap();
+                return Task.Factory.StartNew<T>(fn, new CancellationToken(), TaskCreationOptions.None, scheduler);
             }
             throw new StreamNotFountException(stream);
         }

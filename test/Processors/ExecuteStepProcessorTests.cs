@@ -5,7 +5,6 @@
  *----------------------------------------------------------------*/
 
 
-using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Messages;
@@ -23,7 +22,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         }
 
         [Test]
-        public async Task ShouldProcessExecuteStepRequest()
+        public void ShouldProcessExecuteStepRequest()
         {
             const string parsedStepText = "Foo";
             var request = new ExecuteStepRequest
@@ -46,12 +45,12 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockStepRegistry.Setup(x => x.MethodFor(parsedStepText)).Returns(fooMethodInfo);
             var mockOrchestrator = new Mock<IExecutionOrchestrator>();
             mockOrchestrator.Setup(e => e.ExecuteStep(fooMethodInfo, It.IsAny<string[]>()))
-                .Returns(() => Task.FromResult(new ProtoExecutionResult { ExecutionTime = 1, Failed = false }));
+                .Returns(() => new ProtoExecutionResult { ExecutionTime = 1, Failed = false });
 
             var mockTableFormatter = new Mock<ITableFormatter>();
 
             var processor = new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object);
-            var response = await processor.Process(request);
+            var response = processor.Process(request);
 
             ClassicAssert.False(response.ExecutionResult.Failed);
         }
@@ -59,7 +58,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         [Test]
         [TestCase(Parameter.Types.ParameterType.Table)]
         [TestCase(Parameter.Types.ParameterType.SpecialTable)]
-        public async Task ShouldProcessExecuteStepRequestForTableParam(Parameter.Types.ParameterType parameterType)
+        public void ShouldProcessExecuteStepRequestForTableParam(Parameter.Types.ParameterType parameterType)
         {
             const string parsedStepText = "Foo";
             var protoTable = new ProtoTable();
@@ -84,11 +83,11 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockStepRegistry.Setup(x => x.MethodFor(parsedStepText)).Returns(fooMethodInfo);
             var mockOrchestrator = new Mock<IExecutionOrchestrator>();
             mockOrchestrator.Setup(e => e.ExecuteStep(fooMethodInfo, It.IsAny<string[]>())).Returns(() =>
-                Task.FromResult(new ProtoExecutionResult
+                new ProtoExecutionResult
                 {
                     ExecutionTime = 1,
                     Failed = false
-                }));
+                });
 
             var mockAssemblyLoader = new Mock<IAssemblyLoader>();
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector));
@@ -96,7 +95,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockTableFormatter.Setup(x => x.GetJSON(protoTable))
                 .Returns(tableJSON);
             var processor = new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object);
-            var response = await processor.Process(request);
+            var response = processor.Process(request);
 
             mockOrchestrator.Verify(executor =>
                 executor.ExecuteStep(fooMethodInfo, It.Is<string[]>(strings => strings[0] == tableJSON)));
@@ -104,7 +103,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         }
 
         [Test]
-        public async Task ShouldReportArgumentMismatch()
+        public void ShouldReportArgumentMismatch()
         {
             const string parsedStepText = "Foo";
             var request = new ExecuteStepRequest
@@ -121,7 +120,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var mockTableFormatter = new Mock<ITableFormatter>();
 
             var processor = new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object);
-            var response = await processor.Process(request);
+            var response = processor.Process(request);
 
             ClassicAssert.True(response.ExecutionResult.Failed);
             ClassicAssert.AreEqual(response.ExecutionResult.ErrorMessage,
@@ -129,7 +128,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         }
 
         [Test]
-        public async Task ShouldReportMissingStep()
+        public void ShouldReportMissingStep()
         {
             const string parsedStepText = "Foo";
             var request = new ExecuteStepRequest
@@ -143,7 +142,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             var mockTableFormatter = new Mock<ITableFormatter>();
 
             var processor = new ExecuteStepProcessor(mockStepRegistry.Object, mockOrchestrator.Object, mockTableFormatter.Object);
-            var response = await processor.Process(request);
+            var response = processor.Process(request);
 
             ClassicAssert.True(response.ExecutionResult.Failed);
             ClassicAssert.AreEqual(response.ExecutionResult.ErrorMessage,

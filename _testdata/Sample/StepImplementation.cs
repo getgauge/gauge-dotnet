@@ -30,14 +30,6 @@ namespace IntegrationTestSample
             GaugeMessages.WriteMessage("{0}, {1}!", what, who);
         }
 
-        [Step("Say <what> to <who> async")]
-        public async Task SaySomethingAsync(string what, string who)
-        {
-            Console.WriteLine("{0}, {1}!", what, who);
-            GaugeMessages.WriteMessage("{0}, {1}!", what, who);
-            await Task.Delay(100);
-        }
-
         [Step("I throw an unserializable exception")]
         public void ThrowUnserializableException()
         {

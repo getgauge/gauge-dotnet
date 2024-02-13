@@ -26,6 +26,6 @@ namespace Gauge.Dotnet.Models
         public FileLinePositionSpan Span { get; internal set; }
         public bool HasAlias { get; set; }
         public IEnumerable<string> Aliases { get; set; }
-        public bool IsExternal {get; set;}
+         public bool IsExternal {get; set;}
     }
 }

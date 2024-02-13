@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
@@ -27,10 +26,10 @@ namespace Gauge.Dotnet.Processors
         protected override string CacheClearLevel => ScenarioLevel;
 
 
-        public async Task<ExecutionStatusResponse> Process(ScenarioExecutionEndingRequest request)
+        public ExecutionStatusResponse Process(ScenarioExecutionEndingRequest request)
         {
             _executionOrchestrator.CloseExecutionScope();
-            var result = await ExecuteHooks(request.CurrentExecutionInfo);
+            var result = ExecuteHooks(request.CurrentExecutionInfo);
             ClearCacheForConfiguredLevel();
             return result;
         }

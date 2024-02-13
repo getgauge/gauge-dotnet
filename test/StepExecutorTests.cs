@@ -7,7 +7,6 @@
 
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.UnitTests.Helpers;
 using Gauge.Dotnet.Wrappers;
@@ -21,7 +20,7 @@ namespace Gauge.Dotnet.UnitTests
     internal class StepExecutorTests
     {
         [Test]
-        public async Task ShoudExecuteStep()
+        public void ShoudExecuteStep()
         {
             var mockInstance = new Mock<object>().Object;
             var mockClassInstanceManagerType = new Mock<Type>().Object;
@@ -51,12 +50,13 @@ namespace Gauge.Dotnet.UnitTests
             mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance))
                 .Returns(null);
 
-            var result = await executor.Execute(gaugeMethod);
+
+            var result = executor.Execute(gaugeMethod);
             ClassicAssert.True(result.Success);
         }
 
         [Test]
-        public async Task ShoudExecuteStepAndGetFailure()
+        public void ShoudExecuteStepAndGetFailure()
         {
             var mockInstance = new Mock<object>().Object;
             var mockClassInstanceManagerType = new Mock<Type>().Object;
@@ -86,13 +86,13 @@ namespace Gauge.Dotnet.UnitTests
             mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance))
                 .Throws(new Exception("step execution failure"));
 
-            var result = await executor.Execute(gaugeMethod);
+            var result = executor.Execute(gaugeMethod);
             ClassicAssert.False(result.Success);
             ClassicAssert.AreEqual(result.ExceptionMessage, "step execution failure");
         }
 
         [Test]
-        public async Task ShoudExecuteStepAndGetRecoverableError()
+        public void ShoudExecuteStepAndGetRecoverableError()
         {
             var mockInstance = new Mock<object>().Object;
             var mockClassInstanceManagerType = new Mock<Type>().Object;
@@ -124,7 +124,7 @@ namespace Gauge.Dotnet.UnitTests
             mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance))
                 .Throws(new Exception("step execution failure"));
 
-            var result = await executor.Execute(gaugeMethod);
+            var result = executor.Execute(gaugeMethod);
             ClassicAssert.False(result.Success);
             ClassicAssert.True(result.Recoverable);
             ClassicAssert.AreEqual(result.ExceptionMessage, "step execution failure");

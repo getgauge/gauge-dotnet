@@ -8,8 +8,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Gauge.Dotnet.Models;
-using Gauge.Dotnet.UnitTests.Helpers;
-using Moq;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
@@ -189,23 +187,10 @@ namespace Gauge.Dotnet.UnitTests
             stepRegistry.AddStep("Foo", new GaugeMethod { Name = "Foo", StepText = "Foo", FileName = "foo.cs" });
             stepRegistry.AddStep("Bar", new GaugeMethod { Name = "Bar", StepText = "Bar", IsExternal = true });
 
-            var positions = stepRegistry.GetStepPositions("foo.cs").ToArray();
+            var positions = stepRegistry.GetStepPositions("foo.cs");
 
-            Assert.That(positions.Length, Is.EqualTo(1));
-            Assert.That(positions.First().StepValue, Is.Not.EqualTo("Bar"));
-        }
-
-        [Test]
-        public void ShouldCheckForAsyncVoidImplementation()
-        {
-            var stepRegistry = new StepRegistry();
-            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var mockMethodBuilder = new MockMethodBuilder(mockAssemblyLoader);
-            var impl = new GaugeMethod { MethodInfo = mockMethodBuilder.WithName("Foo").WithStep("Foo").WithAsyncVoidReturn().Build() };
-
-            stepRegistry.AddStep("Foo", impl);
-            
-            Assert.That(stepRegistry.HasAsyncVoidImplementation("Foo"), Is.True);
+            ClassicAssert.True(positions.Count() == 1);
+            ClassicAssert.AreNotEqual(positions.First().StepValue, "Bar");
         }
     }
 }

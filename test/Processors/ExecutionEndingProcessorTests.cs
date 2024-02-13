@@ -6,7 +6,6 @@
 
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
@@ -54,7 +53,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             _mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("AfterSuite", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
                         It.IsAny<ExecutionInfo>()))
-                .Returns(Task.FromResult(_protoExecutionResult));
+                .Returns(_protoExecutionResult);
             _mockMethodExecutor.Setup(x =>
                 x.GetAllPendingMessages()).Returns(_pendingMessages);
             _mockMethodExecutor.Setup(x =>
@@ -87,9 +86,9 @@ namespace Gauge.Dotnet.UnitTests.Processors
         }
 
         [Test]
-        public async Task ShouldProcessHooks()
+        public void ShouldProcessHooks()
         {
-            var result = await _executionEndingProcessor.Process(_request);
+            var result = _executionEndingProcessor.Process(_request);
             _mockMethodExecutor.VerifyAll();
             ClassicAssert.AreEqual(result.ExecutionResult.Message, _pendingMessages);
             ClassicAssert.AreEqual(result.ExecutionResult.ScreenshotFiles, _pendingScreenshotFiles);

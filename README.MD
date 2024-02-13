@@ -37,7 +37,7 @@ gauge run specs
 #### Install specific version
 
 ```
-gauge install dotnet --version 0.6.0
+gauge install dotnet --version 0.5.2
 ```
 
 #### Offline installation
@@ -45,7 +45,7 @@ gauge install dotnet --version 0.6.0
 Download the plugin from [Releases](https://github.com/getgauge/gauge-dotnet/releases)
 
 ```
-gauge install dotnet --file gauge-dotnet-0.6.0.zip
+gauge install dotnet --file gauge-dotnet-0.5.2.zip
 ```
 
 #### Build from Source

@@ -8,7 +8,6 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 using Gauge.CSharp.Core;
 using Gauge.Messages;
 
@@ -25,7 +24,7 @@ namespace Gauge.Dotnet.Processors
 
 
         [DebuggerHidden]
-        public virtual async Task<ExecutionStatusResponse> Process(ExecutionStartingRequest request)
+        public virtual ExecutionStatusResponse Process(ExecutionStartingRequest request)
         {
             var debuggingEnv = Utils.TryReadEnvValue("DEBUGGING");
             if (debuggingEnv != null && debuggingEnv.ToLower().Equals("true"))
@@ -44,7 +43,7 @@ namespace Gauge.Dotnet.Processors
                         break;
                 }
             }
-            return await ExecuteHooks(request.CurrentExecutionInfo);
+            return ExecuteHooks(request.CurrentExecutionInfo);
 
         }
 

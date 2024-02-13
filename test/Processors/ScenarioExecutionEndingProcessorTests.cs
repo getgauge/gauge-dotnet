@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
 using Gauge.Messages;
@@ -45,6 +44,10 @@ namespace Gauge.Dotnet.UnitTests.Processors
             {
                 CurrentSpec = specInfo,
                 CurrentScenario = scenarioInfo
+            };
+            var currentExecutionInfo = new ScenarioExecutionEndingRequest
+            {
+                CurrentExecutionInfo = currentScenario
             };
             var tags = AssertEx.ExecuteProtectedMethod<ScenarioExecutionEndingProcessor>("GetApplicableTags", currentScenario)
                 .ToList();
@@ -87,7 +90,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         }
 
         [Test]
-        public async Task ShouldExecutreBeforeScenarioHook()
+        public void ShouldExecutreBeforeScenarioHook()
         {
             var scenarioExecutionStartingRequest = new ScenarioExecutionEndingRequest
             {
@@ -110,7 +113,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockMethodExecutor.Setup(x =>
                     x.ExecuteHooks("AfterScenario", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
                         It.IsAny<ExecutionInfo>()))
-                .Returns(Task.FromResult(protoExecutionResult));
+                .Returns(protoExecutionResult);
             mockMethodExecutor.Setup(x =>
                 x.GetAllPendingMessages()).Returns(pendingMessages);
             mockMethodExecutor.Setup(x =>
@@ -118,7 +121,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
 
             var processor = new ScenarioExecutionEndingProcessor(mockMethodExecutor.Object);
 
-            var result = await processor.Process(scenarioExecutionStartingRequest);
+            var result = processor.Process(scenarioExecutionStartingRequest);
             ClassicAssert.False(result.ExecutionResult.Failed);
             ClassicAssert.AreEqual(result.ExecutionResult.Message.ToList(), pendingMessages);
             ClassicAssert.AreEqual(result.ExecutionResult.ScreenshotFiles.ToList(), pendingScreenshotFiles);

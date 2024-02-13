@@ -7,7 +7,6 @@
 
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace Gauge.Dotnet.Extensions
 {
@@ -34,11 +33,6 @@ namespace Gauge.Dotnet.Extensions
             var customAttributes = info.GetCustomAttributes(false).ToList();
             return customAttributes.Any(stepType.IsInstanceOfType)
                    && customAttributes.Any(continueOnFailureType.IsInstanceOfType);
-        }
-
-        public static bool IsAsyncVoid(this MethodInfo info)
-        {
-            return info.GetCustomAttributes(typeof(AsyncStateMachineAttribute),true).Any() && info.ReturnType == typeof(void);
         }
     }
 }

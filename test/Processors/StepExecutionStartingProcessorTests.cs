@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
@@ -27,7 +26,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         }
 
         [Test]
-        public async Task ShouldClearExistingGaugeMessages()
+        public void ShouldClearExistingGaugeMessages()
         {
             var mockExecutionHelper = new Mock<IExecutionOrchestrator>();
 
@@ -44,7 +43,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockExecutionHelper.Setup(executor =>
                     executor.ExecuteHooks(It.IsAny<string>(), It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
                         It.IsAny<ExecutionInfo>()))
-                .Returns(Task.FromResult(protoExecutionResult));
+                .Returns(protoExecutionResult);
             var hookRegistry = new Mock<IHookRegistry>();
             hookRegistry.Setup(registry => registry.BeforeStepHooks).Returns(new HashSet<IHookMethod>());
 
@@ -54,14 +53,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
             mockExecutionHelper.Setup(x =>
                     x.ExecuteHooks("BeforeStep", It.IsAny<HooksStrategy>(), It.IsAny<IList<string>>(),
                         It.IsAny<ExecutionInfo>()))
-                .Returns(Task.FromResult(protoExecutionResult));
+                .Returns(protoExecutionResult);
             mockExecutionHelper.Setup(x =>
                 x.GetAllPendingMessages()).Returns(pendingMessages);
             mockExecutionHelper.Setup(x =>
                 x.GetAllPendingScreenshotFiles()).Returns(pendingScreenshotFiles);
 
             var processor = new StepExecutionStartingProcessor(mockExecutionHelper.Object);
-            var result = await processor.Process(request);
+            var result = processor.Process(request);
             ClassicAssert.AreEqual(result.ExecutionResult.Message, pendingMessages);
             ClassicAssert.AreEqual(result.ExecutionResult.ScreenshotFiles, pendingScreenshotFiles);
         }

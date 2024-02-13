@@ -6,7 +6,6 @@
 
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Messages;
@@ -15,9 +14,9 @@ namespace Gauge.Dotnet
 {
     public interface IExecutionOrchestrator
     {
-        Task<ProtoExecutionResult> ExecuteStep(GaugeMethod method, params string[] args);
+        ProtoExecutionResult ExecuteStep(GaugeMethod method, params string[] args);
 
-        Task<ProtoExecutionResult> ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags,
+        ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags,
             ExecutionInfo context);
         void ClearCache();
 

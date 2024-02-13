@@ -6,7 +6,6 @@
 
 
 using System.Threading;
-using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
@@ -19,7 +18,7 @@ namespace Gauge.Dotnet.IntegrationTests
     public class ExecuteStepProcessorTests : IntegrationTestsBase
     {
         [Test]
-        public async Task ShouldExecuteMethodFromRequest()
+        public void ShouldExecuteMethodFromRequest()
         {
             const string parameterizedStepText = "Step that takes a table {}";
             const string stepText = "Step that takes a table <table>";
@@ -65,7 +64,7 @@ namespace Gauge.Dotnet.IntegrationTests
                         }
                     }
             };
-            var result = await executeStepProcessor.Process(message);
+            var result = executeStepProcessor.Process(message);
 
             var protoExecutionResult = result.ExecutionResult;
             ClassicAssert.IsNotNull(protoExecutionResult);
@@ -73,7 +72,7 @@ namespace Gauge.Dotnet.IntegrationTests
         }
 
         [Test]
-        public async Task ShouldCaptureScreenshotOnFailure()
+        public void ShouldCaptureScreenshotOnFailure()
         {
             const string stepText = "I throw a serializable exception";
             var reflectionWrapper = new ReflectionWrapper();
@@ -97,7 +96,7 @@ namespace Gauge.Dotnet.IntegrationTests
                 ActualStepText = stepText
             };
 
-            var result = await executeStepProcessor.Process(message);
+            var result = executeStepProcessor.Process(message);
             var protoExecutionResult = result.ExecutionResult;
 
             ClassicAssert.IsNotNull(protoExecutionResult);

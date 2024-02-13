@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
@@ -39,11 +38,11 @@ namespace Gauge.Dotnet
 
 
         [DebuggerHidden]
-        public async Task<ProtoExecutionResult> ExecuteStep(GaugeMethod method, params string[] args)
+        public ProtoExecutionResult ExecuteStep(GaugeMethod method, params string[] args)
         {
             var stopwatch = Stopwatch.StartNew();
 
-            var executionResult = await _stepExecutor.Execute(method, args);
+            var executionResult = _stepExecutor.Execute(method, args);
             return BuildResult(stopwatch, executionResult);
         }
 
@@ -80,12 +79,11 @@ namespace Gauge.Dotnet
         }
 
         [DebuggerHidden]
-        public async Task<ProtoExecutionResult> ExecuteHooks(string hookType, HooksStrategy strategy,
-            IList<string> applicableTags,
+        public ProtoExecutionResult ExecuteHooks(string hookType, HooksStrategy strategy, IList<string> applicableTags,
             ExecutionInfo info)
         {
             var stopwatch = Stopwatch.StartNew();
-            var executionResult = await _hookExecutor.Execute(hookType, strategy, applicableTags, info);
+            var executionResult = _hookExecutor.Execute(hookType, strategy, applicableTags, info);
             return BuildResult(stopwatch, executionResult);
         }
 

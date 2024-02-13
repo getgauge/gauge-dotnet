@@ -99,29 +99,5 @@ namespace Gauge.Dotnet.UnitTests.Extensions
             ClassicAssert.False(bazMethod.IsRecoverableStep(assemblyLoader.Object),
                 "Recoverable is true only when method is a Step");
         }
-
-        [Test]
-        public void ShouldDetectAsyncVoidReturnType()
-        {
-            var assemblyLoader = new Mock<IAssemblyLoader>();
-            var fooMethod = new MockMethodBuilder(assemblyLoader)
-                .WithName("Foo")
-                .WithAsyncVoidReturn()
-                .Build();
-            
-            Assert.That(fooMethod.IsAsyncVoid(), Is.True, "Async void method was not detected.");
-        }
-        
-        [Test]
-        public void ShouldNotDetectAsyncVoidReturnTypeWhenNotPresent()
-        {
-            var assemblyLoader = new Mock<IAssemblyLoader>();
-            var fooMethod = new MockMethodBuilder(assemblyLoader)
-                .WithName("Foo")
-                .Build();
-            
-            Assert.That(fooMethod.IsAsyncVoid(), Is.False, "Async void method was detected incorrectly.");
-        }
-        
     }
 }
