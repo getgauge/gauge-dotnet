@@ -20,6 +20,8 @@ namespace Gauge.Dotnet.Models
         HashSet<IHookMethod> AfterScenarioHooks { get; }
         HashSet<IHookMethod> BeforeStepHooks { get; }
         HashSet<IHookMethod> AfterStepHooks { get; }
+        HashSet<IHookMethod> BeforeConceptHooks { get; }
+        HashSet<IHookMethod> AfterConceptHooks { get; }
         MethodInfo MethodFor(string method);
     }
 }

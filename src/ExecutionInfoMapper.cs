@@ -60,7 +60,7 @@ namespace Gauge.Dotnet
             return activatorWrapper.CreateInstance(
                 executionContextStepType, 
                 currentStep.Step.ActualStepText, currentStep.IsFailed, 
-                currentStep.StackTrace, currentStep.ErrorMessage, currentStep.IsConcept);
+                currentStep.StackTrace, currentStep.ErrorMessage);
         }
     }
 }

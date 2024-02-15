@@ -36,5 +36,6 @@
   },
   "lspLangId": "csharp",
   "gRPCSupport": true,
-  "multithreaded": true
+  "multithreaded": true,
+  "conceptMessages": true
 }

@@ -11,18 +11,19 @@ using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors
 {
-    public class StepExecutionStartingProcessor : UntaggedHooksFirstExecutionProcessor
+    public class ConceptExecutionEndingProcessor : TaggedHooksFirstExecutionProcessor
     {
-        public StepExecutionStartingProcessor(IExecutionOrchestrator executionOrchestrator)
+        public ConceptExecutionEndingProcessor(IExecutionOrchestrator executionOrchestrator)
             : base(executionOrchestrator)
         {
         }
 
-        protected override string HookType => "BeforeStep";
+        protected override string HookType => "AfterConcept";
 
-        public ExecutionStatusResponse Process(StepExecutionStartingRequest request)
+        public Empty Process(ConceptExecutionEndingRequest request)
         {
-            return ExecuteHooks(request.CurrentExecutionInfo);
+            base.ExecuteHooks(request.CurrentExecutionInfo);
+            return new Empty();
         }
 
         protected override List<string> GetApplicableTags(ExecutionInfo info)

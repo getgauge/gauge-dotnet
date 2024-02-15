@@ -33,7 +33,9 @@ namespace Gauge.Dotnet.Models
                 {LibType.BeforeScenario, new HashSet<IHookMethod>()},
                 {LibType.AfterScenario, new HashSet<IHookMethod>()},
                 {LibType.BeforeStep, new HashSet<IHookMethod>()},
-                {LibType.AfterStep, new HashSet<IHookMethod>()}
+                {LibType.AfterStep, new HashSet<IHookMethod>()},
+                {LibType.BeforeConcept, new HashSet<IHookMethod>()},
+                {LibType.AfterConcept, new HashSet<IHookMethod>()}
             };
 
             foreach (var type in _hooks.Keys)
@@ -55,6 +57,10 @@ namespace Gauge.Dotnet.Models
         public HashSet<IHookMethod> BeforeStepHooks => _hooks[LibType.BeforeStep];
 
         public HashSet<IHookMethod> AfterStepHooks => _hooks[LibType.AfterStep];
+
+        public HashSet<IHookMethod> BeforeConceptHooks => _hooks[LibType.BeforeConcept];
+
+        public HashSet<IHookMethod> AfterConceptHooks => _hooks[LibType.AfterConcept];
 
         public MethodInfo MethodFor(string method)
         {
