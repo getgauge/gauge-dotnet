@@ -74,7 +74,8 @@ namespace Gauge.Dotnet.UnitTests
         {
             var mockActivatorWrapper = new Mock<IActivatorWrapper>();
             mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(ExecutionContext.StepDetails),
-                executionInfo.CurrentStep.Step.ActualStepText, executionInfo.CurrentStep.IsFailed)).Verifiable();
+                executionInfo.CurrentStep.Step.ActualStepText, executionInfo.CurrentStep.IsFailed,
+                executionInfo.CurrentStep.StackTrace, executionInfo.CurrentStep.ErrorMessage)).Verifiable();
             new ExecutionInfoMapper(mockAssemblyLoader.Object, mockActivatorWrapper.Object).ExecutionContextFrom(executionInfo);
             mockActivatorWrapper.VerifyAll();
         }

@@ -5,6 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gauge.CSharp.Lib" Version="0.7.6" />
+    <PackageReference Include="Gauge.CSharp.Lib" Version="0.10.0" />
   </ItemGroup>
 </Project>

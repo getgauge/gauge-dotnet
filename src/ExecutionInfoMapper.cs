@@ -57,7 +57,10 @@ namespace Gauge.Dotnet
             if (currentStep == null || currentStep.Step == null)
                 return activatorWrapper.CreateInstance(executionContextStepType);
 
-            return activatorWrapper.CreateInstance(executionContextStepType, currentStep.Step.ActualStepText, currentStep.IsFailed);
+            return activatorWrapper.CreateInstance(
+                executionContextStepType, 
+                currentStep.Step.ActualStepText, currentStep.IsFailed, 
+                currentStep.StackTrace, currentStep.ErrorMessage);
         }
     }
 }

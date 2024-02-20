@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="4.19.4" />
-    <PackageReference Include="Gauge.CSharp.Lib" Version="0.7.6" />
+    <PackageReference Include="Gauge.CSharp.Lib" Version="0.10.0" />
   </ItemGroup>
 
 </Project>

@@ -101,6 +101,10 @@ namespace Gauge.Dotnet
                     return _registry.BeforeStepHooks;
                 case "AfterStep":
                     return _registry.AfterStepHooks;
+                case "BeforeConcept":
+                    return _registry.BeforeConceptHooks;
+                case "AfterConcept":
+                    return _registry.AfterConceptHooks;
                 case "AfterScenario":
                     return _registry.AfterScenarioHooks;
                 case "AfterSpec":

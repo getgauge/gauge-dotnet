@@ -26,7 +26,8 @@ namespace Gauge.Dotnet.UnitTests
             var types = new[]
             {
                 LibType.BeforeScenario, LibType.AfterScenario, LibType.BeforeSpec, LibType.AfterSpec,
-                LibType.BeforeStep, LibType.AfterStep, LibType.BeforeSuite, LibType.AfterSuite
+                LibType.BeforeStep, LibType.AfterStep, LibType.BeforeConcept, LibType.AfterConcept,
+                LibType.BeforeSuite, LibType.AfterSuite
             };
             foreach (var type in types)
             {

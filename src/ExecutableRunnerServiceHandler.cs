@@ -30,11 +30,13 @@ namespace Gauge.Dotnet
         private ScenarioExecutionEndingProcessor scenarioExecutionEndingProcessor;
         private StepExecutionStartingProcessor stepExecutionStartingProcessor;
         private StepExecutionEndingProcessor stepExecutionEndingProcessor;
+        private ConceptExecutionStartingProcessor conceptExecutionStartingProcessor;
+        private ConceptExecutionEndingProcessor conceptExecutionEndingProcessor;
         private ExecuteStepProcessor executeStepProcessor;
         private ScenarioDataStoreInitProcessor scenarioDataStoreInitProcessor;
         private SpecDataStoreInitProcessor specDataStoreInitProcessor;
         private SuiteDataStoreInitProcessor suiteDataStoreInitProcessor; 
-       public ExecutableRunnerServiceHandler(IActivatorWrapper activationWrapper, IReflectionWrapper reflectionWrapper, 
+        public ExecutableRunnerServiceHandler(IActivatorWrapper activationWrapper, IReflectionWrapper reflectionWrapper, 
             IAssemblyLoader assemblyLoader, IStaticLoader loader, ExecutorPool pool, IHostApplicationLifetime lifetime)
             : base(loader, pool, lifetime)
         {
@@ -49,7 +51,7 @@ namespace Gauge.Dotnet
             return _pool.Execute(getStream(request.Stream), () => this.suiteDataStoreInitProcessor.Process());
         }
 
-         public override Task<ExecutionStatusResponse> ExecuteStep(ExecuteStepRequest request, ServerCallContext context)
+        public override Task<ExecutionStatusResponse> ExecuteStep(ExecuteStepRequest request, ServerCallContext context)
         {
             return _pool.Execute(getStream(request.Stream), () => this.executeStepProcessor.Process(request));
         }
@@ -113,6 +115,17 @@ namespace Gauge.Dotnet
             return _pool.Execute(getStream(request.Stream), () => this.stepExecutionStartingProcessor.Process(request));
         }
 
+        public override Task<Empty> NotifyConceptExecutionStarting(ConceptExecutionStartingRequest request, ServerCallContext context)
+        {
+            return _pool.Execute(getStream(request.Stream), () => this.conceptExecutionStartingProcessor.Process(request));
+        }
+
+        public override Task<Empty> NotifyConceptExecutionEnding(ConceptExecutionEndingRequest request, ServerCallContext context)
+        {
+            return _pool.Execute(getStream(request.Stream), () => this.conceptExecutionEndingProcessor.Process(request));
+        }
+
+
         private void InitializeExecutionMessageHandlers()
         {
             var tableFormatter = new TableFormatter(this._assemblyLoader, this._activatorWrapper);
@@ -134,6 +147,8 @@ namespace Gauge.Dotnet
             this.scenarioExecutionEndingProcessor = new ScenarioExecutionEndingProcessor(executionOrchestrator);
             this.stepExecutionStartingProcessor = new StepExecutionStartingProcessor(executionOrchestrator);
             this.stepExecutionEndingProcessor = new StepExecutionEndingProcessor(executionOrchestrator);
+            this.conceptExecutionStartingProcessor = new ConceptExecutionStartingProcessor(executionOrchestrator);
+            this.conceptExecutionEndingProcessor = new ConceptExecutionEndingProcessor(executionOrchestrator);
             this.executeStepProcessor = new ExecuteStepProcessor(_stepRegistry, executionOrchestrator, tableFormatter);
             this.scenarioDataStoreInitProcessor = new ScenarioDataStoreInitProcessor(this._assemblyLoader);
             this.specDataStoreInitProcessor = new SpecDataStoreInitProcessor(this._assemblyLoader);
