@@ -31,6 +31,16 @@ namespace IntegrationTestSample
         {
         }
 
+        [BeforeConcept]
+        public void BeforeConcept()
+        {
+        }
+
+        [AfterConcept]
+        public void AfterConcept()
+        {
+        }
+
         [BeforeSpec]
         public void BeforeSpec()
         {
