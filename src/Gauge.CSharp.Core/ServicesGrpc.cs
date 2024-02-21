@@ -294,20 +294,20 @@ namespace Gauge.Messages {
         __Marshaller_gauge_messages_Empty);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Gauge.Messages.ConceptExecutionStartingRequest, global::Gauge.Messages.Empty> __Method_NotifyConceptExecutionStarting = new grpc::Method<global::Gauge.Messages.ConceptExecutionStartingRequest, global::Gauge.Messages.Empty>(
+    static readonly grpc::Method<global::Gauge.Messages.ConceptExecutionStartingRequest, global::Gauge.Messages.ExecutionStatusResponse> __Method_NotifyConceptExecutionStarting = new grpc::Method<global::Gauge.Messages.ConceptExecutionStartingRequest, global::Gauge.Messages.ExecutionStatusResponse>(
         grpc::MethodType.Unary,
         __ServiceName,
         "NotifyConceptExecutionStarting",
         __Marshaller_gauge_messages_ConceptExecutionStartingRequest,
-        __Marshaller_gauge_messages_Empty);
+        __Marshaller_gauge_messages_ExecutionStatusResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Gauge.Messages.ConceptExecutionEndingRequest, global::Gauge.Messages.Empty> __Method_NotifyConceptExecutionEnding = new grpc::Method<global::Gauge.Messages.ConceptExecutionEndingRequest, global::Gauge.Messages.Empty>(
+    static readonly grpc::Method<global::Gauge.Messages.ConceptExecutionEndingRequest, global::Gauge.Messages.ExecutionStatusResponse> __Method_NotifyConceptExecutionEnding = new grpc::Method<global::Gauge.Messages.ConceptExecutionEndingRequest, global::Gauge.Messages.ExecutionStatusResponse>(
         grpc::MethodType.Unary,
         __ServiceName,
         "NotifyConceptExecutionEnding",
         __Marshaller_gauge_messages_ConceptExecutionEndingRequest,
-        __Marshaller_gauge_messages_Empty);
+        __Marshaller_gauge_messages_ExecutionStatusResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -630,13 +630,13 @@ namespace Gauge.Messages {
       /// <summary>
       /// NotifyConceptExecutionStarting is a RPC to tell plugins that the concept execution has started.
       ///
-      /// Accepts a ConceptExecutionStartingRequest message and returns a Empty message
+      /// Accepts a ConceptExecutionStartingRequest message and returns an ExecutionStatusResponse message
       /// </summary>
       /// <param name="request">The request received from the client.</param>
       /// <param name="context">The context of the server-side call handler being invoked.</param>
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::System.Threading.Tasks.Task<global::Gauge.Messages.Empty> NotifyConceptExecutionStarting(global::Gauge.Messages.ConceptExecutionStartingRequest request, grpc::ServerCallContext context)
+      public virtual global::System.Threading.Tasks.Task<global::Gauge.Messages.ExecutionStatusResponse> NotifyConceptExecutionStarting(global::Gauge.Messages.ConceptExecutionStartingRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -644,13 +644,13 @@ namespace Gauge.Messages {
       /// <summary>
       /// NotifyConceptExecutionEnding is a RPC to tell plugins that the concept execution has finished.
       ///
-      /// Accepts a ConceptExecutionEndingRequest message and returns a Empty message
+      /// Accepts a ConceptExecutionEndingRequest message and returns an ExecutionStatusResponse message
       /// </summary>
       /// <param name="request">The request received from the client.</param>
       /// <param name="context">The context of the server-side call handler being invoked.</param>
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::System.Threading.Tasks.Task<global::Gauge.Messages.Empty> NotifyConceptExecutionEnding(global::Gauge.Messages.ConceptExecutionEndingRequest request, grpc::ServerCallContext context)
+      public virtual global::System.Threading.Tasks.Task<global::Gauge.Messages.ExecutionStatusResponse> NotifyConceptExecutionEnding(global::Gauge.Messages.ConceptExecutionEndingRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -1919,7 +1919,7 @@ namespace Gauge.Messages {
       /// <summary>
       /// NotifyConceptExecutionStarting is a RPC to tell plugins that the concept execution has started.
       ///
-      /// Accepts a ConceptExecutionStartingRequest message and returns a Empty message
+      /// Accepts a ConceptExecutionStartingRequest message and returns an ExecutionStatusResponse message
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
@@ -1927,27 +1927,27 @@ namespace Gauge.Messages {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Gauge.Messages.Empty NotifyConceptExecutionStarting(global::Gauge.Messages.ConceptExecutionStartingRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Gauge.Messages.ExecutionStatusResponse NotifyConceptExecutionStarting(global::Gauge.Messages.ConceptExecutionStartingRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return NotifyConceptExecutionStarting(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
       /// <summary>
       /// NotifyConceptExecutionStarting is a RPC to tell plugins that the concept execution has started.
       ///
-      /// Accepts a ConceptExecutionStartingRequest message and returns a Empty message
+      /// Accepts a ConceptExecutionStartingRequest message and returns an ExecutionStatusResponse message
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="options">The options for the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Gauge.Messages.Empty NotifyConceptExecutionStarting(global::Gauge.Messages.ConceptExecutionStartingRequest request, grpc::CallOptions options)
+      public virtual global::Gauge.Messages.ExecutionStatusResponse NotifyConceptExecutionStarting(global::Gauge.Messages.ConceptExecutionStartingRequest request, grpc::CallOptions options)
       {
         return CallInvoker.BlockingUnaryCall(__Method_NotifyConceptExecutionStarting, null, options, request);
       }
       /// <summary>
       /// NotifyConceptExecutionStarting is a RPC to tell plugins that the concept execution has started.
       ///
-      /// Accepts a ConceptExecutionStartingRequest message and returns a Empty message
+      /// Accepts a ConceptExecutionStartingRequest message and returns an ExecutionStatusResponse message
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
@@ -1955,27 +1955,27 @@ namespace Gauge.Messages {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Gauge.Messages.Empty> NotifyConceptExecutionStartingAsync(global::Gauge.Messages.ConceptExecutionStartingRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Gauge.Messages.ExecutionStatusResponse> NotifyConceptExecutionStartingAsync(global::Gauge.Messages.ConceptExecutionStartingRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return NotifyConceptExecutionStartingAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
       /// <summary>
       /// NotifyConceptExecutionStarting is a RPC to tell plugins that the concept execution has started.
       ///
-      /// Accepts a ConceptExecutionStartingRequest message and returns a Empty message
+      /// Accepts a ConceptExecutionStartingRequest message and returns an ExecutionStatusResponse message
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="options">The options for the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Gauge.Messages.Empty> NotifyConceptExecutionStartingAsync(global::Gauge.Messages.ConceptExecutionStartingRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Gauge.Messages.ExecutionStatusResponse> NotifyConceptExecutionStartingAsync(global::Gauge.Messages.ConceptExecutionStartingRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_NotifyConceptExecutionStarting, null, options, request);
       }
       /// <summary>
       /// NotifyConceptExecutionEnding is a RPC to tell plugins that the concept execution has finished.
       ///
-      /// Accepts a ConceptExecutionEndingRequest message and returns a Empty message
+      /// Accepts a ConceptExecutionEndingRequest message and returns an ExecutionStatusResponse message
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
@@ -1983,27 +1983,27 @@ namespace Gauge.Messages {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Gauge.Messages.Empty NotifyConceptExecutionEnding(global::Gauge.Messages.ConceptExecutionEndingRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Gauge.Messages.ExecutionStatusResponse NotifyConceptExecutionEnding(global::Gauge.Messages.ConceptExecutionEndingRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return NotifyConceptExecutionEnding(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
       /// <summary>
       /// NotifyConceptExecutionEnding is a RPC to tell plugins that the concept execution has finished.
       ///
-      /// Accepts a ConceptExecutionEndingRequest message and returns a Empty message
+      /// Accepts a ConceptExecutionEndingRequest message and returns an ExecutionStatusResponse message
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="options">The options for the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Gauge.Messages.Empty NotifyConceptExecutionEnding(global::Gauge.Messages.ConceptExecutionEndingRequest request, grpc::CallOptions options)
+      public virtual global::Gauge.Messages.ExecutionStatusResponse NotifyConceptExecutionEnding(global::Gauge.Messages.ConceptExecutionEndingRequest request, grpc::CallOptions options)
       {
         return CallInvoker.BlockingUnaryCall(__Method_NotifyConceptExecutionEnding, null, options, request);
       }
       /// <summary>
       /// NotifyConceptExecutionEnding is a RPC to tell plugins that the concept execution has finished.
       ///
-      /// Accepts a ConceptExecutionEndingRequest message and returns a Empty message
+      /// Accepts a ConceptExecutionEndingRequest message and returns an ExecutionStatusResponse message
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
@@ -2011,20 +2011,20 @@ namespace Gauge.Messages {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Gauge.Messages.Empty> NotifyConceptExecutionEndingAsync(global::Gauge.Messages.ConceptExecutionEndingRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Gauge.Messages.ExecutionStatusResponse> NotifyConceptExecutionEndingAsync(global::Gauge.Messages.ConceptExecutionEndingRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return NotifyConceptExecutionEndingAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
       /// <summary>
       /// NotifyConceptExecutionEnding is a RPC to tell plugins that the concept execution has finished.
       ///
-      /// Accepts a ConceptExecutionEndingRequest message and returns a Empty message
+      /// Accepts a ConceptExecutionEndingRequest message and returns an ExecutionStatusResponse message
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="options">The options for the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Gauge.Messages.Empty> NotifyConceptExecutionEndingAsync(global::Gauge.Messages.ConceptExecutionEndingRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Gauge.Messages.ExecutionStatusResponse> NotifyConceptExecutionEndingAsync(global::Gauge.Messages.ConceptExecutionEndingRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_NotifyConceptExecutionEnding, null, options, request);
       }
@@ -2097,8 +2097,8 @@ namespace Gauge.Messages {
       serviceBinder.AddMethod(__Method_ImplementStub, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Gauge.Messages.StubImplementationCodeRequest, global::Gauge.Messages.FileDiff>(serviceImpl.ImplementStub));
       serviceBinder.AddMethod(__Method_Refactor, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Gauge.Messages.RefactorRequest, global::Gauge.Messages.RefactorResponse>(serviceImpl.Refactor));
       serviceBinder.AddMethod(__Method_Kill, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Gauge.Messages.KillProcessRequest, global::Gauge.Messages.Empty>(serviceImpl.Kill));
-      serviceBinder.AddMethod(__Method_NotifyConceptExecutionStarting, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Gauge.Messages.ConceptExecutionStartingRequest, global::Gauge.Messages.Empty>(serviceImpl.NotifyConceptExecutionStarting));
-      serviceBinder.AddMethod(__Method_NotifyConceptExecutionEnding, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Gauge.Messages.ConceptExecutionEndingRequest, global::Gauge.Messages.Empty>(serviceImpl.NotifyConceptExecutionEnding));
+      serviceBinder.AddMethod(__Method_NotifyConceptExecutionStarting, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Gauge.Messages.ConceptExecutionStartingRequest, global::Gauge.Messages.ExecutionStatusResponse>(serviceImpl.NotifyConceptExecutionStarting));
+      serviceBinder.AddMethod(__Method_NotifyConceptExecutionEnding, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Gauge.Messages.ConceptExecutionEndingRequest, global::Gauge.Messages.ExecutionStatusResponse>(serviceImpl.NotifyConceptExecutionEnding));
     }
 
   }
