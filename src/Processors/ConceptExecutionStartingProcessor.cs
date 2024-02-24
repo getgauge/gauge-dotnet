@@ -20,10 +20,9 @@ namespace Gauge.Dotnet.Processors
 
         protected override string HookType => "BeforeConcept";
 
-        public Empty Process(ConceptExecutionStartingRequest request)
+        public ExecutionStatusResponse Process(ConceptExecutionStartingRequest request)
         {
-            ExecuteHooks(request.CurrentExecutionInfo);
-            return new Empty();
+            return ExecuteHooks(request.CurrentExecutionInfo);
         }
 
         protected override List<string> GetApplicableTags(ExecutionInfo info)

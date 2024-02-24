@@ -115,12 +115,12 @@ namespace Gauge.Dotnet
             return _pool.Execute(getStream(request.Stream), () => this.stepExecutionStartingProcessor.Process(request));
         }
 
-        public override Task<Empty> NotifyConceptExecutionStarting(ConceptExecutionStartingRequest request, ServerCallContext context)
+        public override Task<ExecutionStatusResponse> NotifyConceptExecutionStarting(ConceptExecutionStartingRequest request, ServerCallContext context)
         {
             return _pool.Execute(getStream(request.Stream), () => this.conceptExecutionStartingProcessor.Process(request));
         }
 
-        public override Task<Empty> NotifyConceptExecutionEnding(ConceptExecutionEndingRequest request, ServerCallContext context)
+        public override Task<ExecutionStatusResponse> NotifyConceptExecutionEnding(ConceptExecutionEndingRequest request, ServerCallContext context)
         {
             return _pool.Execute(getStream(request.Stream), () => this.conceptExecutionEndingProcessor.Process(request));
         }
