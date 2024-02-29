@@ -47,7 +47,7 @@ namespace Gauge.Dotnet
             var executionContextScenarioType = _executionContextType.GetNestedType("Scenario");
             return currentScenario != null
                 ? activatorWrapper.CreateInstance(executionContextScenarioType, currentScenario.Name, currentScenario.IsFailed,
-                    currentScenario.Tags.ToArray())
+                    currentScenario.Tags.ToArray(), currentScenario.Retries.MaxRetries, currentScenario.Retries.CurrentRetry)
                 : activatorWrapper.CreateInstance(executionContextScenarioType);
         }
 

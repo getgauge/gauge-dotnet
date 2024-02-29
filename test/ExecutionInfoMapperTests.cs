@@ -19,7 +19,8 @@ namespace Gauge.Dotnet.UnitTests
             mockAssemblyLoader = new Mock<IAssemblyLoader>();
             mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ExecutionContext)).Returns(typeof(ExecutionContext));
             executionInfo = new ExecutionInfo {
-                CurrentScenario = new ScenarioInfo{IsFailed = true, Name = "Dummy Scenario" },
+                CurrentScenario = new ScenarioInfo{IsFailed = true, Name = "Dummy Scenario", 
+                                    Retries = new ScenarioRetriesInfo{MaxRetries = 0, CurrentRetry = 0} },
                 CurrentSpec = new SpecInfo {FileName = "dummy.spec", Name = "Dummy Spec", IsFailed = true},
                 CurrentStep = new StepInfo {IsFailed = true, ErrorMessage = "Dummy Error", StackTrace = "Dummy Stacktrace", 
                     Step = new ExecuteStepRequest {ActualStepText = "Dummy Step Text"}
@@ -54,7 +55,8 @@ namespace Gauge.Dotnet.UnitTests
             var mockActivatorWrapper = new Mock<IActivatorWrapper>();
             mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(ExecutionContext.Scenario),
                 executionInfo.CurrentScenario.Name, executionInfo.CurrentScenario.IsFailed,
-                executionInfo.CurrentScenario.Tags.ToArray())).Verifiable();
+                executionInfo.CurrentScenario.Tags.ToArray(), 
+                executionInfo.CurrentScenario.Retries.MaxRetries, executionInfo.CurrentScenario.Retries.CurrentRetry)).Verifiable();
             new ExecutionInfoMapper(mockAssemblyLoader.Object, mockActivatorWrapper.Object).ExecutionContextFrom(executionInfo);
             mockActivatorWrapper.VerifyAll();
         }
