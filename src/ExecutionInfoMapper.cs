@@ -45,9 +45,13 @@ namespace Gauge.Dotnet
         private dynamic ScenarioFrom(ScenarioInfo currentScenario)
         {
             var executionContextScenarioType = _executionContextType.GetNestedType("Scenario");
+            if (currentScenario != null && currentScenario.Retries == null) 
+            {
+                currentScenario.Retries = new ScenarioRetriesInfo{MaxRetries=0, CurrentRetry=0};
+            }
             return currentScenario != null
                 ? activatorWrapper.CreateInstance(executionContextScenarioType, currentScenario.Name, currentScenario.IsFailed,
-                    currentScenario.Tags.ToArray())
+                    currentScenario.Tags.ToArray(), currentScenario.Retries.MaxRetries, currentScenario.Retries.CurrentRetry)
                 : activatorWrapper.CreateInstance(executionContextScenarioType);
         }
 
