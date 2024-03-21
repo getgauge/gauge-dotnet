@@ -13,6 +13,7 @@ using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
+using Gauge.CSharp.Lib.Attribute;
 
 namespace Gauge.Dotnet
 {
@@ -37,7 +38,8 @@ namespace Gauge.Dotnet
             var methods = GetHookMethods(hookType, strategy, applicableTags);
             var executionResult = new ExecutionResult
             {
-                Success = true
+                Success = true,
+                SkipScenario = false
             };
             foreach (var method in methods)
             {
@@ -49,12 +51,24 @@ namespace Gauge.Dotnet
                 }
                 catch (Exception ex)
                 {
-                    Logger.Debug($"{hookType} Hook execution failed : {methodInfo.DeclaringType.FullName}.{methodInfo.Name}");
-                    var innerException = ex.InnerException ?? ex;
-                    executionResult.ExceptionMessage = innerException.Message;
-                    executionResult.StackTrace = innerException.StackTrace;
-                    executionResult.Source = innerException.Source;
-                    executionResult.Success = false;
+                    var baseException = ex.GetBaseException();
+                    if (baseException != null && 
+                        baseException.GetType().Name.Contains("SkipScenario", StringComparison.OrdinalIgnoreCase)) {
+                        Logger.Debug($"Skipping scenario when executing hook: {methodInfo.DeclaringType.FullName}.{methodInfo.Name} : {baseException.Message}");
+                        executionResult.StackTrace = baseException.StackTrace;
+                        executionResult.ExceptionMessage = baseException.Message;
+                        executionResult.Source = baseException.Source;
+                        executionResult.Success = true;
+                        executionResult.SkipScenario = true;
+                    }
+                    else {
+                        Logger.Debug($"{hookType} Hook execution failed : {methodInfo.DeclaringType.FullName}.{methodInfo.Name}");
+                        var innerException = ex.InnerException ?? ex;
+                        executionResult.ExceptionMessage = innerException.Message;
+                        executionResult.StackTrace = innerException.StackTrace;
+                        executionResult.Source = innerException.Source;
+                        executionResult.Success = false;
+                    }
                 }
             }
 

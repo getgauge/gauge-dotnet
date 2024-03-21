@@ -92,7 +92,8 @@ namespace Gauge.Dotnet
             var result = new ProtoExecutionResult
             {
                 Failed = false,
-                ExecutionTime = stopwatch.ElapsedMilliseconds
+                ExecutionTime = stopwatch.ElapsedMilliseconds,
+                SkipScenario = executionResult.SkipScenario
             };
             var allPendingMessages = GetAllPendingMessages().Where(m => m != null);
             result.Message.AddRange(allPendingMessages);

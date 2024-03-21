@@ -13,6 +13,7 @@ using System.Text;
 using Gauge.Dotnet.Converters;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
+using Gauge.CSharp.Lib.Attribute;
 
 namespace Gauge.Dotnet
 {
@@ -32,7 +33,11 @@ namespace Gauge.Dotnet
         {
             {
                 var method = gaugeMethod.MethodInfo;
-                var executionResult = new ExecutionResult();
+                var executionResult = new ExecutionResult
+                {
+                    Success = true,
+                    SkipScenario = false
+                };
                 try
                 {
                     var parameters = args.Select(o =>
@@ -52,14 +57,27 @@ namespace Gauge.Dotnet
                 }
                 catch (Exception ex)
                 {
-                    Logger.Debug($"Error executing {method.Name} : {ex.Message}") ;
-                    var innerException = ex.InnerException ?? ex;
-                    executionResult.ExceptionMessage = innerException.Message;
-                    executionResult.StackTrace = innerException is AggregateException
-                        ? innerException.ToString()
-                        : innerException.StackTrace;
-                    executionResult.Source = innerException.Source;
-                    executionResult.Recoverable = gaugeMethod.ContinueOnFailure;
+                    var baseException = ex.GetBaseException();
+                    if (baseException != null && 
+                        baseException.GetType().Name.Contains("SkipScenario", StringComparison.OrdinalIgnoreCase)) {
+                        Logger.Debug($"Skipping scenario when executing method: {method.Name} : {baseException.Message}") ;
+                        executionResult.ExceptionMessage = baseException.Message;
+                        executionResult.StackTrace = baseException.StackTrace;
+                        executionResult.Source = baseException.Source;
+                        executionResult.Success = true;
+                        executionResult.SkipScenario = true;
+                    }
+                    else {
+                        Logger.Debug($"Error executing {method.Name} : {ex.Message}") ;
+                        var innerException = ex.InnerException ?? ex;
+                        executionResult.ExceptionMessage = innerException.Message;
+                        executionResult.StackTrace = innerException is AggregateException
+                            ? innerException.ToString()
+                            : innerException.StackTrace;
+                        executionResult.Source = innerException.Source;
+                        executionResult.Recoverable = gaugeMethod.ContinueOnFailure;
+                        executionResult.Success = false;
+                    }
                 }
 
                 return executionResult;

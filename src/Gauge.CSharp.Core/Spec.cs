@@ -104,55 +104,56 @@ namespace Gauge.Messages {
             "AiABKAsyIC5nYXVnZS5tZXNzYWdlcy5Qcm90b0hvb2tGYWlsdXJlEjkKD3Bv",
             "c3RIb29rRmFpbHVyZRgDIAEoCzIgLmdhdWdlLm1lc3NhZ2VzLlByb3RvSG9v",
             "a0ZhaWx1cmUSDwoHc2tpcHBlZBgEIAEoCBIVCg1za2lwcGVkUmVhc29uGAUg",
-            "ASgJIosDChRQcm90b0V4ZWN1dGlvblJlc3VsdBIOCgZmYWlsZWQYASABKAgS",
+            "ASgJIqEDChRQcm90b0V4ZWN1dGlvblJlc3VsdBIOCgZmYWlsZWQYASABKAgS",
             "GAoQcmVjb3ZlcmFibGVFcnJvchgCIAEoCBIUCgxlcnJvck1lc3NhZ2UYAyAB",
             "KAkSEgoKc3RhY2tUcmFjZRgEIAEoCRIWCgpzY3JlZW5TaG90GAUgASgMQgIY",
             "ARIVCg1leGVjdXRpb25UaW1lGAYgASgDEg8KB21lc3NhZ2UYByADKAkSQQoJ",
             "ZXJyb3JUeXBlGAggASgOMi4uZ2F1Z2UubWVzc2FnZXMuUHJvdG9FeGVjdXRp",
             "b25SZXN1bHQuRXJyb3JUeXBlEh0KEWZhaWx1cmVTY3JlZW5zaG90GAkgASgM",
             "QgIYARIXCgtzY3JlZW5zaG90cxgKIAMoDEICGAESHQoVZmFpbHVyZVNjcmVl",
-            "bnNob3RGaWxlGAsgASgJEhcKD3NjcmVlbnNob3RGaWxlcxgMIAMoCSIsCglF",
-            "cnJvclR5cGUSDQoJQVNTRVJUSU9OEAASEAoMVkVSSUZJQ0FUSU9OEAEiqQEK",
-            "EFByb3RvSG9va0ZhaWx1cmUSEgoKc3RhY2tUcmFjZRgBIAEoCRIUCgxlcnJv",
-            "ck1lc3NhZ2UYAiABKAkSFgoKc2NyZWVuU2hvdBgDIAEoDEICGAESFQoNdGFi",
-            "bGVSb3dJbmRleBgEIAEoBRIdChFmYWlsdXJlU2NyZWVuc2hvdBgFIAEoDEIC",
-            "GAESHQoVZmFpbHVyZVNjcmVlbnNob3RGaWxlGAYgASgJIosFChBQcm90b1N1",
-            "aXRlUmVzdWx0EjQKC3NwZWNSZXN1bHRzGAEgAygLMh8uZ2F1Z2UubWVzc2Fn",
-            "ZXMuUHJvdG9TcGVjUmVzdWx0EjgKDnByZUhvb2tGYWlsdXJlGAIgASgLMiAu",
-            "Z2F1Z2UubWVzc2FnZXMuUHJvdG9Ib29rRmFpbHVyZRI5Cg9wb3N0SG9va0Zh",
-            "aWx1cmUYAyABKAsyIC5nYXVnZS5tZXNzYWdlcy5Qcm90b0hvb2tGYWlsdXJl",
-            "Eg4KBmZhaWxlZBgEIAEoCBIYChBzcGVjc0ZhaWxlZENvdW50GAUgASgFEhUK",
-            "DWV4ZWN1dGlvblRpbWUYBiABKAMSEwoLc3VjY2Vzc1JhdGUYByABKAISEwoL",
-            "ZW52aXJvbm1lbnQYCCABKAkSDAoEdGFncxgJIAEoCRITCgtwcm9qZWN0TmFt",
-            "ZRgKIAEoCRIRCgl0aW1lc3RhbXAYCyABKAkSGQoRc3BlY3NTa2lwcGVkQ291",
-            "bnQYDCABKAUSFwoPcHJlSG9va01lc3NhZ2VzGA0gAygJEhgKEHBvc3RIb29r",
-            "TWVzc2FnZXMYDiADKAkSGgoOcHJlSG9va01lc3NhZ2UYDyADKAlCAhgBEhsK",
-            "D3Bvc3RIb29rTWVzc2FnZRgQIAMoCUICGAESHgoScHJlSG9va1NjcmVlbnNo",
-            "b3RzGBEgAygMQgIYARIfChNwb3N0SG9va1NjcmVlbnNob3RzGBIgAygMQgIY",
-            "ARIPCgdjaHVua2VkGBMgASgIEhEKCWNodW5rU2l6ZRgUIAEoAxIeChZwcmVI",
-            "b29rU2NyZWVuc2hvdEZpbGVzGBUgAygJEh8KF3Bvc3RIb29rU2NyZWVuc2hv",
-            "dEZpbGVzGBYgAygJIr4CCg9Qcm90b1NwZWNSZXN1bHQSLAoJcHJvdG9TcGVj",
-            "GAEgASgLMhkuZ2F1Z2UubWVzc2FnZXMuUHJvdG9TcGVjEhUKDXNjZW5hcmlv",
-            "Q291bnQYAiABKAUSGwoTc2NlbmFyaW9GYWlsZWRDb3VudBgDIAEoBRIOCgZm",
-            "YWlsZWQYBCABKAgSGwoTZmFpbGVkRGF0YVRhYmxlUm93cxgFIAMoBRIVCg1l",
-            "eGVjdXRpb25UaW1lGAYgASgDEg8KB3NraXBwZWQYByABKAgSHAoUc2NlbmFy",
-            "aW9Ta2lwcGVkQ291bnQYCCABKAUSHAoUc2tpcHBlZERhdGFUYWJsZVJvd3MY",
-            "CSADKAUSJQoGZXJyb3JzGAogAygLMhUuZ2F1Z2UubWVzc2FnZXMuRXJyb3IS",
-            "EQoJdGltZXN0YW1wGAsgASgJIm0KE1Byb3RvU2NlbmFyaW9SZXN1bHQSLAoJ",
-            "cHJvdG9JdGVtGAEgASgLMhkuZ2F1Z2UubWVzc2FnZXMuUHJvdG9JdGVtEhUK",
-            "DWV4ZWN1dGlvblRpbWUYAiABKAMSEQoJdGltZXN0YW1wGAMgASgJImkKD1By",
-            "b3RvU3RlcFJlc3VsdBIsCglwcm90b0l0ZW0YASABKAsyGS5nYXVnZS5tZXNz",
-            "YWdlcy5Qcm90b0l0ZW0SFQoNZXhlY3V0aW9uVGltZRgCIAEoAxIRCgl0aW1l",
-            "c3RhbXAYAyABKAkioQEKBUVycm9yEi0KBHR5cGUYASABKA4yHy5nYXVnZS5t",
-            "ZXNzYWdlcy5FcnJvci5FcnJvclR5cGUSEAoIZmlsZW5hbWUYAiABKAkSEgoK",
-            "bGluZU51bWJlchgDIAEoBRIPCgdtZXNzYWdlGAQgASgJIjIKCUVycm9yVHlw",
-            "ZRIPCgtQQVJTRV9FUlJPUhAAEhQKEFZBTElEQVRJT05fRVJST1IQASJXCg5Q",
-            "cm90b1N0ZXBWYWx1ZRIRCglzdGVwVmFsdWUYASABKAkSHgoWcGFyYW1ldGVy",
-            "aXplZFN0ZXBWYWx1ZRgCIAEoCRISCgpwYXJhbWV0ZXJzGAMgAygJKkcKD0V4",
-            "ZWN1dGlvblN0YXR1cxIPCgtOT1RFWEVDVVRFRBAAEgoKBlBBU1NFRBABEgoK",
-            "BkZBSUxFRBACEgsKB1NLSVBQRUQQA0JcChZjb20udGhvdWdodHdvcmtzLmdh",
-            "dWdlWjFnaXRodWIuY29tL2dldGdhdWdlL2dhdWdlLXByb3RvL2dvL2dhdWdl",
-            "X21lc3NhZ2VzqgIOR2F1Z2UuTWVzc2FnZXNiBnByb3RvMw=="));
+            "bnNob3RGaWxlGAsgASgJEhcKD3NjcmVlbnNob3RGaWxlcxgMIAMoCRIUCgxz",
+            "a2lwU2NlbmFyaW8YDSABKAgiLAoJRXJyb3JUeXBlEg0KCUFTU0VSVElPThAA",
+            "EhAKDFZFUklGSUNBVElPThABIqkBChBQcm90b0hvb2tGYWlsdXJlEhIKCnN0",
+            "YWNrVHJhY2UYASABKAkSFAoMZXJyb3JNZXNzYWdlGAIgASgJEhYKCnNjcmVl",
+            "blNob3QYAyABKAxCAhgBEhUKDXRhYmxlUm93SW5kZXgYBCABKAUSHQoRZmFp",
+            "bHVyZVNjcmVlbnNob3QYBSABKAxCAhgBEh0KFWZhaWx1cmVTY3JlZW5zaG90",
+            "RmlsZRgGIAEoCSKLBQoQUHJvdG9TdWl0ZVJlc3VsdBI0CgtzcGVjUmVzdWx0",
+            "cxgBIAMoCzIfLmdhdWdlLm1lc3NhZ2VzLlByb3RvU3BlY1Jlc3VsdBI4Cg5w",
+            "cmVIb29rRmFpbHVyZRgCIAEoCzIgLmdhdWdlLm1lc3NhZ2VzLlByb3RvSG9v",
+            "a0ZhaWx1cmUSOQoPcG9zdEhvb2tGYWlsdXJlGAMgASgLMiAuZ2F1Z2UubWVz",
+            "c2FnZXMuUHJvdG9Ib29rRmFpbHVyZRIOCgZmYWlsZWQYBCABKAgSGAoQc3Bl",
+            "Y3NGYWlsZWRDb3VudBgFIAEoBRIVCg1leGVjdXRpb25UaW1lGAYgASgDEhMK",
+            "C3N1Y2Nlc3NSYXRlGAcgASgCEhMKC2Vudmlyb25tZW50GAggASgJEgwKBHRh",
+            "Z3MYCSABKAkSEwoLcHJvamVjdE5hbWUYCiABKAkSEQoJdGltZXN0YW1wGAsg",
+            "ASgJEhkKEXNwZWNzU2tpcHBlZENvdW50GAwgASgFEhcKD3ByZUhvb2tNZXNz",
+            "YWdlcxgNIAMoCRIYChBwb3N0SG9va01lc3NhZ2VzGA4gAygJEhoKDnByZUhv",
+            "b2tNZXNzYWdlGA8gAygJQgIYARIbCg9wb3N0SG9va01lc3NhZ2UYECADKAlC",
+            "AhgBEh4KEnByZUhvb2tTY3JlZW5zaG90cxgRIAMoDEICGAESHwoTcG9zdEhv",
+            "b2tTY3JlZW5zaG90cxgSIAMoDEICGAESDwoHY2h1bmtlZBgTIAEoCBIRCglj",
+            "aHVua1NpemUYFCABKAMSHgoWcHJlSG9va1NjcmVlbnNob3RGaWxlcxgVIAMo",
+            "CRIfChdwb3N0SG9va1NjcmVlbnNob3RGaWxlcxgWIAMoCSK+AgoPUHJvdG9T",
+            "cGVjUmVzdWx0EiwKCXByb3RvU3BlYxgBIAEoCzIZLmdhdWdlLm1lc3NhZ2Vz",
+            "LlByb3RvU3BlYxIVCg1zY2VuYXJpb0NvdW50GAIgASgFEhsKE3NjZW5hcmlv",
+            "RmFpbGVkQ291bnQYAyABKAUSDgoGZmFpbGVkGAQgASgIEhsKE2ZhaWxlZERh",
+            "dGFUYWJsZVJvd3MYBSADKAUSFQoNZXhlY3V0aW9uVGltZRgGIAEoAxIPCgdz",
+            "a2lwcGVkGAcgASgIEhwKFHNjZW5hcmlvU2tpcHBlZENvdW50GAggASgFEhwK",
+            "FHNraXBwZWREYXRhVGFibGVSb3dzGAkgAygFEiUKBmVycm9ycxgKIAMoCzIV",
+            "LmdhdWdlLm1lc3NhZ2VzLkVycm9yEhEKCXRpbWVzdGFtcBgLIAEoCSJtChNQ",
+            "cm90b1NjZW5hcmlvUmVzdWx0EiwKCXByb3RvSXRlbRgBIAEoCzIZLmdhdWdl",
+            "Lm1lc3NhZ2VzLlByb3RvSXRlbRIVCg1leGVjdXRpb25UaW1lGAIgASgDEhEK",
+            "CXRpbWVzdGFtcBgDIAEoCSJpCg9Qcm90b1N0ZXBSZXN1bHQSLAoJcHJvdG9J",
+            "dGVtGAEgASgLMhkuZ2F1Z2UubWVzc2FnZXMuUHJvdG9JdGVtEhUKDWV4ZWN1",
+            "dGlvblRpbWUYAiABKAMSEQoJdGltZXN0YW1wGAMgASgJIqEBCgVFcnJvchIt",
+            "CgR0eXBlGAEgASgOMh8uZ2F1Z2UubWVzc2FnZXMuRXJyb3IuRXJyb3JUeXBl",
+            "EhAKCGZpbGVuYW1lGAIgASgJEhIKCmxpbmVOdW1iZXIYAyABKAUSDwoHbWVz",
+            "c2FnZRgEIAEoCSIyCglFcnJvclR5cGUSDwoLUEFSU0VfRVJST1IQABIUChBW",
+            "QUxJREFUSU9OX0VSUk9SEAEiVwoOUHJvdG9TdGVwVmFsdWUSEQoJc3RlcFZh",
+            "bHVlGAEgASgJEh4KFnBhcmFtZXRlcml6ZWRTdGVwVmFsdWUYAiABKAkSEgoK",
+            "cGFyYW1ldGVycxgDIAMoCSpHCg9FeGVjdXRpb25TdGF0dXMSDwoLTk9URVhF",
+            "Q1VURUQQABIKCgZQQVNTRUQQARIKCgZGQUlMRUQQAhILCgdTS0lQUEVEEANC",
+            "XAoWY29tLnRob3VnaHR3b3Jrcy5nYXVnZVoxZ2l0aHViLmNvbS9nZXRnYXVn",
+            "ZS9nYXVnZS1wcm90by9nby9nYXVnZV9tZXNzYWdlc6oCDkdhdWdlLk1lc3Nh",
+            "Z2VzYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Gauge.Messages.ExecutionStatus), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -170,7 +171,7 @@ namespace Gauge.Messages {
             new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.ProtoTable), global::Gauge.Messages.ProtoTable.Parser, new[]{ "Headers", "Rows" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.ProtoTableRow), global::Gauge.Messages.ProtoTableRow.Parser, new[]{ "Cells" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.ProtoStepExecutionResult), global::Gauge.Messages.ProtoStepExecutionResult.Parser, new[]{ "ExecutionResult", "PreHookFailure", "PostHookFailure", "Skipped", "SkippedReason" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.ProtoExecutionResult), global::Gauge.Messages.ProtoExecutionResult.Parser, new[]{ "Failed", "RecoverableError", "ErrorMessage", "StackTrace", "ScreenShot", "ExecutionTime", "Message", "ErrorType", "FailureScreenshot", "Screenshots", "FailureScreenshotFile", "ScreenshotFiles" }, null, new[]{ typeof(global::Gauge.Messages.ProtoExecutionResult.Types.ErrorType) }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.ProtoExecutionResult), global::Gauge.Messages.ProtoExecutionResult.Parser, new[]{ "Failed", "RecoverableError", "ErrorMessage", "StackTrace", "ScreenShot", "ExecutionTime", "Message", "ErrorType", "FailureScreenshot", "Screenshots", "FailureScreenshotFile", "ScreenshotFiles", "SkipScenario" }, null, new[]{ typeof(global::Gauge.Messages.ProtoExecutionResult.Types.ErrorType) }, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.ProtoHookFailure), global::Gauge.Messages.ProtoHookFailure.Parser, new[]{ "StackTrace", "ErrorMessage", "ScreenShot", "TableRowIndex", "FailureScreenshot", "FailureScreenshotFile" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.ProtoSuiteResult), global::Gauge.Messages.ProtoSuiteResult.Parser, new[]{ "SpecResults", "PreHookFailure", "PostHookFailure", "Failed", "SpecsFailedCount", "ExecutionTime", "SuccessRate", "Environment", "Tags", "ProjectName", "Timestamp", "SpecsSkippedCount", "PreHookMessages", "PostHookMessages", "PreHookMessage", "PostHookMessage", "PreHookScreenshots", "PostHookScreenshots", "Chunked", "ChunkSize", "PreHookScreenshotFiles", "PostHookScreenshotFiles" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gauge.Messages.ProtoSpecResult), global::Gauge.Messages.ProtoSpecResult.Parser, new[]{ "ProtoSpec", "ScenarioCount", "ScenarioFailedCount", "Failed", "FailedDataTableRows", "ExecutionTime", "Skipped", "ScenarioSkippedCount", "SkippedDataTableRows", "Errors", "Timestamp" }, null, null, null, null),
@@ -5890,6 +5891,7 @@ namespace Gauge.Messages {
       screenshots_ = other.screenshots_.Clone();
       failureScreenshotFile_ = other.failureScreenshotFile_;
       screenshotFiles_ = other.screenshotFiles_.Clone();
+      skipScenario_ = other.skipScenario_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -6079,6 +6081,21 @@ namespace Gauge.Messages {
       get { return screenshotFiles_; }
     }
 
+    /// <summary>Field number for the "skipScenario" field.</summary>
+    public const int SkipScenarioFieldNumber = 13;
+    private bool skipScenario_;
+    /// <summary>
+    //// Flag to indicate skipping of the scenario execution
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool SkipScenario {
+      get { return skipScenario_; }
+      set {
+        skipScenario_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -6106,6 +6123,7 @@ namespace Gauge.Messages {
       if(!screenshots_.Equals(other.screenshots_)) return false;
       if (FailureScreenshotFile != other.FailureScreenshotFile) return false;
       if(!screenshotFiles_.Equals(other.screenshotFiles_)) return false;
+      if (SkipScenario != other.SkipScenario) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -6125,6 +6143,7 @@ namespace Gauge.Messages {
       hash ^= screenshots_.GetHashCode();
       if (FailureScreenshotFile.Length != 0) hash ^= FailureScreenshotFile.GetHashCode();
       hash ^= screenshotFiles_.GetHashCode();
+      if (SkipScenario != false) hash ^= SkipScenario.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -6182,6 +6201,10 @@ namespace Gauge.Messages {
         output.WriteString(FailureScreenshotFile);
       }
       screenshotFiles_.WriteTo(output, _repeated_screenshotFiles_codec);
+      if (SkipScenario != false) {
+        output.WriteRawTag(104);
+        output.WriteBool(SkipScenario);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -6231,6 +6254,10 @@ namespace Gauge.Messages {
         output.WriteString(FailureScreenshotFile);
       }
       screenshotFiles_.WriteTo(ref output, _repeated_screenshotFiles_codec);
+      if (SkipScenario != false) {
+        output.WriteRawTag(104);
+        output.WriteBool(SkipScenario);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -6271,6 +6298,9 @@ namespace Gauge.Messages {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(FailureScreenshotFile);
       }
       size += screenshotFiles_.CalculateSize(_repeated_screenshotFiles_codec);
+      if (SkipScenario != false) {
+        size += 1 + 1;
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -6313,6 +6343,9 @@ namespace Gauge.Messages {
         FailureScreenshotFile = other.FailureScreenshotFile;
       }
       screenshotFiles_.Add(other.screenshotFiles_);
+      if (other.SkipScenario != false) {
+        SkipScenario = other.SkipScenario;
+      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -6376,6 +6409,10 @@ namespace Gauge.Messages {
             screenshotFiles_.AddEntriesFrom(input, _repeated_screenshotFiles_codec);
             break;
           }
+          case 104: {
+            SkipScenario = input.ReadBool();
+            break;
+          }
         }
       }
     #endif
@@ -6437,6 +6474,10 @@ namespace Gauge.Messages {
           }
           case 98: {
             screenshotFiles_.AddEntriesFrom(ref input, _repeated_screenshotFiles_codec);
+            break;
+          }
+          case 104: {
+            SkipScenario = input.ReadBool();
             break;
           }
         }
