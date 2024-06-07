@@ -92,13 +92,25 @@ namespace Gauge.Dotnet
             var result = new ProtoExecutionResult
             {
                 Failed = false,
-                ExecutionTime = stopwatch.ElapsedMilliseconds
+                ExecutionTime = stopwatch.ElapsedMilliseconds,
+                SkipScenario = executionResult.SkipScenario
             };
             var allPendingMessages = GetAllPendingMessages().Where(m => m != null);
             result.Message.AddRange(allPendingMessages);
             var allPendingScreenShotFiles = GetAllPendingScreenshotFiles().Where(s => s != null);
             result.ScreenshotFiles.AddRange(allPendingScreenShotFiles);
+
+            // If runtime skipped scenario return Error message and stack info
+            if (!string.IsNullOrEmpty(executionResult.ExceptionMessage))
+            {
+                result.ErrorMessage = executionResult.ExceptionMessage;
+            }      
+            if (!string.IsNullOrEmpty(executionResult.StackTrace))
+            {
+                result.StackTrace = executionResult.StackTrace;
+            }
             if (executionResult.Success) return result;
+
             var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
             result.Failed = true;
             var isScreenShotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
@@ -110,11 +122,6 @@ namespace Gauge.Dotnet
                 }
             }
 
-            result.ErrorMessage = executionResult.ExceptionMessage;
-            if (!string.IsNullOrEmpty(executionResult.StackTrace))
-            {
-                result.StackTrace = executionResult.StackTrace;
-            }
             result.RecoverableError = executionResult.Recoverable;
             result.ExecutionTime = elapsedMilliseconds;
             return result;
