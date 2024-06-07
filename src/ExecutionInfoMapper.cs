@@ -6,9 +6,11 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
+using Gauge.CSharp.Lib;
 
 namespace Gauge.Dotnet
 {
@@ -61,10 +63,18 @@ namespace Gauge.Dotnet
             if (currentStep == null || currentStep.Step == null)
                 return activatorWrapper.CreateInstance(executionContextStepType);
 
-            return activatorWrapper.CreateInstance(
+            var parameters = new List<List<string>>();
+            foreach (var paramneter in currentStep.Step.Parameters) {
+                if (paramneter.ParameterType == Parameter.Types.ParameterType.Static)
+                    parameters.Add(new List<string> { "static", paramneter.Name, paramneter.Value });
+            }
+
+            var inst = activatorWrapper.CreateInstance(
                 executionContextStepType, 
                 currentStep.Step.ActualStepText, currentStep.IsFailed, 
-                currentStep.StackTrace, currentStep.ErrorMessage);
+                currentStep.StackTrace, currentStep.ErrorMessage, parameters);
+            
+            return inst;
         }
     }
 }
