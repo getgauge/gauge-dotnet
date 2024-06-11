@@ -12,6 +12,7 @@ using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Gauge.CSharp.Lib;
 using System.Diagnostics.Tracing;
+using Microsoft.VisualBasic;
 
 namespace Gauge.Dotnet
 {
@@ -69,16 +70,27 @@ namespace Gauge.Dotnet
             foreach (var parameter in currentStep.Step.Parameters) {
                 if (parameter.ParameterType == Parameter.Types.ParameterType.Static)
                     parameters.Add(new List<string> { "Static", parameter.Name, parameter.Value });
+
                 if (parameter.ParameterType == Parameter.Types.ParameterType.Dynamic)
                     parameters.Add(new List<string> { "Dynamic", parameter.Name, parameter.Value });
+
                 if (parameter.ParameterType == Parameter.Types.ParameterType.SpecialString)
                     parameters.Add(new List<string> { "Special", parameter.Name, parameter.Value });
+                    
                 if (parameter.ParameterType == Parameter.Types.ParameterType.SpecialTable ||
                     parameter.ParameterType == Parameter.Types.ParameterType.Table) {
                     parameters.Add(new List<string> { "Table", parameter.Name, parameter.Value });
-                    parametersTbl = new Table(new List<string>(parameter.Table.Headers.Cells));
-                    foreach (var row in parameter.Table.Rows) {
-                        parametersTbl.AddRow(new List<string>(row.Cells));
+
+                    List<string> headers = new List<string>();
+                    foreach (var header in parameter.Table.Headers.Cells)
+                        headers.Add(header);
+                    parametersTbl = new Table(headers);
+
+                    foreach (var currentRow in parameter.Table.Rows) {
+                        List<string> row = new List<string>();
+                        foreach (var item in currentRow.Cells)
+                            row.Add(item);
+                        parametersTbl.AddRow(row);
                     }
                 }
             }
