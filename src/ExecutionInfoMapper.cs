@@ -11,6 +11,7 @@ using System.Linq;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Gauge.CSharp.Lib;
+using System.Diagnostics.Tracing;
 
 namespace Gauge.Dotnet
 {
@@ -64,15 +65,29 @@ namespace Gauge.Dotnet
                 return activatorWrapper.CreateInstance(executionContextStepType);
 
             var parameters = new List<List<string>>();
-            foreach (var paramneter in currentStep.Step.Parameters) {
-                if (paramneter.ParameterType == Parameter.Types.ParameterType.Static)
-                    parameters.Add(new List<string> { "static", paramneter.Name, paramneter.Value });
+            Table parametersTbl = null;
+            foreach (var parameter in currentStep.Step.Parameters) {
+                if (parameter.ParameterType == Parameter.Types.ParameterType.Static)
+                    parameters.Add(new List<string> { "Static", parameter.Name, parameter.Value });
+                if (parameter.ParameterType == Parameter.Types.ParameterType.Dynamic)
+                    parameters.Add(new List<string> { "Dynamic", parameter.Name, parameter.Value });
+                if (parameter.ParameterType == Parameter.Types.ParameterType.SpecialString)
+                    parameters.Add(new List<string> { "Special", parameter.Name, parameter.Value });
+                if (parameter.ParameterType == Parameter.Types.ParameterType.SpecialTable ||
+                    parameter.ParameterType == Parameter.Types.ParameterType.Table) {
+                    parameters.Add(new List<string> { "Table", parameter.Name, parameter.Value });
+                    parametersTbl = new Table(new List<string>(parameter.Table.Headers.Cells));
+                    foreach (var row in parameter.Table.Rows) {
+                        parametersTbl.AddRow(new List<string>(row.Cells));
+                    }
+                }
             }
 
             var inst = activatorWrapper.CreateInstance(
                 executionContextStepType, 
                 currentStep.Step.ActualStepText, currentStep.IsFailed, 
-                currentStep.StackTrace, currentStep.ErrorMessage, parameters);
+                currentStep.StackTrace, currentStep.ErrorMessage, 
+                parameters, parametersTbl);
             
             return inst;
         }
