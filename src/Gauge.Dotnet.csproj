@@ -5,7 +5,7 @@
     <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
     <PackageId>Runner.NetCore30</PackageId>
     <Authors>The Gauge Team</Authors>
-    <Version>0.5.8</Version>
+    <Version>0.5.9</Version>
     <Company>ThoughtWorks Inc.</Company>
     <Product>Gauge</Product>
     <Description>C# runner for Gauge. https://gauge.org</Description>
@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gauge.CSharp.Lib" Version="0.10.2" />
+    <PackageReference Include="Gauge.CSharp.Lib" Version="0.10.3" />
     <PackageReference Include="Grpc.Tools" Version="2.61.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
