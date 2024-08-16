@@ -32,7 +32,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Google.Protobuf" Version="3.19.4" />
+    <PackageReference Include="Google.Protobuf" Version="3.27.3" />
     <PackageReference Include="Grpc.AspNetCore.Server" Version="2.65.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
