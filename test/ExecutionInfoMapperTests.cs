@@ -4,6 +4,7 @@ using Gauge.Messages;
 using Gauge.Dotnet.Wrappers;
 using Gauge.CSharp.Lib;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Gauge.Dotnet.UnitTests
 {
@@ -23,7 +24,7 @@ namespace Gauge.Dotnet.UnitTests
                                     Retries = new ScenarioRetriesInfo{MaxRetries = 0, CurrentRetry = 0} },
                 CurrentSpec = new SpecInfo {FileName = "dummy.spec", Name = "Dummy Spec", IsFailed = true},
                 CurrentStep = new StepInfo {IsFailed = true, ErrorMessage = "Dummy Error", StackTrace = "Dummy Stacktrace", 
-                    Step = new ExecuteStepRequest {ActualStepText = "Dummy Step Text"}
+                    Step = new ExecuteStepRequest {ActualStepText = "Dummy Step Text"},
                 }
             };
         }
@@ -77,7 +78,7 @@ namespace Gauge.Dotnet.UnitTests
             var mockActivatorWrapper = new Mock<IActivatorWrapper>();
             mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(ExecutionContext.StepDetails),
                 executionInfo.CurrentStep.Step.ActualStepText, executionInfo.CurrentStep.IsFailed,
-                executionInfo.CurrentStep.StackTrace, executionInfo.CurrentStep.ErrorMessage)).Verifiable();
+                executionInfo.CurrentStep.StackTrace, executionInfo.CurrentStep.ErrorMessage, new List<List<string>>())).Verifiable();
             new ExecutionInfoMapper(mockAssemblyLoader.Object, mockActivatorWrapper.Object).ExecutionContextFrom(executionInfo);
             mockActivatorWrapper.VerifyAll();
         }
