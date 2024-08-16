@@ -1,6 +1,6 @@
 # Gauge-dotnet
 
-[![tests](https://github.com/getgauge/gauge-dotnet/workflows/build/badge.svg)](https://github.com/getgauge/gauge-dotnet/actions?query=workflow%3Abuild)
+[![tests](https://github.com/getgauge/gauge-dotnet/workflows/build.yml/badge.svg)](https://github.com/getgauge/gauge-dotnet/actions/workflows/build.yml)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 This project adds a .NET [language plugin](https://gauge.org/plugins/) for [Gauge](https://gauge.org).
