@@ -52,7 +52,7 @@ set_os_architecture
 
 dotnet restore
 
-grpc_tools_version="2.61.0"
+grpc_tools_version="2.65.0"
 protoc="$HOME"/.nuget/packages/build/grpc.tools/"grpc_tools_version"/tools/"$OS"_"$ARCH"/protoc
 grpc_csharp="$HOME"/.nuget/packages/build/grpc.tools/"grpc_tools_version"/tools/"$OS"_"$ARCH"/grpc_csharp_plugin
 
