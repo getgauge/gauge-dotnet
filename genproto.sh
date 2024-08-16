@@ -41,6 +41,11 @@ set_os_architecture() {
             ;;
     esac
 
+    # gprc-tools is not available for MacOS arm64. Sigh.
+    if [ "$_ostype" == "macosx" ]; then
+        _cputype="x64"
+    fi
+
     echo "OS is $_ostype"
     echo "Architecture is $_cputype"
     ARCH="$_cputype"
@@ -53,8 +58,8 @@ set_os_architecture
 dotnet restore
 
 grpc_tools_version="2.65.0"
-protoc="$HOME"/.nuget/packages/build/grpc.tools/"$grpc_tools_version"/tools/"$OS"_"$ARCH"/protoc
-grpc_csharp="$HOME"/.nuget/packages/build/grpc.tools/"$grpc_tools_version"/tools/"$OS"_"$ARCH"/grpc_csharp_plugin
+protoc="$HOME"/.nuget/packages/grpc.tools/"$grpc_tools_version"/tools/"$OS"_"$ARCH"/protoc
+grpc_csharp="$HOME"/.nuget/packages/grpc.tools/"$grpc_tools_version"/tools/"$OS"_"$ARCH"/grpc_csharp_plugin
 
 chmod +x $protoc
 chmod +x $grpc_csharp
