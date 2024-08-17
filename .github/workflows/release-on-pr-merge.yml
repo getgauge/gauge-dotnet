@@ -1,4 +1,4 @@
-name: Deploy
+name: Release on PR Merge
 
 on: deployment
 
@@ -26,43 +26,32 @@ jobs:
       - name: Build artifacts
         run: |
           ./run.sh package
-      - name: Set Version env
+
+      - name: Release on github
         run: |
-          cd artifacts
           if [ -z "$version" ]; then
-            version=$(ls gauge-dotnet* | sed "s/\.[^\.]*$//" | sed "s/gauge-dotnet-//");
+          version=$(cd artifacts && ls gauge-dotnet* | head -1 | sed "s/\.[^\.]*$//" | sed "s/gauge-dotnet-//" | sed "s/-[a-z]*\.[a-z0-9_]*$//");
           fi
           echo "VERSION=$version" >> $GITHUB_ENV
-      - name: update
-        run: |
-          cd artifacts
-          artifacts=()
-          dir=`pwd`
-          for i in `ls`; do
-            artifacts+="$dir/$i "
-          done
-          cd ..
-
+          
           echo "---------------------------"
-          echo "Updating release v$VERSION"
+          echo "Updating release v$version"
           echo "---------------------------"
-
-          echo -e "Gauge Dotnet v$VERSION\n\n" > desc.txt
+          echo -e "Gauge Dotnet v$version\n\n" > desc.txt
           release_description=$(ruby -e "$(curl -sSfL https://github.com/getgauge/gauge/raw/master/build/create_release_text.rb)" getgauge gauge-dotnet)
           echo "$release_description" >> desc.txt
-
-          gh release create "v$VERSION" -F ./desc.txt $artifacts
+          gh release create --title "Gauge DotNet v${version}" --notes-file ./desc.txt "v${version}" artifacts/*
 
       - name: 'deployment success'
         if: success()
-        uses: 'deliverybot/status@master'
+        uses: deliverybot/deployment-status@master
         with:
           state: 'success'
           token: '${{ secrets.GITHUB_TOKEN }}'
 
       - name: 'deployment failure'
         if: failure()
-        uses: 'deliverybot/status@master'
+        uses: deliverybot/deployment-status@master
         with:
           state: 'failure'
           token: '${{ secrets.GITHUB_TOKEN }}'
