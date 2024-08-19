@@ -1,6 +1,6 @@
 {
   "id": "dotnet",
-  "version": "0.5.8",
+  "version": "0.6.0",
   "description": "C# support for gauge + .NET 6.0/7.0/8.0",
   "run": {
     "windows": [

@@ -37,7 +37,7 @@ gauge run specs
 #### Install specific version
 
 ```
-gauge install dotnet --version 0.5.8
+gauge install dotnet --version 0.6.0
 ```
 
 #### Offline installation

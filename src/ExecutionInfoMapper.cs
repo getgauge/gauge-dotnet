@@ -6,9 +6,12 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
+using Gauge.CSharp.Lib;
+using Gauge.Dotnet.Processors;
 
 namespace Gauge.Dotnet
 {
@@ -16,11 +19,13 @@ namespace Gauge.Dotnet
     {
         private Type _executionContextType;
         private readonly IActivatorWrapper activatorWrapper;
+        private readonly ITableFormatter tableFormatter;
 
         public ExecutionInfoMapper(IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper)
         {
             _executionContextType = assemblyLoader.GetLibType(LibType.ExecutionContext);
             this.activatorWrapper = activatorWrapper;
+            tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
         }
 
         public dynamic ExecutionContextFrom(ExecutionInfo currentExecutionInfo)
@@ -61,10 +66,31 @@ namespace Gauge.Dotnet
             if (currentStep == null || currentStep.Step == null)
                 return activatorWrapper.CreateInstance(executionContextStepType);
 
-            return activatorWrapper.CreateInstance(
+            var parameters = new List<List<string>>();
+            foreach (var parameter in currentStep.Step.Parameters) {
+                if (parameter.ParameterType == Parameter.Types.ParameterType.Static) {
+                    parameters.Add(new List<string> { "Static", parameter.Name, parameter.Value });
+                }
+                else if (parameter.ParameterType == Parameter.Types.ParameterType.Dynamic) {
+                    parameters.Add(new List<string> { "Dynamic", parameter.Name, parameter.Value });
+                }
+                else if (parameter.ParameterType == Parameter.Types.ParameterType.SpecialString) {
+                    parameters.Add(new List<string> { "Special", parameter.Name, parameter.Value });
+                }
+                else if (parameter.ParameterType == Parameter.Types.ParameterType.SpecialTable ||
+                    parameter.ParameterType == Parameter.Types.ParameterType.Table) {
+                    var asJSon = tableFormatter.GetJSON(parameter.Table);
+                    parameters.Add(new List<string> { "Table", parameter.Name, asJSon });
+                }
+            }
+
+            var inst = activatorWrapper.CreateInstance(
                 executionContextStepType, 
                 currentStep.Step.ActualStepText, currentStep.IsFailed, 
-                currentStep.StackTrace, currentStep.ErrorMessage);
+                currentStep.StackTrace, currentStep.ErrorMessage, 
+                parameters);
+            
+            return inst;
         }
     }
 }
