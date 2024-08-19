@@ -8,3 +8,4 @@ artifacts
 .ionide
 .DS_Store
 .fake
+.idea/
