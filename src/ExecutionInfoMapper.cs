@@ -12,8 +12,6 @@ using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Processors;
-using System.Diagnostics.Tracing;
-using Microsoft.VisualBasic;
 
 namespace Gauge.Dotnet
 {

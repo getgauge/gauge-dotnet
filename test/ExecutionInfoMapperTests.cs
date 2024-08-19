@@ -24,7 +24,7 @@ namespace Gauge.Dotnet.UnitTests
                                     Retries = new ScenarioRetriesInfo{MaxRetries = 0, CurrentRetry = 0} },
                 CurrentSpec = new SpecInfo {FileName = "dummy.spec", Name = "Dummy Spec", IsFailed = true},
                 CurrentStep = new StepInfo {IsFailed = true, ErrorMessage = "Dummy Error", StackTrace = "Dummy Stacktrace", 
-                    Step = new ExecuteStepRequest {ActualStepText = "Dummy Step Text"},
+                    Step = new ExecuteStepRequest {ActualStepText = "Dummy Step Text"}
                 }
             };
         }
