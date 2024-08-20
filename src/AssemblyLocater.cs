@@ -22,7 +22,7 @@ namespace Gauge.Dotnet
             _directoryWrapper = directoryWrapper;
         }
 
-        public AssemblyPath GetTestAssembly()
+        public string GetTestAssembly()
         {
             var gaugeBinDir = Utils.GetGaugeBinDir();
             try

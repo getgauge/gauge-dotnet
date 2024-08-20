@@ -27,14 +27,14 @@ namespace Gauge.Dotnet
         private readonly IActivatorWrapper _activatorWrapper;
         private readonly IStepRegistry _registry;
 
-        public AssemblyLoader(AssemblyPath assemblyPath, IGaugeLoadContext gaugeLoadContext,
+        public AssemblyLoader(string assemblyPath, IGaugeLoadContext gaugeLoadContext,
             IReflectionWrapper reflectionWrapper, IActivatorWrapper activatorWrapper, IStepRegistry registry)
         {
             _reflectionWrapper = reflectionWrapper;
             _activatorWrapper = activatorWrapper;
             AssembliesReferencingGaugeLib = new List<Assembly>();
             _registry = registry;
-            
+
             Logger.Debug($"Loading assembly from : {assemblyPath}");
             _gaugeLoadContext = gaugeLoadContext;
             this._targetLibAssembly = _gaugeLoadContext.LoadFromAssemblyName(new AssemblyName(GaugeLibAssemblyName));
@@ -167,7 +167,7 @@ namespace Gauge.Dotnet
             var csg = _activatorWrapper.CreateInstance(ScreenshotWriter);
             var gaugeScreenshotsType = _targetLibAssembly.ExportedTypes.First(x => x.FullName == "Gauge.CSharp.Lib.GaugeScreenshots");
             _reflectionWrapper.InvokeMethod(gaugeScreenshotsType, null, "RegisterCustomScreenshotWriter",
-                BindingFlags.Static | BindingFlags.Public, new[] {csg});
+                BindingFlags.Static | BindingFlags.Public, new[] { csg });
         }
 
         private void ScanForCustomInstanceManager(IEnumerable<Type> types)
@@ -181,7 +181,7 @@ namespace Gauge.Dotnet
         {
             ClassInstanceManagerType = ClassInstanceManagerType ??
                 _targetLibAssembly.GetType(LibType.DefaultClassInstanceManager.FullName());
-            ScreenshotWriter = ScreenshotWriter ?? 
+            ScreenshotWriter = ScreenshotWriter ??
                 _targetLibAssembly.GetType(LibType.DefaultScreenshotWriter.FullName());
         }
     }

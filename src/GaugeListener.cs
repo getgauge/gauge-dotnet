@@ -6,16 +6,16 @@
 
 
 using System;
+using System.Linq;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Executor;
+using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Hosting.Server.Features;
-using System.Linq;
-using Gauge.Dotnet.Models;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet
@@ -53,8 +53,8 @@ namespace Gauge.Dotnet
                 var isDaemon = string.Compare(Environment.GetEnvironmentVariable("IS_DAEMON"), "true", true) == 0;
                 return isDaemon ? new LockFreeGaugeLoadContext(assemblyPath) : new GaugeLoadContext(assemblyPath);
             });
-            services.AddSingleton<AssemblyPath>(s => assemblyPath);
-            services.AddSingleton<IAssemblyLoader, AssemblyLoader>();
+            services.AddSingleton<IAssemblyLoader>((sp) => new AssemblyLoader(assemblyPath, sp.GetRequiredService<IGaugeLoadContext>(),
+                sp.GetRequiredService<IReflectionWrapper>(), sp.GetRequiredService<IActivatorWrapper>(), sp.GetRequiredService<IStepRegistry>()));
             services.AddSingleton<IDirectoryWrapper, DirectoryWrapper>();
             services.AddSingleton<IStaticLoader, StaticLoader>();
             services.AddSingleton<IAttributesLoader, AttributesLoader>();
