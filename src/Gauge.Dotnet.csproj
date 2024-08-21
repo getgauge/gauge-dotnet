@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<PackageId>Runner.NetCore30</PackageId>
 		<Authors>The Gauge Team</Authors>
 		<Version>0.6.0</Version>
@@ -15,6 +16,14 @@
 		<PackageIconUrl>https://raw.githubusercontent.com/getgauge/gauge-csharp/master/logo-64x64.png</PackageIconUrl>
 		<RepositoryUrl>https://github.com/getgauge/gauge-dotnet</RepositoryUrl>
 	</PropertyGroup>
+	
+	<ItemGroup>
+		<Protobuf Include="..\gauge-proto\api.proto" Link="Protos\api.proto" />
+		<Protobuf Include="..\gauge-proto\lsp.proto" Link="Protos\lsp.proto" />
+		<Protobuf Include="..\gauge-proto\messages.proto" Link="Protos\messages.proto" />
+		<Protobuf Include="..\gauge-proto\services.proto" Link="Protos\services.proto" />
+		<Protobuf Include="..\gauge-proto\spec.proto" Link="Protos\spec.proto" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<Compile Remove="deploy\**" />
