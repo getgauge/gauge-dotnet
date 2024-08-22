@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2020
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34601.278
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTestSample", "IntegrationTestSample\IntegrationTestSample.csproj", "{8927158D-F899-4270-B898-906910A79D8A}"
 EndProject
@@ -10,6 +10,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gauge.Dotnet.UnitTests", "test\Gauge.Dotnet.UnitTests.csproj", "{F5E5359B-A610-49E9-A0BE-AD0F77CAEEF0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gauge.Dotnet.IntegrationTests", "integration-test\Gauge.Dotnet.IntegrationTests.csproj", "{E7079EDD-7987-4042-877C-999FCA6C60A1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3852E248-E868-4E7F-A439-3F182E88A4A4}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
