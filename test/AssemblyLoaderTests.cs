@@ -83,7 +83,9 @@ namespace Gauge.Dotnet.UnitTests
                 .Returns(_mockLibAssembly.Object);
             _mockGaugeLoadContext.Setup(x => x.GetAssembliesReferencingGaugeLib())
                 .Returns(new[] { _mockAssembly.Object });
-            _assemblyLoader = new AssemblyLoader(Path.Combine(_assemblyLocation, "Mock.Test.Assembly.dll"), _mockGaugeLoadContext.Object,
+            var mockAssemblyLocator = new Mock<IAssemblyLocater>();
+            mockAssemblyLocator.Setup(x => x.GetTestAssembly()).Returns(Path.Combine(_assemblyLocation, "Mock.Test.Assembly.dll"));
+            _assemblyLoader = new AssemblyLoader(mockAssemblyLocator.Object, _mockGaugeLoadContext.Object,
                 mockReflectionWrapper.Object, mockActivationWrapper.Object, new StepRegistry());
         }
 
@@ -142,7 +144,9 @@ namespace Gauge.Dotnet.UnitTests
             var mockReflectionWrapper = new Mock<IReflectionWrapper>();
             var mockActivationWrapper = new Mock<IActivatorWrapper>();
             var mockGaugeLoadContext = new Mock<IGaugeLoadContext>();
-            ClassicAssert.Throws<FileLoadException>(() => new AssemblyLoader(Path.Combine(TmpLocation, $"{_mockLibAssembly.Name}.dll"), mockGaugeLoadContext.Object,
+            var mockAssemblyLocator = new Mock<IAssemblyLocater>();
+            mockAssemblyLocator.Setup(x => x.GetTestAssembly()).Returns(Path.Combine(TmpLocation, $"{_mockLibAssembly.Name}.dll"));
+            ClassicAssert.Throws<FileLoadException>(() => new AssemblyLoader(mockAssemblyLocator.Object, mockGaugeLoadContext.Object,
                 mockReflectionWrapper.Object, mockActivationWrapper.Object, new StepRegistry()));
         }
     }

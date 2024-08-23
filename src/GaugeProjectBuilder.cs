@@ -5,28 +5,41 @@
  *----------------------------------------------------------------*/
 
 
-using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Gauge.CSharp.Core;
+using Gauge.Dotnet.Exceptions;
+using Gauge.Dotnet.Extensions;
 
-namespace Gauge.Dotnet
+namespace Gauge.Dotnet;
+
+public class GaugeProjectBuilder : IGaugeProjectBuilder
 {
-    public class GaugeProjectBuilder : IGaugeProjectBuilder
+    private readonly IConfiguration _config;
+
+    public GaugeProjectBuilder(IConfiguration config)
     {
-        public bool BuildTargetGaugeProject()
+        _config = config;
+    }
+
+    public bool BuildTargetGaugeProject()
+    {
+        var customBuildPath = _config.GetGaugeCustomBuildPath();
+        if (!string.IsNullOrEmpty(customBuildPath))
+            return true;
+
+        try
         {
-            var gaugeBinDir = Utils.GetGaugeBinDir();
-            var csprojEnvVariable = Utils.TryReadEnvValue("GAUGE_CSHARP_PROJECT_FILE");
-            var additionalBuildArgs = Utils.TryReadEnvValue("GAUGE_DOTNET_BUILD_ARGS");
-            var runtime = Utils.TryReadEnvValue("GAUGE_DOTNET_RUNTIME");
+            var gaugeBinDir = _config.GetGaugeBinDir();
+            var csprojEnvVariable = _config.GetGaugeCSharpProjectFile();
+            var additionalBuildArgs = _config.GetGaugeCSharpBuildArgs();
+            var runtime = _config.GetGaugeCSharpRuntime();
 
             if (string.IsNullOrEmpty(runtime))
             {
                 runtime = $"{GetOS()}-{GetArch()}";
             }
 
-            var configurationEnvVariable = ReadBuildConfiguration();
+            var configurationEnvVariable = _config.GetGaugeCSharpConfig();
             var commandArgs = $"publish --runtime={runtime} --no-self-contained --configuration={configurationEnvVariable} --output=\"{gaugeBinDir}\" {additionalBuildArgs}";
 
             if (!string.IsNullOrEmpty(csprojEnvVariable))
@@ -34,66 +47,69 @@ namespace Gauge.Dotnet
                 commandArgs = $"{commandArgs} \"{csprojEnvVariable}\"";
             }
 
-            var logLevel = Utils.TryReadEnvValue("GAUGE_LOG_LEVEL");
+            var logLevel = _config.GetGaugeLogLevel();
 
             if (string.Compare(logLevel, "DEBUG", true) != 0)
             {
                 commandArgs = $"{commandArgs} --verbosity=quiet";
             }
 
-            if(RunDotnetCommand(commandArgs) !=0)
+            if (RunDotnetCommand(commandArgs) != 0)
             {
                 throw new Exception($"dotnet Project build failed.\nRan 'dotnet {commandArgs}'");
             }
 
             return true;
         }
-
-        private static int RunDotnetCommand(string args)
+        catch (NotAValidGaugeProjectException)
         {
-            var startInfo = new ProcessStartInfo
-            {
-                WorkingDirectory = Utils.GaugeProjectRoot,
-                FileName = "dotnet",
-                Arguments = args
-            };
-            var buildProcess = new Process {EnableRaisingEvents = true, StartInfo = startInfo};
-            buildProcess.OutputDataReceived += (sender, e) => { Logger.Debug(e.Data); };
-            buildProcess.ErrorDataReceived += (sender, e) => { Logger.Error(e.Data); };
-            buildProcess.Start();
-            buildProcess.WaitForExit();
-            return buildProcess.ExitCode;
+            Logger.Fatal($"Cannot locate a Project File in {_config.GetGaugeProjectRoot()}");
+            return false;
         }
-
-        private static string ReadBuildConfiguration()
+        catch (Exception ex)
         {
-            var configurationEnvVariable = Utils.TryReadEnvValue("GAUGE_CSHARP_PROJECT_CONFIG");
-            if (string.IsNullOrEmpty(configurationEnvVariable)) configurationEnvVariable = "release";
-
-            return configurationEnvVariable;
+            if (!_config.IgnoreBuildFailures())
+                Logger.Fatal($"Unable to build Project in {_config.GetGaugeProjectRoot()}\n{ex.Message}\n{ex.StackTrace}");
+            return false;
         }
-
-        private static string GetOS()
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                return "win";
-            }
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                return "linux";
-            }
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                return "osx";
-            }
-            return null;
-        }
-
-        private static string GetArch()
-        {
-            return RuntimeInformation.ProcessArchitecture.ToString().ToLower();
-        }
-
     }
+
+    private int RunDotnetCommand(string args)
+    {
+        var startInfo = new ProcessStartInfo
+        {
+            WorkingDirectory = _config.GetGaugeProjectRoot(),
+            FileName = "dotnet",
+            Arguments = args
+        };
+        var buildProcess = new Process { EnableRaisingEvents = true, StartInfo = startInfo };
+        buildProcess.OutputDataReceived += (sender, e) => { Logger.Debug(e.Data); };
+        buildProcess.ErrorDataReceived += (sender, e) => { Logger.Error(e.Data); };
+        buildProcess.Start();
+        buildProcess.WaitForExit();
+        return buildProcess.ExitCode;
+    }
+
+    private static string GetOS()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return "win";
+        }
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            return "linux";
+        }
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            return "osx";
+        }
+        return null;
+    }
+
+    private static string GetArch()
+    {
+        return RuntimeInformation.ProcessArchitecture.ToString().ToLower();
+    }
+
 }

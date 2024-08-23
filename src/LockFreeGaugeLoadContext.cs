@@ -6,33 +6,33 @@
 
 using System.Reflection;
 
-namespace Gauge.Dotnet
-{
-    /* NOTE: LockFreeGaugeLoadContext is required because GaugeLoadContext uses 
-    // AssemblyLoadContext.LoadFromAssemblyPath which holds a filesystem lock 
-    // on the assembly file. This causes Run/Debug to fail because these
-    // actions run as separate process and cannot write to build output dir.
-    // GaugeLoadContext is also required because certain assemblies are shipped
-    // with runtime specific artifacts, and loading raw bytes is risky, can 
-    // cause BadImageFormatException at runtime. */
-    public class LockFreeGaugeLoadContext : GaugeLoadContext
-    {
-        public LockFreeGaugeLoadContext(string pluginPath) : base(pluginPath)
-        {
-        }
+namespace Gauge.Dotnet;
 
-        protected override Assembly Load(AssemblyName assemblyName)
+/* NOTE: LockFreeGaugeLoadContext is required because GaugeLoadContext uses 
+// AssemblyLoadContext.LoadFromAssemblyPath which holds a filesystem lock 
+// on the assembly file. This causes Run/Debug to fail because these
+// actions run as separate process and cannot write to build output dir.
+// GaugeLoadContext is also required because certain assemblies are shipped
+// with runtime specific artifacts, and loading raw bytes is risky, can 
+// cause BadImageFormatException at runtime. */
+public class LockFreeGaugeLoadContext : GaugeLoadContext
+{
+    public LockFreeGaugeLoadContext(IAssemblyLocater locater)
+        : base(locater)
+    {
+    }
+
+    protected override Assembly Load(AssemblyName assemblyName)
+    {
+        var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
+        Logger.Debug($"Try load {assemblyName.Name} in LockFreeGaugeLoadContext");
+        if (assemblyPath != null)
         {
-            var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
-            Logger.Debug($"Try load {assemblyName.Name} in LockFreeGaugeLoadContext");
-            if (assemblyPath != null)
+            using (var fileStream = System.IO.File.OpenRead(assemblyPath))
             {
-                using (var fileStream = System.IO.File.OpenRead(assemblyPath))
-                {
-                    return LoadFromStream(fileStream);
-                }
+                return LoadFromStream(fileStream);
             }
-            return null;
         }
+        return null;
     }
 }

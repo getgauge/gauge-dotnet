@@ -3,24 +3,15 @@
  *  Licensed under the Apache License, Version 2.0
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
-using System;
-using System.IO;
-
 namespace Gauge.CSharp.Core
 {
     public class Utils
     {
-        private const string GaugePortEnv = "GAUGE_INTERNAL_PORT";
-        private const string GaugeApiPortEnv = "GAUGE_API_PORT";
         private const string GaugeProjectRootEnv = "GAUGE_PROJECT_ROOT";
         private const string GaugeCustomBuildPath = "GAUGE_CUSTOM_BUILD_PATH";
 
 
-        public static int GaugePort => Convert.ToInt32(ReadEnvValue(GaugePortEnv));
-
         public static string GaugeProjectRoot => ReadEnvValue(GaugeProjectRootEnv);
-
-        public static int GaugeApiPort => Convert.ToInt32(ReadEnvValue(GaugeApiPortEnv));
 
         public static string ReadEnvValue(string env)
         {
@@ -61,7 +52,7 @@ namespace Gauge.CSharp.Core
             }
         }
 
-        public static bool IsAbsoluteUrl(string url)
+        private static bool IsAbsoluteUrl(string url)
         {
             Uri result;
             return Uri.TryCreate(url, UriKind.Absolute, out result);

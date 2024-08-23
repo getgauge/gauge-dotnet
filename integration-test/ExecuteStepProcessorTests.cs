@@ -24,8 +24,8 @@ namespace Gauge.Dotnet.IntegrationTests
             const string stepText = "Step that takes a table <table>";
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
-            var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
+            var assemblyLocater = new AssemblyLocater(new DirectoryWrapper());
+            var assemblyLoader = new AssemblyLoader(assemblyLocater, new GaugeLoadContext(assemblyLocater), reflectionWrapper, activatorWrapper, new StepRegistry());
             var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
             var classInstanceManager = assemblyLoader.GetClassInstanceManager();
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
@@ -77,8 +77,8 @@ namespace Gauge.Dotnet.IntegrationTests
             const string stepText = "I throw a serializable exception";
             var reflectionWrapper = new ReflectionWrapper();
             var activatorWrapper = new ActivatorWrapper();
-            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
-            var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
+            var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
+            var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
             var classInstanceManager = new ThreadLocal<object>(() => assemblyLoader.GetClassInstanceManager());
             var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
             var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
