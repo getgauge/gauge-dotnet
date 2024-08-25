@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Messages;
@@ -29,7 +30,7 @@ namespace Gauge.Dotnet.IntegrationTests
         }
 
         [Test]
-        public void ShouldAddParameters()
+        public async Task ShouldAddParameters()
         {
             const string parameterizedStepText = "Refactoring 1 Say <what> to <who>";
             const string stepValue = "Refactoring 1 Say {} to {}";
@@ -65,7 +66,7 @@ namespace Gauge.Dotnet.IntegrationTests
             };
 
             var refactorProcessor = new RefactorProcessor(stepRegistry);
-            var result = refactorProcessor.Process(message);
+            var result = await refactorProcessor.Process(message);
             ClassicAssert.IsTrue(result.Success);
         }
 

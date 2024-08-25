@@ -4,10 +4,9 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
-namespace Gauge.Dotnet
+namespace Gauge.Dotnet;
+
+public interface IAssemblyLocater
 {
-    public interface IAssemblyLocater
-    {
-        string GetTestAssembly();
-    }
+    string GetTestAssembly();
 }

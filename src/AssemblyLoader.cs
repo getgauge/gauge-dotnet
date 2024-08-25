@@ -39,6 +39,7 @@ public class AssemblyLoader : IAssemblyLoader
         AssembliesReferencingGaugeLib = _gaugeLoadContext.GetAssembliesReferencingGaugeLib().ToList();
         Logger.Debug($"Number of AssembliesReferencingGaugeLib : {AssembliesReferencingGaugeLib.Count()}");
         SetDefaultTypes();
+        _registry = GetStepRegistry();
     }
 
     public List<Assembly> AssembliesReferencingGaugeLib { get; }
@@ -77,7 +78,7 @@ public class AssemblyLoader : IAssemblyLoader
         Logger.Debug($"{infos.Count()} Step implementations found. Adding to registry...");
         foreach (var info in infos)
         {
-            var stepTexts = info.GetCustomAttributes().Where(x => x.GetType().FullName == LibType.Step.FullName())
+            var stepTexts = Attribute.GetCustomAttributes(info).Where(x => x.GetType().FullName == LibType.Step.FullName())
                 .SelectMany(x => x.GetType().GetProperty("Names").GetValue(x, null) as string[]);
             foreach (var stepText in stepTexts)
             {

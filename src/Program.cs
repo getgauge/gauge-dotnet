@@ -13,7 +13,9 @@ using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Executor;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
+using Gauge.Messages;
 using Microsoft.Extensions.Logging.Console;
 
 namespace Gauge.Dotnet;
@@ -104,6 +106,16 @@ internal static class Program
         services.AddSingleton<IStaticLoader, StaticLoader>();
         services.AddSingleton<IAttributesLoader, AttributesLoader>();
         services.AddSingleton<IStepRegistry>(s => s.GetRequiredService<IStaticLoader>().GetStepRegistry());
+        services.AddSingleton<IExecutor, Executor.Executor>();
+        services.AddTransient<IGaugeProcessor<StepValidateRequest, StepValidateResponse>, StepValidationProcessor>();
+        services.AddTransient<IGaugeProcessor<CacheFileRequest, Empty>, CacheFileProcessor>();
+        services.AddTransient<IGaugeProcessor<Empty, ImplementationFileGlobPatternResponse>, ImplementationFileGlobPatterProcessor>();
+        services.AddTransient<IGaugeProcessor<Empty, ImplementationFileListResponse>, ImplementationFileListProcessor>();
+        services.AddTransient<IGaugeProcessor<StepNameRequest, StepNameResponse>, StepNameProcessor>();
+        services.AddTransient<IGaugeProcessor<StepNamesRequest, StepNamesResponse>, StepNamesProcessor>();
+        services.AddTransient<IGaugeProcessor<StepPositionsRequest, StepPositionsResponse>, StepPositionsProcessor>();
+        services.AddTransient<IGaugeProcessor<StubImplementationCodeRequest, FileDiff>, StubImplementationCodeProcessor>();
+        services.AddTransient<IGaugeProcessor<RefactorRequest, RefactorResponse>, RefactorProcessor>();
 
         return services;
     }

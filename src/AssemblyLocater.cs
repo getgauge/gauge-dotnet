@@ -5,36 +5,33 @@
  *----------------------------------------------------------------*/
 
 
-using System.IO;
-using System.Linq;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Wrappers;
 
-namespace Gauge.Dotnet
+namespace Gauge.Dotnet;
+
+public class AssemblyLocater : IAssemblyLocater
 {
-    public class AssemblyLocater : IAssemblyLocater
+    private readonly IDirectoryWrapper _directoryWrapper;
+
+    public AssemblyLocater(IDirectoryWrapper directoryWrapper)
     {
-        private readonly IDirectoryWrapper _directoryWrapper;
+        _directoryWrapper = directoryWrapper;
+    }
 
-        public AssemblyLocater(IDirectoryWrapper directoryWrapper)
+    public string GetTestAssembly()
+    {
+        var gaugeBinDir = Utils.GetGaugeBinDir();
+        try
         {
-            _directoryWrapper = directoryWrapper;
+            return _directoryWrapper
+                .EnumerateFiles(gaugeBinDir, "*.deps.json", SearchOption.TopDirectoryOnly)
+                .First().Replace(".deps.json", ".dll");
         }
-
-        public string GetTestAssembly()
+        catch (System.InvalidOperationException)
         {
-            var gaugeBinDir = Utils.GetGaugeBinDir();
-            try
-            {
-                return _directoryWrapper
-                    .EnumerateFiles(gaugeBinDir, "*.deps.json", SearchOption.TopDirectoryOnly)
-                    .First().Replace(".deps.json", ".dll");
-            }
-            catch (System.InvalidOperationException)
-            {
-                throw new GaugeTestAssemblyNotFoundException(gaugeBinDir);
-            }
+            throw new GaugeTestAssemblyNotFoundException(gaugeBinDir);
         }
     }
 }

@@ -5,39 +5,40 @@
  *----------------------------------------------------------------*/
 
 
-using System;
-using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using Gauge.CSharp.Lib;
-using NUnit.Framework;
+using Microsoft.Extensions.Configuration;
 
-namespace Gauge.Dotnet.IntegrationTests
+namespace Gauge.Dotnet.IntegrationTests;
+
+public class IntegrationTestsBase
 {
-    public class IntegrationTestsBase
+    protected IConfiguration _configuration;
+    protected string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
+
+    [SetUp]
+    public void Setup()
     {
-        protected string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
+        Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _testProjectPath);
+        var builder = new ConfigurationBuilder();
+        builder.AddInMemoryCollection(new Dictionary<string, string> { { "GAUGE_PROJECT_ROOT", _testProjectPath } });
+        _configuration = builder.Build();
+    }
 
-        [SetUp]
-        public void Setup()
+    public static string SerializeTable(Table table)
+    {
+        var serializer = new DataContractJsonSerializer(typeof(Table));
+        using (var memoryStream = new MemoryStream())
         {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _testProjectPath);
+            serializer.WriteObject(memoryStream, table);
+            return Encoding.UTF8.GetString(memoryStream.ToArray());
         }
+    }
 
-        public static string SerializeTable(Table table)
-        {
-            var serializer = new DataContractJsonSerializer(typeof(Table));
-            using (var memoryStream = new MemoryStream())
-            {
-                serializer.WriteObject(memoryStream, table);
-                return Encoding.UTF8.GetString(memoryStream.ToArray());
-            }
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
-        }
+    [TearDown]
+    public void TearDown()
+    {
+        Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
     }
 }
