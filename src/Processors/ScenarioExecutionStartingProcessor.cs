@@ -5,33 +5,31 @@
  *----------------------------------------------------------------*/
 
 
-using System.Collections.Generic;
-using System.Linq;
+using Gauge.Dotnet.Executors;
 using Gauge.Messages;
 
-namespace Gauge.Dotnet.Processors
+namespace Gauge.Dotnet.Processors;
+
+public class ScenarioExecutionStartingProcessor : UntaggedHooksFirstExecutionProcessor, IGaugeProcessor<ScenarioExecutionStartingRequest, ExecutionStatusResponse>
 {
-    public class ScenarioExecutionStartingProcessor : UntaggedHooksFirstExecutionProcessor
+    private readonly IExecutionOrchestrator _executionOrchestrator;
+
+    public ScenarioExecutionStartingProcessor(IExecutionOrchestrator executionOrchestrator, IConfiguration config)
+        : base(executionOrchestrator, config)
     {
-        private readonly IExecutionOrchestrator _executionOrchestrator;
+        _executionOrchestrator = executionOrchestrator;
+    }
 
-        public ScenarioExecutionStartingProcessor(IExecutionOrchestrator executionOrchestrator)
-            : base(executionOrchestrator)
-        {
-            _executionOrchestrator = executionOrchestrator;
-        }
+    protected override string HookType => "BeforeScenario";
 
-        protected override string HookType => "BeforeScenario";
+    public async Task<ExecutionStatusResponse> Process(int streamId, ScenarioExecutionStartingRequest request)
+    {
+        _executionOrchestrator.StartExecutionScope("scenario");
+        return await ExecuteHooks(streamId, request.CurrentExecutionInfo);
+    }
 
-        public ExecutionStatusResponse Process(ScenarioExecutionStartingRequest request)
-        {
-            _executionOrchestrator.StartExecutionScope("scenario");
-            return ExecuteHooks(request.CurrentExecutionInfo);
-        }
-
-        protected override List<string> GetApplicableTags(ExecutionInfo info)
-        {
-            return info.CurrentScenario.Tags.Union(info.CurrentSpec.Tags).ToList();
-        }
+    protected override List<string> GetApplicableTags(ExecutionInfo info)
+    {
+        return info.CurrentScenario.Tags.Union(info.CurrentSpec.Tags).ToList();
     }
 }

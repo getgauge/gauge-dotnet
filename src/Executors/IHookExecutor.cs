@@ -5,13 +5,13 @@
  *----------------------------------------------------------------*/
 
 
+using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Strategy;
+using Gauge.Messages;
 
-namespace Gauge.Dotnet.Processors
+namespace Gauge.Dotnet.Executors;
+
+public interface IHookExecutor
 {
-    public enum DataStoreType
-    {
-        Suite,
-        Spec,
-        Scenario
-    }
+    Task<ExecutionResult> Execute(string hookType, IHooksStrategy strategy, IList<string> applicableTags, int streamId, ExecutionInfo context);
 }

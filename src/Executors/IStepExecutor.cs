@@ -7,10 +7,9 @@
 
 using Gauge.Dotnet.Models;
 
-namespace Gauge.Dotnet
+namespace Gauge.Dotnet.Executors;
+
+public interface IStepExecutor
 {
-    public interface IStepExecutor
-    {
-        ExecutionResult Execute(GaugeMethod gaugeMethod, string[] args);
-    }
+    Task<ExecutionResult> Execute(GaugeMethod gaugeMethod, int streamId, string[] args);
 }

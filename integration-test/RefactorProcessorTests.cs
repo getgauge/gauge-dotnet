@@ -5,14 +5,9 @@
  *----------------------------------------------------------------*/
 
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Messages;
-using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace Gauge.Dotnet.IntegrationTests
 {
@@ -66,7 +61,7 @@ namespace Gauge.Dotnet.IntegrationTests
             };
 
             var refactorProcessor = new RefactorProcessor(stepRegistry);
-            var result = await refactorProcessor.Process(message);
+            var result = await refactorProcessor.Process(1, message);
             ClassicAssert.IsTrue(result.Success);
         }
 

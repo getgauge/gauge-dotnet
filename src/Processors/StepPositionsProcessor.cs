@@ -19,7 +19,7 @@ public class StepPositionsProcessor : IGaugeProcessor<StepPositionsRequest, Step
         _stepRegistry = stepRegistry;
     }
 
-    public Task<StepPositionsResponse> Process(StepPositionsRequest request)
+    public Task<StepPositionsResponse> Process(int stream, StepPositionsRequest request)
     {
         var response = new StepPositionsResponse();
         response.StepPositions.AddRange(_stepRegistry.GetStepPositions(request.FilePath));

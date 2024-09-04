@@ -5,14 +5,12 @@
  *----------------------------------------------------------------*/
 
 
-using System.Collections.Generic;
 using Gauge.Dotnet.Models;
 
-namespace Gauge.Dotnet.Strategy
+namespace Gauge.Dotnet.Strategy;
+
+public interface IHooksStrategy
 {
-    public interface IHooksStrategy
-    {
-        IEnumerable<string> GetTaggedHooks(IEnumerable<string> applicableTags, IList<IHookMethod> hooks);
-        IEnumerable<string> GetApplicableHooks(IEnumerable<string> applicableTags, IEnumerable<IHookMethod> hooks);
-    }
+    IEnumerable<string> GetTaggedHooks(IEnumerable<string> applicableTags, IList<IHookMethod> hooks);
+    IEnumerable<string> GetApplicableHooks(IEnumerable<string> applicableTags, IEnumerable<IHookMethod> hooks);
 }

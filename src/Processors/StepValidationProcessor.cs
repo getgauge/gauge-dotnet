@@ -20,7 +20,7 @@ public class StepValidationProcessor : IGaugeProcessor<StepValidateRequest, Step
         _stepRegistry = stepRegistry;
     }
 
-    public Task<StepValidateResponse> Process(StepValidateRequest request)
+    public Task<StepValidateResponse> Process(int stream, StepValidateRequest request)
     {
         var stepToValidate = request.StepText;
         var isValid = true;

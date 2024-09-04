@@ -5,10 +5,9 @@
  *----------------------------------------------------------------*/
 
 
-using Gauge.Dotnet.Executor;
+using Gauge.Dotnet.Executors;
+using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
-using Gauge.Dotnet.Processors;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Grpc.Core;
 
@@ -16,146 +15,104 @@ namespace Gauge.Dotnet;
 
 internal class ExecutableRunnerServiceHandler : AuthoringRunnerServiceHandler
 {
-    private readonly ExecutorPool _pool;
-    private readonly IActivatorWrapper _activatorWrapper;
-    private readonly IReflectionWrapper _reflectionWrapper;
-    private readonly IAssemblyLoader _assemblyLoader;
-    private ExecutionStartingProcessor executionStartingProcessor;
-    private ExecutionEndingProcessor executionEndingProcessor;
-    private SpecExecutionStartingProcessor specExecutionStartingProcessor;
-    private SpecExecutionEndingProcessor specExecutionEndingProcessor;
-    private ScenarioExecutionStartingProcessor scenarioExecutionStartingProcessor;
-    private ScenarioExecutionEndingProcessor scenarioExecutionEndingProcessor;
-    private StepExecutionStartingProcessor stepExecutionStartingProcessor;
-    private StepExecutionEndingProcessor stepExecutionEndingProcessor;
-    private ConceptExecutionStartingProcessor conceptExecutionStartingProcessor;
-    private ConceptExecutionEndingProcessor conceptExecutionEndingProcessor;
-    private ExecuteStepProcessor executeStepProcessor;
-    private ScenarioDataStoreInitProcessor scenarioDataStoreInitProcessor;
-    private SpecDataStoreInitProcessor specDataStoreInitProcessor;
-    private SuiteDataStoreInitProcessor suiteDataStoreInitProcessor;
-    public ExecutableRunnerServiceHandler(IActivatorWrapper activationWrapper, IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader,
-        ExecutorPool pool, IExecutor executor, IHostApplicationLifetime lifetime, IStepRegistry stepRegistry)
+    private readonly IConfiguration _config;
+
+    public IAssemblyLoader AssemblyLoader { get; private set; }
+
+    public ExecutableRunnerServiceHandler(IExecutor executor, IAssemblyLoader assemblyLoader, IHostApplicationLifetime lifetime, IStepRegistry stepRegistry, IConfiguration config)
         : base(executor, lifetime, stepRegistry)
     {
-        this._pool = pool;
-        this._activatorWrapper = activationWrapper;
-        this._reflectionWrapper = reflectionWrapper;
-        this._assemblyLoader = assemblyLoader;
-        InitializeExecutionMessageHandlers();
+        _config = config;
+        AssemblyLoader = assemblyLoader;
     }
     public override Task<ExecutionStatusResponse> InitializeSuiteDataStore(SuiteDataStoreInitRequest request, ServerCallContext context)
     {
-        return _pool.Execute(getStream(request.Stream), () => this.suiteDataStoreInitProcessor.Process());
+        request.Stream = GetStream(request.Stream);
+        Logger.Info($"Processing init suite data store processor. Stream {request.Stream}");
+        return Executor.Execute<SuiteDataStoreInitRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
     public override Task<ExecutionStatusResponse> ExecuteStep(ExecuteStepRequest request, ServerCallContext context)
     {
-        return _pool.Execute(getStream(request.Stream), () => this.executeStepProcessor.Process(request));
+        request.Stream = GetStream(request.Stream);
+        return Executor.Execute<ExecuteStepRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
     public override Task<ExecutionStatusResponse> FinishExecution(ExecutionEndingRequest request, ServerCallContext context)
     {
-        return _pool.Execute(getStream(request.Stream), () => this.executionEndingProcessor.Process(request));
+        request.Stream = GetStream(request.Stream);
+        return Executor.Execute<ExecutionEndingRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
     public override Task<ExecutionStatusResponse> FinishScenarioExecution(ScenarioExecutionEndingRequest request, ServerCallContext context)
     {
-        return _pool.Execute(getStream(request.Stream), () => this.scenarioExecutionEndingProcessor.Process(request));
+        request.Stream = GetStream(request.Stream);
+        return Executor.Execute<ScenarioExecutionEndingRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
     public override Task<ExecutionStatusResponse> FinishSpecExecution(SpecExecutionEndingRequest request, ServerCallContext context)
     {
-        return _pool.Execute(getStream(request.Stream), () => this.specExecutionEndingProcessor.Process(request));
+        request.Stream = GetStream(request.Stream);
+        return Executor.Execute<SpecExecutionEndingRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
     public override Task<ExecutionStatusResponse> FinishStepExecution(StepExecutionEndingRequest request, ServerCallContext context)
     {
-        return _pool.Execute(getStream(request.Stream), () => this.stepExecutionEndingProcessor.Process(request));
+        request.Stream = GetStream(request.Stream);
+        return Executor.Execute<StepExecutionEndingRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
     public override Task<ExecutionStatusResponse> InitializeScenarioDataStore(ScenarioDataStoreInitRequest request, ServerCallContext context)
     {
-        return _pool.Execute(getStream(request.Stream), () => this.scenarioDataStoreInitProcessor.Process());
+        request.Stream = GetStream(request.Stream);
+        return Executor.Execute<ScenarioDataStoreInitRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
     public override Task<ExecutionStatusResponse> InitializeSpecDataStore(SpecDataStoreInitRequest request, ServerCallContext context)
     {
-        try
-        {
-            return _pool.Execute(getStream(request.Stream), () => this.specDataStoreInitProcessor.Process());
-        }
-        catch (System.Exception e)
-        {
-            Console.WriteLine(e);
-            Environment.Exit(1);
-        }
-        return null;
+        request.Stream = GetStream(request.Stream);
+        return Executor.Execute<SpecDataStoreInitRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
     public override Task<ExecutionStatusResponse> StartExecution(ExecutionStartingRequest request, ServerCallContext context)
     {
-        return _pool.Execute(getStream(request.Stream), () => this.executionStartingProcessor.Process(request));
+        request.Stream = GetStream(request.Stream);
+        return Executor.Execute<ExecutionStartingRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
     public override Task<ExecutionStatusResponse> StartScenarioExecution(ScenarioExecutionStartingRequest request, ServerCallContext context)
     {
-        return _pool.Execute(getStream(request.Stream), () => this.scenarioExecutionStartingProcessor.Process(request));
+        request.Stream = GetStream(request.Stream);
+        return Executor.Execute<ScenarioExecutionStartingRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
     public override Task<ExecutionStatusResponse> StartSpecExecution(SpecExecutionStartingRequest request, ServerCallContext context)
     {
-        return _pool.Execute(getStream(request.Stream), () => this.specExecutionStartingProcessor.Process(request));
+        request.Stream = GetStream(request.Stream);
+        return Executor.Execute<SpecExecutionStartingRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
     public override Task<ExecutionStatusResponse> StartStepExecution(StepExecutionStartingRequest request, ServerCallContext context)
     {
-        return _pool.Execute(getStream(request.Stream), () => this.stepExecutionStartingProcessor.Process(request));
+        request.Stream = GetStream(request.Stream);
+        return Executor.Execute<StepExecutionStartingRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
     public override Task<ExecutionStatusResponse> NotifyConceptExecutionStarting(ConceptExecutionStartingRequest request, ServerCallContext context)
     {
-        return _pool.Execute(getStream(request.Stream), () => this.conceptExecutionStartingProcessor.Process(request));
+        request.Stream = GetStream(request.Stream);
+        return Executor.Execute<ConceptExecutionStartingRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
     public override Task<ExecutionStatusResponse> NotifyConceptExecutionEnding(ConceptExecutionEndingRequest request, ServerCallContext context)
     {
-        return _pool.Execute(getStream(request.Stream), () => this.conceptExecutionEndingProcessor.Process(request));
+        request.Stream = GetStream(request.Stream);
+        return Executor.Execute<ConceptExecutionEndingRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 
-
-    private void InitializeExecutionMessageHandlers()
+    private int GetStream(int stream)
     {
-        var tableFormatter = new TableFormatter(this._assemblyLoader, this._activatorWrapper);
-        var classInstanceManager = new ThreadLocal<object>(() =>
-        {
-            return this._assemblyLoader.GetClassInstanceManager();
-        });
-        var executionInfoMapper = new ExecutionInfoMapper(this._assemblyLoader, this._activatorWrapper);
-        var executionOrchestrator = new ExecutionOrchestrator(this._reflectionWrapper, this._assemblyLoader,
-            classInstanceManager.Value,
-            new HookExecutor(this._assemblyLoader, this._reflectionWrapper, classInstanceManager.Value, executionInfoMapper),
-            new StepExecutor(this._assemblyLoader, this._reflectionWrapper, classInstanceManager.Value));
-
-        this.executionStartingProcessor = new ExecutionStartingProcessor(executionOrchestrator);
-        this.executionEndingProcessor = new ExecutionEndingProcessor(executionOrchestrator);
-        this.specExecutionStartingProcessor = new SpecExecutionStartingProcessor(executionOrchestrator);
-        this.specExecutionEndingProcessor = new SpecExecutionEndingProcessor(executionOrchestrator);
-        this.scenarioExecutionStartingProcessor = new ScenarioExecutionStartingProcessor(executionOrchestrator);
-        this.scenarioExecutionEndingProcessor = new ScenarioExecutionEndingProcessor(executionOrchestrator);
-        this.stepExecutionStartingProcessor = new StepExecutionStartingProcessor(executionOrchestrator);
-        this.stepExecutionEndingProcessor = new StepExecutionEndingProcessor(executionOrchestrator);
-        this.conceptExecutionStartingProcessor = new ConceptExecutionStartingProcessor(executionOrchestrator);
-        this.conceptExecutionEndingProcessor = new ConceptExecutionEndingProcessor(executionOrchestrator);
-        this.executeStepProcessor = new ExecuteStepProcessor(_stepRegistry, executionOrchestrator, tableFormatter);
-        this.scenarioDataStoreInitProcessor = new ScenarioDataStoreInitProcessor(this._assemblyLoader);
-        this.specDataStoreInitProcessor = new SpecDataStoreInitProcessor(this._assemblyLoader);
-        this.suiteDataStoreInitProcessor = new SuiteDataStoreInitProcessor(this._assemblyLoader);
-    }
-
-    private int getStream(int stream)
-    {
-        if (!_pool.IsMultithreading)
+        if (!_config.IsMultithreading())
         {
             return 1;
         }

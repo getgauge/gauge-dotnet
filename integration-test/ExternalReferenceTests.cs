@@ -5,6 +5,7 @@
  *----------------------------------------------------------------*/
 
 
+using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
@@ -30,7 +31,7 @@ public class ExternalReferenceTests
             StepValue = new ProtoStepValue { StepValue = stepValue, ParameterizedStepValue = parameterizedStepValue },
             NumberOfParameters = 1,
         };
-        var result = await stepValidationProcessor.Process(message);
+        var result = await stepValidationProcessor.Process(1, message);
 
         ClassicAssert.IsTrue(result.IsValid, $"Expected valid step text, got error: {result.ErrorMessage}");
     }
@@ -39,19 +40,18 @@ public class ExternalReferenceTests
     [Test]
     [TestCase("ProjectReference", "Take Screenshot in reference Project", "ReferenceProject-IDoNotExist.png")]
     [TestCase("DllReference", "Take Screenshot in reference DLL", "ReferenceDll-IDoNotExist.png")]
-    public void ShouldRegisterScreenshotWriterFromReference(string referenceType, string stepText, string expected)
+    public async Task ShouldRegisterScreenshotWriterFromReference(string referenceType, string stepText, string expected)
     {
         Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TestUtils.GetIntegrationTestSampleDirectory(referenceType));
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
-        var classInstanceManager = new ThreadLocal<object>(() => assemblyLoader.GetClassInstanceManager()).Value;
+        var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            classInstanceManager,
-            new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
-            new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
+            new StepExecutor(assemblyLoader));
 
         var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
             executionOrchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
@@ -62,7 +62,7 @@ public class ExternalReferenceTests
             ActualStepText = stepText
         };
 
-        var result = executeStepProcessor.Process(message);
+        var result = await executeStepProcessor.Process(1, message);
         var protoExecutionResult = result.ExecutionResult;
 
         ClassicAssert.IsNotNull(protoExecutionResult);

@@ -5,56 +5,55 @@
  *----------------------------------------------------------------*/
 
 
-using System.Collections.Generic;
-using System.Linq;
-using Gauge.CSharp.Core;
+using Gauge.Dotnet.Executors;
+using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Strategy;
 using Gauge.Messages;
 
-namespace Gauge.Dotnet.Processors
+namespace Gauge.Dotnet.Processors;
+
+public abstract class HookExecutionProcessor
 {
-    public abstract class HookExecutionProcessor : ExecutionProcessor
+    protected const string SuiteLevel = "suite";
+    protected const string SpecLevel = "spec";
+    protected const string ScenarioLevel = "scenario";
+
+    protected IConfiguration Configuration { get; private set; }
+    protected IExecutionOrchestrator ExecutionOrchestrator { get; private init; }
+
+    protected HookExecutionProcessor(IExecutionOrchestrator executionOrchestrator, IConfiguration config)
     {
-        private const string ClearStateFlag = "gauge_clear_state_level";
-        protected const string SuiteLevel = "suite";
-        protected const string SpecLevel = "spec";
-        protected const string ScenarioLevel = "scenario";
-        protected readonly IExecutionOrchestrator ExecutionOrchestrator;
+        Configuration = config;
+        ExecutionOrchestrator = executionOrchestrator;
+        Strategy = new HooksStrategy();
+    }
 
-        protected HookExecutionProcessor(IExecutionOrchestrator executionOrchestrator)
-        {
-            ExecutionOrchestrator = executionOrchestrator;
-            Strategy = new HooksStrategy();
-        }
+    protected HooksStrategy Strategy { get; set; }
 
-        protected HooksStrategy Strategy { get; set; }
+    protected abstract string HookType { get; }
 
-        protected abstract string HookType { get; }
+    protected virtual string CacheClearLevel => null;
 
-        protected virtual string CacheClearLevel => null;
+    protected virtual async Task<ExecutionStatusResponse> ExecuteHooks(int streamId, ExecutionInfo info)
+    {
+        var applicableTags = GetApplicableTags(info);
+        var protoExecutionResult = await ExecutionOrchestrator.ExecuteHooks(HookType, Strategy, applicableTags, streamId, info);
+        var allPendingMessages = ExecutionOrchestrator.GetAllPendingMessages().Where(m => m != null);
+        var allPendingScreenShotFiles = ExecutionOrchestrator.GetAllPendingScreenshotFiles();
+        protoExecutionResult.Message.AddRange(allPendingMessages);
+        protoExecutionResult.ScreenshotFiles.AddRange(allPendingScreenShotFiles);
+        return new ExecutionStatusResponse { ExecutionResult = protoExecutionResult };
+    }
 
-        protected virtual ExecutionStatusResponse ExecuteHooks(ExecutionInfo info)
-        {
-            var applicableTags = GetApplicableTags(info);
-            var protoExecutionResult =
-                ExecutionOrchestrator.ExecuteHooks(HookType, Strategy, applicableTags, info);
-            var allPendingMessages = ExecutionOrchestrator.GetAllPendingMessages().Where(m => m != null);
-            var allPendingScreenShotFiles = ExecutionOrchestrator.GetAllPendingScreenshotFiles();
-            protoExecutionResult.Message.AddRange(allPendingMessages);
-            protoExecutionResult.ScreenshotFiles.AddRange(allPendingScreenShotFiles);
-            return new ExecutionStatusResponse { ExecutionResult = protoExecutionResult };
-        }
+    protected void ClearCacheForConfiguredLevel()
+    {
+        var flag = Configuration.GetGaugeClearStateFlag();
+        if (!string.IsNullOrEmpty(flag) && flag.Trim().Equals(CacheClearLevel))
+            ExecutionOrchestrator.ClearCache();
+    }
 
-        protected void ClearCacheForConfiguredLevel()
-        {
-            var flag = Utils.TryReadEnvValue(ClearStateFlag);
-            if (!string.IsNullOrEmpty(flag) && flag.Trim().Equals(CacheClearLevel))
-                ExecutionOrchestrator.ClearCache();
-        }
-
-        protected virtual List<string> GetApplicableTags(ExecutionInfo info)
-        {
-            return Enumerable.Empty<string>().ToList();
-        }
+    protected virtual List<string> GetApplicableTags(ExecutionInfo info)
+    {
+        return Enumerable.Empty<string>().ToList();
     }
 }

@@ -4,33 +4,31 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
-using System.Collections.Generic;
-using System.Linq;
+using Gauge.Dotnet.Executors;
 using Gauge.Messages;
 
-namespace Gauge.Dotnet.Processors
+namespace Gauge.Dotnet.Processors;
+
+public class SpecExecutionStartingProcessor : UntaggedHooksFirstExecutionProcessor, IGaugeProcessor<SpecExecutionStartingRequest, ExecutionStatusResponse>
 {
-    public class SpecExecutionStartingProcessor : UntaggedHooksFirstExecutionProcessor
+    private readonly IExecutionOrchestrator _executionOrchestrator;
+
+    public SpecExecutionStartingProcessor(IExecutionOrchestrator executionOrchestrator, IConfiguration config)
+        : base(executionOrchestrator, config)
     {
-        private readonly IExecutionOrchestrator _executionOrchestrator;
+        _executionOrchestrator = executionOrchestrator;
+    }
 
-        public SpecExecutionStartingProcessor(IExecutionOrchestrator executionOrchestrator)
-            : base(executionOrchestrator)
-        {
-            _executionOrchestrator = executionOrchestrator;
-        }
+    protected override string HookType => "BeforeSpec";
 
-        protected override string HookType => "BeforeSpec";
+    protected override List<string> GetApplicableTags(ExecutionInfo info)
+    {
+        return info.CurrentSpec.Tags.ToList();
+    }
 
-        protected override List<string> GetApplicableTags(ExecutionInfo info)
-        {
-            return info.CurrentSpec.Tags.ToList();
-        }
-
-        public ExecutionStatusResponse Process(SpecExecutionStartingRequest request)
-        {
-            _executionOrchestrator.StartExecutionScope("spec");
-            return ExecuteHooks(request.CurrentExecutionInfo);
-        }
+    public async Task<ExecutionStatusResponse> Process(int streamId, SpecExecutionStartingRequest request)
+    {
+        _executionOrchestrator.StartExecutionScope("spec");
+        return await ExecuteHooks(streamId, request.CurrentExecutionInfo);
     }
 }

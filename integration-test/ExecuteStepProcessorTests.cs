@@ -5,6 +5,7 @@
  *----------------------------------------------------------------*/
 
 
+using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
@@ -15,7 +16,7 @@ namespace Gauge.Dotnet.IntegrationTests;
 public class ExecuteStepProcessorTests : IntegrationTestsBase
 {
     [Test]
-    public void ShouldExecuteMethodFromRequest()
+    public async Task ShouldExecuteMethodFromRequest()
     {
         const string parameterizedStepText = "Step that takes a table {}";
         const string stepText = "Step that takes a table <table>";
@@ -24,11 +25,10 @@ public class ExecuteStepProcessorTests : IntegrationTestsBase
         var assemblyLocater = new AssemblyLocater(new DirectoryWrapper());
         var assemblyLoader = new AssemblyLoader(assemblyLocater, new GaugeLoadContext(assemblyLocater), reflectionWrapper, activatorWrapper, new StepRegistry());
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
-        var classInstanceManager = assemblyLoader.GetClassInstanceManager();
+        var hookRegistry = new HookRegistry(assemblyLoader);
         var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            classInstanceManager,
-            new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
-            new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
+            new StepExecutor(assemblyLoader));
 
         var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
             orchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
@@ -61,7 +61,7 @@ public class ExecuteStepProcessorTests : IntegrationTestsBase
                     }
                 }
         };
-        var result = executeStepProcessor.Process(message);
+        var result = await executeStepProcessor.Process(1, message);
 
         var protoExecutionResult = result.ExecutionResult;
         ClassicAssert.IsNotNull(protoExecutionResult);
@@ -69,19 +69,18 @@ public class ExecuteStepProcessorTests : IntegrationTestsBase
     }
 
     [Test]
-    public void ShouldCaptureScreenshotOnFailure()
+    public async Task ShouldCaptureScreenshotOnFailure()
     {
         const string stepText = "I throw a serializable exception";
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
-        var classInstanceManager = new ThreadLocal<object>(() => assemblyLoader.GetClassInstanceManager());
+        var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            classInstanceManager,
-            new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
-            new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
+            new StepExecutor(assemblyLoader));
 
         var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
             orchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
@@ -93,7 +92,7 @@ public class ExecuteStepProcessorTests : IntegrationTestsBase
             ActualStepText = stepText
         };
 
-        var result = executeStepProcessor.Process(message);
+        var result = await executeStepProcessor.Process(1, message);
         var protoExecutionResult = result.ExecutionResult;
 
         ClassicAssert.IsNotNull(protoExecutionResult);

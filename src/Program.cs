@@ -10,7 +10,7 @@ using System.Net;
 using System.Reflection;
 using Gauge.CSharp.Core;
 using Gauge.Dotnet.Exceptions;
-using Gauge.Dotnet.Executor;
+using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
@@ -94,7 +94,6 @@ internal static class Program
         services.AddTransient<IAssemblyLocater, AssemblyLocater>();
         services.AddSingleton<IReflectionWrapper, ReflectionWrapper>();
         services.AddSingleton<IActivatorWrapper, ActivatorWrapper>();
-        services.AddSingleton(new ExecutorPool(config.GetNumberOfParallelStreams(), config.IsMultithreading()));
         services.AddSingleton<IGaugeLoadContext>((sp) =>
         {
             return config.IsDaemon() ?
@@ -105,8 +104,14 @@ internal static class Program
         services.AddSingleton<IDirectoryWrapper, DirectoryWrapper>();
         services.AddSingleton<IStaticLoader, StaticLoader>();
         services.AddSingleton<IAttributesLoader, AttributesLoader>();
+        services.AddSingleton<IHookRegistry, HookRegistry>();
         services.AddSingleton<IStepRegistry>(s => s.GetRequiredService<IStaticLoader>().GetStepRegistry());
-        services.AddSingleton<IExecutor, Executor.Executor>();
+        services.AddSingleton<IExecutor, Executor>();
+        services.AddSingleton<IStepExecutor, StepExecutor>();
+        services.AddSingleton<IHookExecutor, HookExecutor>();
+        services.AddSingleton<ITableFormatter, TableFormatter>();
+        services.AddSingleton<IExecutionOrchestrator, ExecutionOrchestrator>();
+        services.AddSingleton<IExecutionInfoMapper, ExecutionInfoMapper>();
         services.AddTransient<IGaugeProcessor<StepValidateRequest, StepValidateResponse>, StepValidationProcessor>();
         services.AddTransient<IGaugeProcessor<CacheFileRequest, Empty>, CacheFileProcessor>();
         services.AddTransient<IGaugeProcessor<Empty, ImplementationFileGlobPatternResponse>, ImplementationFileGlobPatterProcessor>();
@@ -116,6 +121,21 @@ internal static class Program
         services.AddTransient<IGaugeProcessor<StepPositionsRequest, StepPositionsResponse>, StepPositionsProcessor>();
         services.AddTransient<IGaugeProcessor<StubImplementationCodeRequest, FileDiff>, StubImplementationCodeProcessor>();
         services.AddTransient<IGaugeProcessor<RefactorRequest, RefactorResponse>, RefactorProcessor>();
+        services.AddTransient<IGaugeProcessor<SuiteDataStoreInitRequest, ExecutionStatusResponse>, SuiteDataStoreInitProcessor>();
+        services.AddTransient<IGaugeProcessor<SuiteDataStoreInitRequest, ExecutionStatusResponse>, SuiteDataStoreInitProcessor>();
+        services.AddTransient<IGaugeProcessor<ExecuteStepRequest, ExecutionStatusResponse>, ExecuteStepProcessor>();
+        services.AddTransient<IGaugeProcessor<ExecutionEndingRequest, ExecutionStatusResponse>, ExecutionEndingProcessor>();
+        services.AddTransient<IGaugeProcessor<ScenarioExecutionEndingRequest, ExecutionStatusResponse>, ScenarioExecutionEndingProcessor>();
+        services.AddTransient<IGaugeProcessor<SpecExecutionEndingRequest, ExecutionStatusResponse>, SpecExecutionEndingProcessor>();
+        services.AddTransient<IGaugeProcessor<StepExecutionEndingRequest, ExecutionStatusResponse>, StepExecutionEndingProcessor>();
+        services.AddTransient<IGaugeProcessor<ScenarioDataStoreInitRequest, ExecutionStatusResponse>, ScenarioDataStoreInitProcessor>();
+        services.AddTransient<IGaugeProcessor<SpecDataStoreInitRequest, ExecutionStatusResponse>, SpecDataStoreInitProcessor>();
+        services.AddTransient<IGaugeProcessor<ExecutionStartingRequest, ExecutionStatusResponse>, ExecutionStartingProcessor>();
+        services.AddTransient<IGaugeProcessor<ScenarioExecutionStartingRequest, ExecutionStatusResponse>, ScenarioExecutionStartingProcessor>();
+        services.AddTransient<IGaugeProcessor<SpecExecutionStartingRequest, ExecutionStatusResponse>, SpecExecutionStartingProcessor>();
+        services.AddTransient<IGaugeProcessor<StepExecutionStartingRequest, ExecutionStatusResponse>, StepExecutionStartingProcessor>();
+        services.AddTransient<IGaugeProcessor<ConceptExecutionStartingRequest, ExecutionStatusResponse>, ConceptExecutionStartingProcessor>();
+        services.AddTransient<IGaugeProcessor<ConceptExecutionEndingRequest, ExecutionStatusResponse>, ConceptExecutionEndingProcessor>();
 
         return services;
     }

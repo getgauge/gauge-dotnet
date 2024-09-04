@@ -19,7 +19,7 @@ public class RefactorProcessor : IGaugeProcessor<RefactorRequest, RefactorRespon
         _stepRegistry = stepRegistry;
     }
 
-    public async Task<RefactorResponse> Process(RefactorRequest request)
+    public async Task<RefactorResponse> Process(int stream, RefactorRequest request)
     {
         var newStep = request.NewStepValue;
 

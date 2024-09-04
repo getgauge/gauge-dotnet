@@ -25,7 +25,7 @@ public class StubImplementationCodeTests : IntegrationTestsBase
         };
 
         var processor = new StubImplementationCodeProcessor(_configuration);
-        var result = await processor.Process(message);
+        var result = await processor.Process(1, message);
         ClassicAssert.AreEqual("StepImplementation1.cs", Path.GetFileName(result.FilePath));
         ClassicAssert.AreEqual(1, result.TextDiffs.Count);
         Console.WriteLine(result.TextDiffs[0].Content);
@@ -48,7 +48,7 @@ public class StubImplementationCodeTests : IntegrationTestsBase
         };
 
         var processor = new StubImplementationCodeProcessor(_configuration);
-        var result = await processor.Process(message);
+        var result = await processor.Process(1, message);
         ClassicAssert.AreEqual(1, result.TextDiffs.Count);
         ClassicAssert.True(result.TextDiffs[0].Content.Contains("namespace Sample"));
         ClassicAssert.True(result.TextDiffs[0].Content.Contains("class Empty"));
@@ -70,7 +70,7 @@ public class StubImplementationCodeTests : IntegrationTestsBase
         };
 
         var processor = new StubImplementationCodeProcessor(_configuration);
-        var result = await processor.Process(message);
+        var result = await processor.Process(1, message);
         ClassicAssert.AreEqual(1, result.TextDiffs.Count);
         StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
         ClassicAssert.AreEqual(107, result.TextDiffs[0].Span.Start);
@@ -90,7 +90,7 @@ public class StubImplementationCodeTests : IntegrationTestsBase
         };
 
         var processor = new StubImplementationCodeProcessor(_configuration);
-        var result = await processor.Process(message);
+        var result = await processor.Process(1, message);
         ClassicAssert.AreEqual(1, result.TextDiffs.Count);
         StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
         ClassicAssert.True(result.TextDiffs[0].Content.Contains("Step Method"));
@@ -111,7 +111,7 @@ public class StubImplementationCodeTests : IntegrationTestsBase
         };
 
         var processor = new StubImplementationCodeProcessor(_configuration);
-        var result = await processor.Process(message);
+        var result = await processor.Process(1, message);
         ClassicAssert.AreEqual(1, result.TextDiffs.Count);
         StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
         ClassicAssert.True(result.TextDiffs[0].Content.Contains("namespace Sample"));

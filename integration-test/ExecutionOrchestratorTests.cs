@@ -6,6 +6,7 @@
 
 
 using Gauge.CSharp.Lib;
+using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
 
@@ -15,106 +16,101 @@ namespace Gauge.Dotnet.IntegrationTests;
 public class ExecutionOrchestratorTests : IntegrationTestsBase
 {
     [Test]
-    public void RecoverableIsTrueOnExceptionThrownWhenContinueOnFailure()
+    public async Task RecoverableIsTrueOnExceptionThrownWhenContinueOnFailure()
     {
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
-        var classInstanceManager = assemblyLoader.GetClassInstanceManager();
+        var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            classInstanceManager,
-            new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
-            new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
+            new StepExecutor(assemblyLoader));
         var gaugeMethod = assemblyLoader.GetStepRegistry()
             .MethodFor("I throw a serializable exception and continue");
-        var executionResult = orchestrator.ExecuteStep(gaugeMethod);
+        var executionResult = await orchestrator.ExecuteStep(gaugeMethod, 1);
         ClassicAssert.IsTrue(executionResult.Failed);
         ClassicAssert.IsTrue(executionResult.RecoverableError);
     }
 
     [Test]
-    public void ShouldCreateTableFromTargetType()
+    public async Task ShouldCreateTableFromTargetType()
     {
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
-        var classInstanceManager = assemblyLoader.GetClassInstanceManager();
+        var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            classInstanceManager,
-            new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
-            new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
+            new StepExecutor(assemblyLoader));
         var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("Step that takes a table {}");
         var table = new Table(new List<string> { "foo", "bar" });
         table.AddRow(new List<string> { "foorow1", "barrow1" });
         table.AddRow(new List<string> { "foorow2", "barrow2" });
 
-        var executionResult = orchestrator.ExecuteStep(gaugeMethod, SerializeTable(table));
+        var executionResult = await orchestrator.ExecuteStep(gaugeMethod, 1, SerializeTable(table));
         ClassicAssert.False(executionResult.Failed);
     }
 
     [Test]
-    public void ShouldExecuteMethodAndReturnResult()
+    public async Task ShouldExecuteMethodAndReturnResult()
     {
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
-        var classInstanceManager = assemblyLoader.GetClassInstanceManager();
+        var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            classInstanceManager,
-            new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
-            new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
+            new StepExecutor(assemblyLoader));
         var gaugeMethod = assemblyLoader.GetStepRegistry()
             .MethodFor("A context step which gets executed before every scenario");
 
-        var executionResult = orchestrator.ExecuteStep(gaugeMethod);
+        var executionResult = await orchestrator.ExecuteStep(gaugeMethod, 1);
         ClassicAssert.False(executionResult.Failed);
     }
 
 
     [Test]
-    public void ShouldGetPendingMessages()
+    public async Task ShouldGetPendingMessages()
     {
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
-        var classInstanceManager = assemblyLoader.GetClassInstanceManager();
+        var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            classInstanceManager,
-            new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
-            new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
+            new StepExecutor(assemblyLoader));
 
         var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("Say {} to {}");
 
-        var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod, "hello", "world");
+        var executionResult = await executionOrchestrator.ExecuteStep(gaugeMethod, 1, "hello", "world");
 
         ClassicAssert.False(executionResult.Failed);
         ClassicAssert.Contains("hello, world!", executionResult.Message);
     }
 
     [Test]
-    public void ShouldGetStacktraceForAggregateException()
+    public async Task ShouldGetStacktraceForAggregateException()
     {
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
-        var classInstanceManager = assemblyLoader.GetClassInstanceManager();
+        var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            classInstanceManager,
-            new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
-            new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
+            new StepExecutor(assemblyLoader));
 
         var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an AggregateException");
-        var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod);
+        var executionResult = await executionOrchestrator.ExecuteStep(gaugeMethod, 1);
 
         ClassicAssert.True(executionResult.Failed);
         ClassicAssert.True(executionResult.StackTrace.Contains("First Exception"));
@@ -137,22 +133,21 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     }
 
     [Test]
-    public void SuccessIsFalseOnSerializableExceptionThrown()
+    public async Task SuccessIsFalseOnSerializableExceptionThrown()
     {
         const string expectedMessage = "I am a custom serializable exception";
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
-        var classInstanceManager = assemblyLoader.GetClassInstanceManager();
+        var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            classInstanceManager,
-            new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
-            new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
+            new StepExecutor(assemblyLoader));
         var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw a serializable exception");
 
-        var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod);
+        var executionResult = await executionOrchestrator.ExecuteStep(gaugeMethod, 1);
 
         ClassicAssert.True(executionResult.Failed);
         ClassicAssert.AreEqual(expectedMessage, executionResult.ErrorMessage);
@@ -161,22 +156,21 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     }
 
     [Test]
-    public void SuccessIsFalseOnUnserializableExceptionThrown()
+    public async Task SuccessIsFalseOnUnserializableExceptionThrown()
     {
         const string expectedMessage = "I am a custom exception";
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
-        var classInstanceManager = assemblyLoader.GetClassInstanceManager();
+        var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            classInstanceManager,
-            new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
-            new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
+            new StepExecutor(assemblyLoader));
 
         var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an unserializable exception");
-        var executionResult = executionOrchestrator.ExecuteStep(gaugeMethod);
+        var executionResult = await executionOrchestrator.ExecuteStep(gaugeMethod, 1);
         ClassicAssert.True(executionResult.Failed);
         ClassicAssert.AreEqual(expectedMessage, executionResult.ErrorMessage);
         StringAssert.Contains("IntegrationTestSample.StepImplementation.ThrowUnserializableException",

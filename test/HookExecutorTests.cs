@@ -5,137 +5,113 @@
  *----------------------------------------------------------------*/
 
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
+using Gauge.CSharp.Lib;
+using Gauge.Dotnet.Executors;
+using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.UnitTests.Helpers;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
-using Moq;
-using NUnit.Framework;
-using NUnit.Framework.Legacy;
 using ExecutionContext = Gauge.CSharp.Lib.ExecutionContext;
 
-namespace Gauge.Dotnet.UnitTests
+namespace Gauge.Dotnet.UnitTests;
+
+[TestFixture]
+internal class HookExecutorTests
 {
-    [TestFixture]
-    internal class HookExecutorTests
+    [Test]
+    public async Task ShoudExecuteHooks()
     {
-        [Test]
-        public void ShoudExecuteHooks()
-        {
-            var mockInstance = new Mock<object>().Object;
-            var mockClassInstanceManagerType = new Mock<Type>().Object;
-            var mockClassInstanceManager = new ThreadLocal<object>(() => new Mock<object>().Object);
+        var mockClassInstanceManager = new Mock<IClassInstanceManager>();
+        var mockHookRegistry = new Mock<IHookRegistry>();
 
-            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var type = LibType.BeforeSuite;
-            var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
-                .WithName($"{type}Hook")
-                .WithFilteredHook(type)
-                .WithDeclaringTypeName("my.foo.type")
-                .WithNoParameters()
-                .Build();
-            mockAssemblyLoader.Setup(x => x.GetMethods(type)).Returns(new List<MethodInfo> { methodInfo });
-            mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(mockClassInstanceManagerType);
+        var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+        var type = LibType.BeforeSuite;
+        var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
+            .WithName($"{type}Hook")
+            .WithFilteredHook(type)
+            .WithDeclaringTypeName("my.foo.type")
+            .WithNoParameters()
+            .Build();
+        var method = new HookMethod(type, methodInfo, mockAssemblyLoader.Object);
+        mockHookRegistry.Setup(x => x.BeforeSuiteHooks).Returns(new HashSet<IHookMethod> { method });
+        mockHookRegistry.Setup(x => x.MethodFor($"my.foo.type.{type}Hook")).Returns(methodInfo);
+        mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(typeof(IClassInstanceManager));
+        mockAssemblyLoader.Setup(x => x.GetClassInstanceManager()).Returns(mockClassInstanceManager.Object);
 
-            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            mockReflectionWrapper
-                .Setup(x => x.InvokeMethod(mockClassInstanceManagerType, mockClassInstanceManager, "Get",
-                    methodInfo.DeclaringType))
-                .Returns(mockInstance);
-            mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance, new List<object>()));
+        var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
+        mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>())).Returns(new { });
 
-            var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
-            mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>())).Returns(new { });
+        var executor = new HookExecutor(mockAssemblyLoader.Object, mockExecutionInfoMapper.Object, mockHookRegistry.Object);
 
-            var executor = new HookExecutor(mockAssemblyLoader.Object, mockReflectionWrapper.Object,
-                mockClassInstanceManager, mockExecutionInfoMapper.Object);
+        var result = await executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(), 1, new ExecutionInfo());
+        ClassicAssert.True(result.Success, $"Hook execution failed: {result.ExceptionMessage}\n{result.StackTrace}");
+    }
 
-            var result = executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(),
-                new ExecutionInfo());
-            ClassicAssert.True(result.Success, $"Hook execution failed: {result.ExceptionMessage}\n{result.StackTrace}");
-        }
+    [Test]
+    public async Task ShoudExecuteHooksWithExecutionContext()
+    {
+        var mockClassInstanceManager = new Mock<IClassInstanceManager>();
+        var mockHookRegistry = new Mock<IHookRegistry>();
 
-        [Test]
-        public void ShoudExecuteHooksWithExecutionContext()
-        {
-            var mockInstance = new Mock<object>().Object;
-            var mockClassInstanceManagerType = new Mock<Type>().Object;
-            var mockClassInstanceManager = new ThreadLocal<object>(() => new Mock<object>().Object);
+        var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+        var type = LibType.BeforeSuite;
+        var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
+            .WithName($"{type}Hook")
+            .WithFilteredHook(type)
+            .WithDeclaringTypeName("my.foo.type")
+            .WithParameters(new KeyValuePair<Type, string>(typeof(ExecutionContext), "context"))
+            .Build();
+        var method = new HookMethod(type, methodInfo, mockAssemblyLoader.Object);
+        mockHookRegistry.Setup(x => x.BeforeSuiteHooks).Returns(new HashSet<IHookMethod> { method });
+        mockHookRegistry.Setup(x => x.MethodFor($"my.foo.type.BeforeSuiteHook-ExecutionContextcontext")).Returns(methodInfo);
+        mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(typeof(IClassInstanceManager));
+        mockAssemblyLoader.Setup(x => x.GetClassInstanceManager()).Returns(mockClassInstanceManager.Object);
 
-            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var type = LibType.BeforeSuite;
-            var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
-                .WithName($"{type}Hook")
-                .WithFilteredHook(type)
-                .WithDeclaringTypeName("my.foo.type")
-                .WithParameters(new KeyValuePair<Type, string>(typeof(ExecutionContext), "context"))
-                .Build();
-            mockAssemblyLoader.Setup(x => x.GetMethods(type)).Returns(new List<MethodInfo> { methodInfo });
-            mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(mockClassInstanceManagerType);
+        var executionInfo = new ExecutionInfo();
+        var expectedExecutionInfo = new ExecutionContext();
 
-            var executionInfo = new ExecutionInfo();
-            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            mockReflectionWrapper
-                .Setup(x => x.InvokeMethod(mockClassInstanceManagerType, mockClassInstanceManager, "Get",
-                    methodInfo.DeclaringType))
-                .Returns(mockInstance);
-            var expectedExecutionInfo = new ExecutionContext();
+        var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
+        mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(executionInfo)).Returns(expectedExecutionInfo);
 
-            var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
-            mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(executionInfo))
-                .Returns(expectedExecutionInfo);
+        mockClassInstanceManager.Setup(x => x.InvokeMethod(methodInfo, 1, expectedExecutionInfo)).Verifiable();
 
-            mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance, expectedExecutionInfo))
-                .Verifiable();
+        var executor = new HookExecutor(mockAssemblyLoader.Object, mockExecutionInfoMapper.Object, mockHookRegistry.Object);
 
-            var executor = new HookExecutor(mockAssemblyLoader.Object, mockReflectionWrapper.Object,
-                mockClassInstanceManager, mockExecutionInfoMapper.Object);
+        var result = await executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(), 1, executionInfo);
+        ClassicAssert.True(result.Success, $"Hook execution failed: {result.ExceptionMessage}\n{result.StackTrace}");
+        mockClassInstanceManager.VerifyAll();
+    }
 
-            var result = executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(),
-                executionInfo);
-            ClassicAssert.True(result.Success, $"Hook execution failed: {result.ExceptionMessage}\n{result.StackTrace}");
-            mockReflectionWrapper.VerifyAll();
-        }
+    [Test]
+    public async Task ShoudExecuteHooksAndGetTheError()
+    {
+        var mockClassInstanceManagerType = new Mock<IClassInstanceManager>();
+        var mockHookRegistry = new Mock<IHookRegistry>();
 
-        [Test]
-        public void ShoudExecuteHooksAndGetTheError()
-        {
-            var mockInstance = new Mock<object>().Object;
-            var mockClassInstanceManagerType = new Mock<Type>().Object;
-            var mockClassInstanceManager = new ThreadLocal<object>(() => new Mock<object>().Object);
+        var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+        var type = LibType.BeforeSuite;
+        var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
+            .WithName($"{type}Hook")
+            .WithFilteredHook(type)
+            .WithDeclaringTypeName("my.foo.type")
+            .Build();
+        var method = new HookMethod(type, methodInfo, mockAssemblyLoader.Object);
+        mockHookRegistry.Setup(x => x.BeforeSuiteHooks).Returns(new HashSet<IHookMethod> { method });
+        mockHookRegistry.Setup(x => x.MethodFor($"my.foo.type.BeforeSuiteHook")).Returns(methodInfo);
+        mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(typeof(IClassInstanceManager));
+        mockAssemblyLoader.Setup(x => x.GetClassInstanceManager()).Returns(mockClassInstanceManagerType.Object);
 
-            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var type = LibType.BeforeSuite;
-            var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
-                .WithName($"{type}Hook")
-                .WithFilteredHook(type)
-                .WithDeclaringTypeName("my.foo.type")
-                .Build();
-            mockAssemblyLoader.Setup(x => x.GetMethods(type)).Returns(new List<MethodInfo> { methodInfo });
-            mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(mockClassInstanceManagerType);
+        var expectedExecutionInfo = new ExecutionContext();
 
-            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            mockReflectionWrapper
-                .Setup(x => x.InvokeMethod(mockClassInstanceManagerType, mockClassInstanceManager, "Get",
-                    methodInfo.DeclaringType))
-                .Returns(mockInstance);
+        var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
+        mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>()))
+            .Returns(expectedExecutionInfo);
+        var executor = new HookExecutor(mockAssemblyLoader.Object, mockExecutionInfoMapper.Object, mockHookRegistry.Object);
+        mockClassInstanceManagerType.Setup(x => x.InvokeMethod(methodInfo, 1, It.IsAny<object[]>()))
+            .Throws(new Exception("hook failed"));
 
-            var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
-            mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>()))
-                .Returns(new { Foo = "bar" });
-            var executor = new HookExecutor(mockAssemblyLoader.Object, mockReflectionWrapper.Object,
-                mockClassInstanceManager, mockExecutionInfoMapper.Object);
-            mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance))
-                .Throws(new Exception("hook failed"));
-
-            var result = executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(),
-                new ExecutionInfo());
-            ClassicAssert.False(result.Success, "Hook execution passed, expected failure");
-            ClassicAssert.AreEqual(result.ExceptionMessage, "hook failed");
-        }
+        var result = await executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(), 1, new ExecutionInfo());
+        ClassicAssert.False(result.Success, "Hook execution passed, expected failure");
+        ClassicAssert.AreEqual(result.ExceptionMessage, "hook failed");
     }
 }

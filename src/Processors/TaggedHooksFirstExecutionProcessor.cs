@@ -5,16 +5,16 @@
  *----------------------------------------------------------------*/
 
 
+using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Strategy;
 
-namespace Gauge.Dotnet.Processors
+namespace Gauge.Dotnet.Processors;
+
+public abstract class TaggedHooksFirstExecutionProcessor : HookExecutionProcessor
 {
-    public abstract class TaggedHooksFirstExecutionProcessor : HookExecutionProcessor
+    protected TaggedHooksFirstExecutionProcessor(IExecutionOrchestrator executionOrchestrator, IConfiguration config)
+        : base(executionOrchestrator, config)
     {
-        protected TaggedHooksFirstExecutionProcessor(IExecutionOrchestrator executionOrchestrator)
-            : base(executionOrchestrator)
-        {
-            Strategy = new TaggedHooksFirstStrategy();
-        }
+        Strategy = new TaggedHooksFirstStrategy();
     }
 }

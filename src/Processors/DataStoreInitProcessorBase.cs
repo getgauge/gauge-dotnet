@@ -5,53 +5,43 @@
  *----------------------------------------------------------------*/
 
 
-using System;
+using System.Reflection;
+using Gauge.CSharp.Lib;
 using Gauge.Messages;
 
-namespace Gauge.Dotnet.Processors
+namespace Gauge.Dotnet.Processors;
+
+public abstract class DataStoreInitProcessorBase
 {
-    public abstract class DataStoreInitProcessorBase
+    private readonly IAssemblyLoader _assemblyLoader;
+    private readonly DataStoreType _dataStoreType;
+
+    protected DataStoreInitProcessorBase(DataStoreType type, IAssemblyLoader assemblyLoader)
     {
-        private readonly IAssemblyLoader _assemblyLoader;
-        private readonly DataStoreType _dataStoreType;
+        _dataStoreType = type;
+        _assemblyLoader = assemblyLoader;
+    }
 
-        protected DataStoreInitProcessorBase(IAssemblyLoader assemblyLoader, DataStoreType type)
+    protected ExecutionStatusResponse Process(int stream)
+    {
+        try
         {
-            _assemblyLoader = assemblyLoader;
-            _dataStoreType = type;
+            var factoryType = _assemblyLoader.GetLibType(LibType.DataStoreFactory);
+            var methodInfo = factoryType.GetMethod("AddDataStore", BindingFlags.NonPublic | BindingFlags.Static);
+            methodInfo.Invoke(null, new object[] { stream, _dataStoreType });
         }
-
-        public ExecutionStatusResponse Process()
+        catch (Exception ex)
         {
-            try
-            {
-                var initMethod = _assemblyLoader.GetLibType(LibType.DataStoreFactory)
-                    .GetMethod($"Initialize{_dataStoreType}DataStore");
-                initMethod.Invoke(null, null);
-                return new ExecutionStatusResponse
-                {
-                    ExecutionResult = new ProtoExecutionResult
-                    {
-                        Failed = false,
-                        ExecutionTime = 0
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                var executionResult = new ProtoExecutionResult
-                    {
-                        Failed = true,
-                        ExecutionTime = 0
-                    };
-                var innerException = ex.InnerException ?? ex;
-                executionResult.ErrorMessage = innerException.Message;
-                executionResult.StackTrace = innerException is AggregateException
-                    ? innerException.ToString()
-                    : innerException.StackTrace;
-
-                return new ExecutionStatusResponse { ExecutionResult = executionResult };
-            }
+            Logger.Error($"*** Failed with the following error: {ex.Message}");
+            throw;
         }
+        return new ExecutionStatusResponse
+        {
+            ExecutionResult = new ProtoExecutionResult
+            {
+                Failed = false,
+                ExecutionTime = 0
+            }
+        };
     }
 }

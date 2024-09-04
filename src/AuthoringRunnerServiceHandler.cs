@@ -5,7 +5,7 @@
  *----------------------------------------------------------------*/
 
 
-using Gauge.Dotnet.Executor;
+using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Models;
 using Gauge.Messages;
 using Grpc.Core;
@@ -14,60 +14,61 @@ namespace Gauge.Dotnet;
 
 internal class AuthoringRunnerServiceHandler : Runner.RunnerBase
 {
-    private readonly IExecutor _executor;
+    private const int DefaultStream = 1;
+    protected IExecutor Executor { get; private init; }
     private readonly IHostApplicationLifetime _lifetime;
     protected IStepRegistry _stepRegistry;
 
     public AuthoringRunnerServiceHandler(IExecutor executor, IHostApplicationLifetime lifetime, IStepRegistry stepRegistry)
     {
-        _executor = executor;
+        Executor = executor;
         _lifetime = lifetime;
         _stepRegistry = stepRegistry;
     }
 
     public override Task<StepValidateResponse> ValidateStep(StepValidateRequest request, ServerCallContext context)
     {
-        return _executor.Execute<StepValidateRequest, StepValidateResponse>(request);
+        return Executor.Execute<StepValidateRequest, StepValidateResponse>(DefaultStream, request);
     }
 
     public override Task<Empty> CacheFile(CacheFileRequest request, ServerCallContext context)
     {
-        return _executor.Execute<CacheFileRequest, Empty>(request);
+        return Executor.Execute<CacheFileRequest, Empty>(DefaultStream, request);
     }
 
     public override Task<ImplementationFileGlobPatternResponse> GetGlobPatterns(Empty request, ServerCallContext context)
     {
-        return _executor.Execute<Empty, ImplementationFileGlobPatternResponse>(request);
+        return Executor.Execute<Empty, ImplementationFileGlobPatternResponse>(DefaultStream, request);
     }
 
     public override Task<ImplementationFileListResponse> GetImplementationFiles(Empty request, ServerCallContext context)
     {
-        return _executor.Execute<Empty, ImplementationFileListResponse>(request);
+        return Executor.Execute<Empty, ImplementationFileListResponse>(DefaultStream, request);
     }
 
     public override Task<StepNameResponse> GetStepName(StepNameRequest request, ServerCallContext context)
     {
-        return _executor.Execute<StepNameRequest, StepNameResponse>(request);
+        return Executor.Execute<StepNameRequest, StepNameResponse>(DefaultStream, request);
     }
 
     public override Task<StepNamesResponse> GetStepNames(StepNamesRequest request, ServerCallContext context)
     {
-        return _executor.Execute<StepNamesRequest, StepNamesResponse>(request);
+        return Executor.Execute<StepNamesRequest, StepNamesResponse>(DefaultStream, request);
     }
 
     public override Task<StepPositionsResponse> GetStepPositions(StepPositionsRequest request, ServerCallContext context)
     {
-        return _executor.Execute<StepPositionsRequest, StepPositionsResponse>(request);
+        return Executor.Execute<StepPositionsRequest, StepPositionsResponse>(DefaultStream, request);
     }
 
     public override Task<FileDiff> ImplementStub(StubImplementationCodeRequest request, ServerCallContext context)
     {
-        return _executor.Execute<StubImplementationCodeRequest, FileDiff>(request);
+        return Executor.Execute<StubImplementationCodeRequest, FileDiff>(DefaultStream, request);
     }
 
     public override Task<RefactorResponse> Refactor(RefactorRequest request, ServerCallContext context)
     {
-        return _executor.Execute<RefactorRequest, RefactorResponse>(request);
+        return Executor.Execute<RefactorRequest, RefactorResponse>(DefaultStream, request);
     }
 
     public override Task<Empty> Kill(KillProcessRequest request, ServerCallContext context)

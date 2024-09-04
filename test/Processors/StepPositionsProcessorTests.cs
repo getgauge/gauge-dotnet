@@ -24,7 +24,7 @@ public class StepPositionsProcessorTests
         var processor = new StepPositionsProcessor(mockStepRegistry.Object);
         var request = new StepPositionsRequest { FilePath = "Foo.cs" };
 
-        var response = await processor.Process(request);
+        var response = await processor.Process(1, request);
 
         ClassicAssert.AreEqual(response.StepPositions.Count, 1);
         ClassicAssert.AreEqual(response.StepPositions.First().StepValue, "goodbye");
@@ -45,7 +45,7 @@ public class StepPositionsProcessorTests
         var processor = new StepPositionsProcessor(mockStepRegistry.Object);
         var request = new StepPositionsRequest { FilePath = filePath };
 
-        var response = await processor.Process(request);
+        var response = await processor.Process(1, request);
 
         ClassicAssert.AreEqual(response.StepPositions.Count, 2);
     }

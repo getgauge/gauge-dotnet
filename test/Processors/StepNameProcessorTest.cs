@@ -29,7 +29,7 @@ public class StepNameProcessorTest
             mockStepRegistry.Setup(r => r.HasAlias(stepText)).Returns(false);
             var stepNameProcessor = new StepNameProcessor(mockStepRegistry.Object);
 
-            var response = await stepNameProcessor.Process(request);
+            var response = await stepNameProcessor.Process(1, request);
 
             ClassicAssert.AreEqual(response.FileName, "foo");
             ClassicAssert.AreEqual(response.StepName[0], "step1");
@@ -59,7 +59,7 @@ public class StepNameProcessorTest
             mockStepRegistry.Setup(r => r.HasAlias(stepText)).Returns(true);
             var stepNameProcessor = new StepNameProcessor(mockStepRegistry.Object);
 
-            var response = await stepNameProcessor.Process(request);
+            var response = await stepNameProcessor.Process(1, request);
 
             ClassicAssert.AreEqual(response.FileName, "foo");
             ClassicAssert.AreEqual(response.StepName[0], "step2");
@@ -88,7 +88,7 @@ public class StepNameProcessorTest
             mockStepRegistry.Setup(r => r.MethodFor(parsedStepText)).Returns(gaugeMethod);
             var stepNameProcessor = new StepNameProcessor(mockStepRegistry.Object);
 
-            var response = await stepNameProcessor.Process(request);
+            var response = await stepNameProcessor.Process(1, request);
 
             ClassicAssert.True(response.IsExternal);
             // ClassicAssert.AreEqual(response.FileName, null);

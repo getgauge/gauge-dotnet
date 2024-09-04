@@ -7,10 +7,9 @@
 
 using Gauge.Messages;
 
-namespace Gauge.Dotnet
+namespace Gauge.Dotnet.Executors;
+
+public interface IExecutionInfoMapper
 {
-    public interface IExecutionInfoMapper
-    {
-        dynamic ExecutionContextFrom(ExecutionInfo currentExecutionInfo);
-    }
+    dynamic ExecutionContextFrom(ExecutionInfo currentExecutionInfo);
 }

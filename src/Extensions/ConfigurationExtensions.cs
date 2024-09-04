@@ -11,6 +11,9 @@ public static class ConfigurationExtensions
     public static bool IsMultithreading(this IConfiguration config) =>
         config.GetValue("ENABLE_MULTITHREADING", false);
 
+    public static bool IsDebugging(this IConfiguration config) =>
+        config.GetValue("DEBUGGING", false);
+
     public static string GetGaugeProjectRoot(this IConfiguration config) =>
         config.GetValue<string>("GAUGE_PROJECT_ROOT");
 
@@ -31,6 +34,9 @@ public static class ConfigurationExtensions
 
     public static string GetGaugeLogLevel(this IConfiguration config) =>
         config.GetValue<string>("GAUGE_LOG_LEVEL");
+
+    public static string GetGaugeClearStateFlag(this IConfiguration config) =>
+        config.GetValue<string>("GAUGE_CLEAR_STATE_LEVEL");
 
     public static string GetGaugeBinDir(this IConfiguration config)
     {

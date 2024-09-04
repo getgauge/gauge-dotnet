@@ -1,6 +1,6 @@
 ﻿using Gauge.Dotnet.Processors;
 
-namespace Gauge.Dotnet.Executor;
+namespace Gauge.Dotnet.Executors;
 
 internal class Executor : IExecutor
 {
@@ -11,9 +11,10 @@ internal class Executor : IExecutor
         _serviceProvider = serviceProvider;
     }
 
-    public Task<TResult> Execute<TRequest, TResult>(TRequest request)
+    public Task<TResult> Execute<TRequest, TResult>(int streamId, TRequest request)
     {
         var processor = _serviceProvider.GetRequiredService<IGaugeProcessor<TRequest, TResult>>();
-        return processor.Process(request);
+        var result = processor.Process(streamId, request);
+        return result;
     }
 }

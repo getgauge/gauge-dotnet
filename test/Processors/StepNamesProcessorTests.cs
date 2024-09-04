@@ -13,7 +13,7 @@ public class StepNamesProcessorTests
         mockStepRegistry.Setup(r => r.GetStepTexts()).Returns(new List<string> { "step1", "step2", "step3" });
         var stepNamesProcessor = new StepNamesProcessor(mockStepRegistry.Object);
         var request = new StepNamesRequest();
-        var response = await stepNamesProcessor.Process(request);
+        var response = await stepNamesProcessor.Process(1, request);
         ClassicAssert.AreEqual(3, response.Steps.Count);
         ClassicAssert.AreEqual(response.Steps[0], "step1");
     }

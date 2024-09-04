@@ -19,6 +19,7 @@ public class AssemblyLoader : IAssemblyLoader
     private readonly IReflectionWrapper _reflectionWrapper;
     private readonly IGaugeLoadContext _gaugeLoadContext;
     private Assembly _targetLibAssembly;
+    private object _classInstanceManager;
 
     private readonly IActivatorWrapper _activatorWrapper;
     private readonly IStepRegistry _registry;
@@ -115,12 +116,12 @@ public class AssemblyLoader : IAssemblyLoader
 
     public object GetClassInstanceManager()
     {
+        if (_classInstanceManager != null) return _classInstanceManager;
         if (ClassInstanceManagerType == null) return null;
-        var classInstanceManager = _activatorWrapper.CreateInstance(ClassInstanceManagerType);
-        Logger.Debug("Loaded Instance Manager of Type:" + classInstanceManager.GetType().FullName);
-        _reflectionWrapper.InvokeMethod(ClassInstanceManagerType, classInstanceManager, "Initialize",
-            AssembliesReferencingGaugeLib);
-        return classInstanceManager;
+        _classInstanceManager = _activatorWrapper.CreateInstance(ClassInstanceManagerType);
+        Logger.Debug("Loaded Instance Manager of Type:" + _classInstanceManager.GetType().FullName);
+        _reflectionWrapper.InvokeMethod(ClassInstanceManagerType, _classInstanceManager, "Initialize", AssembliesReferencingGaugeLib);
+        return _classInstanceManager;
     }
 
     private static string GetStepValue(string stepText)

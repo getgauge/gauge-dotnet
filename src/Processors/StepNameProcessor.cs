@@ -20,7 +20,7 @@ public class StepNameProcessor : IGaugeProcessor<StepNameRequest, StepNameRespon
         _stepRegistry = stepRegistry;
     }
 
-    public Task<StepNameResponse> Process(StepNameRequest request)
+    public Task<StepNameResponse> Process(int stream, StepNameRequest request)
     {
 
         var parsedStepText = request.StepValue;

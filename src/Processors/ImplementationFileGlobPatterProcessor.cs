@@ -12,7 +12,7 @@ public class ImplementationFileGlobPatterProcessor : IGaugeProcessor<Empty, Impl
         _config = config;
     }
 
-    public Task<ImplementationFileGlobPatternResponse> Process(Empty request)
+    public Task<ImplementationFileGlobPatternResponse> Process(int stream, Empty request)
     {
         var response = new ImplementationFileGlobPatternResponse();
         response.GlobPatterns.Add($"{_config.GetGaugeProjectRoot()}/**/*.cs");

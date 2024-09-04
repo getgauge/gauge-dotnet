@@ -5,29 +5,27 @@
  *----------------------------------------------------------------*/
 
 
-using System.Collections.Generic;
-using System.Linq;
+using Gauge.Dotnet.Executors;
 using Gauge.Messages;
 
-namespace Gauge.Dotnet.Processors
+namespace Gauge.Dotnet.Processors;
+
+public class StepExecutionEndingProcessor : TaggedHooksFirstExecutionProcessor, IGaugeProcessor<StepExecutionEndingRequest, ExecutionStatusResponse>
 {
-    public class StepExecutionEndingProcessor : TaggedHooksFirstExecutionProcessor
+    public StepExecutionEndingProcessor(IExecutionOrchestrator executionOrchestrator, IConfiguration config)
+        : base(executionOrchestrator, config)
     {
-        public StepExecutionEndingProcessor(IExecutionOrchestrator executionOrchestrator)
-            : base(executionOrchestrator)
-        {
-        }
+    }
 
-        protected override string HookType => "AfterStep";
+    protected override string HookType => "AfterStep";
 
-        public ExecutionStatusResponse Process(StepExecutionEndingRequest request)
-        {
-            return base.ExecuteHooks(request.CurrentExecutionInfo);
-        }
+    public Task<ExecutionStatusResponse> Process(int streamId, StepExecutionEndingRequest request)
+    {
+        return ExecuteHooks(streamId, request.CurrentExecutionInfo);
+    }
 
-        protected override List<string> GetApplicableTags(ExecutionInfo info)
-        {
-            return info.CurrentScenario.Tags.Union(info.CurrentSpec.Tags).ToList();
-        }
+    protected override List<string> GetApplicableTags(ExecutionInfo info)
+    {
+        return info.CurrentScenario.Tags.Union(info.CurrentSpec.Tags).ToList();
     }
 }

@@ -19,7 +19,7 @@ public class CacheFileProcessor : IGaugeProcessor<CacheFileRequest, Empty>
         _loader = loader;
     }
 
-    public async Task<Empty> Process(CacheFileRequest request)
+    public async Task<Empty> Process(int stream, CacheFileRequest request)
     {
         var content = request.Content;
         var file = request.FilePath;

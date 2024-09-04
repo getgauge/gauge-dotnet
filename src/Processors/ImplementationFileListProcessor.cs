@@ -15,7 +15,7 @@ public class ImplementationFileListProcessor : IGaugeProcessor<Empty, Implementa
         _attributesLoader = attributesLoader;
     }
 
-    public Task<ImplementationFileListResponse> Process(Empty request)
+    public Task<ImplementationFileListResponse> Process(int stream, Empty request)
     {
         var response = new ImplementationFileListResponse();
         var classFiles = Directory.EnumerateFiles(_config.GetGaugeProjectRoot(), "*.cs", SearchOption.AllDirectories).ToList();

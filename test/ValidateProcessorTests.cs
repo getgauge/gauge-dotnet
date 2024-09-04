@@ -34,7 +34,7 @@ public class ValidateProcessorTests
         _mockStepRegistry.Setup(registry => registry.ContainsStep("step_text_1")).Returns(true);
         _mockStepRegistry.Setup(registry => registry.HasMultipleImplementations("step_text_1")).Returns(true);
         var processor = new StepValidationProcessor(_mockStepRegistry.Object);
-        var response = await processor.Process(request);
+        var response = await processor.Process(1, request);
 
         ClassicAssert.AreEqual(false, response.IsValid);
         ClassicAssert.AreEqual(StepValidateResponse.Types.ErrorType.DuplicateStepImplementation,
@@ -58,7 +58,7 @@ public class ValidateProcessorTests
             }
         };
         var processor = new StepValidationProcessor(_mockStepRegistry.Object);
-        var response = await processor.Process(request);
+        var response = await processor.Process(1, request);
 
         ClassicAssert.AreEqual(false, response.IsValid);
         ClassicAssert.AreEqual(StepValidateResponse.Types.ErrorType.StepImplementationNotFound,
@@ -82,7 +82,7 @@ public class ValidateProcessorTests
         _mockStepRegistry.Setup(registry => registry.HasMultipleImplementations("step_text_1")).Returns(false);
 
         var processor = new StepValidationProcessor(_mockStepRegistry.Object);
-        var response = await processor.Process(request);
+        var response = await processor.Process(1, request);
 
         ClassicAssert.AreEqual(true, response.IsValid);
     }

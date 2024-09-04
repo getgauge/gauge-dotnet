@@ -5,129 +5,97 @@
  *----------------------------------------------------------------*/
 
 
-using System;
-using System.Threading;
+using Gauge.CSharp.Lib;
+using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.UnitTests.Helpers;
-using Gauge.Dotnet.Wrappers;
-using Moq;
-using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
-namespace Gauge.Dotnet.UnitTests
+namespace Gauge.Dotnet.UnitTests;
+
+[TestFixture]
+internal class StepExecutorTests
 {
-    [TestFixture]
-    internal class StepExecutorTests
+    [Test]
+    public async Task ShoudExecuteStep()
     {
-        [Test]
-        public void ShoudExecuteStep()
+        var mockClassInstanceManager = new Mock<IClassInstanceManager>();
+
+        var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+        var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
+            .WithName("StepImplementation")
+            .WithDeclaringTypeName("my.foo.type")
+            .Build();
+        var gaugeMethod = new GaugeMethod
         {
-            var mockInstance = new Mock<object>().Object;
-            var mockClassInstanceManagerType = new Mock<Type>().Object;
-            var mockClassInstanceManager = new ThreadLocal<object>(() => new Mock<object>().Object);
+            Name = "StepImplementation",
+            MethodInfo = methodInfo
+        };
 
-            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
-                .WithName("StepImplementation")
-                .WithDeclaringTypeName("my.foo.type")
-                .Build();
-            var gaugeMethod = new GaugeMethod
-            {
-                Name = "StepImplementation",
-                MethodInfo = methodInfo
-            };
+        mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(typeof(IClassInstanceManager));
+        mockAssemblyLoader.Setup(x => x.GetClassInstanceManager()).Returns(mockClassInstanceManager.Object);
 
-            mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(mockClassInstanceManagerType);
+        var executor = new StepExecutor(mockAssemblyLoader.Object);
 
-            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            mockReflectionWrapper
-                .Setup(x => x.InvokeMethod(mockClassInstanceManagerType, mockClassInstanceManager, "Get",
-                    methodInfo.DeclaringType))
-                .Returns(mockInstance);
+        var result = await executor.Execute(gaugeMethod, 1);
+        ClassicAssert.True(result.Success);
+    }
 
-            var executor = new StepExecutor(mockAssemblyLoader.Object, mockReflectionWrapper.Object,
-                mockClassInstanceManager);
-            mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance))
-                .Returns(null);
+    [Test]
+    public async Task ShoudExecuteStepAndGetFailure()
+    {
+        var mockClassInstanceManager = new Mock<IClassInstanceManager>();
 
+        var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+        var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
+            .WithName("StepImplementation")
+            .WithDeclaringTypeName("my.foo.type")
+            .Build();
 
-            var result = executor.Execute(gaugeMethod);
-            ClassicAssert.True(result.Success);
-        }
-
-        [Test]
-        public void ShoudExecuteStepAndGetFailure()
+        var gaugeMethod = new GaugeMethod
         {
-            var mockInstance = new Mock<object>().Object;
-            var mockClassInstanceManagerType = new Mock<Type>().Object;
-            var mockClassInstanceManager = new ThreadLocal<object>(() => new Mock<object>().Object);
+            Name = "StepImplementation",
+            MethodInfo = methodInfo
+        };
+        mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(typeof(IClassInstanceManager));
+        mockAssemblyLoader.Setup(x => x.GetClassInstanceManager()).Returns(mockClassInstanceManager.Object);
 
-            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
-                .WithName("StepImplementation")
-                .WithDeclaringTypeName("my.foo.type")
-                .Build();
+        var executor = new StepExecutor(mockAssemblyLoader.Object);
+        mockClassInstanceManager.Setup(x => x.InvokeMethod(methodInfo, 1, It.IsAny<object[]>()))
+            .Throws(new Exception("step execution failure"));
 
-            var gaugeMethod = new GaugeMethod
-            {
-                Name = "StepImplementation",
-                MethodInfo = methodInfo
-            };
-            mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(mockClassInstanceManagerType);
+        var result = await executor.Execute(gaugeMethod, 1);
+        ClassicAssert.False(result.Success);
+        ClassicAssert.AreEqual(result.ExceptionMessage, "step execution failure");
+    }
 
-            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            mockReflectionWrapper
-                .Setup(x => x.InvokeMethod(mockClassInstanceManagerType, mockClassInstanceManager, "Get",
-                    methodInfo.DeclaringType))
-                .Returns(mockInstance);
+    [Test]
+    public async Task ShoudExecuteStepAndGetRecoverableError()
+    {
+        var mockClassInstanceManager = new Mock<IClassInstanceManager>();
 
-            var executor = new StepExecutor(mockAssemblyLoader.Object, mockReflectionWrapper.Object,
-                mockClassInstanceManager);
-            mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance))
-                .Throws(new Exception("step execution failure"));
+        var mockAssemblyLoader = new Mock<IAssemblyLoader>();
+        var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
+            .WithName("StepImplementation")
+            .WithContinueOnFailure()
+            .WithDeclaringTypeName("my.foo.type")
+            .Build();
 
-            var result = executor.Execute(gaugeMethod);
-            ClassicAssert.False(result.Success);
-            ClassicAssert.AreEqual(result.ExceptionMessage, "step execution failure");
-        }
-
-        [Test]
-        public void ShoudExecuteStepAndGetRecoverableError()
+        var gaugeMethod = new GaugeMethod
         {
-            var mockInstance = new Mock<object>().Object;
-            var mockClassInstanceManagerType = new Mock<Type>().Object;
-            var mockClassInstanceManager = new ThreadLocal<object>(() => new Mock<object>().Object);
+            Name = "StepImplementation",
+            MethodInfo = methodInfo,
+            ContinueOnFailure = true
+        };
+        mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(typeof(IClassInstanceManager));
+        mockAssemblyLoader.Setup(x => x.GetClassInstanceManager()).Returns(mockClassInstanceManager.Object);
 
-            var mockAssemblyLoader = new Mock<IAssemblyLoader>();
-            var methodInfo = new MockMethodBuilder(mockAssemblyLoader)
-                .WithName("StepImplementation")
-                .WithContinueOnFailure()
-                .WithDeclaringTypeName("my.foo.type")
-                .Build();
+        var executor = new StepExecutor(mockAssemblyLoader.Object);
+        mockClassInstanceManager.Setup(x => x.InvokeMethod(methodInfo, 1, It.IsAny<object[]>()))
+            .Throws(new Exception("step execution failure"));
 
-            var gaugeMethod = new GaugeMethod
-            {
-                Name = "StepImplementation",
-                MethodInfo = methodInfo,
-                ContinueOnFailure = true
-            };
-            mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(mockClassInstanceManagerType);
-
-            var mockReflectionWrapper = new Mock<IReflectionWrapper>();
-            mockReflectionWrapper
-                .Setup(x => x.InvokeMethod(mockClassInstanceManagerType, mockClassInstanceManager, "Get",
-                    methodInfo.DeclaringType))
-                .Returns(mockInstance);
-
-            var executor = new StepExecutor(mockAssemblyLoader.Object, mockReflectionWrapper.Object,
-                mockClassInstanceManager);
-            mockReflectionWrapper.Setup(x => x.Invoke(methodInfo, mockInstance))
-                .Throws(new Exception("step execution failure"));
-
-            var result = executor.Execute(gaugeMethod);
-            ClassicAssert.False(result.Success);
-            ClassicAssert.True(result.Recoverable);
-            ClassicAssert.AreEqual(result.ExceptionMessage, "step execution failure");
-        }
+        var result = await executor.Execute(gaugeMethod, 1);
+        ClassicAssert.False(result.Success);
+        ClassicAssert.True(result.Recoverable);
+        ClassicAssert.AreEqual(result.ExceptionMessage, "step execution failure");
     }
 }

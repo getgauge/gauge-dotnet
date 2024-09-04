@@ -5,47 +5,42 @@
  *----------------------------------------------------------------*/
 
 
-using System;
 using System.Diagnostics;
-using System.Threading;
-using Gauge.CSharp.Core;
+using Gauge.Dotnet.Executors;
+using Gauge.Dotnet.Extensions;
 using Gauge.Messages;
 
-namespace Gauge.Dotnet.Processors
+namespace Gauge.Dotnet.Processors;
+
+public class ExecutionStartingProcessor : HookExecutionProcessor, IGaugeProcessor<ExecutionStartingRequest, ExecutionStatusResponse>
 {
-    public class ExecutionStartingProcessor : HookExecutionProcessor
+    public ExecutionStartingProcessor(IExecutionOrchestrator executionOrchestrator, IConfiguration config)
+        : base(executionOrchestrator, config)
     {
-        public ExecutionStartingProcessor(IExecutionOrchestrator executionOrchestrator)
-            : base(executionOrchestrator)
-        {
-        }
-
-        protected override string HookType => "BeforeSuite";
-
-
-        [DebuggerHidden]
-        public virtual ExecutionStatusResponse Process(ExecutionStartingRequest request)
-        {
-            var debuggingEnv = Utils.TryReadEnvValue("DEBUGGING");
-            if (debuggingEnv != null && debuggingEnv.ToLower().Equals("true"))
-            {
-                // if the runner is launched in DEBUG mode, let the debugger attach.
-                Console.WriteLine("Runner Ready for Debugging at Process ID " +
-                                  System.Diagnostics.Process.GetCurrentProcess().Id);
-                var j = 0;
-                while (!Debugger.IsAttached)
-                {
-                    j++;
-                    //Trying to debug, wait for a debugger to attach
-                    Thread.Sleep(100);
-                    //Timeout, no debugger connected, break out into a normal execution.
-                    if (j == 300)
-                        break;
-                }
-            }
-            return ExecuteHooks(request.CurrentExecutionInfo);
-
-        }
-
     }
+
+    protected override string HookType => "BeforeSuite";
+
+
+    [DebuggerHidden]
+    public virtual async Task<ExecutionStatusResponse> Process(int streamId, ExecutionStartingRequest request)
+    {
+        if (Configuration.IsDebugging())
+        {
+            // if the runner is launched in DEBUG mode, let the debugger attach.
+            Console.WriteLine("Runner Ready for Debugging at Process ID " + Environment.ProcessId);
+            var j = 0;
+            while (!Debugger.IsAttached)
+            {
+                j++;
+                //Trying to debug, wait for a debugger to attach
+                Thread.Sleep(100);
+                //Timeout, no debugger connected, break out into a normal execution.
+                if (j == 300)
+                    break;
+            }
+        }
+        return await ExecuteHooks(streamId, request.CurrentExecutionInfo);
+    }
+
 }

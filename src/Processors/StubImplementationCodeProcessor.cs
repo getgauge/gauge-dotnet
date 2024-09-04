@@ -22,7 +22,7 @@ public class StubImplementationCodeProcessor : IGaugeProcessor<StubImplementatio
         _config = config;
     }
 
-    public async Task<FileDiff> Process(StubImplementationCodeRequest request)
+    public async Task<FileDiff> Process(int stream, StubImplementationCodeRequest request)
     {
         var stubs = request.Codes;
         var file = request.ImplementationFilePath;
