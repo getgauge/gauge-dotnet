@@ -8,7 +8,6 @@
 using System.Diagnostics;
 using System.Net;
 using System.Reflection;
-using Gauge.CSharp.Core;
 using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Extensions;
@@ -16,12 +15,15 @@ using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Logging.Console;
 
 namespace Gauge.Dotnet;
 
 internal static class Program
 {
+    private static ILogger _logger = null;
+
     [STAThread]
     [DebuggerHidden]
     private static async Task Main(string[] args)
@@ -39,10 +41,11 @@ internal static class Program
             builder.Logging.SetupLogging();
             builder.WebHost.ConfigureKestrel(opts =>
             {
-                opts.Listen(IPAddress.Parse("127.0.0.1"), 0);
+                opts.Listen(IPAddress.Parse("127.0.0.1"), 0, (opt) => { opt.Protocols = HttpProtocols.Http2; });
             });
             builder.Services.ConfigureServices(builder.Configuration);
             var app = builder.Build();
+            _logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Gauge");
 
             Environment.CurrentDirectory = app.Configuration.GetGaugeProjectRoot();
             var buildSucceeded = app.Services.GetRequiredService<IGaugeProjectBuilder>().BuildTargetGaugeProject();
@@ -74,17 +77,31 @@ internal static class Program
         }
         catch (TargetInvocationException e)
         {
-            if (!(e.InnerException is GaugeLibVersionMismatchException))
+            if (e.InnerException is not GaugeLibVersionMismatchException)
                 throw;
-            Logger.Fatal(e.InnerException.Message);
+            _logger?.LogCritical(e.InnerException.Message);
+            Environment.Exit(1);
         }
     }
 
     private static IConfigurationBuilder SetupConfiguration(this IConfigurationBuilder builder) =>
-        builder.AddJsonFile($"{Utils.GaugeProjectRoot}/appsettings.json", true).AddEnvironmentVariables();
+        builder.AddEnvironmentVariables();
 
     public static ILoggingBuilder SetupLogging(this ILoggingBuilder builder) =>
-        builder.AddConsole().AddConsoleFormatter<GaugeLoggingFormatter, ConsoleFormatterOptions>();
+        builder.ClearProviders()
+            .SetMinimumLevel(LogLevel.Debug)
+            .AddFilter("Microsoft", LogLevel.Error)
+            .AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Error)
+            .AddFilter("Grpc.AspNetCore", LogLevel.Error)
+            .AddConsole((opt) =>
+            {
+                opt.FormatterName = "GaugeLoggingFormatter";
+            })
+            .AddConsoleFormatter<GaugeLoggingFormatter, ConsoleFormatterOptions>((opt) =>
+            {
+                opt.IncludeScopes = true;
+                opt.TimestampFormat = "HH:mm:ss ";
+            });
 
 
     private static IServiceCollection ConfigureServices(this IServiceCollection services, IConfiguration config)
@@ -97,8 +114,8 @@ internal static class Program
         services.AddSingleton<IGaugeLoadContext>((sp) =>
         {
             return config.IsDaemon() ?
-                new LockFreeGaugeLoadContext(sp.GetRequiredService<IAssemblyLocater>()) :
-                new GaugeLoadContext(sp.GetRequiredService<IAssemblyLocater>());
+                new LockFreeGaugeLoadContext(sp.GetRequiredService<IAssemblyLocater>(), sp.GetRequiredService<ILogger<LockFreeGaugeLoadContext>>()) :
+                new GaugeLoadContext(sp.GetRequiredService<IAssemblyLocater>(), sp.GetRequiredService<ILogger<GaugeLoadContext>>());
         });
         services.AddSingleton<IAssemblyLoader, AssemblyLoader>();
         services.AddSingleton<IDirectoryWrapper, DirectoryWrapper>();

@@ -18,8 +18,6 @@ internal class RefactorHelperTests
     [SetUp]
     public void Setup()
     {
-        Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _testProjectPath);
-
         File.Copy(Path.Combine(_testProjectPath, "RefactoringSample.cs"),
             Path.Combine(_testProjectPath, "RefactoringSample.copy"), true);
     }
@@ -30,7 +28,6 @@ internal class RefactorHelperTests
         var sourceFileName = Path.Combine(_testProjectPath, "RefactoringSample.copy");
         File.Copy(sourceFileName, Path.Combine(_testProjectPath, "RefactoringSample.cs"), true);
         File.Delete(sourceFileName);
-        Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
     }
 
     private readonly string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();

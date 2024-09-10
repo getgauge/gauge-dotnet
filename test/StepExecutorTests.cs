@@ -9,12 +9,15 @@ using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.UnitTests.Helpers;
+using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet.UnitTests;
 
 [TestFixture]
 internal class StepExecutorTests
 {
+    private readonly Mock<ILogger<StepExecutor>> _logger = new();
+
     [Test]
     public async Task ShoudExecuteStep()
     {
@@ -34,7 +37,7 @@ internal class StepExecutorTests
         mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(typeof(IClassInstanceManager));
         mockAssemblyLoader.Setup(x => x.GetClassInstanceManager()).Returns(mockClassInstanceManager.Object);
 
-        var executor = new StepExecutor(mockAssemblyLoader.Object);
+        var executor = new StepExecutor(mockAssemblyLoader.Object, _logger.Object);
 
         var result = await executor.Execute(gaugeMethod, 1);
         ClassicAssert.True(result.Success);
@@ -59,7 +62,7 @@ internal class StepExecutorTests
         mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(typeof(IClassInstanceManager));
         mockAssemblyLoader.Setup(x => x.GetClassInstanceManager()).Returns(mockClassInstanceManager.Object);
 
-        var executor = new StepExecutor(mockAssemblyLoader.Object);
+        var executor = new StepExecutor(mockAssemblyLoader.Object, _logger.Object);
         mockClassInstanceManager.Setup(x => x.InvokeMethod(methodInfo, 1, It.IsAny<object[]>()))
             .Throws(new Exception("step execution failure"));
 
@@ -89,7 +92,7 @@ internal class StepExecutorTests
         mockAssemblyLoader.Setup(x => x.ClassInstanceManagerType).Returns(typeof(IClassInstanceManager));
         mockAssemblyLoader.Setup(x => x.GetClassInstanceManager()).Returns(mockClassInstanceManager.Object);
 
-        var executor = new StepExecutor(mockAssemblyLoader.Object);
+        var executor = new StepExecutor(mockAssemblyLoader.Object, _logger.Object);
         mockClassInstanceManager.Setup(x => x.InvokeMethod(methodInfo, 1, It.IsAny<object[]>()))
             .Throws(new Exception("step execution failure"));
 

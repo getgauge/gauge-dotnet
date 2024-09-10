@@ -18,8 +18,6 @@ namespace Gauge.Dotnet.IntegrationTests
         [SetUp]
         public void Setup()
         {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _testProjectPath);
-
             File.Copy(Path.Combine(_testProjectPath, "RefactoringSample.cs"),
                 Path.Combine(_testProjectPath, "RefactoringSample.copy1"), true);
         }
@@ -71,7 +69,6 @@ namespace Gauge.Dotnet.IntegrationTests
             var sourceFileName = Path.Combine(_testProjectPath, "RefactoringSample.copy1");
             File.Copy(sourceFileName, Path.Combine(_testProjectPath, "RefactoringSample.cs"), true);
             File.Delete(sourceFileName);
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
         }
     }
 }

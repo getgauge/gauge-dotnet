@@ -29,19 +29,29 @@ public abstract class DataStoreInitProcessorBase
             var factoryType = _assemblyLoader.GetLibType(LibType.DataStoreFactory);
             var methodInfo = factoryType.GetMethod("AddDataStore", BindingFlags.NonPublic | BindingFlags.Static);
             methodInfo.Invoke(null, new object[] { stream, _dataStoreType });
+            return new ExecutionStatusResponse
+            {
+                ExecutionResult = new ProtoExecutionResult
+                {
+                    Failed = false,
+                    ExecutionTime = 0
+                }
+            };
         }
         catch (Exception ex)
         {
-            Logger.Error($"*** Failed with the following error: {ex.Message}");
-            throw;
-        }
-        return new ExecutionStatusResponse
-        {
-            ExecutionResult = new ProtoExecutionResult
+            var executionResult = new ProtoExecutionResult
             {
-                Failed = false,
+                Failed = true,
                 ExecutionTime = 0
-            }
-        };
+            };
+            var innerException = ex.InnerException ?? ex;
+            executionResult.ErrorMessage = innerException.Message;
+            executionResult.StackTrace = innerException is AggregateException
+                ? innerException.ToString()
+                : innerException.StackTrace;
+
+            return new ExecutionStatusResponse { ExecutionResult = executionResult };
+        }
     }
 }

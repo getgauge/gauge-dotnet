@@ -4,24 +4,22 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
-
-
-using Gauge.CSharp.Core;
+using Gauge.Dotnet.Extensions;
 
 namespace Gauge.Dotnet.Helpers;
 
-public class FileHelper
+public static class FileHelper
 {
-    public static IEnumerable<string> GetRemovedDirFiles()
+    public static IEnumerable<string> GetRemovedDirFiles(IConfiguration config)
     {
         var removedFiles = new List<string>();
-        var excludedDirs = Environment.GetEnvironmentVariable("gauge_exclude_dirs");
+        var excludedDirs = config.GetGaugeExcludeDirs();
         if (excludedDirs == null) return removedFiles;
 
         var excludedDir = excludedDirs.Split(",").Select(dir => dir.Trim()).ToList();
         foreach (var dir in excludedDir)
         {
-            var dirpath = Path.Combine(Utils.GaugeProjectRoot, dir);
+            var dirpath = Path.Combine(config.GetGaugeProjectRoot(), dir);
             if (!Directory.Exists(dirpath)) continue;
             removedFiles.AddRange(Directory.EnumerateFiles(dirpath, "*.cs",
                 SearchOption.AllDirectories));

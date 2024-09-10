@@ -15,10 +15,12 @@ namespace Gauge.Dotnet;
 public class GaugeProjectBuilder : IGaugeProjectBuilder
 {
     private readonly IConfiguration _config;
+    private readonly ILogger<GaugeProjectBuilder> _logger;
 
-    public GaugeProjectBuilder(IConfiguration config)
+    public GaugeProjectBuilder(IConfiguration config, ILogger<GaugeProjectBuilder> logger)
     {
         _config = config;
+        _logger = logger;
     }
 
     public bool BuildTargetGaugeProject()
@@ -63,13 +65,16 @@ public class GaugeProjectBuilder : IGaugeProjectBuilder
         }
         catch (NotAValidGaugeProjectException)
         {
-            Logger.Fatal($"Cannot locate a Project File in {_config.GetGaugeProjectRoot()}");
-            return false;
+            _logger.LogCritical("Cannot locate a Project File in {ProjectRoot}", _config.GetGaugeProjectRoot());
+            throw;
         }
         catch (Exception ex)
         {
             if (!_config.IgnoreBuildFailures())
-                Logger.Fatal($"Unable to build Project in {_config.GetGaugeProjectRoot()}\n{ex.Message}\n{ex.StackTrace}");
+            {
+                _logger.LogCritical("Unable to build Project in {ProjectRoot}\n{Message}\n{StackTrace}", _config.GetGaugeProjectRoot(), ex.Message, ex.StackTrace);
+                throw;
+            }
             return false;
         }
     }
@@ -83,8 +88,8 @@ public class GaugeProjectBuilder : IGaugeProjectBuilder
             Arguments = args
         };
         var buildProcess = new Process { EnableRaisingEvents = true, StartInfo = startInfo };
-        buildProcess.OutputDataReceived += (sender, e) => { Logger.Debug(e.Data); };
-        buildProcess.ErrorDataReceived += (sender, e) => { Logger.Error(e.Data); };
+        buildProcess.OutputDataReceived += (sender, e) => { _logger.LogDebug(e.Data); };
+        buildProcess.ErrorDataReceived += (sender, e) => { _logger.LogError(e.Data); };
         buildProcess.Start();
         buildProcess.WaitForExit();
         return buildProcess.ExitCode;

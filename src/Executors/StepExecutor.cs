@@ -15,11 +15,13 @@ namespace Gauge.Dotnet.Executors;
 public class StepExecutor : MethodExecutor, IStepExecutor
 {
     private readonly IAssemblyLoader _assemblyLoader;
+    private readonly ILogger<StepExecutor> _logger;
 
-    public StepExecutor(IAssemblyLoader assemblyLoader)
+    public StepExecutor(IAssemblyLoader assemblyLoader, ILogger<StepExecutor> logger)
         : base(assemblyLoader)
     {
         _assemblyLoader = assemblyLoader;
+        _logger = logger;
     }
 
     public async Task<ExecutionResult> Execute(GaugeMethod gaugeMethod, int streamId, params string[] args)
@@ -44,7 +46,7 @@ public class StepExecutor : MethodExecutor, IStepExecutor
                         return o;
                     }
                 }).ToArray();
-                Logger.Debug($"Executing method: {gaugeMethod.Name}");
+                _logger.LogDebug("Executing method: {MethodName}", gaugeMethod.Name);
                 await Execute(method, streamId, StringParamConverter.TryConvertParams(method, parameters));
                 executionResult.Success = true;
             }
@@ -54,7 +56,7 @@ public class StepExecutor : MethodExecutor, IStepExecutor
                 if (baseException != null &&
                     baseException.GetType().Name.Contains("SkipScenario", StringComparison.OrdinalIgnoreCase))
                 {
-                    Logger.Debug($"Skipping scenario when executing method: {method.Name} : {baseException.Message}");
+                    _logger.LogDebug("Skipping scenario when executing method: {MethodName} : {ExceptionMessage}", method.Name, baseException.Message);
                     executionResult.ExceptionMessage = baseException.Message;
                     executionResult.StackTrace = baseException.StackTrace;
                     executionResult.Source = baseException.Source;
@@ -63,7 +65,7 @@ public class StepExecutor : MethodExecutor, IStepExecutor
                 }
                 else
                 {
-                    Logger.Debug($"Error executing {method.Name} : {ex.Message}");
+                    _logger.LogDebug("Error executing {MethodName} : {ExceptionMessage}", method.Name, method.Name);
                     var innerException = ex.InnerException ?? ex;
                     executionResult.ExceptionMessage = innerException.Message;
                     executionResult.StackTrace = innerException is AggregateException

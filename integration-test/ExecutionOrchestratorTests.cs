@@ -9,6 +9,7 @@ using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
+using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet.IntegrationTests;
 
@@ -20,13 +21,14 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     {
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
+        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
+        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
-            new StepExecutor(assemblyLoader));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), _configuration, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
         var gaugeMethod = assemblyLoader.GetStepRegistry()
             .MethodFor("I throw a serializable exception and continue");
         var executionResult = await orchestrator.ExecuteStep(gaugeMethod, 1);
@@ -39,13 +41,14 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     {
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
+        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
+        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
-            new StepExecutor(assemblyLoader));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), _configuration, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
         var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("Step that takes a table {}");
         var table = new Table(new List<string> { "foo", "bar" });
         table.AddRow(new List<string> { "foorow1", "barrow1" });
@@ -60,13 +63,14 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     {
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
+        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
+        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
-            new StepExecutor(assemblyLoader));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), _configuration, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
         var gaugeMethod = assemblyLoader.GetStepRegistry()
             .MethodFor("A context step which gets executed before every scenario");
 
@@ -80,13 +84,14 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     {
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
+        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
+        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
-            new StepExecutor(assemblyLoader));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), _configuration, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
 
         var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("Say {} to {}");
 
@@ -101,13 +106,14 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     {
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
+        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
+        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
-            new StepExecutor(assemblyLoader));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), _configuration, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
 
         var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an AggregateException");
         var executionResult = await executionOrchestrator.ExecuteStep(gaugeMethod, 1);
@@ -122,8 +128,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     {
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
+        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
+        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var registry = assemblyLoader.GetStepRegistry();
         var gaugeMethod = registry.MethodFor("and an alias");
         var stepTexts = gaugeMethod.Aliases.ToList();
@@ -138,13 +145,14 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         const string expectedMessage = "I am a custom serializable exception";
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
+        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
+        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
-            new StepExecutor(assemblyLoader));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), _configuration, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
         var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw a serializable exception");
 
         var executionResult = await executionOrchestrator.ExecuteStep(gaugeMethod, 1);
@@ -161,13 +169,14 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         const string expectedMessage = "I am a custom exception";
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
+        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
+        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
-            new StepExecutor(assemblyLoader));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), _configuration, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
 
         var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an unserializable exception");
         var executionResult = await executionOrchestrator.ExecuteStep(gaugeMethod, 1);

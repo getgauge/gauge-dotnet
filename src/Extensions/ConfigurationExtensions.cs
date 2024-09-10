@@ -11,6 +11,9 @@ public static class ConfigurationExtensions
     public static bool IsMultithreading(this IConfiguration config) =>
         config.GetValue("ENABLE_MULTITHREADING", false);
 
+    public static bool ScreenshotOnFailure(this IConfiguration config) =>
+        config.GetValue("SCREENSHOT_ON_FAILURE", true);
+
     public static bool IsDebugging(this IConfiguration config) =>
         config.GetValue("DEBUGGING", false);
 
@@ -38,6 +41,9 @@ public static class ConfigurationExtensions
     public static string GetGaugeClearStateFlag(this IConfiguration config) =>
         config.GetValue<string>("GAUGE_CLEAR_STATE_LEVEL");
 
+    public static string GetGaugeExcludeDirs(this IConfiguration config) =>
+        config.GetValue<string>("GAUGE_EXCLUDE_DIRS");
+
     public static string GetGaugeBinDir(this IConfiguration config)
     {
         var customBuildPath = config.GetValue<string>("GAUGE_CUSTOM_BUILD_PATH");
@@ -53,26 +59,5 @@ public static class ConfigurationExtensions
         {
             return Path.Combine(config.GetGaugeProjectRoot(), "gauge_bin");
         }
-    }
-
-    public static int GetNumberOfParallelStreams(this IConfiguration config)
-    {
-        int numberOfStreams = 1;
-        if (config.IsMultithreading())
-        {
-            var streamsCount = config.GetValue<string>("GAUGE_PARALLEL_STREAMS_COUNT");
-            try
-            {
-                numberOfStreams = int.Parse(streamsCount);
-                Logger.Debug($"Multithreading enabled, number of threads={numberOfStreams}");
-            }
-            catch (Exception e)
-            {
-                Logger.Debug($"Multithreading enabled, but could not read GAUGE_PARALLEL_STREAMS_COUNT as int. Got GAUGE_PARALLEL_STREAMS_COUNT={streamsCount}");
-                Logger.Debug($"Using numberOfStreams=1, err: {e.Message}");
-            }
-        }
-        return numberOfStreams;
-
     }
 }

@@ -6,7 +6,6 @@
 
 
 using System.Text.RegularExpressions;
-using Gauge.CSharp.Core;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Helpers;
 using Gauge.Dotnet.Models;
@@ -21,13 +20,17 @@ public sealed class StaticLoader : IStaticLoader
     private readonly IAttributesLoader _attributesLoader;
     private readonly IDirectoryWrapper _directoryWrapper;
     private readonly IStepRegistry _stepRegistry;
+    private readonly IConfiguration _config;
+    private readonly ILogger<StaticLoader> _logger;
 
 
-    public StaticLoader(IAttributesLoader attributesLoader, IDirectoryWrapper directoryWrapper)
+    public StaticLoader(IAttributesLoader attributesLoader, IDirectoryWrapper directoryWrapper, IConfiguration config, ILogger<StaticLoader> logger)
     {
         _stepRegistry = new StepRegistry();
         _attributesLoader = attributesLoader;
         _directoryWrapper = directoryWrapper;
+        _config = config;
+        _logger = logger;
         LoadImplementations();
         _stepRegistry = GetStepRegistry();
     }
@@ -59,30 +62,30 @@ public sealed class StaticLoader : IStaticLoader
     private bool IsFileRemoved(string file)
     {
         var attributes = _attributesLoader.GetRemovedAttributes();
-        var removedFiles = FileHelper.GetRemovedDirFiles();
+        var removedFiles = FileHelper.GetRemovedDirFiles(_config);
 
         var isFileRemoved =
-            attributes.Any(attribute => Path.Combine(Utils.GaugeProjectRoot, attribute.Value) == file) ||
+            attributes.Any(attribute => Path.Combine(_config.GetGaugeProjectRoot(), attribute.Value) == file) ||
             removedFiles.Contains(file);
         return isFileRemoved;
     }
 
     public void LoadImplementations()
     {
-        if (!string.IsNullOrEmpty(Utils.TryReadEnvValue("GAUGE_CUSTOM_BUILD_PATH")))
+        if (!string.IsNullOrEmpty(_config.GetGaugeCustomBuildPath()))
         {
-            Logger.Debug("GAUGE_CUSTOM_BUILD_PATH is set, skipping static loading");
+            _logger.LogDebug("GAUGE_CUSTOM_BUILD_PATH is set, skipping static loading");
             return;
         }
 
-        var classFiles = _directoryWrapper.EnumerateFiles(Utils.GaugeProjectRoot, "*.cs",
+        var classFiles = _directoryWrapper.EnumerateFiles(_config.GetGaugeProjectRoot(), "*.cs",
             SearchOption.AllDirectories).ToList();
         var attributes = _attributesLoader.GetRemovedAttributes();
         foreach (var attribute in attributes)
         {
-            classFiles.Remove(Path.Combine(Utils.GaugeProjectRoot, attribute.Value));
+            classFiles.Remove(Path.Combine(_config.GetGaugeProjectRoot(), attribute.Value));
         }
-        var removedFiles = FileHelper.GetRemovedDirFiles();
+        var removedFiles = FileHelper.GetRemovedDirFiles(_config);
         var wantedFiles = classFiles.Except(removedFiles);
         foreach (var f in wantedFiles)
         {

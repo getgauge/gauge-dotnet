@@ -11,6 +11,7 @@ using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.UnitTests.Helpers;
 using Gauge.Messages;
+using Microsoft.Extensions.Logging;
 using ExecutionContext = Gauge.CSharp.Lib.ExecutionContext;
 
 namespace Gauge.Dotnet.UnitTests;
@@ -18,11 +19,14 @@ namespace Gauge.Dotnet.UnitTests;
 [TestFixture]
 internal class HookExecutorTests
 {
+    private readonly Mock<ILogger<HookExecutor>> mockLogger = new();
+
     [Test]
     public async Task ShoudExecuteHooks()
     {
         var mockClassInstanceManager = new Mock<IClassInstanceManager>();
         var mockHookRegistry = new Mock<IHookRegistry>();
+        var mockLogger = new Mock<ILogger<HookExecutor>>();
 
         var mockAssemblyLoader = new Mock<IAssemblyLoader>();
         var type = LibType.BeforeSuite;
@@ -41,7 +45,7 @@ internal class HookExecutorTests
         var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
         mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>())).Returns(new { });
 
-        var executor = new HookExecutor(mockAssemblyLoader.Object, mockExecutionInfoMapper.Object, mockHookRegistry.Object);
+        var executor = new HookExecutor(mockAssemblyLoader.Object, mockExecutionInfoMapper.Object, mockHookRegistry.Object, mockLogger.Object);
 
         var result = await executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(), 1, new ExecutionInfo());
         ClassicAssert.True(result.Success, $"Hook execution failed: {result.ExceptionMessage}\n{result.StackTrace}");
@@ -75,7 +79,7 @@ internal class HookExecutorTests
 
         mockClassInstanceManager.Setup(x => x.InvokeMethod(methodInfo, 1, expectedExecutionInfo)).Verifiable();
 
-        var executor = new HookExecutor(mockAssemblyLoader.Object, mockExecutionInfoMapper.Object, mockHookRegistry.Object);
+        var executor = new HookExecutor(mockAssemblyLoader.Object, mockExecutionInfoMapper.Object, mockHookRegistry.Object, mockLogger.Object);
 
         var result = await executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(), 1, executionInfo);
         ClassicAssert.True(result.Success, $"Hook execution failed: {result.ExceptionMessage}\n{result.StackTrace}");
@@ -106,7 +110,7 @@ internal class HookExecutorTests
         var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
         mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>()))
             .Returns(expectedExecutionInfo);
-        var executor = new HookExecutor(mockAssemblyLoader.Object, mockExecutionInfoMapper.Object, mockHookRegistry.Object);
+        var executor = new HookExecutor(mockAssemblyLoader.Object, mockExecutionInfoMapper.Object, mockHookRegistry.Object, mockLogger.Object);
         mockClassInstanceManagerType.Setup(x => x.InvokeMethod(methodInfo, 1, It.IsAny<object[]>()))
             .Throws(new Exception("hook failed"));
 

@@ -10,6 +10,7 @@ using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
+using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet.IntegrationTests;
 
@@ -22,13 +23,14 @@ public class ExecuteStepProcessorTests : IntegrationTestsBase
         const string stepText = "Step that takes a table <table>";
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
-        var assemblyLocater = new AssemblyLocater(new DirectoryWrapper());
-        var assemblyLoader = new AssemblyLoader(assemblyLocater, new GaugeLoadContext(assemblyLocater), reflectionWrapper, activatorWrapper, new StepRegistry());
+        var assemblyLocater = new AssemblyLocater(new DirectoryWrapper(), _configuration);
+        var assemblyLoader = new AssemblyLoader(assemblyLocater, new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var hookRegistry = new HookRegistry(assemblyLoader);
         var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
-            new StepExecutor(assemblyLoader));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), _configuration, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
 
         var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
             orchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
@@ -74,13 +76,14 @@ public class ExecuteStepProcessorTests : IntegrationTestsBase
         const string stepText = "I throw a serializable exception";
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
+        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
+        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
-            new StepExecutor(assemblyLoader));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), _configuration, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
 
         var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
             orchestrator, new TableFormatter(assemblyLoader, activatorWrapper));

@@ -26,7 +26,7 @@ public class ImplementationFileListProcessor : IGaugeProcessor<Empty, Implementa
             classFiles.Remove(Path.Combine(_config.GetGaugeProjectRoot(), attribute.Value));
         }
 
-        var removedFiles = FileHelper.GetRemovedDirFiles();
+        var removedFiles = FileHelper.GetRemovedDirFiles(_config);
 
         response.ImplementationFilePaths.AddRange(classFiles.Except(removedFiles));
         return Task.FromResult(response);

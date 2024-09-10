@@ -6,29 +6,28 @@
 
 
 using System.Reflection;
-using Gauge.CSharp.Core;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet.UnitTests;
 
 [TestFixture]
 public class ExecutionOrchestratorTests
 {
+    private readonly Mock<ILogger<ExecutionOrchestrator>> _logger = new();
+    private IConfiguration _config;
+
     [SetUp]
     public void Setup()
     {
-        Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT",
-            Directory.GetDirectoryRoot(Assembly.GetExecutingAssembly().Location));
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
+        _config = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string> { { "GAUGE_PROJECT_ROOT", Directory.GetDirectoryRoot(Assembly.GetExecutingAssembly().Location) } })
+            .Build();
     }
 
     [Test]
@@ -59,7 +58,7 @@ public class ExecutionOrchestratorTests
             .Returns(pendingScreenshots);
         var assemblyLoader = mockAssemblyLoader.Object;
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            mockHookExecuter.Object, mockStepExecuter.Object);
+            mockHookExecuter.Object, mockStepExecuter.Object, _config, _logger.Object);
 
         var result = await executionOrchestrator.ExecuteHooks("hooks", hooksStrategy, new List<string>(), 1, It.IsAny<ExecutionInfo>());
 
@@ -70,6 +69,7 @@ public class ExecutionOrchestratorTests
     [Test]
     public async Task ShouldExecuteHooksAndNotTakeScreenshotOnFailureWhenDisabled()
     {
+        _config["SCREENSHOT_ON_FAILURE"] = "false";
         var pendingMessages = new List<string> { "Foo", "Bar" };
         var pendingScreenshots = new List<string> { "screenshot.png" };
         var hooksStrategy = new HooksStrategy();
@@ -87,7 +87,7 @@ public class ExecutionOrchestratorTests
         var reflectionWrapper = mockReflectionWrapper.Object;
         var assemblyLoader = mockAssemblyLoader.Object;
         var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            mockHookExecuter.Object, mockStepExecuter.Object);
+            mockHookExecuter.Object, mockStepExecuter.Object, _config, _logger.Object);
         mockHookExecuter.Setup(executor =>
             executor.Execute("hooks", hooksStrategy, new List<string>(), It.IsAny<int>(), It.IsAny<ExecutionInfo>())
         ).ReturnsAsync(executionResult).Verifiable();
@@ -102,15 +102,11 @@ public class ExecutionOrchestratorTests
                 x.InvokeMethod(mockType, null, "GetAllPendingScreenshotFiles", It.IsAny<BindingFlags>()))
             .Returns(pendingScreenshots);
 
-        var screenshotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
-        Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", "false");
-
         var result = await orchestrator.ExecuteHooks("hooks", hooksStrategy, new List<string>(), 1, It.IsAny<ExecutionInfo>());
 
         mockHookExecuter.VerifyAll();
         ClassicAssert.True(result.Failed);
         ClassicAssert.True(string.IsNullOrEmpty(result.FailureScreenshotFile));
-        Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", screenshotEnabled);
     }
 
     [Test]
@@ -132,7 +128,7 @@ public class ExecutionOrchestratorTests
             .Callback(() => Thread.Sleep(1)); // Simulate a delay in method execution
 
         var orchestrator = new ExecutionOrchestrator(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
-            mockHookExecuter.Object, mockStepExecutor.Object);
+            mockHookExecuter.Object, mockStepExecutor.Object, _config, _logger.Object);
 
         var mockType = new Mock<Type>().Object;
         mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
@@ -153,6 +149,8 @@ public class ExecutionOrchestratorTests
     [Test]
     public async Task ShouldNotTakeScreenShotWhenDisabled()
     {
+        _config["SCREENSHOT_ON_FAILURE"] = "false";
+
         var pendingMessages = new List<string> { "Foo", "Bar" };
         var pendingScreenshots = new List<string> { "screenshot.png" };
         var gaugeMethod = new GaugeMethod { Name = "ShouldNotTakeScreenShotWhenDisabled", ParameterCount = 1 };
@@ -182,16 +180,12 @@ public class ExecutionOrchestratorTests
             .Returns(pendingScreenshots);
 
         var orchestrator = new ExecutionOrchestrator(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
-            mockHookExecuter.Object, mockStepExecutor.Object);
-
-        var screenshotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
-        Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", "false");
+            mockHookExecuter.Object, mockStepExecutor.Object, _config, _logger.Object);
 
         var result = await orchestrator.ExecuteStep(gaugeMethod, 1, "Bar", "string");
 
         mockStepExecutor.VerifyAll();
         ClassicAssert.True(string.IsNullOrEmpty(result.FailureScreenshotFile));
-        Environment.SetEnvironmentVariable("SCREENSHOT_ON_FAILURE", screenshotEnabled);
     }
 
     [Test]
@@ -226,7 +220,7 @@ public class ExecutionOrchestratorTests
             .Returns(pendingScreenshots);
 
         var orchestrator = new ExecutionOrchestrator(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
-            mockHookExecuter.Object, mockStepExecutor.Object);
+            mockHookExecuter.Object, mockStepExecutor.Object, _config, _logger.Object);
 
         var result = await orchestrator.ExecuteStep(gaugeMethod, 1, "Bar", "String");
         mockStepExecutor.VerifyAll();

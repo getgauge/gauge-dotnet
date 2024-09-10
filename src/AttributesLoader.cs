@@ -5,19 +5,24 @@
  *----------------------------------------------------------------*/
 
 
-using System.Collections.Generic;
 using System.Xml.Linq;
-using Gauge.CSharp.Core;
+using Gauge.Dotnet.Extensions;
 
-namespace Gauge.Dotnet
+namespace Gauge.Dotnet;
+
+public class AttributesLoader : IAttributesLoader
 {
-    public class AttributesLoader : IAttributesLoader
+    private readonly IConfiguration _config;
+
+    public AttributesLoader(IConfiguration config)
     {
-        public virtual IEnumerable<XAttribute> GetRemovedAttributes()
-        {
-            var xmldoc = XDocument.Load(Utils.ReadEnvValue("GAUGE_CSHARP_PROJECT_FILE"));
-            var attributes = xmldoc.Descendants().Attributes("Remove");
-            return attributes;
-        }
+        _config = config;
+    }
+
+    public virtual IEnumerable<XAttribute> GetRemovedAttributes()
+    {
+        var xmldoc = XDocument.Load(_config.GetGaugeCSharpProjectFile());
+        var attributes = xmldoc.Descendants().Attributes("Remove");
+        return attributes;
     }
 }

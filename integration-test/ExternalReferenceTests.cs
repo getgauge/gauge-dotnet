@@ -10,19 +10,28 @@ using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet.IntegrationTests;
 
 public class ExternalReferenceTests
 {
+    protected readonly ILoggerFactory _loggerFactory = new LoggerFactory();
+
     [Test]
     [TestCase("DllReference", "Dll Reference: Vowels in English language are {}.", "Dll Reference: Vowels in English language are <vowelString>.", "Dll Reference: Vowels in English language are \"aeiou\".")]
     [TestCase("ProjectReference", "Project Reference: Vowels in English language are {}.", "Project Reference: Vowels in English language are <vowelString>.", "Project Reference: Vowels in English language are \"aeiou\".")]
     public async Task ShouldGetStepsFromReference(string referenceType, string stepText, string stepValue, string parameterizedStepValue)
     {
-        Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TestUtils.GetIntegrationTestSampleDirectory(referenceType));
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), new ReflectionWrapper(), new ActivatorWrapper(), new StepRegistry());
+        var testProjectPath = TestUtils.GetIntegrationTestSampleDirectory(referenceType);
+        var builder = new ConfigurationBuilder();
+        builder.AddInMemoryCollection(new Dictionary<string, string> { { "GAUGE_PROJECT_ROOT", testProjectPath } });
+        var config = builder.Build();
+
+        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), config);
+        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()),
+            new ReflectionWrapper(), new ActivatorWrapper(), new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
 
         var stepValidationProcessor = new StepValidationProcessor(assemblyLoader.GetStepRegistry());
         var message = new StepValidateRequest
@@ -42,16 +51,21 @@ public class ExternalReferenceTests
     [TestCase("DllReference", "Take Screenshot in reference DLL", "ReferenceDll-IDoNotExist.png")]
     public async Task ShouldRegisterScreenshotWriterFromReference(string referenceType, string stepText, string expected)
     {
-        Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", TestUtils.GetIntegrationTestSampleDirectory(referenceType));
+        var testProjectPath = TestUtils.GetIntegrationTestSampleDirectory(referenceType);
+        var builder = new ConfigurationBuilder();
+        builder.AddInMemoryCollection(new Dictionary<string, string> { { "GAUGE_PROJECT_ROOT", testProjectPath } });
+        var config = builder.Build();
+
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper();
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper());
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator), reflectionWrapper, activatorWrapper, new StepRegistry());
+        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), config);
+        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<StepExecutor>()), reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry),
-            new StepExecutor(assemblyLoader));
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), config, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
 
         var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
             executionOrchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
@@ -68,11 +82,5 @@ public class ExternalReferenceTests
         ClassicAssert.IsNotNull(protoExecutionResult);
         Console.WriteLine(protoExecutionResult.ScreenshotFiles[0]);
         ClassicAssert.AreEqual(protoExecutionResult.ScreenshotFiles[0], expected);
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
     }
 }

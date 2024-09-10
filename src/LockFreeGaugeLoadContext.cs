@@ -17,15 +17,15 @@ namespace Gauge.Dotnet;
 // cause BadImageFormatException at runtime. */
 public class LockFreeGaugeLoadContext : GaugeLoadContext
 {
-    public LockFreeGaugeLoadContext(IAssemblyLocater locater)
-        : base(locater)
+    public LockFreeGaugeLoadContext(IAssemblyLocater locater, ILogger logger)
+        : base(locater, logger)
     {
     }
 
     protected override Assembly Load(AssemblyName assemblyName)
     {
         var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
-        Logger.Debug($"Try load {assemblyName.Name} in LockFreeGaugeLoadContext");
+        _logger.LogDebug("Try load {AssemblyName} in LockFreeGaugeLoadContext", assemblyName.Name);
         if (assemblyPath != null)
         {
             using (var fileStream = System.IO.File.OpenRead(assemblyPath))

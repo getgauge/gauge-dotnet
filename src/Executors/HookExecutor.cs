@@ -17,13 +17,15 @@ public class HookExecutor : MethodExecutor, IHookExecutor
     private readonly IAssemblyLoader _assemblyLoader;
     private readonly IHookRegistry _registry;
     private readonly IExecutionInfoMapper _executionInfoMapper;
+    private readonly ILogger<HookExecutor> _logger;
 
-    public HookExecutor(IAssemblyLoader assemblyLoader, IExecutionInfoMapper mapper, IHookRegistry registry)
+    public HookExecutor(IAssemblyLoader assemblyLoader, IExecutionInfoMapper mapper, IHookRegistry registry, ILogger<HookExecutor> logger)
         : base(assemblyLoader)
     {
         _assemblyLoader = assemblyLoader;
         _registry = registry;
         _executionInfoMapper = mapper;
+        _logger = logger;
     }
 
     public async Task<ExecutionResult> Execute(string hookType, IHooksStrategy strategy, IList<string> applicableTags, int streamId, ExecutionInfo info)
@@ -48,7 +50,7 @@ public class HookExecutor : MethodExecutor, IHookExecutor
                 if (baseException != null &&
                     baseException.GetType().Name.Contains("SkipScenario", StringComparison.OrdinalIgnoreCase))
                 {
-                    Logger.Debug($"Skipping scenario when executing hook: {methodInfo.DeclaringType.FullName}.{methodInfo.Name} : {baseException.Message}");
+                    _logger.LogDebug("Skipping scenario when executing hook: {ClassFullName}.{MethodName} : {ExceptionMessage}", methodInfo.DeclaringType.FullName, methodInfo.Name, baseException.Message);
                     executionResult.StackTrace = baseException.StackTrace;
                     executionResult.ExceptionMessage = baseException.Message;
                     executionResult.Source = baseException.Source;
@@ -57,7 +59,7 @@ public class HookExecutor : MethodExecutor, IHookExecutor
                 }
                 else
                 {
-                    Logger.Debug($"{hookType} Hook execution failed : {methodInfo.DeclaringType.FullName}.{methodInfo.Name}");
+                    _logger.LogDebug("{HookType} Hook execution failed : {ClassFullName}.{MethodName}", hookType, methodInfo.DeclaringType.FullName, methodInfo.Name);
                     var innerException = ex.InnerException ?? ex;
                     executionResult.ExceptionMessage = innerException.Message;
                     executionResult.StackTrace = innerException.StackTrace;

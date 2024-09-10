@@ -5,8 +5,8 @@
  *----------------------------------------------------------------*/
 
 
-using Gauge.CSharp.Core;
 using Gauge.Dotnet.Exceptions;
+using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Wrappers;
 
 namespace Gauge.Dotnet;
@@ -14,15 +14,17 @@ namespace Gauge.Dotnet;
 public class AssemblyLocater : IAssemblyLocater
 {
     private readonly IDirectoryWrapper _directoryWrapper;
+    private readonly IConfiguration _config;
 
-    public AssemblyLocater(IDirectoryWrapper directoryWrapper)
+    public AssemblyLocater(IDirectoryWrapper directoryWrapper, IConfiguration config)
     {
         _directoryWrapper = directoryWrapper;
+        _config = config;
     }
 
     public string GetTestAssembly()
     {
-        var gaugeBinDir = Utils.GetGaugeBinDir();
+        var gaugeBinDir = _config.GetGaugeBinDir();
         try
         {
             return _directoryWrapper

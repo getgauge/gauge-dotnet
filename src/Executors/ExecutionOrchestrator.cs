@@ -7,7 +7,7 @@
 
 using System.Diagnostics;
 using System.Reflection;
-using Gauge.CSharp.Core;
+using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
@@ -22,14 +22,19 @@ public class ExecutionOrchestrator : IExecutionOrchestrator
     private readonly IHookExecutor _hookExecutor;
     private readonly IReflectionWrapper _reflectionWrapper;
     private readonly IStepExecutor _stepExecutor;
+    private readonly IConfiguration _config;
+    private readonly ILogger<ExecutionOrchestrator> _logger;
 
-    public ExecutionOrchestrator(IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader, IHookExecutor hookExecutor, IStepExecutor stepExecutor)
+    public ExecutionOrchestrator(IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader, IHookExecutor hookExecutor, IStepExecutor stepExecutor,
+        IConfiguration config, ILogger<ExecutionOrchestrator> logger)
     {
         _reflectionWrapper = reflectionWrapper;
         _assemblyLoader = assemblyLoader;
         _classInstanceManager = assemblyLoader.GetClassInstanceManager();
         _hookExecutor = hookExecutor;
         _stepExecutor = stepExecutor;
+        _config = config;
+        _logger = logger;
     }
 
 
@@ -105,8 +110,7 @@ public class ExecutionOrchestrator : IExecutionOrchestrator
 
         var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
         result.Failed = true;
-        var isScreenShotEnabled = Utils.TryReadEnvValue("SCREENSHOT_ON_FAILURE");
-        if (isScreenShotEnabled == null || isScreenShotEnabled.ToLower() != "false")
+        if (_config.ScreenshotOnFailure())
         {
             var screenshotFile = TryScreenCapture();
             if (!string.IsNullOrEmpty(screenshotFile))
@@ -128,7 +132,7 @@ public class ExecutionOrchestrator : IExecutionOrchestrator
         }
         catch (Exception ex)
         {
-            Logger.Warning($"Unable to capture screenshot, CustomScreenshotWriter is probably not set.({ex.Message})\n{ex.StackTrace}");
+            _logger.LogWarning("Unable to capture screenshot, CustomScreenshotWriter is probably not set.({Message})\n{StackTrace}", ex.Message, ex.StackTrace);
             return null;
         }
         var messageCollectorType = _assemblyLoader.GetLibType(LibType.ScreenshotFilesCollector);

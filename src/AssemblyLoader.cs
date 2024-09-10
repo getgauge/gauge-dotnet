@@ -23,22 +23,24 @@ public class AssemblyLoader : IAssemblyLoader
 
     private readonly IActivatorWrapper _activatorWrapper;
     private readonly IStepRegistry _registry;
+    private readonly ILogger<AssemblyLoader> _logger;
 
-    public AssemblyLoader(IAssemblyLocater locater, IGaugeLoadContext gaugeLoadContext,
-        IReflectionWrapper reflectionWrapper, IActivatorWrapper activatorWrapper, IStepRegistry registry)
+    public AssemblyLoader(IAssemblyLocater locater, IGaugeLoadContext gaugeLoadContext, IReflectionWrapper reflectionWrapper,
+        IActivatorWrapper activatorWrapper, IStepRegistry registry, ILogger<AssemblyLoader> logger)
     {
         var assemblyPath = locater.GetTestAssembly();
         _reflectionWrapper = reflectionWrapper;
         _activatorWrapper = activatorWrapper;
         AssembliesReferencingGaugeLib = new List<Assembly>();
         _registry = registry;
+        _logger = logger;
 
-        Logger.Debug($"Loading assembly from : {assemblyPath}");
+        _logger.LogDebug("Loading assembly from : {AssemblyPath}", assemblyPath);
         _gaugeLoadContext = gaugeLoadContext;
         this._targetLibAssembly = _gaugeLoadContext.LoadFromAssemblyName(new AssemblyName(GaugeLibAssemblyName));
         ScanAndLoad(assemblyPath);
         AssembliesReferencingGaugeLib = _gaugeLoadContext.GetAssembliesReferencingGaugeLib().ToList();
-        Logger.Debug($"Number of AssembliesReferencingGaugeLib : {AssembliesReferencingGaugeLib.Count()}");
+        _logger.LogDebug("Number of AssembliesReferencingGaugeLib : {AssembliesReferencingGaugeLibCount}", AssembliesReferencingGaugeLib.Count);
         SetDefaultTypes();
         _registry = GetStepRegistry();
     }
@@ -74,9 +76,9 @@ public class AssemblyLoader : IAssemblyLoader
 
     public IStepRegistry GetStepRegistry()
     {
-        Logger.Debug("Building StepRegistry...");
+        _logger.LogDebug("Building StepRegistry...");
         var infos = GetMethods(LibType.Step);
-        Logger.Debug($"{infos.Count()} Step implementations found. Adding to registry...");
+        _logger.LogDebug("{InfosCount} Step implementations found. Adding to registry...", infos.Count());
         foreach (var info in infos)
         {
             var stepTexts = Attribute.GetCustomAttributes(info).Where(x => x.GetType().FullName == LibType.Step.FullName())
@@ -86,13 +88,13 @@ public class AssemblyLoader : IAssemblyLoader
                 var stepValue = GetStepValue(stepText);
                 if (_registry.ContainsStep(stepValue))
                 {
-                    Logger.Debug($"'{stepValue}': implementation found in StepRegistry, setting reflected methodInfo");
+                    _logger.LogDebug("'{StepValue}': implementation found in StepRegistry, setting reflected methodInfo", stepValue);
                     _registry.MethodFor(stepValue).MethodInfo = info;
                     _registry.MethodFor(stepValue).ContinueOnFailure = info.IsRecoverableStep(this);
                 }
                 else
                 {
-                    Logger.Debug($"'{stepValue}': no implementation in StepRegistry, adding via reflection");
+                    _logger.LogDebug("'{StepValue}': no implementation in StepRegistry, adding via reflection", stepValue);
                     var hasAlias = stepTexts.Count() > 1;
                     var stepMethod = new GaugeMethod
                     {
@@ -119,7 +121,7 @@ public class AssemblyLoader : IAssemblyLoader
         if (_classInstanceManager != null) return _classInstanceManager;
         if (ClassInstanceManagerType == null) return null;
         _classInstanceManager = _activatorWrapper.CreateInstance(ClassInstanceManagerType);
-        Logger.Debug("Loaded Instance Manager of Type:" + _classInstanceManager.GetType().FullName);
+        _logger.LogDebug("Loaded Instance Manager of Type: {ClassInstanceManagerType}", _classInstanceManager.GetType().FullName);
         _reflectionWrapper.InvokeMethod(ClassInstanceManagerType, _classInstanceManager, "Initialize", AssembliesReferencingGaugeLib);
         return _classInstanceManager;
     }
@@ -138,29 +140,23 @@ public class AssemblyLoader : IAssemblyLoader
         }
         try
         {
+            var exportedTypes = _gaugeLoadContext.GetAssembliesReferencingGaugeLib().SelectMany(x => x.ExportedTypes).ToList();
             if (ScreenshotWriter is null)
-                ScanForCustomScreenshotWriter(assembly.ExportedTypes);
+                ScanForCustomScreenshotWriter(exportedTypes);
 
             if (ClassInstanceManagerType is null)
-                ScanForCustomInstanceManager(assembly.ExportedTypes);
+                ScanForCustomInstanceManager(exportedTypes);
         }
         catch (ReflectionTypeLoadException ex)
         {
             foreach (var e in ex.LoaderExceptions)
-                Logger.Error(e.ToString());
+                _logger.LogError(e.ToString());
         }
     }
 
     private void ScanForCustomScreenshotWriter(IEnumerable<Type> types)
     {
-        var deprecatedImplementations = types.Where(type => type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotGrabber"));
-        if (deprecatedImplementations.Any())
-        {
-            Logger.Error("These types implement DEPRECATED ICustomScreenshotGrabber interface and will not be used. Use ICustomScreenshotWriter instead.\n" +
-                deprecatedImplementations.Select(x => x.FullName).Aggregate((a, b) => $"{a}, {b}"));
-        }
-        var implementingTypes = types.Where(type =>
-            type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotWriter"));
+        var implementingTypes = types.Where(type => type.GetInterfaces().Any(t => t.FullName == "Gauge.CSharp.Lib.ICustomScreenshotWriter"));
         ScreenshotWriter = implementingTypes.FirstOrDefault();
         if (ScreenshotWriter is null) return;
         var csg = _activatorWrapper.CreateInstance(ScreenshotWriter);

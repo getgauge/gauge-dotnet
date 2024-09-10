@@ -18,12 +18,14 @@ internal class AuthoringRunnerServiceHandler : Runner.RunnerBase
     protected IExecutor Executor { get; private init; }
     private readonly IHostApplicationLifetime _lifetime;
     protected IStepRegistry _stepRegistry;
+    protected ILogger<AuthoringRunnerServiceHandler> _logger;
 
-    public AuthoringRunnerServiceHandler(IExecutor executor, IHostApplicationLifetime lifetime, IStepRegistry stepRegistry)
+    public AuthoringRunnerServiceHandler(IExecutor executor, IHostApplicationLifetime lifetime, IStepRegistry stepRegistry, ILogger<AuthoringRunnerServiceHandler> logger)
     {
         Executor = executor;
         _lifetime = lifetime;
         _stepRegistry = stepRegistry;
+        _logger = logger;
     }
 
     public override Task<StepValidateResponse> ValidateStep(StepValidateRequest request, ServerCallContext context)
@@ -73,7 +75,7 @@ internal class AuthoringRunnerServiceHandler : Runner.RunnerBase
 
     public override Task<Empty> Kill(KillProcessRequest request, ServerCallContext context)
     {
-        Logger.Debug("KillProcessrequest received");
+        _logger.LogDebug("KillProcessrequest received");
         _lifetime.StopApplication();
         return Task.FromResult(new Empty());
     }

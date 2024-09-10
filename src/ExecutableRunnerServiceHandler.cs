@@ -19,8 +19,9 @@ internal class ExecutableRunnerServiceHandler : AuthoringRunnerServiceHandler
 
     public IAssemblyLoader AssemblyLoader { get; private set; }
 
-    public ExecutableRunnerServiceHandler(IExecutor executor, IAssemblyLoader assemblyLoader, IHostApplicationLifetime lifetime, IStepRegistry stepRegistry, IConfiguration config)
-        : base(executor, lifetime, stepRegistry)
+    public ExecutableRunnerServiceHandler(IExecutor executor, IAssemblyLoader assemblyLoader, IHostApplicationLifetime lifetime, IStepRegistry stepRegistry,
+        IConfiguration config, ILogger<ExecutableRunnerServiceHandler> logger)
+        : base(executor, lifetime, stepRegistry, logger)
     {
         _config = config;
         AssemblyLoader = assemblyLoader;
@@ -28,7 +29,6 @@ internal class ExecutableRunnerServiceHandler : AuthoringRunnerServiceHandler
     public override Task<ExecutionStatusResponse> InitializeSuiteDataStore(SuiteDataStoreInitRequest request, ServerCallContext context)
     {
         request.Stream = GetStream(request.Stream);
-        Logger.Info($"Processing init suite data store processor. Stream {request.Stream}");
         return Executor.Execute<SuiteDataStoreInitRequest, ExecutionStatusResponse>(request.Stream, request);
     }
 

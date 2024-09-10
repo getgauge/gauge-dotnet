@@ -9,18 +9,19 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using Gauge.CSharp.Lib;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet.IntegrationTests;
 
 public class IntegrationTestsBase
 {
+    protected readonly ILoggerFactory _loggerFactory = new LoggerFactory();
     protected IConfiguration _configuration;
     protected string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
 
     [SetUp]
     public void Setup()
     {
-        Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _testProjectPath);
         var builder = new ConfigurationBuilder();
         builder.AddInMemoryCollection(new Dictionary<string, string> { { "GAUGE_PROJECT_ROOT", _testProjectPath } });
         _configuration = builder.Build();
@@ -34,11 +35,5 @@ public class IntegrationTestsBase
             serializer.WriteObject(memoryStream, table);
             return Encoding.UTF8.GetString(memoryStream.ToArray());
         }
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
     }
 }
