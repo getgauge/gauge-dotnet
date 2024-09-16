@@ -73,7 +73,7 @@ public class StubImplementationCodeTests : IntegrationTestsBase
         var result = await processor.Process(1, message);
         ClassicAssert.AreEqual(1, result.TextDiffs.Count);
         StringAssert.Contains("Step Method", result.TextDiffs[0].Content);
-        ClassicAssert.AreEqual(107, result.TextDiffs[0].Span.Start);
+        ClassicAssert.AreEqual(100, result.TextDiffs[0].Span.Start);
     }
 
     [Test]

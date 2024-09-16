@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<PackageId>Runner.NetCore30</PackageId>
 		<Authors>The Gauge Team</Authors>
-		<Version>0.6.0</Version>
+		<Version>0.7.0</Version>
 		<Company>ThoughtWorks Inc.</Company>
 		<Product>Gauge</Product>
 		<Description>C# runner for Gauge. https://gauge.org</Description>
@@ -32,7 +32,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Gauge.CSharp.Lib" Version="0.11.37" />
+		<PackageReference Include="Gauge.CSharp.Lib" Version="0.11.1" />
 		<PackageReference Include="Grpc.AspNetCore" Version="2.57.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
 	</ItemGroup>
