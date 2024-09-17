@@ -20,6 +20,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        
     - name: Setup .NET Core 
       uses: actions/setup-dotnet@v4
       with:
@@ -48,6 +51,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
       - name: Setup go
         uses: actions/setup-go@v5
@@ -113,6 +118,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
       - name: Setup go
         uses: actions/setup-go@v5
