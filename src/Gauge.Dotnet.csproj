@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gauge.CSharp.Lib" Version="0.10.3" />
+    <PackageReference Include="Gauge.CSharp.Lib" Version="0.11.1" />
     <PackageReference Include="Grpc.Tools" Version="2.66.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
