@@ -1,14 +1,14 @@
 {
   "runtimeTarget": {
-    "name": ".NETCoreApp,Version=v3.0",
+    "name": ".NETCoreApp,Version=v8.0",
     "signature": ""
   },
   "compilationOptions": {},
   "targets": {
-    ".NETCoreApp,Version=v3.0": {
+    ".NETCoreApp,Version=v8.0": {
       "IntegrationTestSample/1.0.0": {
         "dependencies": {
-          "Gauge.CSharp.Lib": "0.7.6",
+          "Gauge.CSharp.Lib": "0.11.29",
           "ReferenceProject": "1.0.0"
         },
         "runtime": {
@@ -31,11 +31,11 @@
           }
         }
       },
-      "Gauge.CSharp.Lib/0.7.6": {
+      "Gauge.CSharp.Lib/0.11.29": {
         "runtime": {
-          "lib/netstandard2.0/Gauge.CSharp.Lib.dll": {
-            "assemblyVersion": "0.7.6.0",
-            "fileVersion": "0.7.6.0"
+          "lib/net8.0/Gauge.CSharp.Lib.dll": {
+            "assemblyVersion": "0.11.29.0",
+            "fileVersion": "0.10.3.0"
           }
         }
       },
@@ -687,7 +687,7 @@
       "ReferenceProject/1.0.0": {
         "dependencies": {
           "FluentAssertions": "4.19.4",
-          "Gauge.CSharp.Lib": "0.7.6"
+          "Gauge.CSharp.Lib": "0.11.29"
         },
         "runtime": {
           "ReferenceProject.dll": {}
@@ -708,12 +708,12 @@
       "path": "fluentassertions/4.19.4",
       "hashPath": "fluentassertions.4.19.4.nupkg.sha512"
     },
-    "Gauge.CSharp.Lib/0.7.6": {
+    "Gauge.CSharp.Lib/0.11.29": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-VPkNe57TqAXTxA0+UHe35+cpJT2DkqWt1hmWi3eOxTJZy3widdC8GIhRERM34V5G5mQrfM2z4+AvPAbj0nv0+A==",
-      "path": "gauge.csharp.lib/0.7.6",
-      "hashPath": "gauge.csharp.lib.0.7.6.nupkg.sha512"
+      "sha512": "sha512-3WXaDyUh63Z0YDz2OI4Af0UC20ggt8NBebUM6dtpydAOrqqIOHvK84Fc7iHyB5UT2hFUQlNhuBQnF9O2h0/crQ==",
+      "path": "gauge.csharp.lib/0.11.29",
+      "hashPath": "gauge.csharp.lib.0.11.29.nupkg.sha512"
     },
     "Microsoft.NETCore.Platforms/1.0.1": {
       "type": "package",

@@ -9,3 +9,9 @@ artifacts
 .DS_Store
 .fake
 .idea/
+
+# User-specific files
+**/*.suo
+**/*.user
+**/*.userosscache
+**/*.sln.docstates

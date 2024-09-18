@@ -5,25 +5,24 @@
  *----------------------------------------------------------------*/
 
 
-using System;
+using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Strategy;
-using Gauge.Messages;
+using Microsoft.Extensions.Configuration;
 
-namespace Gauge.Dotnet.UnitTests.Processors.Stubs
+namespace Gauge.Dotnet.UnitTests.Processors.Stubs;
+
+public class TestTaggedHooksFirstExecutionProcessor : TaggedHooksFirstExecutionProcessor
 {
-    public class TestTaggedHooksFirstExecutionProcessor : TaggedHooksFirstExecutionProcessor
+    public TestTaggedHooksFirstExecutionProcessor(IExecutionOrchestrator executionOrchestrator, IConfiguration config)
+        : base(executionOrchestrator, config)
     {
-        public TestTaggedHooksFirstExecutionProcessor(IExecutionOrchestrator executionOrchestrator)
-            : base(executionOrchestrator)
-        {
-        }
+    }
 
-        protected override string HookType => throw new NotImplementedException();
+    protected override string HookType => throw new NotImplementedException();
 
-        public HooksStrategy GetHooksStrategy()
-        {
-            return Strategy;
-        }
+    public HooksStrategy GetHooksStrategy()
+    {
+        return Strategy;
     }
 }

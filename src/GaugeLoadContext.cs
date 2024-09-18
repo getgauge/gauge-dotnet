@@ -4,37 +4,36 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace Gauge.Dotnet
+namespace Gauge.Dotnet;
+
+public class GaugeLoadContext : AssemblyLoadContext, IGaugeLoadContext
 {
-    public class GaugeLoadContext: AssemblyLoadContext, IGaugeLoadContext
+    private const string GaugeLibAssemblyName = "Gauge.CSharp.Lib";
+    protected readonly ILogger _logger;
+    protected AssemblyDependencyResolver _resolver;
+
+    public GaugeLoadContext(IAssemblyLocater locater, ILogger logger)
     {
-        private const string GaugeLibAssemblyName = "Gauge.CSharp.Lib";
-        protected AssemblyDependencyResolver _resolver;
+        _resolver = new AssemblyDependencyResolver(locater.GetTestAssembly());
+        _logger = logger;
+    }
 
-        public GaugeLoadContext(string pluginPath)
-        {
-            _resolver = new AssemblyDependencyResolver(pluginPath);
-        }
+    public IEnumerable<Assembly> GetAssembliesReferencingGaugeLib()
+    {
+        return Assemblies.Where(a => a.GetReferencedAssemblies().Any(a => a.Name == GaugeLibAssemblyName));
+    }
 
-        public IEnumerable<Assembly> GetAssembliesReferencingGaugeLib()
+    protected override Assembly Load(AssemblyName assemblyName)
+    {
+        var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
+        _logger.LogDebug("Try load {AssemblyName} in GaugeLoadContext", assemblyName.Name);
+        if (assemblyPath != null)
         {
-            return this.Assemblies.Where(a => a.GetReferencedAssemblies().Any(a => a.Name == GaugeLibAssemblyName));
+            return LoadFromAssemblyPath(assemblyPath);
         }
-
-        protected override Assembly Load(AssemblyName assemblyName)
-        {
-            var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
-            Logger.Debug($"Try load {assemblyName.Name} in GaugeLoadContext");
-            if (assemblyPath != null)
-            {
-                return LoadFromAssemblyPath(assemblyPath);
-            }
-            return null;
-        }
+        return null;
     }
 }

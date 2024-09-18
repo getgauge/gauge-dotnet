@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Gauge.CSharp.Lib" Version="0.11.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ReferenceDll">
+      <HintPath>libs/ReferenceDll.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

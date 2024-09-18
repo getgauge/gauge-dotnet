@@ -8,21 +8,21 @@
 using Gauge.Dotnet.Models;
 using Gauge.Messages;
 
-namespace Gauge.Dotnet.Processors
-{
-    public class StepPositionsProcessor
-    {
-        private readonly IStepRegistry _stepRegistry;
+namespace Gauge.Dotnet.Processors;
 
-        public StepPositionsProcessor(IStepRegistry stepRegistry)
-        {
-            _stepRegistry = stepRegistry;
-        }
-        public StepPositionsResponse Process(StepPositionsRequest request)
-        {
-            var response = new StepPositionsResponse();
-            response.StepPositions.AddRange(_stepRegistry.GetStepPositions(request.FilePath));
-            return response;
-        }
+public class StepPositionsProcessor : IGaugeProcessor<StepPositionsRequest, StepPositionsResponse>
+{
+    private readonly IStepRegistry _stepRegistry;
+
+    public StepPositionsProcessor(IStepRegistry stepRegistry)
+    {
+        _stepRegistry = stepRegistry;
+    }
+
+    public Task<StepPositionsResponse> Process(int stream, StepPositionsRequest request)
+    {
+        var response = new StepPositionsResponse();
+        response.StepPositions.AddRange(_stepRegistry.GetStepPositions(request.FilePath));
+        return Task.FromResult(response);
     }
 }

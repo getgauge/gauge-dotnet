@@ -7,8 +7,6 @@
 
 using System;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
 using System.Threading.Tasks;
 using Gauge.CSharp.Lib;
 using Gauge.CSharp.Lib.Attribute;
@@ -82,11 +80,6 @@ namespace IntegrationTestSample
         public class CustomSerializableException : Exception
         {
             public CustomSerializableException(string s) : base(s)
-            {
-            }
-
-            public CustomSerializableException(SerializationInfo info, StreamingContext context)
-                : base(info, context)
             {
             }
         }

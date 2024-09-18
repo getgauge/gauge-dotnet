@@ -5,35 +5,33 @@
  *----------------------------------------------------------------*/
 
 
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using Gauge.Dotnet.Executors;
 using Gauge.Messages;
 
-namespace Gauge.Dotnet.Processors
+namespace Gauge.Dotnet.Processors;
+
+public class ExecutionEndingProcessor : HookExecutionProcessor, IGaugeProcessor<ExecutionEndingRequest, ExecutionStatusResponse>
 {
-    public class ExecutionEndingProcessor : HookExecutionProcessor
+    public ExecutionEndingProcessor(IExecutionOrchestrator executionOrchestrator, IConfiguration config)
+        : base(executionOrchestrator, config)
     {
-        public ExecutionEndingProcessor(IExecutionOrchestrator executionOrchestrator)
-            : base(executionOrchestrator)
-        {
-        }
+    }
 
-        [DebuggerHidden]
-        public virtual ExecutionStatusResponse Process(ExecutionEndingRequest request)
-        {
-            var result = ExecuteHooks(request.CurrentExecutionInfo);
-            ClearCacheForConfiguredLevel();
-            return result;
-        }
+    [DebuggerHidden]
+    public async Task<ExecutionStatusResponse> Process(int streamId, ExecutionEndingRequest request)
+    {
+        var result = await ExecuteHooks(streamId, request.CurrentExecutionInfo);
+        ClearCacheForConfiguredLevel();
+        return result;
+    }
 
-        protected override string HookType => "AfterSuite";
+    protected override string HookType => "AfterSuite";
 
-        protected override string CacheClearLevel => SuiteLevel;
+    protected override string CacheClearLevel => SuiteLevel;
 
-        protected override List<string> GetApplicableTags(ExecutionInfo info)
-        {
-            return info?.CurrentSpec?.Tags?.ToList() ?? new List<string>();
-        }
+    protected override List<string> GetApplicableTags(ExecutionInfo info)
+    {
+        return info?.CurrentSpec?.Tags?.ToList() ?? new List<string>();
     }
 }

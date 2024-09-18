@@ -5,36 +5,35 @@
  *----------------------------------------------------------------*/
 
 
-using System.IO;
-using System.Linq;
-using Gauge.CSharp.Core;
 using Gauge.Dotnet.Exceptions;
+using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Wrappers;
 
-namespace Gauge.Dotnet
+namespace Gauge.Dotnet;
+
+public class AssemblyLocater : IAssemblyLocater
 {
-    public class AssemblyLocater : IAssemblyLocater
+    private readonly IDirectoryWrapper _directoryWrapper;
+    private readonly IConfiguration _config;
+
+    public AssemblyLocater(IDirectoryWrapper directoryWrapper, IConfiguration config)
     {
-        private readonly IDirectoryWrapper _directoryWrapper;
+        _directoryWrapper = directoryWrapper;
+        _config = config;
+    }
 
-        public AssemblyLocater(IDirectoryWrapper directoryWrapper)
+    public string GetTestAssembly()
+    {
+        var gaugeBinDir = _config.GetGaugeBinDir();
+        try
         {
-            _directoryWrapper = directoryWrapper;
+            return _directoryWrapper
+                .EnumerateFiles(gaugeBinDir, "*.deps.json", SearchOption.TopDirectoryOnly)
+                .First().Replace(".deps.json", ".dll");
         }
-
-        public AssemblyPath GetTestAssembly()
+        catch (System.InvalidOperationException)
         {
-            var gaugeBinDir = Utils.GetGaugeBinDir();
-            try
-            {
-                return _directoryWrapper
-                    .EnumerateFiles(gaugeBinDir, "*.deps.json", SearchOption.TopDirectoryOnly)
-                    .First().Replace(".deps.json", ".dll");
-            }
-            catch (System.InvalidOperationException)
-            {
-                throw new GaugeTestAssemblyNotFoundException(gaugeBinDir);
-            }
+            throw new GaugeTestAssemblyNotFoundException(gaugeBinDir);
         }
     }
 }

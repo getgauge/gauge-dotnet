@@ -5,12 +5,20 @@
  *----------------------------------------------------------------*/
 
 
-namespace Gauge.Dotnet.Processors
+using Gauge.CSharp.Lib;
+using Gauge.Messages;
+
+namespace Gauge.Dotnet.Processors;
+
+public class SpecDataStoreInitProcessor : DataStoreInitProcessorBase, IGaugeProcessor<SpecDataStoreInitRequest, ExecutionStatusResponse>
 {
-    public class SpecDataStoreInitProcessor : DataStoreInitProcessorBase
+    public SpecDataStoreInitProcessor(IAssemblyLoader loader)
+        : base(DataStoreType.Spec, loader)
     {
-        public SpecDataStoreInitProcessor(IAssemblyLoader assemblyLoader) : base(assemblyLoader, DataStoreType.Spec)
-        {
-        }
+    }
+
+    public Task<ExecutionStatusResponse> Process(int stream, SpecDataStoreInitRequest request)
+    {
+        return Task.FromResult(Process(request.Stream));
     }
 }

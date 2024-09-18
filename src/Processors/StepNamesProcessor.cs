@@ -5,27 +5,25 @@
  *----------------------------------------------------------------*/
 
 
-using System.Collections.Generic;
 using Gauge.Dotnet.Models;
 using Gauge.Messages;
 
-namespace Gauge.Dotnet.Processors
+namespace Gauge.Dotnet.Processors;
+
+public class StepNamesProcessor : IGaugeProcessor<StepNamesRequest, StepNamesResponse>
 {
-    public class StepNamesProcessor
+    private readonly IStepRegistry _stepRegistry;
+
+    public StepNamesProcessor(IStepRegistry stepRegistry)
     {
-        private readonly IStepRegistry _stepRegistry;
+        _stepRegistry = stepRegistry;
+    }
 
-        public StepNamesProcessor(IStepRegistry stepRegistry)
-        {
-            _stepRegistry = stepRegistry;
-        }
-
-        public StepNamesResponse Process(StepNamesRequest request)
-        {
-            var allSteps = _stepRegistry.GetStepTexts();
-            var stepNamesResponse = new StepNamesResponse();
-            stepNamesResponse.Steps.AddRange(allSteps);
-            return stepNamesResponse;
-        }
+    public Task<StepNamesResponse> Process(int stream, StepNamesRequest request)
+    {
+        var allSteps = _stepRegistry.GetStepTexts();
+        var stepNamesResponse = new StepNamesResponse();
+        stepNamesResponse.Steps.AddRange(allSteps);
+        return Task.FromResult(stepNamesResponse);
     }
 }

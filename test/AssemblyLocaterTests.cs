@@ -5,34 +5,28 @@
  *----------------------------------------------------------------*/
 
 
-using System;
-using System.IO;
-using System.Linq;
-using Gauge.CSharp.Core;
 using Gauge.Dotnet.Exceptions;
+using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Wrappers;
-using Moq;
-using NUnit.Framework;
-using NUnit.Framework.Legacy;
+using Microsoft.Extensions.Configuration;
 
 namespace Gauge.Dotnet.UnitTests
 {
     [TestFixture]
     internal class AssemblyLocaterTests
     {
+        private readonly Mock<IDirectoryWrapper> _mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+        private string _rootDirectory;
+        private IConfiguration _config;
+
         [SetUp]
         public void Setup()
         {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", Directory.GetCurrentDirectory());
+            _rootDirectory = Directory.GetCurrentDirectory();
+            _config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string> { { "GAUGE_PROJECT_ROOT", _rootDirectory } })
+                .Build();
         }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
-        }
-
-        private readonly Mock<IDirectoryWrapper> _mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
 
         [Test]
         public void ShouldGetAssembliesFromGaugeBin()
@@ -40,9 +34,9 @@ namespace Gauge.Dotnet.UnitTests
             var expected = "fooAssemblyLocation";
             var expectedAssemblies = new[] { $"{expected}.deps.json" };
             _mockDirectoryWrapper.Setup(wrapper =>
-                    wrapper.EnumerateFiles(Utils.GetGaugeBinDir(), "*.deps.json", SearchOption.TopDirectoryOnly))
+                    wrapper.EnumerateFiles(_config.GetGaugeBinDir(), "*.deps.json", SearchOption.TopDirectoryOnly))
                 .Returns(expectedAssemblies);
-            var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object);
+            var assemblyLocater = new AssemblyLocater(_mockDirectoryWrapper.Object, _config);
 
             var assembly = assemblyLocater.GetTestAssembly();
 
@@ -53,11 +47,11 @@ namespace Gauge.Dotnet.UnitTests
         public void ShouldNotAddAssembliesFromInvalidFile()
         {
             _mockDirectoryWrapper.Setup(wrapper =>
-                    wrapper.EnumerateFiles(Utils.GetGaugeBinDir(), "*.deps.json", SearchOption.TopDirectoryOnly))
+                    wrapper.EnumerateFiles(_config.GetGaugeBinDir(), "*.deps.json", SearchOption.TopDirectoryOnly))
                 .Returns(Enumerable.Empty<string>());
 
             var expectedMessage = $"Could not locate the target test assembly. Gauge-Dotnet could not find a deps.json file in {Directory.GetCurrentDirectory()}";
-            ClassicAssert.Throws<GaugeTestAssemblyNotFoundException>(() => new AssemblyLocater(_mockDirectoryWrapper.Object).GetTestAssembly(), expectedMessage);
+            ClassicAssert.Throws<GaugeTestAssemblyNotFoundException>(() => new AssemblyLocater(_mockDirectoryWrapper.Object, _config).GetTestAssembly(), expectedMessage);
         }
     }
 }

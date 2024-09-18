@@ -5,226 +5,216 @@
  *----------------------------------------------------------------*/
 
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Gauge.CSharp.Lib.Attribute;
 using Gauge.Dotnet.Models;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
-namespace Gauge.Dotnet.IntegrationTests
+namespace Gauge.Dotnet.IntegrationTests;
+
+[TestFixture]
+internal class RefactorHelperTests
 {
-    [TestFixture]
-    internal class RefactorHelperTests
+    [SetUp]
+    public void Setup()
     {
-        [SetUp]
-        public void Setup()
+        File.Copy(Path.Combine(_testProjectPath, "RefactoringSample.cs"),
+            Path.Combine(_testProjectPath, "RefactoringSample.copy"), true);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        var sourceFileName = Path.Combine(_testProjectPath, "RefactoringSample.copy");
+        File.Copy(sourceFileName, Path.Combine(_testProjectPath, "RefactoringSample.cs"), true);
+        File.Delete(sourceFileName);
+    }
+
+    private readonly string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
+
+    private void ClassicAssertStepAttributeWithTextExists(RefactoringChange result, string methodName, string text)
+    {
+        var name = methodName.Split('.').Last().Split('-').First();
+        var tree =
+            CSharpSyntaxTree.ParseText(result.FileContent);
+        var root = tree.GetRoot();
+
+        var stepTexts = root.DescendantNodes().OfType<MethodDeclarationSyntax>()
+            .Select(
+                node => new { node, attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes) })
+            .Where(t => string.CompareOrdinal(t.node.Identifier.ValueText, name) == 0
+                        &&
+                        t.attributeSyntaxes.Any(
+                            syntax => string.CompareOrdinal(syntax.ToFullString(), typeof(Step).ToString()) > 0))
+            .SelectMany(t => t.node.AttributeLists.SelectMany(syntax => syntax.Attributes))
+            .SelectMany(syntax => syntax.ArgumentList.Arguments)
+            .Select(syntax => syntax.GetText().ToString().Trim('"'));
+        ClassicAssert.True(stepTexts.Contains(text));
+    }
+
+    private void ClassicAssertParametersExist(RefactoringChange result, string methodName,
+        IReadOnlyList<string> parameters)
+    {
+        var name = methodName.Split('.').Last().Split('-').First();
+        var tree =
+            CSharpSyntaxTree.ParseText(result.FileContent);
+        var root = tree.GetRoot();
+        var methodParameters = root.DescendantNodes().OfType<MethodDeclarationSyntax>()
+            .Where(syntax => string.CompareOrdinal(syntax.Identifier.Text, name) == 0)
+            .Select(syntax => syntax.ParameterList)
+            .SelectMany(syntax => syntax.Parameters)
+            .Select(syntax => syntax.Identifier.Text)
+            .ToArray();
+
+        for (var i = 0; i < parameters.Count; i++)
+            ClassicAssert.AreEqual(parameters[i], methodParameters[i]);
+    }
+
+    [Test]
+    public void ShouldAddParameters()
+    {
+        const string newStepValue = "Refactoring Say <what> to <who> in <where>";
+        var gaugeMethod = new GaugeMethod
         {
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", _testProjectPath);
+            Name = "RefactoringSaySomething",
+            ClassName = "RefactoringSample",
+            FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
+        };
 
-            File.Copy(Path.Combine(_testProjectPath, "RefactoringSample.cs"),
-                Path.Combine(_testProjectPath, "RefactoringSample.copy"), true);
-        }
+        var parameterPositions = new[]
+            {new Tuple<int, int>(0, 0), new Tuple<int, int>(1, 1), new Tuple<int, int>(-1, 2)};
+        var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions,
+            new List<string> { "what", "who", "where" },
+            newStepValue);
+        ClassicAssertStepAttributeWithTextExists(changes, gaugeMethod.Name, newStepValue);
+        ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "what", "who", "where" });
+    }
 
-        [TearDown]
-        public void TearDown()
+    [Test]
+    public void ShouldAddParametersWhenNoneExisted()
+    {
+        const string newStepValue = "Refactoring this is a test step <foo>";
+        var gaugeMethod = new GaugeMethod
         {
-            var sourceFileName = Path.Combine(_testProjectPath, "RefactoringSample.copy");
-            File.Copy(sourceFileName, Path.Combine(_testProjectPath, "RefactoringSample.cs"), true);
-            File.Delete(sourceFileName);
-            Environment.SetEnvironmentVariable("GAUGE_PROJECT_ROOT", null);
-        }
+            Name = "RefactoringSampleTest",
+            ClassName = "RefactoringSample",
+            FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
+        };
+        var parameterPositions = new[] { new Tuple<int, int>(-1, 0) };
 
-        private readonly string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
+        var changes =
+            RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> { "foo" }, newStepValue);
 
-        private void ClassicAssertStepAttributeWithTextExists(RefactoringChange result, string methodName, string text)
+        ClassicAssertStepAttributeWithTextExists(changes, gaugeMethod.Name, newStepValue);
+        ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "foo" });
+    }
+
+    [Test]
+    public void ShouldAddParametersWithReservedKeywordName()
+    {
+        const string newStepValue = "Refactoring this is a test step <class>";
+
+        var gaugeMethod = new GaugeMethod
         {
-            var name = methodName.Split('.').Last().Split('-').First();
-            var tree =
-                CSharpSyntaxTree.ParseText(result.FileContent);
-            var root = tree.GetRoot();
+            Name = "RefactoringSampleTest",
+            ClassName = "RefactoringSample",
+            FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
+        };
+        var parameterPositions = new[] { new Tuple<int, int>(-1, 0) };
 
-            var stepTexts = root.DescendantNodes().OfType<MethodDeclarationSyntax>()
-                .Select(
-                    node => new { node, attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes) })
-                .Where(t => string.CompareOrdinal(t.node.Identifier.ValueText, name) == 0
-                            &&
-                            t.attributeSyntaxes.Any(
-                                syntax => string.CompareOrdinal(syntax.ToFullString(), typeof(Step).ToString()) > 0))
-                .SelectMany(t => t.node.AttributeLists.SelectMany(syntax => syntax.Attributes))
-                .SelectMany(syntax => syntax.ArgumentList.Arguments)
-                .Select(syntax => syntax.GetText().ToString().Trim('"'));
-            ClassicAssert.True(stepTexts.Contains(text));
-        }
+        var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> { "class" },
+            newStepValue);
 
-        private void ClassicAssertParametersExist(RefactoringChange result, string methodName,
-            IReadOnlyList<string> parameters)
+        ClassicAssertStepAttributeWithTextExists(changes, gaugeMethod.Name, newStepValue);
+        ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "@class" });
+    }
+
+    [Test]
+    public void ShouldRefactorAndReturnFilesChanged()
+    {
+        var gaugeMethod = new GaugeMethod
         {
-            var name = methodName.Split('.').Last().Split('-').First();
-            var tree =
-                CSharpSyntaxTree.ParseText(result.FileContent);
-            var root = tree.GetRoot();
-            var methodParameters = root.DescendantNodes().OfType<MethodDeclarationSyntax>()
-                .Where(syntax => string.CompareOrdinal(syntax.Identifier.Text, name) == 0)
-                .Select(syntax => syntax.ParameterList)
-                .SelectMany(syntax => syntax.Parameters)
-                .Select(syntax => syntax.Identifier.Text)
-                .ToArray();
+            Name = "RefactoringContext",
+            ClassName = "RefactoringSample",
+            FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
+        };
 
-            for (var i = 0; i < parameters.Count; i++)
-                ClassicAssert.AreEqual(parameters[i], methodParameters[i]);
-        }
+        var expectedPath = Path.GetFullPath(Path.Combine(_testProjectPath, "RefactoringSample.cs"));
 
-        [Test]
-        public void ShouldAddParameters()
+        var changes =
+            RefactorHelper.Refactor(gaugeMethod, new List<Tuple<int, int>>(), new List<string>(), "foo");
+
+        ClassicAssert.AreEqual(expectedPath, changes.FileName);
+    }
+
+    [Test]
+    public void ShouldRefactorAttributeText()
+    {
+        var gaugeMethod = new GaugeMethod
         {
-            const string newStepValue = "Refactoring Say <what> to <who> in <where>";
-            var gaugeMethod = new GaugeMethod
-            {
-                Name = "RefactoringSaySomething",
-                ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
-            };
+            Name = "RefactoringContext",
+            ClassName = "RefactoringSample",
+            FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
+        };
+        var changes = RefactorHelper.Refactor(gaugeMethod, new List<Tuple<int, int>>(), new List<string>(), "foo");
 
-            var parameterPositions = new[]
-                {new Tuple<int, int>(0, 0), new Tuple<int, int>(1, 1), new Tuple<int, int>(-1, 2)};
-            var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions,
-                new List<string> { "what", "who", "where" },
-                newStepValue);
-            ClassicAssertStepAttributeWithTextExists(changes, gaugeMethod.Name, newStepValue);
-            ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "what", "who", "where" });
-        }
+        ClassicAssertStepAttributeWithTextExists(changes, gaugeMethod.Name, "foo");
+    }
 
-        [Test]
-        public void ShouldAddParametersWhenNoneExisted()
+    [Test]
+    public void ShouldRemoveParameters()
+    {
+        var gaugeMethod = new GaugeMethod
         {
-            const string newStepValue = "Refactoring this is a test step <foo>";
-            var gaugeMethod = new GaugeMethod
-            {
-                Name = "RefactoringSampleTest",
-                ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
-            };
-            var parameterPositions = new[] { new Tuple<int, int>(-1, 0) };
+            Name = "RefactoringSaySomething",
+            ClassName = "RefactoringSample",
+            FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
+        };
+        var parameterPositions = new[] { new Tuple<int, int>(0, 0) };
 
-            var changes =
-                RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> { "foo" }, newStepValue);
+        var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string>(),
+            "Refactoring Say <what> to someone");
 
-            ClassicAssertStepAttributeWithTextExists(changes, gaugeMethod.Name, newStepValue);
-            ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "foo" });
-        }
+        ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "what" });
+    }
 
-        [Test]
-        public void ShouldAddParametersWithReservedKeywordName()
+    [Test]
+    public void ShouldRemoveParametersInAnyOrder()
+    {
+        var gaugeMethod = new GaugeMethod
         {
-            const string newStepValue = "Refactoring this is a test step <class>";
+            Name = "RefactoringSaySomething",
+            ClassName = "RefactoringSample",
+            FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
+        };
 
-            var gaugeMethod = new GaugeMethod
-            {
-                Name = "RefactoringSampleTest",
-                ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
-            };
-            var parameterPositions = new[] { new Tuple<int, int>(-1, 0) };
+        var parameterPositions = new[] { new Tuple<int, int>(1, 0) };
 
-            var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> { "class" },
-                newStepValue);
+        var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string>(),
+            "Refactoring Say something to <who>");
 
-            ClassicAssertStepAttributeWithTextExists(changes, gaugeMethod.Name, newStepValue);
-            ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "@class" });
-        }
+        ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "who" });
+    }
 
-        [Test]
-        public void ShouldRefactorAndReturnFilesChanged()
+    [Test]
+    public void ShouldReorderParameters()
+    {
+        const string newStepValue = "Refactoring Say <who> to <what>";
+
+        var gaugeMethod = new GaugeMethod
         {
-            var gaugeMethod = new GaugeMethod
-            {
-                Name = "RefactoringContext",
-                ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
-            };
+            Name = "RefactoringSaySomething",
+            ClassName = "RefactoringSample",
+            FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
+        };
 
-            var expectedPath = Path.GetFullPath(Path.Combine(_testProjectPath, "RefactoringSample.cs"));
+        var parameterPositions = new[] { new Tuple<int, int>(0, 1), new Tuple<int, int>(1, 0) };
+        var result = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> { "who", "what" },
+            newStepValue);
 
-            var changes =
-                RefactorHelper.Refactor(gaugeMethod, new List<Tuple<int, int>>(), new List<string>(), "foo");
-
-            ClassicAssert.AreEqual(expectedPath, changes.FileName);
-        }
-
-        [Test]
-        public void ShouldRefactorAttributeText()
-        {
-            var gaugeMethod = new GaugeMethod
-            {
-                Name = "RefactoringContext",
-                ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
-            };
-            var changes = RefactorHelper.Refactor(gaugeMethod, new List<Tuple<int, int>>(), new List<string>(), "foo");
-
-            ClassicAssertStepAttributeWithTextExists(changes, gaugeMethod.Name, "foo");
-        }
-
-        [Test]
-        public void ShouldRemoveParameters()
-        {
-            var gaugeMethod = new GaugeMethod
-            {
-                Name = "RefactoringSaySomething",
-                ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
-            };
-            var parameterPositions = new[] { new Tuple<int, int>(0, 0) };
-
-            var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string>(),
-                "Refactoring Say <what> to someone");
-
-            ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "what" });
-        }
-
-        [Test]
-        public void ShouldRemoveParametersInAnyOrder()
-        {
-            var gaugeMethod = new GaugeMethod
-            {
-                Name = "RefactoringSaySomething",
-                ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
-            };
-
-            var parameterPositions = new[] { new Tuple<int, int>(1, 0) };
-
-            var changes = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string>(),
-                "Refactoring Say something to <who>");
-
-            ClassicAssertParametersExist(changes, gaugeMethod.Name, new[] { "who" });
-        }
-
-        [Test]
-        public void ShouldReorderParameters()
-        {
-            const string newStepValue = "Refactoring Say <who> to <what>";
-
-            var gaugeMethod = new GaugeMethod
-            {
-                Name = "RefactoringSaySomething",
-                ClassName = "RefactoringSample",
-                FileName = Path.Combine(_testProjectPath, "RefactoringSample.cs")
-            };
-
-            var parameterPositions = new[] { new Tuple<int, int>(0, 1), new Tuple<int, int>(1, 0) };
-            var result = RefactorHelper.Refactor(gaugeMethod, parameterPositions, new List<string> { "who", "what" },
-                newStepValue);
-
-            ClassicAssertStepAttributeWithTextExists(result, gaugeMethod.Name, newStepValue);
-            ClassicAssertParametersExist(result, gaugeMethod.Name, new[] { "who", "what" });
-            ClassicAssert.True(result.Diffs.Any(d => d.Content == "\"Refactoring Say <who> to <what>\""));
-            ClassicAssert.True(result.Diffs.Any(d => d.Content == "(string who,string what)"));
-        }
+        ClassicAssertStepAttributeWithTextExists(result, gaugeMethod.Name, newStepValue);
+        ClassicAssertParametersExist(result, gaugeMethod.Name, new[] { "who", "what" });
+        ClassicAssert.True(result.Diffs.Any(d => d.Content == "\"Refactoring Say <who> to <what>\""));
+        ClassicAssert.True(result.Diffs.Any(d => d.Content == "(string who,string what)"));
     }
 }

@@ -4,9 +4,6 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
-
-using System.Collections.Generic;
-
 namespace Gauge.Dotnet
 {
     public enum LibType

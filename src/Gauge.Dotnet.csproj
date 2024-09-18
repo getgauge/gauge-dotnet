@@ -1,45 +1,44 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
-    <PackageId>Runner.NetCore30</PackageId>
-    <Authors>The Gauge Team</Authors>
-    <Version>0.6.0</Version>
-    <Company>ThoughtWorks Inc.</Company>
-    <Product>Gauge</Product>
-    <Description>C# runner for Gauge. https://gauge.org</Description>
-    <Copyright>"Copyright © ThoughtWorks Inc 2017"</Copyright>
-    <PackageLicenseUrl>https://github.com/getgauge/gauge-dotnet/blob/master/License.txt</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/getgauge/gauge-dotnet</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/getgauge/gauge-csharp/master/logo-64x64.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/getgauge/gauge-dotnet</RepositoryUrl>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<PackageId>Runner.NetCore30</PackageId>
+		<Authors>The Gauge Team</Authors>
+		<Version>0.7.0</Version>
+		<Company>ThoughtWorks Inc.</Company>
+		<Product>Gauge</Product>
+		<Description>C# runner for Gauge. https://gauge.org</Description>
+		<Copyright>"Copyright © ThoughtWorks Inc 2017"</Copyright>
+		<PackageLicenseUrl>https://github.com/getgauge/gauge-dotnet/blob/master/License.txt</PackageLicenseUrl>
+		<PackageProjectUrl>https://github.com/getgauge/gauge-dotnet</PackageProjectUrl>
+		<PackageIconUrl>https://raw.githubusercontent.com/getgauge/gauge-csharp/master/logo-64x64.png</PackageIconUrl>
+		<RepositoryUrl>https://github.com/getgauge/gauge-dotnet</RepositoryUrl>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<Protobuf Include="..\gauge-proto\api.proto" Link="Protos\api.proto" />
+		<Protobuf Include="..\gauge-proto\lsp.proto" Link="Protos\lsp.proto" />
+		<Protobuf Include="..\gauge-proto\messages.proto" Link="Protos\messages.proto" />
+		<Protobuf Include="..\gauge-proto\services.proto" Link="Protos\services.proto" />
+		<Protobuf Include="..\gauge-proto\spec.proto" Link="Protos\spec.proto" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="deploy\**" />
-    <EmbeddedResource Remove="deploy\**" />
-    <None Remove="deploy\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="deploy\**" />
+		<EmbeddedResource Remove="deploy\**" />
+		<None Remove="deploy\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Gauge.CSharp.Lib" Version="0.10.3" />
-    <PackageReference Include="Grpc.Tools" Version="2.66.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Google.Protobuf" Version="3.28.1" />
-    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.65.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.11.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Gauge.CSharp.Lib" Version="0.11.1" />
+		<PackageReference Include="Grpc.AspNetCore" Version="2.65.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Properties\" />
+	</ItemGroup>
 
 </Project>

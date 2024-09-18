@@ -4,14 +4,8 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
-using System;
-using System.Collections.Generic;
-using System.Xml.Linq;
 using Gauge.Dotnet.Processors;
-using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
-using Moq;
-using NUnit.Framework;
 
 namespace Gauge.Dotnet.UnitTests.Processors
 {
@@ -32,7 +26,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
         private const string fileName = "foo.cs";
 
         [Test]
-        public void ShouldProcessMessage()
+        public async Task ShouldProcessMessage()
         {
             var mockLoader = new Mock<IStaticLoader>();
             mockLoader.Setup(x => x.LoadImplementations());
@@ -45,14 +39,14 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 Status = CacheFileRequest.Types.FileStatus.Opened
             };
 
-            processor.Process(request);
+            await processor.Process(1, request);
 
             mockLoader.Verify();
             mockLoader.VerifyNoOtherCalls();
         }
 
         [Test]
-        public void ShouldProcessRequestWithDeleteStatus()
+        public async Task ShouldProcessRequestWithDeleteStatus()
         {
             var mockLoader = new Mock<IStaticLoader>();
             mockLoader.Setup(x => x.LoadImplementations());
@@ -64,7 +58,7 @@ namespace Gauge.Dotnet.UnitTests.Processors
                 Status = CacheFileRequest.Types.FileStatus.Deleted
             };
 
-            processor.Process(request);
+            await processor.Process(1, request);
 
             mockLoader.Verify();
             mockLoader.VerifyNoOtherCalls();

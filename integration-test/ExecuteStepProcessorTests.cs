@@ -5,103 +5,101 @@
  *----------------------------------------------------------------*/
 
 
-using System.Threading;
+using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
-using NUnit.Framework;
-using NUnit.Framework.Legacy;
+using Microsoft.Extensions.Logging;
 
-namespace Gauge.Dotnet.IntegrationTests
+namespace Gauge.Dotnet.IntegrationTests;
+
+public class ExecuteStepProcessorTests : IntegrationTestsBase
 {
-    public class ExecuteStepProcessorTests : IntegrationTestsBase
+    [Test]
+    public async Task ShouldExecuteMethodFromRequest()
     {
-        [Test]
-        public void ShouldExecuteMethodFromRequest()
+        const string parameterizedStepText = "Step that takes a table {}";
+        const string stepText = "Step that takes a table <table>";
+        var reflectionWrapper = new ReflectionWrapper();
+        var activatorWrapper = new ActivatorWrapper();
+        var assemblyLocater = new AssemblyLocater(new DirectoryWrapper(), _configuration);
+        var assemblyLoader = new AssemblyLoader(assemblyLocater, new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+        var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
+        var hookRegistry = new HookRegistry(assemblyLoader);
+        var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), _configuration, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
+
+        var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
+            orchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
+
+        var protoTable = new ProtoTable
         {
-            const string parameterizedStepText = "Step that takes a table {}";
-            const string stepText = "Step that takes a table <table>";
-            var reflectionWrapper = new ReflectionWrapper();
-            var activatorWrapper = new ActivatorWrapper();
-            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
-            var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
-            var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
-            var classInstanceManager = assemblyLoader.GetClassInstanceManager();
-            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-                classInstanceManager,
-                new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
-                new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
-
-            var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
-                orchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
-
-            var protoTable = new ProtoTable
+            Headers = new ProtoTableRow
             {
-                Headers = new ProtoTableRow
+                Cells = { "foo", "bar" }
+            },
+            Rows =
+            {
+                new ProtoTableRow
                 {
-                    Cells = { "foo", "bar" }
-                },
-                Rows =
+                    Cells = {"foorow1", "foorow2"}
+                }
+            }
+        };
+        var message = new ExecuteStepRequest
+        {
+            ParsedStepText = parameterizedStepText,
+            ActualStepText = stepText,
+            Parameters =
                 {
-                    new ProtoTableRow
+                    new Parameter
                     {
-                        Cells = {"foorow1", "foorow2"}
+                        Name = "table",
+                        ParameterType = Parameter.Types.ParameterType.Table,
+                        Table = protoTable
                     }
                 }
-            };
-            var message = new ExecuteStepRequest
-            {
-                ParsedStepText = parameterizedStepText,
-                ActualStepText = stepText,
-                Parameters =
-                    {
-                        new Parameter
-                        {
-                            Name = "table",
-                            ParameterType = Parameter.Types.ParameterType.Table,
-                            Table = protoTable
-                        }
-                    }
-            };
-            var result = executeStepProcessor.Process(message);
+        };
+        var result = await executeStepProcessor.Process(1, message);
 
-            var protoExecutionResult = result.ExecutionResult;
-            ClassicAssert.IsNotNull(protoExecutionResult);
-            ClassicAssert.IsFalse(protoExecutionResult.Failed);
-        }
+        var protoExecutionResult = result.ExecutionResult;
+        ClassicAssert.IsNotNull(protoExecutionResult);
+        ClassicAssert.IsFalse(protoExecutionResult.Failed);
+    }
 
-        [Test]
-        public void ShouldCaptureScreenshotOnFailure()
+    [Test]
+    public async Task ShouldCaptureScreenshotOnFailure()
+    {
+        const string stepText = "I throw a serializable exception";
+        var reflectionWrapper = new ReflectionWrapper();
+        var activatorWrapper = new ActivatorWrapper();
+        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
+        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+        var hookRegistry = new HookRegistry(assemblyLoader);
+        var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
+        var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
+            new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), _configuration, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
+
+        var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
+            orchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
+
+
+        var message = new ExecuteStepRequest
         {
-            const string stepText = "I throw a serializable exception";
-            var reflectionWrapper = new ReflectionWrapper();
-            var activatorWrapper = new ActivatorWrapper();
-            var path = new AssemblyLocater(new DirectoryWrapper()).GetTestAssembly();
-            var assemblyLoader = new AssemblyLoader(path, new GaugeLoadContext(path), reflectionWrapper, activatorWrapper, new StepRegistry());
-            var classInstanceManager = new ThreadLocal<object>(() => assemblyLoader.GetClassInstanceManager());
-            var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
-            var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-                classInstanceManager,
-                new HookExecutor(assemblyLoader, reflectionWrapper, classInstanceManager, executionInfoMapper),
-                new StepExecutor(assemblyLoader, reflectionWrapper, classInstanceManager));
+            ParsedStepText = stepText,
+            ActualStepText = stepText
+        };
 
-            var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
-                orchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
+        var result = await executeStepProcessor.Process(1, message);
+        var protoExecutionResult = result.ExecutionResult;
 
-
-            var message = new ExecuteStepRequest
-            {
-                ParsedStepText = stepText,
-                ActualStepText = stepText
-            };
-
-            var result = executeStepProcessor.Process(message);
-            var protoExecutionResult = result.ExecutionResult;
-
-            ClassicAssert.IsNotNull(protoExecutionResult);
-            ClassicAssert.IsTrue(protoExecutionResult.Failed);
-            ClassicAssert.AreEqual("screenshot.png", protoExecutionResult.FailureScreenshotFile);
-        }
+        ClassicAssert.IsNotNull(protoExecutionResult);
+        ClassicAssert.IsTrue(protoExecutionResult.Failed);
+        ClassicAssert.AreEqual("screenshot.png", protoExecutionResult.FailureScreenshotFile);
     }
 }

@@ -9,52 +9,51 @@
 using Gauge.Dotnet.Models;
 using Gauge.Messages;
 
-namespace Gauge.Dotnet.Processors
+namespace Gauge.Dotnet.Processors;
+
+public class StepNameProcessor : IGaugeProcessor<StepNameRequest, StepNameResponse>
 {
-    public class StepNameProcessor
+    private readonly IStepRegistry _stepRegistry;
+
+    public StepNameProcessor(IStepRegistry stepRegistry)
     {
-        private readonly IStepRegistry _stepRegistry;
+        _stepRegistry = stepRegistry;
+    }
 
-        public StepNameProcessor(IStepRegistry stepRegistry)
+    public Task<StepNameResponse> Process(int stream, StepNameRequest request)
+    {
+
+        var parsedStepText = request.StepValue;
+        var isStepPresent = _stepRegistry.ContainsStep(parsedStepText);
+        var response = new StepNameResponse
         {
-            _stepRegistry = stepRegistry;
-        }
+            IsStepPresent = isStepPresent
+        };
 
-        public StepNameResponse Process(StepNameRequest request)
+        if (!isStepPresent) return Task.FromResult(response);
+
+        var stepText = _stepRegistry.GetStepText(parsedStepText);
+        var hasAlias = _stepRegistry.HasAlias(stepText);
+        var info = _stepRegistry.MethodFor(parsedStepText);
+        response.IsExternal = info.IsExternal;
+        response.HasAlias = hasAlias;
+        if (!response.IsExternal)
         {
-
-            var parsedStepText = request.StepValue;
-            var isStepPresent = _stepRegistry.ContainsStep(parsedStepText);
-            var response = new StepNameResponse
+            response.FileName = info.FileName;
+            response.Span = new Span
             {
-                IsStepPresent = isStepPresent
+                Start = info.Span.Span.Start.Line + 1,
+                StartChar = info.Span.StartLinePosition.Character,
+                End = info.Span.EndLinePosition.Line + 1,
+                EndChar = info.Span.EndLinePosition.Character
             };
-
-            if (!isStepPresent) return response;
-
-            var stepText = _stepRegistry.GetStepText(parsedStepText);
-            var hasAlias = _stepRegistry.HasAlias(stepText);
-            var info = _stepRegistry.MethodFor(parsedStepText);
-            response.IsExternal = info.IsExternal;
-            response.HasAlias = hasAlias;
-            if (!response.IsExternal)
-            {
-                response.FileName = info.FileName;
-                response.Span = new Span
-                {
-                    Start = info.Span.Span.Start.Line + 1,
-                    StartChar = info.Span.StartLinePosition.Character,
-                    End = info.Span.EndLinePosition.Line + 1,
-                    EndChar = info.Span.EndLinePosition.Character
-                };
-            }
-
-            if (hasAlias)
-                response.StepName.AddRange(info.Aliases);
-            else
-                response.StepName.Add(stepText);
-
-            return response;
         }
+
+        if (hasAlias)
+            response.StepName.AddRange(info.Aliases);
+        else
+            response.StepName.Add(stepText);
+
+        return Task.FromResult(response);
     }
 }

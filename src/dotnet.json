@@ -1,6 +1,6 @@
 {
   "id": "dotnet",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "C# support for gauge + .NET 6.0/7.0/8.0",
   "run": {
     "windows": [
@@ -31,7 +31,7 @@
     ]
   },
   "gaugeVersionSupport": {
-    "minimum": "1.0.6",
+    "minimum": "1.6.7",
     "maximum": ""
   },
   "lspLangId": "csharp",
