@@ -16,6 +16,11 @@ public class ReflectionWrapper : IReflectionWrapper
         return type.GetMethod(methodName);
     }
 
+    public MethodInfo GetMethod(Type type, string methodName, BindingFlags bindAttrs)
+    {
+        return type.GetMethod(methodName, bindAttrs);
+    }
+
     public MethodInfo[] GetMethods(Type type)
     {
         return type.GetMethods();

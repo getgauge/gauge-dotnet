@@ -44,7 +44,7 @@ public class ExecutionOrchestrator : IExecutionOrchestrator
         var stopwatch = Stopwatch.StartNew();
 
         var executionResult = await _stepExecutor.Execute(method, streamId, args);
-        return BuildResult(stopwatch, executionResult);
+        return BuildResult(stopwatch, executionResult, streamId);
     }
 
     public void ClearCache()
@@ -81,10 +81,10 @@ public class ExecutionOrchestrator : IExecutionOrchestrator
     {
         var stopwatch = Stopwatch.StartNew();
         var executionResult = await _hookExecutor.Execute(hookType, strategy, applicableTags, streamId, info);
-        return BuildResult(stopwatch, executionResult);
+        return BuildResult(stopwatch, executionResult, streamId);
     }
 
-    private ProtoExecutionResult BuildResult(Stopwatch stopwatch, ExecutionResult executionResult)
+    private ProtoExecutionResult BuildResult(Stopwatch stopwatch, ExecutionResult executionResult, int streamId)
     {
         var result = new ProtoExecutionResult
         {
@@ -112,7 +112,7 @@ public class ExecutionOrchestrator : IExecutionOrchestrator
         result.Failed = true;
         if (_config.ScreenshotOnFailure())
         {
-            var screenshotFile = TryScreenCapture();
+            var screenshotFile = TryScreenCapture(streamId);
             if (!string.IsNullOrEmpty(screenshotFile))
             {
                 result.FailureScreenshotFile = screenshotFile;
@@ -124,11 +124,11 @@ public class ExecutionOrchestrator : IExecutionOrchestrator
         return result;
     }
 
-    private string TryScreenCapture()
+    private string TryScreenCapture(int streamId)
     {
         try
         {
-            InvokeScreenshotCapture();
+            InvokeScreenshotCapture(streamId);
         }
         catch (Exception ex)
         {
@@ -140,9 +140,15 @@ public class ExecutionOrchestrator : IExecutionOrchestrator
             BindingFlags.Static | BindingFlags.Public) as IEnumerable<string>).FirstOrDefault();
     }
 
-    private void InvokeScreenshotCapture()
+    private void InvokeScreenshotCapture(int streamId)
     {
         var gaugeScreenshotsType = _assemblyLoader.GetLibType(LibType.GaugeScreenshots);
+        var methodInfo = _reflectionWrapper.GetMethod(gaugeScreenshotsType, "CaptureByStream", BindingFlags.Static | BindingFlags.Public);
+        if (methodInfo != null)
+        {
+            _reflectionWrapper.Invoke(methodInfo, null, streamId);
+            return;
+        }
         _reflectionWrapper.InvokeMethod(gaugeScreenshotsType, null, "Capture",
             BindingFlags.Static | BindingFlags.Public);
     }

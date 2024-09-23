@@ -5,20 +5,19 @@
  *----------------------------------------------------------------*/
 
 
-using System;
 using System.Reflection;
 
-namespace Gauge.Dotnet.Wrappers
+namespace Gauge.Dotnet.Wrappers;
+
+public interface IReflectionWrapper
 {
-    public interface IReflectionWrapper
-    {
-        MethodInfo GetMethod(Type type, string methodName);
-        MethodInfo[] GetMethods(Type type);
-        object Invoke(MethodInfo method, object obj, params object[] args);
+    MethodInfo GetMethod(Type type, string methodName);
+    MethodInfo GetMethod(Type type, string methodName, BindingFlags bindAttrs);
+    MethodInfo[] GetMethods(Type type);
+    object Invoke(MethodInfo method, object obj, params object[] args);
 
-        object InvokeMethod(Type type, object instance, string methodName, BindingFlags bindAttrs,
-            params object[] args);
+    object InvokeMethod(Type type, object instance, string methodName, BindingFlags bindAttrs,
+        params object[] args);
 
-        object InvokeMethod(Type type, object instance, string methodName, params object[] args);
-    }
+    object InvokeMethod(Type type, object instance, string methodName, params object[] args);
 }
