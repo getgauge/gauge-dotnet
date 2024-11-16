@@ -7,8 +7,6 @@
 
 using System;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
 using System.Threading.Tasks;
 using Gauge.CSharp.Lib;
 using Gauge.CSharp.Lib.Attribute;
@@ -79,7 +77,8 @@ namespace IntegrationTestSample
         }
 
         [Step("Take Screenshot in reference DLL")]
-        public void TakeDllReferenceScreenshot() {
+        public void TakeDllReferenceScreenshot()
+        {
             GaugeScreenshots.RegisterCustomScreenshotWriter(new ReferenceDll.ScreenshotWriter());
             GaugeScreenshots.Capture();
             GaugeScreenshots.RegisterCustomScreenshotWriter(new StringScreenshotWriter());
@@ -89,11 +88,6 @@ namespace IntegrationTestSample
         public class CustomSerializableException : Exception
         {
             public CustomSerializableException(string s) : base(s)
-            {
-            }
-
-            public CustomSerializableException(SerializationInfo info, StreamingContext context)
-                : base(info, context)
             {
             }
         }

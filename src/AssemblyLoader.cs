@@ -7,6 +7,7 @@
 
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
@@ -37,7 +38,8 @@ public class AssemblyLoader : IAssemblyLoader
 
         _logger.LogDebug("Loading assembly from : {AssemblyPath}", assemblyPath);
         _gaugeLoadContext = gaugeLoadContext;
-        this._targetLibAssembly = _gaugeLoadContext.LoadFromAssemblyName(new AssemblyName(GaugeLibAssemblyName));
+        _targetLibAssembly = _gaugeLoadContext.LoadFromAssemblyName(new AssemblyName(GaugeLibAssemblyName));
+        VerifyTargetAssemblyVersion();
         ScanAndLoad(assemblyPath);
         AssembliesReferencingGaugeLib = _gaugeLoadContext.GetAssembliesReferencingGaugeLib().ToList();
         _logger.LogDebug("Number of AssembliesReferencingGaugeLib : {AssembliesReferencingGaugeLibCount}", AssembliesReferencingGaugeLib.Count);
@@ -178,5 +180,17 @@ public class AssemblyLoader : IAssemblyLoader
             _targetLibAssembly.GetType(LibType.DefaultClassInstanceManager.FullName());
         ScreenshotWriter = ScreenshotWriter ??
             _targetLibAssembly.GetType(LibType.DefaultScreenshotWriter.FullName());
+    }
+
+    private void VerifyTargetAssemblyVersion()
+    {
+        var myLibAssemblyVersion = Assembly.GetEntryAssembly().GetReferencedAssemblies().FirstOrDefault(x => x.Name == GaugeLibAssemblyName).Version;
+        var targetAssemblyVersion = _targetLibAssembly.GetName().Version;
+        if (myLibAssemblyVersion.Major != targetAssemblyVersion.Major
+            || myLibAssemblyVersion.Minor != targetAssemblyVersion.Minor)
+        {
+            throw new GaugeLibVersionMismatchException(myLibAssemblyVersion);
+        }
+
     }
 }
