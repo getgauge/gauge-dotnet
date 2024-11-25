@@ -4,18 +4,16 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
+namespace Gauge.Dotnet.Refactoring;
 
-namespace Gauge.Dotnet.Models
+public class Position
 {
-    public class Range
+    public Position(int line, int character)
     {
-        public Range(Position start, Position end)
-        {
-            Start = start;
-            End = end;
-        }
-
-        public Position Start { get; internal set; }
-        public Position End { get; internal set; }
+        Line = line;
+        Character = character;
     }
+
+    public int Line { get; internal set; }
+    public int Character { get; internal set; }
 }

@@ -7,12 +7,14 @@
 
 using System.Reflection;
 using Gauge.Dotnet.Executors;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using static Gauge.Dotnet.Constants;
 
 namespace Gauge.Dotnet.UnitTests;
 

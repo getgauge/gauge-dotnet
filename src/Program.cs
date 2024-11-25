@@ -11,6 +11,7 @@ using System.Reflection;
 using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Extensions;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
@@ -65,6 +66,8 @@ internal static class Program
 
             if (buildSucceeded)
             {
+                // Generate step registry before starting GRPC service
+                _ = app.Services.GetRequiredService<IAssemblyLoader>().GetStepRegistry();
                 app.MapGrpcService<ExecutableRunnerServiceHandler>();
             }
             else

@@ -7,6 +7,7 @@
 
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Executors;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.UnitTests.Helpers;
 using Microsoft.Extensions.Logging;

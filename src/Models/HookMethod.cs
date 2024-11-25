@@ -5,48 +5,45 @@
  *----------------------------------------------------------------*/
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Gauge.Dotnet.Extensions;
+using Gauge.Dotnet.Loaders;
 
-namespace Gauge.Dotnet.Models
+namespace Gauge.Dotnet.Models;
+
+[Serializable]
+public class HookMethod : IHookMethod
 {
-    [Serializable]
-    public class HookMethod : IHookMethod
+    public HookMethod(LibType hookType, MethodInfo methodInfo, IAssemblyLoader assemblyLoader)
     {
-        public HookMethod(LibType hookType, MethodInfo methodInfo, IAssemblyLoader assemblyLoader)
-        {
-            Method = methodInfo.FullyQuallifiedName();
-            FilterTags = Enumerable.Empty<string>();
+        Method = methodInfo.FullyQuallifiedName();
+        FilterTags = Enumerable.Empty<string>();
 
-            var type = assemblyLoader.GetLibType(hookType);
-            if (!type.IsSubclassOf(assemblyLoader.GetLibType(LibType.FilteredHookAttribute)))
-                return;
-            var customAttributes = methodInfo.GetCustomAttributes(false);
-            var filteredHookAttribute = customAttributes.FirstOrDefault(type.IsInstanceOfType);
-            if (filteredHookAttribute == null) return;
+        var type = assemblyLoader.GetLibType(hookType);
+        if (!type.IsSubclassOf(assemblyLoader.GetLibType(LibType.FilteredHookAttribute)))
+            return;
+        var customAttributes = methodInfo.GetCustomAttributes(false);
+        var filteredHookAttribute = customAttributes.FirstOrDefault(type.IsInstanceOfType);
+        if (filteredHookAttribute == null) return;
 
-            FilterTags = (string[]) GetPropValue(filteredHookAttribute, "FilterTags");
+        FilterTags = (string[])GetPropValue(filteredHookAttribute, "FilterTags");
 
-            var targetTagBehaviourType = assemblyLoader.GetLibType(LibType.TagAggregationBehaviourAttribute);
-            dynamic tagAggregationBehaviourAttribute =
-                customAttributes.FirstOrDefault(targetTagBehaviourType.IsInstanceOfType);
+        var targetTagBehaviourType = assemblyLoader.GetLibType(LibType.TagAggregationBehaviourAttribute);
+        dynamic tagAggregationBehaviourAttribute =
+            customAttributes.FirstOrDefault(targetTagBehaviourType.IsInstanceOfType);
 
-            if (tagAggregationBehaviourAttribute != null)
-                TagAggregation = (int) GetPropValue(tagAggregationBehaviourAttribute, "TagAggregation");
-        }
+        if (tagAggregationBehaviourAttribute != null)
+            TagAggregation = (int)GetPropValue(tagAggregationBehaviourAttribute, "TagAggregation");
+    }
 
-        public int TagAggregation { get; }
+    public int TagAggregation { get; }
 
-        public IEnumerable<string> FilterTags { get; }
+    public IEnumerable<string> FilterTags { get; }
 
-        public string Method { get; }
+    public string Method { get; }
 
-        private static object GetPropValue(object src, string propName)
-        {
-            return src.GetType().GetProperty(propName).GetValue(src, null);
-        }
+    private static object GetPropValue(object src, string propName)
+    {
+        return src.GetType().GetProperty(propName).GetValue(src, null);
     }
 }

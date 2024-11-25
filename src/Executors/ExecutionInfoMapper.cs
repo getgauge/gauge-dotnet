@@ -5,6 +5,7 @@
  *----------------------------------------------------------------*/
 
 
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;

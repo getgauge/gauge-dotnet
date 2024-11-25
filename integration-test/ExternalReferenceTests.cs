@@ -6,11 +6,13 @@
 
 
 using Gauge.Dotnet.Executors;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet.IntegrationTests;
@@ -29,9 +31,10 @@ public class ExternalReferenceTests
         builder.AddInMemoryCollection(new Dictionary<string, string> { { "GAUGE_PROJECT_ROOT", testProjectPath } });
         var config = builder.Build();
 
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), config);
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()),
-            new ReflectionWrapper(), new ActivatorWrapper(), new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+            new ReflectionWrapper(), new ActivatorWrapper(serviceProvider), new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
 
         var stepValidationProcessor = new StepValidationProcessor(assemblyLoader.GetStepRegistry());
         var message = new StepValidateRequest
@@ -56,8 +59,9 @@ public class ExternalReferenceTests
         builder.AddInMemoryCollection(new Dictionary<string, string> { { "GAUGE_PROJECT_ROOT", testProjectPath } });
         var config = builder.Build();
 
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
-        var activatorWrapper = new ActivatorWrapper();
+        var activatorWrapper = new ActivatorWrapper(serviceProvider);
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), config);
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<StepExecutor>()), reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());

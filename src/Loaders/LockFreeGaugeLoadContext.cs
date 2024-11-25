@@ -6,7 +6,7 @@
 
 using System.Reflection;
 
-namespace Gauge.Dotnet;
+namespace Gauge.Dotnet.Loaders;
 
 /* NOTE: LockFreeGaugeLoadContext is required because GaugeLoadContext uses 
 // AssemblyLoadContext.LoadFromAssemblyPath which holds a filesystem lock 
@@ -28,7 +28,7 @@ public class LockFreeGaugeLoadContext : GaugeLoadContext
         _logger.LogDebug("Try load {AssemblyName} in LockFreeGaugeLoadContext", assemblyName.Name);
         if (assemblyPath != null)
         {
-            using (var fileStream = System.IO.File.OpenRead(assemblyPath))
+            using (var fileStream = File.OpenRead(assemblyPath))
             {
                 return LoadFromStream(fileStream);
             }

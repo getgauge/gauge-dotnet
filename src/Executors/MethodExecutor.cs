@@ -6,6 +6,7 @@
 
 
 using System.Reflection;
+using Gauge.Dotnet.Loaders;
 
 namespace Gauge.Dotnet.Executors;
 

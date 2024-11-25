@@ -8,6 +8,7 @@
 using System.Runtime.Serialization.Json;
 using System.Text;
 using Gauge.Dotnet.Converters;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
 
 namespace Gauge.Dotnet.Executors;

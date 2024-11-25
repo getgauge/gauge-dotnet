@@ -7,7 +7,7 @@
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace Gauge.Dotnet;
+namespace Gauge.Dotnet.Loaders;
 
 public class GaugeLoadContext : AssemblyLoadContext, IGaugeLoadContext
 {

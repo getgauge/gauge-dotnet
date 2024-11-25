@@ -6,7 +6,7 @@
 
 
 using System.Reflection;
-using Gauge.CSharp.Lib;
+using Gauge.Dotnet.Loaders;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors;

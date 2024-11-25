@@ -4,18 +4,11 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
+namespace Gauge.Dotnet.Refactoring;
 
-namespace Gauge.Dotnet.Models
+public class RefactoringChange
 {
-    public class Position
-    {
-        public Position(int line, int character)
-        {
-            Line = line;
-            Character = character;
-        }
-
-        public int Line { get; internal set; }
-        public int Character { get; internal set; }
-    }
+    public string FileName { get; internal set; }
+    public string FileContent { get; internal set; }
+    public List<Diff> Diffs { get; set; }
 }

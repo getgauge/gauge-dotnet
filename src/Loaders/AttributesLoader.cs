@@ -8,7 +8,7 @@
 using System.Xml.Linq;
 using Gauge.Dotnet.Extensions;
 
-namespace Gauge.Dotnet;
+namespace Gauge.Dotnet.Loaders;
 
 public class AttributesLoader : IAttributesLoader
 {

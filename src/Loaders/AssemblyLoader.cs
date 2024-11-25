@@ -12,7 +12,7 @@ using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
 
-namespace Gauge.Dotnet;
+namespace Gauge.Dotnet.Loaders;
 
 public class AssemblyLoader : IAssemblyLoader
 {
@@ -184,7 +184,7 @@ public class AssemblyLoader : IAssemblyLoader
 
     private void VerifyTargetAssemblyVersion()
     {
-        var myLibAssemblyVersion = Assembly.GetEntryAssembly().GetReferencedAssemblies().FirstOrDefault(x => x.Name == GaugeLibAssemblyName).Version;
+        var myLibAssemblyVersion = new Version(CSharpLibVersion);
         var targetAssemblyVersion = _targetLibAssembly.GetName().Version;
         if (myLibAssemblyVersion.Major != targetAssemblyVersion.Major
             || myLibAssemblyVersion.Minor != targetAssemblyVersion.Minor)

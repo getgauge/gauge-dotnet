@@ -4,7 +4,7 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
-namespace Gauge.Dotnet;
+namespace Gauge.Dotnet.Loaders;
 
 public interface IAssemblyLocater
 {

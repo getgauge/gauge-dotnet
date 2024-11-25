@@ -7,7 +7,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Gauge.Dotnet
+namespace Gauge.Dotnet.Loaders
 {
     public interface IGaugeLoadContext
     {

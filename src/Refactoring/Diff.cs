@@ -4,16 +4,16 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
+namespace Gauge.Dotnet.Refactoring;
 
-
-using System.Collections.Generic;
-
-namespace Gauge.Dotnet.Models
+public class Diff
 {
-    public class RefactoringChange
+    public Diff(string content, Range range)
     {
-        public string FileName { get; internal set; }
-        public string FileContent { get; internal set; }
-        public List<Diff> Diffs { get; set; }
+        Content = content;
+        Range = range;
     }
+
+    public string Content { get; internal set; }
+    public Range Range { get; internal set; }
 }

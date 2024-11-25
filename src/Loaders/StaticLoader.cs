@@ -13,7 +13,7 @@ using Gauge.Dotnet.Wrappers;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Gauge.Dotnet;
+namespace Gauge.Dotnet.Loaders;
 
 public sealed class StaticLoader : IStaticLoader
 {

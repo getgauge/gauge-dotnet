@@ -1,0 +1,1 @@
+﻿global using static Gauge.Dotnet.Constants;

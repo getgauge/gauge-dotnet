@@ -6,6 +6,7 @@
 
 
 using System.Reflection;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Strategy;
 using Gauge.Messages;

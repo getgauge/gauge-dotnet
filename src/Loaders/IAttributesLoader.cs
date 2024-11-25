@@ -5,17 +5,13 @@
  *----------------------------------------------------------------*/
 
 
-namespace Gauge.Dotnet.Models
-{
-    public class Diff
-    {
-        public Diff(string content, Range range)
-        {
-            Content = content;
-            Range = range;
-        }
+using System.Collections.Generic;
+using System.Xml.Linq;
 
-        public string Content { get; internal set; }
-        public Range Range { get; internal set; }
+namespace Gauge.Dotnet.Loaders
+{
+    public interface IAttributesLoader
+    {
+        IEnumerable<XAttribute> GetRemovedAttributes();
     }
 }

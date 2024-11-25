@@ -1,6 +1,8 @@
 using Gauge.Dotnet.Executors;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
+using static Gauge.Dotnet.Constants;
 
 namespace Gauge.Dotnet.UnitTests;
 

@@ -7,7 +7,7 @@
 
 using Gauge.Dotnet.Models;
 
-namespace Gauge.Dotnet
+namespace Gauge.Dotnet.Loaders
 {
     public interface IStaticLoader
     {

@@ -7,8 +7,10 @@
 
 using Gauge.CSharp.Lib;
 using Gauge.Dotnet.Executors;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Wrappers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet.IntegrationTests;
@@ -19,8 +21,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     [Test]
     public async Task RecoverableIsTrueOnExceptionThrownWhenContinueOnFailure()
     {
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
-        var activatorWrapper = new ActivatorWrapper();
+        var activatorWrapper = new ActivatorWrapper(serviceProvider);
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
@@ -39,8 +42,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     [Test]
     public async Task ShouldCreateTableFromTargetType()
     {
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
-        var activatorWrapper = new ActivatorWrapper();
+        var activatorWrapper = new ActivatorWrapper(serviceProvider);
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
@@ -61,8 +65,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     [Test]
     public async Task ShouldExecuteMethodAndReturnResult()
     {
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
-        var activatorWrapper = new ActivatorWrapper();
+        var activatorWrapper = new ActivatorWrapper(serviceProvider);
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
@@ -82,8 +87,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     [Test]
     public async Task ShouldGetPendingMessages()
     {
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
-        var activatorWrapper = new ActivatorWrapper();
+        var activatorWrapper = new ActivatorWrapper(serviceProvider);
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
@@ -104,8 +110,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     [Test]
     public async Task ShouldGetStacktraceForAggregateException()
     {
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
-        var activatorWrapper = new ActivatorWrapper();
+        var activatorWrapper = new ActivatorWrapper(serviceProvider);
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
@@ -126,8 +133,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     [Test]
     public void ShouldGetStepTextsForMethod()
     {
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
-        var activatorWrapper = new ActivatorWrapper();
+        var activatorWrapper = new ActivatorWrapper(serviceProvider);
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
@@ -142,9 +150,10 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     [Test]
     public async Task SuccessIsFalseOnSerializableExceptionThrown()
     {
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
         const string expectedMessage = "I am a custom serializable exception";
         var reflectionWrapper = new ReflectionWrapper();
-        var activatorWrapper = new ActivatorWrapper();
+        var activatorWrapper = new ActivatorWrapper(serviceProvider);
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
@@ -166,9 +175,10 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
     [Test]
     public async Task SuccessIsFalseOnUnserializableExceptionThrown()
     {
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
         const string expectedMessage = "I am a custom exception";
         var reflectionWrapper = new ReflectionWrapper();
-        var activatorWrapper = new ActivatorWrapper();
+        var activatorWrapper = new ActivatorWrapper(serviceProvider);
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());

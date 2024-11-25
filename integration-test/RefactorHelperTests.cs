@@ -7,6 +7,7 @@
 
 using Gauge.CSharp.Lib.Attribute;
 using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Refactoring;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 

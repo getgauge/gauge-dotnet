@@ -7,6 +7,7 @@
 
 using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Extensions;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Wrappers;
 using Microsoft.Extensions.Configuration;
 

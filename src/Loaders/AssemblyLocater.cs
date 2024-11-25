@@ -9,7 +9,7 @@ using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Wrappers;
 
-namespace Gauge.Dotnet;
+namespace Gauge.Dotnet.Loaders;
 
 public class AssemblyLocater : IAssemblyLocater
 {
@@ -31,7 +31,7 @@ public class AssemblyLocater : IAssemblyLocater
                 .EnumerateFiles(gaugeBinDir, "*.deps.json", SearchOption.TopDirectoryOnly)
                 .First().Replace(".deps.json", ".dll");
         }
-        catch (System.InvalidOperationException)
+        catch (InvalidOperationException)
         {
             throw new GaugeTestAssemblyNotFoundException(gaugeBinDir);
         }

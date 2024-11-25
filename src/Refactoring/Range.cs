@@ -4,14 +4,16 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
+namespace Gauge.Dotnet.Refactoring;
 
-using System.Collections.Generic;
-using System.Xml.Linq;
-
-namespace Gauge.Dotnet
+public class Range
 {
-    public interface IAttributesLoader
+    public Range(Position start, Position end)
     {
-        IEnumerable<XAttribute> GetRemovedAttributes();
+        Start = start;
+        End = end;
     }
+
+    public Position Start { get; internal set; }
+    public Position End { get; internal set; }
 }
