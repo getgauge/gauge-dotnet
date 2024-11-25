@@ -33,7 +33,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Gauge.CSharp.Lib" Version="0.11.3" />
-		<PackageReference Include="Grpc.AspNetCore" Version="2.66.0" />
+		<PackageReference Include="Grpc.AspNetCore" Version="2.67.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
 	</ItemGroup>
 
