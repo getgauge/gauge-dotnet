@@ -5,18 +5,14 @@
  *----------------------------------------------------------------*/
 
 
-using Gauge.Dotnet.Loaders;
+using Gauge.Dotnet.DataStore;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors;
 
-public class SuiteDataStoreInitProcessor : DataStoreInitProcessorBase, IGaugeProcessor<SuiteDataStoreInitRequest, ExecutionStatusResponse>
+public class SuiteDataStoreInitProcessor(IDataStoreFactory dataStoreFactory) : DataStoreInitProcessorBase(DataStoreType.Suite, dataStoreFactory),
+    IGaugeProcessor<SuiteDataStoreInitRequest, ExecutionStatusResponse>
 {
-    public SuiteDataStoreInitProcessor(IAssemblyLoader loader)
-        : base(DataStoreType.Suite, loader)
-    {
-    }
-
     public Task<ExecutionStatusResponse> Process(int stream, SuiteDataStoreInitRequest request)
     {
         return Task.FromResult(Process(request.Stream));

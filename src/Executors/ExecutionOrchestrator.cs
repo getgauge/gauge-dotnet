@@ -7,6 +7,7 @@
 
 using System.Diagnostics;
 using System.Reflection;
+using Gauge.Dotnet.DataStore;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
@@ -24,10 +25,11 @@ public class ExecutionOrchestrator : IExecutionOrchestrator
     private readonly IReflectionWrapper _reflectionWrapper;
     private readonly IStepExecutor _stepExecutor;
     private readonly IConfiguration _config;
+    private readonly IDataStoreFactory _dataStoreFactory;
     private readonly ILogger<ExecutionOrchestrator> _logger;
 
     public ExecutionOrchestrator(IReflectionWrapper reflectionWrapper, IAssemblyLoader assemblyLoader, IHookExecutor hookExecutor, IStepExecutor stepExecutor,
-        IConfiguration config, ILogger<ExecutionOrchestrator> logger)
+        IConfiguration config, ILogger<ExecutionOrchestrator> logger, IDataStoreFactory dataStoreFactory)
     {
         _reflectionWrapper = reflectionWrapper;
         _assemblyLoader = assemblyLoader;
@@ -35,6 +37,7 @@ public class ExecutionOrchestrator : IExecutionOrchestrator
         _hookExecutor = hookExecutor;
         _stepExecutor = stepExecutor;
         _config = config;
+        _dataStoreFactory = dataStoreFactory;
         _logger = logger;
     }
 
@@ -144,13 +147,10 @@ public class ExecutionOrchestrator : IExecutionOrchestrator
     private void InvokeScreenshotCapture(int streamId)
     {
         var gaugeScreenshotsType = _assemblyLoader.GetLibType(LibType.GaugeScreenshots);
-        var methodInfo = _reflectionWrapper.GetMethod(gaugeScreenshotsType, "CaptureByStream", BindingFlags.Static | BindingFlags.Public);
-        if (methodInfo != null)
-        {
-            _reflectionWrapper.Invoke(methodInfo, null, streamId);
-            return;
-        }
-        _reflectionWrapper.InvokeMethod(gaugeScreenshotsType, null, "Capture",
-            BindingFlags.Static | BindingFlags.Public);
+        var dataStores = _dataStoreFactory.GetDataStoresByStream(streamId);
+        var methodInfo = _reflectionWrapper.GetMethod(gaugeScreenshotsType, "CaptureWithDataStores", BindingFlags.Static | BindingFlags.Public);
+        _reflectionWrapper.Invoke(methodInfo, null, _dataStoreFactory.SuiteDataStore, dataStores.GetValueOrDefault(DataStoreType.Spec),
+            dataStores.GetValueOrDefault(DataStoreType.Scenario));
+        return;
     }
 }

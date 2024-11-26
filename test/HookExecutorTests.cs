@@ -45,7 +45,7 @@ internal class HookExecutorTests
         mockAssemblyLoader.Setup(x => x.GetClassInstanceManager()).Returns(mockClassInstanceManager.Object);
 
         var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
-        mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>())).Returns(new { });
+        mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>(), 1)).Returns(new ExecutionContext());
 
         var executor = new HookExecutor(mockAssemblyLoader.Object, mockExecutionInfoMapper.Object, mockHookRegistry.Object, mockLogger.Object);
 
@@ -77,9 +77,9 @@ internal class HookExecutorTests
         var expectedExecutionInfo = new ExecutionContext();
 
         var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
-        mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(executionInfo)).Returns(expectedExecutionInfo);
+        mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(executionInfo, 1)).Returns(expectedExecutionInfo);
 
-        mockClassInstanceManager.Setup(x => x.InvokeMethod(methodInfo, 1, expectedExecutionInfo)).Verifiable();
+        mockClassInstanceManager.Setup(x => x.InvokeMethod(methodInfo, It.IsAny<CSharp.Lib.ExecutionContext>(), expectedExecutionInfo)).Verifiable();
 
         var executor = new HookExecutor(mockAssemblyLoader.Object, mockExecutionInfoMapper.Object, mockHookRegistry.Object, mockLogger.Object);
 
@@ -110,10 +110,10 @@ internal class HookExecutorTests
         var expectedExecutionInfo = new ExecutionContext();
 
         var mockExecutionInfoMapper = new Mock<IExecutionInfoMapper>();
-        mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>()))
+        mockExecutionInfoMapper.Setup(x => x.ExecutionContextFrom(It.IsAny<ExecutionInfo>(), 1))
             .Returns(expectedExecutionInfo);
         var executor = new HookExecutor(mockAssemblyLoader.Object, mockExecutionInfoMapper.Object, mockHookRegistry.Object, mockLogger.Object);
-        mockClassInstanceManagerType.Setup(x => x.InvokeMethod(methodInfo, 1, It.IsAny<object[]>()))
+        mockClassInstanceManagerType.Setup(x => x.InvokeMethod(methodInfo, It.IsAny<CSharp.Lib.ExecutionContext>(), It.IsAny<object[]>()))
             .Throws(new Exception("hook failed"));
 
         var result = await executor.Execute("BeforeSuite", new HooksStrategy(), new List<string>(), 1, new ExecutionInfo());

@@ -6,6 +6,7 @@
 
 
 using System.Reflection;
+using Gauge.Dotnet.DataStore;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
@@ -21,6 +22,7 @@ namespace Gauge.Dotnet.UnitTests;
 [TestFixture]
 public class ExecutionOrchestratorTests
 {
+    private readonly Mock<IDataStoreFactory> _dataStoreFactoryMock = new();
     private readonly Mock<ILogger<ExecutionOrchestrator>> _logger = new();
     private IConfiguration _config;
 
@@ -60,7 +62,8 @@ public class ExecutionOrchestratorTests
             .Returns(pendingScreenshots);
         var assemblyLoader = mockAssemblyLoader.Object;
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            mockHookExecuter.Object, mockStepExecuter.Object, _config, _logger.Object);
+            mockHookExecuter.Object, mockStepExecuter.Object, _config, _logger.Object,
+            _dataStoreFactoryMock.Object);
 
         var result = await executionOrchestrator.ExecuteHooks("hooks", hooksStrategy, new List<string>(), 1, It.IsAny<ExecutionInfo>());
 
@@ -89,7 +92,8 @@ public class ExecutionOrchestratorTests
         var reflectionWrapper = mockReflectionWrapper.Object;
         var assemblyLoader = mockAssemblyLoader.Object;
         var orchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
-            mockHookExecuter.Object, mockStepExecuter.Object, _config, _logger.Object);
+            mockHookExecuter.Object, mockStepExecuter.Object, _config, _logger.Object,
+            _dataStoreFactoryMock.Object);
         mockHookExecuter.Setup(executor =>
             executor.Execute("hooks", hooksStrategy, new List<string>(), It.IsAny<int>(), It.IsAny<ExecutionInfo>())
         ).ReturnsAsync(executionResult).Verifiable();
@@ -130,7 +134,7 @@ public class ExecutionOrchestratorTests
             .Callback(() => Thread.Sleep(1)); // Simulate a delay in method execution
 
         var orchestrator = new ExecutionOrchestrator(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
-            mockHookExecuter.Object, mockStepExecutor.Object, _config, _logger.Object);
+            mockHookExecuter.Object, mockStepExecutor.Object, _config, _logger.Object, _dataStoreFactoryMock.Object);
 
         var mockType = new Mock<Type>().Object;
         mockAssemblyLoader.Setup(x => x.GetLibType(LibType.MessageCollector)).Returns(mockType);
@@ -182,7 +186,7 @@ public class ExecutionOrchestratorTests
             .Returns(pendingScreenshots);
 
         var orchestrator = new ExecutionOrchestrator(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
-            mockHookExecuter.Object, mockStepExecutor.Object, _config, _logger.Object);
+            mockHookExecuter.Object, mockStepExecutor.Object, _config, _logger.Object, _dataStoreFactoryMock.Object);
 
         var result = await orchestrator.ExecuteStep(gaugeMethod, 1, "Bar", "string");
 
@@ -220,13 +224,13 @@ public class ExecutionOrchestratorTests
         mockReflectionWrapper.Setup(x =>
                 x.InvokeMethod(mockType, null, "GetAllPendingScreenshotFiles", It.IsAny<BindingFlags>()))
             .Returns(pendingScreenshots);
+        _dataStoreFactoryMock.Setup(x => x.GetDataStoresByStream(1)).Returns(new Dictionary<DataStoreType, dynamic>());
 
         var orchestrator = new ExecutionOrchestrator(mockReflectionWrapper.Object, mockAssemblyLoader.Object,
-            mockHookExecuter.Object, mockStepExecutor.Object, _config, _logger.Object);
+            mockHookExecuter.Object, mockStepExecutor.Object, _config, _logger.Object, _dataStoreFactoryMock.Object);
 
         var result = await orchestrator.ExecuteStep(gaugeMethod, 1, "Bar", "String");
         mockStepExecutor.VerifyAll();
-
 
         ClassicAssert.True(result.Failed);
         ClassicAssert.AreEqual(expectedScreenshot, result.FailureScreenshotFile);

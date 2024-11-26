@@ -11,5 +11,5 @@ namespace Gauge.Dotnet.Executors;
 
 public interface IExecutionInfoMapper
 {
-    dynamic ExecutionContextFrom(ExecutionInfo currentExecutionInfo);
+    dynamic ExecutionContextFrom(ExecutionInfo currentExecutionInfo, int streamId);
 }

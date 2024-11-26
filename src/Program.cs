@@ -8,6 +8,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Reflection;
+using Gauge.Dotnet.DataStore;
 using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Extensions;
@@ -132,6 +133,7 @@ internal static class Program
         services.AddSingleton<ITableFormatter, TableFormatter>();
         services.AddSingleton<IExecutionOrchestrator, ExecutionOrchestrator>();
         services.AddSingleton<IExecutionInfoMapper, ExecutionInfoMapper>();
+        services.AddSingleton<IDataStoreFactory, DataStoreFactory>();
         services.AddTransient<IGaugeProcessor<StepValidateRequest, StepValidateResponse>, StepValidationProcessor>();
         services.AddTransient<IGaugeProcessor<CacheFileRequest, Empty>, CacheFileProcessor>();
         services.AddTransient<IGaugeProcessor<Empty, ImplementationFileGlobPatternResponse>, ImplementationFileGlobPatterProcessor>();

@@ -1,5 +1,7 @@
+using Gauge.Dotnet.DataStore;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Loaders;
+using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using static Gauge.Dotnet.Constants;
@@ -10,13 +12,16 @@ namespace Gauge.Dotnet.UnitTests;
 public class ExecutionInfoMapperTests
 {
     private ExecutionInfo executionInfo;
-    private Mock<IAssemblyLoader> mockAssemblyLoader;
+    private Mock<IAssemblyLoader> _mockAssemblyLoader;
+    private readonly Mock<IDataStoreFactory> _mockDataStoreFactory = new();
+    private readonly Mock<ITableFormatter> _mockTableFormatter = new();
 
     [SetUp]
     public void Setup()
     {
-        mockAssemblyLoader = new Mock<IAssemblyLoader>();
-        mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ExecutionContext)).Returns(typeof(CSharp.Lib.ExecutionContext));
+        _mockAssemblyLoader = new Mock<IAssemblyLoader>();
+        _mockAssemblyLoader.Setup(x => x.GetLibType(LibType.ExecutionContext)).Returns(typeof(CSharp.Lib.ExecutionContext));
+        _mockDataStoreFactory.Setup(x => x.GetDataStoresByStream(1)).Returns(new Dictionary<DataStoreType, object>());
         executionInfo = new ExecutionInfo
         {
             CurrentScenario = new ScenarioInfo
@@ -43,7 +48,10 @@ public class ExecutionInfoMapperTests
         mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(CSharp.Lib.ExecutionContext.Specification),
             executionInfo.CurrentSpec.Name, executionInfo.CurrentSpec.FileName, executionInfo.CurrentSpec.IsFailed,
             executionInfo.CurrentSpec.Tags.ToArray())).Verifiable();
-        new ExecutionInfoMapper(mockAssemblyLoader.Object, mockActivatorWrapper.Object).ExecutionContextFrom(executionInfo);
+        mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(CSharp.Lib.ExecutionContext.CurrentDataStores)))
+            .Returns(new CSharp.Lib.ExecutionContext.CurrentDataStores());
+        new ExecutionInfoMapper(_mockAssemblyLoader.Object, mockActivatorWrapper.Object, _mockDataStoreFactory.Object, _mockTableFormatter.Object)
+            .ExecutionContextFrom(executionInfo, 1);
         mockActivatorWrapper.VerifyAll();
     }
 
@@ -53,7 +61,10 @@ public class ExecutionInfoMapperTests
         executionInfo.CurrentSpec = null;
         var mockActivatorWrapper = new Mock<IActivatorWrapper>();
         mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(CSharp.Lib.ExecutionContext.Specification))).Verifiable();
-        new ExecutionInfoMapper(mockAssemblyLoader.Object, mockActivatorWrapper.Object).ExecutionContextFrom(executionInfo);
+        mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(CSharp.Lib.ExecutionContext.CurrentDataStores)))
+            .Returns(new CSharp.Lib.ExecutionContext.CurrentDataStores());
+        new ExecutionInfoMapper(_mockAssemblyLoader.Object, mockActivatorWrapper.Object, _mockDataStoreFactory.Object, _mockTableFormatter.Object)
+            .ExecutionContextFrom(executionInfo, 1);
         mockActivatorWrapper.VerifyAll();
     }
 
@@ -65,7 +76,10 @@ public class ExecutionInfoMapperTests
             executionInfo.CurrentScenario.Name, executionInfo.CurrentScenario.IsFailed,
             executionInfo.CurrentScenario.Tags.ToArray(),
             executionInfo.CurrentScenario.Retries.MaxRetries, executionInfo.CurrentScenario.Retries.CurrentRetry)).Verifiable();
-        new ExecutionInfoMapper(mockAssemblyLoader.Object, mockActivatorWrapper.Object).ExecutionContextFrom(executionInfo);
+        mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(CSharp.Lib.ExecutionContext.CurrentDataStores)))
+            .Returns(new CSharp.Lib.ExecutionContext.CurrentDataStores());
+        new ExecutionInfoMapper(_mockAssemblyLoader.Object, mockActivatorWrapper.Object, _mockDataStoreFactory.Object, _mockTableFormatter.Object)
+            .ExecutionContextFrom(executionInfo, 1);
         mockActivatorWrapper.VerifyAll();
     }
 
@@ -75,7 +89,10 @@ public class ExecutionInfoMapperTests
         executionInfo.CurrentScenario = null;
         var mockActivatorWrapper = new Mock<IActivatorWrapper>();
         mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(CSharp.Lib.ExecutionContext.Scenario))).Verifiable();
-        new ExecutionInfoMapper(mockAssemblyLoader.Object, mockActivatorWrapper.Object).ExecutionContextFrom(executionInfo);
+        mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(CSharp.Lib.ExecutionContext.CurrentDataStores)))
+            .Returns(new CSharp.Lib.ExecutionContext.CurrentDataStores());
+        new ExecutionInfoMapper(_mockAssemblyLoader.Object, mockActivatorWrapper.Object, _mockDataStoreFactory.Object, _mockTableFormatter.Object)
+            .ExecutionContextFrom(executionInfo, 1);
         mockActivatorWrapper.VerifyAll();
     }
 
@@ -86,7 +103,10 @@ public class ExecutionInfoMapperTests
         mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(CSharp.Lib.ExecutionContext.StepDetails),
             executionInfo.CurrentStep.Step.ActualStepText, executionInfo.CurrentStep.IsFailed,
             executionInfo.CurrentStep.StackTrace, executionInfo.CurrentStep.ErrorMessage, new List<List<string>>())).Verifiable();
-        new ExecutionInfoMapper(mockAssemblyLoader.Object, mockActivatorWrapper.Object).ExecutionContextFrom(executionInfo);
+        mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(CSharp.Lib.ExecutionContext.CurrentDataStores)))
+            .Returns(new CSharp.Lib.ExecutionContext.CurrentDataStores());
+        new ExecutionInfoMapper(_mockAssemblyLoader.Object, mockActivatorWrapper.Object, _mockDataStoreFactory.Object, _mockTableFormatter.Object)
+            .ExecutionContextFrom(executionInfo, 1);
         mockActivatorWrapper.VerifyAll();
     }
 
@@ -96,7 +116,10 @@ public class ExecutionInfoMapperTests
         executionInfo.CurrentStep = null;
         var mockActivatorWrapper = new Mock<IActivatorWrapper>();
         mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(CSharp.Lib.ExecutionContext.StepDetails))).Verifiable();
-        new ExecutionInfoMapper(mockAssemblyLoader.Object, mockActivatorWrapper.Object).ExecutionContextFrom(executionInfo);
+        mockActivatorWrapper.Setup(x => x.CreateInstance(typeof(CSharp.Lib.ExecutionContext.CurrentDataStores)))
+            .Returns(new CSharp.Lib.ExecutionContext.CurrentDataStores());
+        new ExecutionInfoMapper(_mockAssemblyLoader.Object, mockActivatorWrapper.Object, _mockDataStoreFactory.Object, _mockTableFormatter.Object)
+            .ExecutionContextFrom(executionInfo, 1);
         mockActivatorWrapper.VerifyAll();
     }
 }

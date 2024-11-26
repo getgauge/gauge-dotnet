@@ -5,6 +5,7 @@
  *----------------------------------------------------------------*/
 
 
+using Gauge.Dotnet.DataStore;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
@@ -66,10 +67,13 @@ public class ExternalReferenceTests
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<StepExecutor>()), reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
-        var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
+        var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
+        var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
+        var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper, dataStoreFactory, tableFormatter);
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
             new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
-            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), config, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>(), executionInfoMapper), config,
+            _loggerFactory.CreateLogger<ExecutionOrchestrator>(), dataStoreFactory);
 
         var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
             executionOrchestrator, new TableFormatter(assemblyLoader, activatorWrapper));
