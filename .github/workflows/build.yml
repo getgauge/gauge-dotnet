@@ -26,7 +26,7 @@ jobs:
     - name: Setup .NET Core 
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 9.0.x
 
     - name: Dotnet unit test on windows
       if: matrix.os == 'windows-latest'
@@ -69,7 +69,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 9.0.x
 
       - uses: getgauge/setup-gauge@master
         with:
@@ -130,7 +130,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 9.0.x
 
       - uses: getgauge/setup-gauge@master
         with:

@@ -5,6 +5,8 @@
  *----------------------------------------------------------------*/
 
 
+using Gauge.Dotnet.DataStore;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
@@ -13,34 +15,34 @@ namespace Gauge.Dotnet.Executors;
 
 public class ExecutionInfoMapper : IExecutionInfoMapper
 {
-    private Type _executionContextType;
-    private readonly IActivatorWrapper activatorWrapper;
-    private readonly ITableFormatter tableFormatter;
+    private readonly Type _executionContextType;
+    private readonly IActivatorWrapper _activatorWrapper;
+    private readonly ITableFormatter _tableFormatter;
+    private readonly IDataStoreFactory _dataStoreFactory;
 
-    public ExecutionInfoMapper(IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper)
+    public ExecutionInfoMapper(IAssemblyLoader assemblyLoader, IActivatorWrapper activatorWrapper, IDataStoreFactory dataStoreFactory, ITableFormatter tableFormatter)
     {
         _executionContextType = assemblyLoader.GetLibType(LibType.ExecutionContext);
-        this.activatorWrapper = activatorWrapper;
-        tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
+        _activatorWrapper = activatorWrapper;
+        _dataStoreFactory = dataStoreFactory;
+        _tableFormatter = tableFormatter;
     }
 
-    public dynamic ExecutionContextFrom(ExecutionInfo currentExecutionInfo)
+    public dynamic ExecutionContextFrom(ExecutionInfo currentExecutionInfo, int streamId)
     {
-        if (currentExecutionInfo == null)
-            return activatorWrapper.CreateInstance(_executionContextType);
-
-        return activatorWrapper.CreateInstance(_executionContextType, SpecificationFrom(currentExecutionInfo.CurrentSpec),
-            ScenarioFrom(currentExecutionInfo.CurrentScenario),
-            StepFrom(currentExecutionInfo.CurrentStep));
+        return _activatorWrapper.CreateInstance(_executionContextType, SpecificationFrom(currentExecutionInfo?.CurrentSpec),
+            ScenarioFrom(currentExecutionInfo?.CurrentScenario),
+            StepFrom(currentExecutionInfo?.CurrentStep),
+            DataStoresFor(streamId));
     }
 
     private dynamic SpecificationFrom(SpecInfo currentSpec)
     {
         var executionContextSpecType = _executionContextType.GetNestedType("Specification");
         return currentSpec != null
-            ? activatorWrapper.CreateInstance(executionContextSpecType, currentSpec.Name, currentSpec.FileName, currentSpec.IsFailed,
+            ? _activatorWrapper.CreateInstance(executionContextSpecType, currentSpec.Name, currentSpec.FileName, currentSpec.IsFailed,
                 currentSpec.Tags.ToArray())
-            : activatorWrapper.CreateInstance(executionContextSpecType);
+            : _activatorWrapper.CreateInstance(executionContextSpecType);
     }
 
     private dynamic ScenarioFrom(ScenarioInfo currentScenario)
@@ -51,16 +53,16 @@ public class ExecutionInfoMapper : IExecutionInfoMapper
             currentScenario.Retries = new ScenarioRetriesInfo { MaxRetries = 0, CurrentRetry = 0 };
         }
         return currentScenario != null
-            ? activatorWrapper.CreateInstance(executionContextScenarioType, currentScenario.Name, currentScenario.IsFailed,
+            ? _activatorWrapper.CreateInstance(executionContextScenarioType, currentScenario.Name, currentScenario.IsFailed,
                 currentScenario.Tags.ToArray(), currentScenario.Retries.MaxRetries, currentScenario.Retries.CurrentRetry)
-            : activatorWrapper.CreateInstance(executionContextScenarioType);
+            : _activatorWrapper.CreateInstance(executionContextScenarioType);
     }
 
     private dynamic StepFrom(StepInfo currentStep)
     {
         var executionContextStepType = _executionContextType.GetNestedType("StepDetails"); ;
         if (currentStep == null || currentStep.Step == null)
-            return activatorWrapper.CreateInstance(executionContextStepType);
+            return _activatorWrapper.CreateInstance(executionContextStepType);
 
         var parameters = new List<List<string>>();
         foreach (var parameter in currentStep.Step.Parameters)
@@ -80,12 +82,12 @@ public class ExecutionInfoMapper : IExecutionInfoMapper
             else if (parameter.ParameterType == Parameter.Types.ParameterType.SpecialTable ||
                 parameter.ParameterType == Parameter.Types.ParameterType.Table)
             {
-                var asJSon = tableFormatter.GetJSON(parameter.Table);
+                var asJSon = _tableFormatter.GetJSON(parameter.Table);
                 parameters.Add(new List<string> { "Table", parameter.Name, asJSon });
             }
         }
 
-        var inst = activatorWrapper.CreateInstance(
+        var inst = _activatorWrapper.CreateInstance(
             executionContextStepType,
             currentStep.Step.ActualStepText, currentStep.IsFailed,
             currentStep.StackTrace, currentStep.ErrorMessage,
@@ -93,4 +95,16 @@ public class ExecutionInfoMapper : IExecutionInfoMapper
 
         return inst;
     }
+
+    private dynamic DataStoresFor(int streamId)
+    {
+        var streamDataStores = _dataStoreFactory.GetDataStoresByStream(streamId);
+        var executionContextDataStoresType = _executionContextType.GetNestedType("CurrentDataStores");
+        dynamic dataStores = _activatorWrapper.CreateInstance(executionContextDataStoresType);
+        dataStores.SuiteDataStore = _dataStoreFactory.SuiteDataStore;
+        dataStores.SpecDataStore = streamDataStores.GetValueOrDefault(DataStoreType.Spec);
+        dataStores.ScenarioDataStore = streamDataStores.GetValueOrDefault(DataStoreType.Scenario);
+        return dataStores;
+    }
+
 }

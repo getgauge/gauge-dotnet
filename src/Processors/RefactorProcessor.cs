@@ -6,6 +6,7 @@
 
 
 using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Refactoring;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors;

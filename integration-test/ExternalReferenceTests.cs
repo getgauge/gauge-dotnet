@@ -5,12 +5,15 @@
  *----------------------------------------------------------------*/
 
 
+using Gauge.Dotnet.DataStore;
 using Gauge.Dotnet.Executors;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet.IntegrationTests;
@@ -29,9 +32,10 @@ public class ExternalReferenceTests
         builder.AddInMemoryCollection(new Dictionary<string, string> { { "GAUGE_PROJECT_ROOT", testProjectPath } });
         var config = builder.Build();
 
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), config);
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()),
-            new ReflectionWrapper(), new ActivatorWrapper(), new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+            new ReflectionWrapper(), new ActivatorWrapper(serviceProvider), new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
 
         var stepValidationProcessor = new StepValidationProcessor(assemblyLoader.GetStepRegistry());
         var message = new StepValidateRequest
@@ -56,16 +60,20 @@ public class ExternalReferenceTests
         builder.AddInMemoryCollection(new Dictionary<string, string> { { "GAUGE_PROJECT_ROOT", testProjectPath } });
         var config = builder.Build();
 
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
-        var activatorWrapper = new ActivatorWrapper();
+        var activatorWrapper = new ActivatorWrapper(serviceProvider);
         var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), config);
         var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<StepExecutor>()), reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
-        var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper);
+        var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
+        var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
+        var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper, dataStoreFactory, tableFormatter);
         var executionOrchestrator = new ExecutionOrchestrator(reflectionWrapper, assemblyLoader,
             new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
-            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>()), config, _loggerFactory.CreateLogger<ExecutionOrchestrator>());
+            new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>(), executionInfoMapper), config,
+            _loggerFactory.CreateLogger<ExecutionOrchestrator>(), dataStoreFactory);
 
         var executeStepProcessor = new ExecuteStepProcessor(assemblyLoader.GetStepRegistry(),
             executionOrchestrator, new TableFormatter(assemblyLoader, activatorWrapper));

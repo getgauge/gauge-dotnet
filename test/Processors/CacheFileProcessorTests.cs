@@ -4,6 +4,7 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Processors;
 using Gauge.Messages;
 

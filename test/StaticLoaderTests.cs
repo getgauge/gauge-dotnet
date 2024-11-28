@@ -6,6 +6,7 @@
 
 
 using System.Xml.Linq;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Wrappers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using Gauge.Dotnet.Extensions;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.UnitTests.Helpers;
 using Moq;
 using NUnit.Framework;

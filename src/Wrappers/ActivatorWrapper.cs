@@ -4,16 +4,17 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
+using System.Diagnostics.CodeAnalysis;
 
-using System;
+namespace Gauge.Dotnet.Wrappers;
 
-namespace Gauge.Dotnet.Wrappers
+[ExcludeFromCodeCoverage]
+public class ActivatorWrapper(IServiceProvider serviceProvider) : IActivatorWrapper
 {
-    public class ActivatorWrapper : IActivatorWrapper
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
+
+    public object CreateInstance(Type t, params object[] args)
     {
-        public object CreateInstance(Type t, params object[] args)
-        {
-            return Activator.CreateInstance(t, args);
-        }
+        return ActivatorUtilities.CreateInstance(_serviceProvider, t, args);
     }
 }

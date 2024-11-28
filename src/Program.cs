@@ -8,9 +8,11 @@
 using System.Diagnostics;
 using System.Net;
 using System.Reflection;
+using Gauge.Dotnet.DataStore;
 using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Extensions;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
@@ -65,6 +67,8 @@ internal static class Program
 
             if (buildSucceeded)
             {
+                // Generate step registry before starting GRPC service
+                _ = app.Services.GetRequiredService<IAssemblyLoader>().GetStepRegistry();
                 app.MapGrpcService<ExecutableRunnerServiceHandler>();
             }
             else
@@ -129,6 +133,7 @@ internal static class Program
         services.AddSingleton<ITableFormatter, TableFormatter>();
         services.AddSingleton<IExecutionOrchestrator, ExecutionOrchestrator>();
         services.AddSingleton<IExecutionInfoMapper, ExecutionInfoMapper>();
+        services.AddSingleton<IDataStoreFactory, DataStoreFactory>();
         services.AddTransient<IGaugeProcessor<StepValidateRequest, StepValidateResponse>, StepValidationProcessor>();
         services.AddTransient<IGaugeProcessor<CacheFileRequest, Empty>, CacheFileProcessor>();
         services.AddTransient<IGaugeProcessor<Empty, ImplementationFileGlobPatternResponse>, ImplementationFileGlobPatterProcessor>();

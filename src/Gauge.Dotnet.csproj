@@ -2,11 +2,11 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<PackageId>Runner.NetCore30</PackageId>
 		<Authors>The Gauge Team</Authors>
-		<Version>0.7.2</Version>
+		<Version>0.7.3</Version>
 		<Company>ThoughtWorks Inc.</Company>
 		<Product>Gauge</Product>
 		<Description>C# runner for Gauge. https://gauge.org</Description>
@@ -16,7 +16,7 @@
 		<PackageIconUrl>https://raw.githubusercontent.com/getgauge/gauge-csharp/master/logo-64x64.png</PackageIconUrl>
 		<RepositoryUrl>https://github.com/getgauge/gauge-dotnet</RepositoryUrl>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
 		<Protobuf Include="..\gauge-proto\api.proto" Link="Protos\api.proto" />
 		<Protobuf Include="..\gauge-proto\lsp.proto" Link="Protos\lsp.proto" />
@@ -32,7 +32,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Gauge.CSharp.Lib" Version="0.11.3" />
 		<PackageReference Include="Grpc.AspNetCore" Version="2.67.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
 	</ItemGroup>

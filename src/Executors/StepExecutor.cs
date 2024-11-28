@@ -8,6 +8,7 @@
 using System.Runtime.Serialization.Json;
 using System.Text;
 using Gauge.Dotnet.Converters;
+using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
 
 namespace Gauge.Dotnet.Executors;
@@ -15,13 +16,13 @@ namespace Gauge.Dotnet.Executors;
 public class StepExecutor : MethodExecutor, IStepExecutor
 {
     private readonly IAssemblyLoader _assemblyLoader;
-    private readonly ILogger<StepExecutor> _logger;
+    private readonly IExecutionInfoMapper _executionInfoMapper;
 
-    public StepExecutor(IAssemblyLoader assemblyLoader, ILogger<StepExecutor> logger)
-        : base(assemblyLoader)
+    public StepExecutor(IAssemblyLoader assemblyLoader, ILogger<StepExecutor> logger, IExecutionInfoMapper mapper)
+        : base(assemblyLoader, logger)
     {
         _assemblyLoader = assemblyLoader;
-        _logger = logger;
+        _executionInfoMapper = mapper;
     }
 
     public async Task<ExecutionResult> Execute(GaugeMethod gaugeMethod, int streamId, params string[] args)
@@ -46,8 +47,8 @@ public class StepExecutor : MethodExecutor, IStepExecutor
                         return o;
                     }
                 }).ToArray();
-                _logger.LogDebug("Executing method: {MethodName}", gaugeMethod.Name);
-                await Execute(method, streamId, StringParamConverter.TryConvertParams(method, parameters));
+                var context = _executionInfoMapper.ExecutionContextFrom(null, streamId);
+                await Execute(method, context, StringParamConverter.TryConvertParams(method, parameters));
                 executionResult.Success = true;
             }
             catch (Exception ex)
@@ -56,7 +57,7 @@ public class StepExecutor : MethodExecutor, IStepExecutor
                 if (baseException != null &&
                     baseException.GetType().Name.Contains("SkipScenario", StringComparison.OrdinalIgnoreCase))
                 {
-                    _logger.LogDebug("Skipping scenario when executing method: {MethodName} : {ExceptionMessage}", method.Name, baseException.Message);
+                    Logger.LogDebug("Skipping scenario when executing method: {MethodName} : {ExceptionMessage}", method.Name, baseException.Message);
                     executionResult.ExceptionMessage = baseException.Message;
                     executionResult.StackTrace = baseException.StackTrace;
                     executionResult.Source = baseException.Source;
@@ -65,7 +66,7 @@ public class StepExecutor : MethodExecutor, IStepExecutor
                 }
                 else
                 {
-                    _logger.LogDebug("Error executing {MethodName} : {ExceptionMessage}", method.Name, method.Name);
+                    Logger.LogDebug("Error executing {MethodName} : {ExceptionMessage}", method.Name, method.Name);
                     var innerException = ex.InnerException ?? ex;
                     executionResult.ExceptionMessage = innerException.Message;
                     executionResult.StackTrace = innerException is AggregateException

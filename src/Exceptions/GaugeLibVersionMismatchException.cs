@@ -4,24 +4,16 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
+namespace Gauge.Dotnet.Exceptions;
 
-using System;
-
-namespace Gauge.Dotnet.Exceptions
+[Serializable]
+public class GaugeLibVersionMismatchException : Exception
 {
-    [Serializable]
-    public class GaugeLibVersionMismatchException : Exception
+    public GaugeLibVersionMismatchException(Version expectedLibVersion)
+        : base("The version of Gauge.CSharp.Lib in the project is incompatible with the version of Gauge CSharp plugin.\n" +
+              $"Expecting minimum version: {expectedLibVersion.Major}.{expectedLibVersion.Minor}.0, " +
+              $"and less than {expectedLibVersion.Major}.{expectedLibVersion.Minor + 1}.0")
+
     {
-        private const string ExceptionMessageFormat =
-            "The version of Gauge.CSharp.Lib in the project is inconpatible with the version of Gauge CSharp plugin.\n Expecting minimum version: {0}, found {1}";
-
-        public GaugeLibVersionMismatchException(Version targetLibVersion, Version expectedLibVersion)
-            : base(string.Format(ExceptionMessageFormat, expectedLibVersion, targetLibVersion))
-        {
-        }
-
-        public GaugeLibVersionMismatchException()
-        {
-        }
     }
 }

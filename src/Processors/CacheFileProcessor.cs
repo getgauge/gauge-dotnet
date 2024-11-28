@@ -5,6 +5,7 @@
  *----------------------------------------------------------------*/
 
 using System.Text;
+using Gauge.Dotnet.Loaders;
 using Gauge.Messages;
 using static Gauge.Messages.CacheFileRequest.Types;
 
