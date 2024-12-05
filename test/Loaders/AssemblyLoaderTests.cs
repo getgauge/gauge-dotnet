@@ -13,7 +13,7 @@ using Gauge.Dotnet.Wrappers;
 using Microsoft.Extensions.Logging;
 using static Gauge.Dotnet.Constants;
 
-namespace Gauge.Dotnet.UnitTests;
+namespace Gauge.Dotnet.UnitTests.Loaders;
 
 [TestFixture]
 public class AssemblyLoaderTests
@@ -21,16 +21,15 @@ public class AssemblyLoaderTests
     [SetUp]
     public void Setup()
     {
-        _assemblyLocation = "/foo/location";
         _mockAssembly = new Mock<Assembly>();
         _mockActivationWrapper = new Mock<IActivatorWrapper>();
         var mockStepAttributeType = new Mock<Type>();
         _mockStepMethod = new Mock<MethodInfo>();
         var mockStepAttribute = new Mock<Attribute>();
         _mockStepMethod.Setup(x => x.GetCustomAttributes(It.IsAny<bool>()))
-            .Returns((new List<Attribute> { mockStepAttribute.Object }).ToArray());
+            .Returns(new List<Attribute> { mockStepAttribute.Object }.ToArray());
         _mockStepMethod.Setup(x => x.GetCustomAttributes(It.IsAny<Type>(), It.IsAny<bool>()))
-            .Returns((new List<Attribute> { mockStepAttribute.Object }).ToArray());
+            .Returns(new List<Attribute> { mockStepAttribute.Object }.ToArray());
         mockStepAttributeType.Setup(x => x.IsInstanceOfType(mockStepAttribute.Object))
             .Returns(true);
         mockStepAttributeType.Setup(x => x.FullName).Returns(LibType.Step.FullName());
@@ -58,9 +57,9 @@ public class AssemblyLoaderTests
                 _mockInstanceManagerType.Object
             });
         _mockAssembly.Setup(x => x.GetName()).Returns(_assemblyName);
-        var libAssemblyName = new AssemblyName("Gauge.CSharp.Lib")
+        var libAssemblyName = new AssemblyName(GaugeLibAssemblyName)
         {
-            Version = Assembly.GetExecutingAssembly().GetReferencedAssemblies().FirstOrDefault(x => x.Name == "Gauge.CSharp.Lib").Version
+            Version = Assembly.GetExecutingAssembly().GetReferencedAssemblies().FirstOrDefault(x => x.Name == GaugeLibAssemblyName).Version
         };
         var mockGaugeScreenshotsType = new Mock<Type>();
         mockGaugeScreenshotsType.Setup(x => x.FullName).Returns("Gauge.CSharp.Lib.GaugeScreenshots");
@@ -82,23 +81,18 @@ public class AssemblyLoaderTests
             .Returns(_mockAssembly.Object);
         _mockGaugeLoadContext.Setup(x => x.LoadFromAssemblyName(It.Is<AssemblyName>(x => libAssemblyName.FullName.Contains(x.FullName))))
             .Returns(_mockLibAssembly.Object);
-        _mockGaugeLoadContext.Setup(x => x.GetAssembliesReferencingGaugeLib())
+        _mockGaugeLoadContext.Setup(x => x.GetLoadedAssembliesReferencingGaugeLib())
             .Returns(new[] { _mockAssembly.Object });
-        _mockAssemblyLocator = new Mock<IAssemblyLocater>();
-        _mockAssemblyLocator.Setup(x => x.GetTestAssembly()).Returns(Path.Combine(_assemblyLocation, "Mock.Test.Assembly.dll"));
         _mockLogger = new Mock<ILogger<AssemblyLoader>>();
-        _assemblyLoader = new AssemblyLoader(_mockAssemblyLocator.Object, _mockGaugeLoadContext.Object,
-            _mockReflectionWrapper.Object, _mockActivationWrapper.Object, new StepRegistry(), _mockLogger.Object);
+        _assemblyLoader = new AssemblyLoader(_mockGaugeLoadContext.Object, _mockReflectionWrapper.Object, _mockActivationWrapper.Object,
+            new StepRegistry(), _mockLogger.Object, (logger) => ["Mock.Test.Assembly.dll"]);
     }
-
-    private string _assemblyLocation;
 
     private AssemblyName _assemblyName;
     private Mock<Assembly> _mockAssembly;
     private Mock<Assembly> _mockLibAssembly;
     private AssemblyLoader _assemblyLoader;
     private Mock<IGaugeLoadContext> _mockGaugeLoadContext;
-    private Mock<IAssemblyLocater> _mockAssemblyLocator;
     private Mock<IReflectionWrapper> _mockReflectionWrapper;
     private Mock<IActivatorWrapper> _mockActivationWrapper;
     private Mock<ILogger<AssemblyLoader>> _mockLogger;
@@ -106,12 +100,6 @@ public class AssemblyLoaderTests
     private Mock<Type> _mockScreenshotWriterType;
     private Mock<MethodInfo> _mockStepMethod;
     private const string TmpLocation = "/tmp/location";
-
-    [Test]
-    public void ShouldGetAssemblyReferencingGaugeLib()
-    {
-        ClassicAssert.Contains(_mockAssembly.Object, _assemblyLoader.AssembliesReferencingGaugeLib);
-    }
 
     [Test]
     public void ShouldGetClassInstanceManagerType()
@@ -145,25 +133,23 @@ public class AssemblyLoaderTests
         var mockActivationWrapper = new Mock<IActivatorWrapper>();
         var mockGaugeLoadContext = new Mock<IGaugeLoadContext>();
         mockGaugeLoadContext.Setup(x => x.LoadFromAssemblyName(It.IsAny<AssemblyName>())).Throws<FileLoadException>();
-        var mockAssemblyLocator = new Mock<IAssemblyLocater>();
-        mockAssemblyLocator.Setup(x => x.GetTestAssembly()).Returns(Path.Combine(TmpLocation, $"{_mockLibAssembly.Name}.dll"));
-        Assert.Throws<FileLoadException>(() => new AssemblyLoader(mockAssemblyLocator.Object, mockGaugeLoadContext.Object,
-            mockReflectionWrapper.Object, mockActivationWrapper.Object, new StepRegistry(), mockLogger.Object));
+        Assert.Throws<FileLoadException>(() => new AssemblyLoader(mockGaugeLoadContext.Object, mockReflectionWrapper.Object,
+            mockActivationWrapper.Object, new StepRegistry(), mockLogger.Object, (logger) => []));
     }
 
     [Test]
     public void ShouldThrowExceptionWhenLibAssemblyDoesNotMatchVersionTooHigh()
     {
-        var testVersion = Assembly.GetExecutingAssembly().GetReferencedAssemblies().FirstOrDefault(x => x.Name == "Gauge.CSharp.Lib").Version;
+        var testVersion = Assembly.GetExecutingAssembly().GetReferencedAssemblies().FirstOrDefault(x => x.Name == GaugeLibAssemblyName).Version;
         var mockVersion = new Version(testVersion.Major, testVersion.Minor + 1, testVersion.Build);
-        var libAssemblyName = new AssemblyName("Gauge.CSharp.Lib")
+        var libAssemblyName = new AssemblyName(GaugeLibAssemblyName)
         {
             Version = mockVersion
         };
         _mockLibAssembly.Setup(x => x.GetName()).Returns(libAssemblyName);
 
-        var exception = Assert.Throws<GaugeLibVersionMismatchException>(() => new AssemblyLoader(_mockAssemblyLocator.Object, _mockGaugeLoadContext.Object,
-            _mockReflectionWrapper.Object, _mockActivationWrapper.Object, new StepRegistry(), _mockLogger.Object));
+        var exception = Assert.Throws<GaugeLibVersionMismatchException>(() => new AssemblyLoader(_mockGaugeLoadContext.Object,
+            _mockReflectionWrapper.Object, _mockActivationWrapper.Object, new StepRegistry(), _mockLogger.Object, (logger) => []));
 
         Assert.That(exception.Message, Contains.Substring($"Expecting minimum version: {testVersion.Major}.{testVersion.Minor}.0"));
         Assert.That(exception.Message, Contains.Substring($"and less than {testVersion.Major}.{testVersion.Minor + 1}.0"));
@@ -172,16 +158,16 @@ public class AssemblyLoaderTests
     [Test]
     public void ShouldThrowExceptionWhenLibAssemblyDoesNotMatchVersionTooLow()
     {
-        var testVersion = Assembly.GetExecutingAssembly().GetReferencedAssemblies().FirstOrDefault(x => x.Name == "Gauge.CSharp.Lib").Version;
+        var testVersion = Assembly.GetExecutingAssembly().GetReferencedAssemblies().FirstOrDefault(x => x.Name == GaugeLibAssemblyName).Version;
         var mockVersion = new Version(testVersion.Major, testVersion.Minor - 1, testVersion.Build);
-        var libAssemblyName = new AssemblyName("Gauge.CSharp.Lib")
+        var libAssemblyName = new AssemblyName(GaugeLibAssemblyName)
         {
             Version = mockVersion
         };
         _mockLibAssembly.Setup(x => x.GetName()).Returns(libAssemblyName);
 
-        var exception = Assert.Throws<GaugeLibVersionMismatchException>(() => new AssemblyLoader(_mockAssemblyLocator.Object, _mockGaugeLoadContext.Object,
-            _mockReflectionWrapper.Object, _mockActivationWrapper.Object, new StepRegistry(), _mockLogger.Object));
+        var exception = Assert.Throws<GaugeLibVersionMismatchException>(() => new AssemblyLoader(_mockGaugeLoadContext.Object,
+            _mockReflectionWrapper.Object, _mockActivationWrapper.Object, new StepRegistry(), _mockLogger.Object, (logger) => []));
 
         Assert.That(exception.Message, Contains.Substring($"Expecting minimum version: {testVersion.Major}.{testVersion.Minor}.0"));
         Assert.That(exception.Message, Contains.Substring($"and less than {testVersion.Major}.{testVersion.Minor + 1}.0"));

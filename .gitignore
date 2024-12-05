@@ -15,3 +15,4 @@ artifacts
 **/*.user
 **/*.userosscache
 **/*.sln.docstates
+TestResults/

@@ -8,7 +8,7 @@ using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Messages;
 
-namespace Gauge.Dotnet.UnitTests;
+namespace Gauge.Dotnet.UnitTests.Processors;
 
 [TestFixture]
 public class ValidateProcessorTests

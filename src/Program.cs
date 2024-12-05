@@ -18,7 +18,9 @@ using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging.Console;
+using static Gauge.Dotnet.Loaders.AssemblyLocater;
 
 namespace Gauge.Dotnet;
 
@@ -45,7 +47,7 @@ internal static class Program
             {
                 opts.Listen(IPAddress.Parse("127.0.0.1"), 0, (opt) => { opt.Protocols = HttpProtocols.Http2; });
             });
-            builder.Services.ConfigureServices(builder.Configuration);
+            builder.Services.ConfigureServices(builder.Configuration, builder.Environment.ContentRootFileProvider);
             var app = builder.Build();
             _logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Gauge");
 
@@ -108,18 +110,19 @@ internal static class Program
             });
 
 
-    private static IServiceCollection ConfigureServices(this IServiceCollection services, IConfiguration config)
+    private static IServiceCollection ConfigureServices(this IServiceCollection services, IConfiguration config, IFileProvider fileProvider)
     {
         services.AddGrpc();
+        services.AddSingleton<IFileProvider>(new PhysicalFileProvider(config.GetGaugeBinDir()));
         services.AddTransient<IGaugeProjectBuilder, GaugeProjectBuilder>();
-        services.AddTransient<IAssemblyLocater, AssemblyLocater>();
+        //services.AddTransient<IAssemblyLocater, AssemblyLocater>();
         services.AddSingleton<IReflectionWrapper, ReflectionWrapper>();
         services.AddSingleton<IActivatorWrapper, ActivatorWrapper>();
         services.AddSingleton<IGaugeLoadContext>((sp) =>
         {
             return config.IsDaemon() ?
-                new LockFreeGaugeLoadContext(sp.GetRequiredService<IAssemblyLocater>(), sp.GetRequiredService<ILogger<LockFreeGaugeLoadContext>>()) :
-                new GaugeLoadContext(sp.GetRequiredService<IAssemblyLocater>(), sp.GetRequiredService<ILogger<GaugeLoadContext>>());
+                new LockFreeGaugeLoadContext(sp.GetRequiredService<GetTestAssembly>(), sp.GetRequiredService<ILogger<LockFreeGaugeLoadContext>>()) :
+                new GaugeLoadContext(sp.GetRequiredService<GetTestAssembly>(), sp.GetRequiredService<ILogger<GaugeLoadContext>>());
         });
         services.AddSingleton<IAssemblyLoader, AssemblyLoader>();
         services.AddSingleton<IDirectoryWrapper, DirectoryWrapper>();
@@ -158,7 +161,14 @@ internal static class Program
         services.AddTransient<IGaugeProcessor<StepExecutionStartingRequest, ExecutionStatusResponse>, StepExecutionStartingProcessor>();
         services.AddTransient<IGaugeProcessor<ConceptExecutionStartingRequest, ExecutionStatusResponse>, ConceptExecutionStartingProcessor>();
         services.AddTransient<IGaugeProcessor<ConceptExecutionEndingRequest, ExecutionStatusResponse>, ConceptExecutionEndingProcessor>();
-
+        services.AddTransient<GetAssembliesReferencingGaugeLib>((sp) => (logger) =>
+        {
+            return GetAssembliesReferencingGaugeLib(sp.GetRequiredService<IFileProvider>(), logger);
+        });
+        services.AddTransient<GetTestAssembly>((sp) => () =>
+        {
+            return GetTestAssembly(sp.GetRequiredService<IFileProvider>());
+        });
         return services;
     }
 }

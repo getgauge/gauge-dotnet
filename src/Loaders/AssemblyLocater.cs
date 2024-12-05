@@ -5,35 +5,52 @@
  *----------------------------------------------------------------*/
 
 
+using System.Text.Json;
 using Gauge.Dotnet.Exceptions;
-using Gauge.Dotnet.Extensions;
-using Gauge.Dotnet.Wrappers;
+using Microsoft.Extensions.FileProviders;
 
 namespace Gauge.Dotnet.Loaders;
 
-public class AssemblyLocater : IAssemblyLocater
+public static class AssemblyLocater
 {
-    private readonly IDirectoryWrapper _directoryWrapper;
-    private readonly IConfiguration _config;
-
-    public AssemblyLocater(IDirectoryWrapper directoryWrapper, IConfiguration config)
+    public static string GetTestAssembly(IFileProvider fileProvider)
     {
-        _directoryWrapper = directoryWrapper;
-        _config = config;
+        var depsFile = fileProvider.GetDirectoryContents(string.Empty).FirstOrDefault(x => x.Name.EndsWith(".deps.json"))
+            ?? throw new GaugeTestAssemblyNotFoundException(fileProvider);
+
+        return depsFile.PhysicalPath.Replace(".deps.json", ".dll");
     }
 
-    public string GetTestAssembly()
+    public static IEnumerable<string> GetAssembliesReferencingGaugeLib(IFileProvider fileProvider, ILogger logger)
     {
-        var gaugeBinDir = _config.GetGaugeBinDir();
+        var depsFile = fileProvider.GetDirectoryContents(string.Empty).FirstOrDefault(x => x.Name.EndsWith(".deps.json"))
+            ?? throw new GaugeTestAssemblyNotFoundException(fileProvider);
+
         try
         {
-            return _directoryWrapper
-                .EnumerateFiles(gaugeBinDir, "*.deps.json", SearchOption.TopDirectoryOnly)
-                .First().Replace(".deps.json", ".dll");
+            var jsonDoc = JsonDocument.Parse(depsFile.CreateReadStream());
+            return jsonDoc.RootElement.GetProperty("targets")
+                .EnumerateObject().SelectMany(platform => platform.Value.EnumerateObject())
+                .Where(lib =>
+                {
+                    return lib.Value.TryGetProperty("dependencies", out JsonElement jsonElement)
+                        && jsonElement.EnumerateObject().Any(dep => dep.Name == GaugeLibAssemblyName);
+                })
+                .Select(lib =>
+                {
+                    if (lib.Value.TryGetProperty("runtime", out JsonElement jsonElement))
+                    {
+                        return jsonElement.EnumerateObject().First().Name.Split('/').LastOrDefault();
+                    }
+
+                    return $"{lib.Name.Split('/').FirstOrDefault()}.dll";
+                });
         }
-        catch (InvalidOperationException)
+        catch (Exception ex)
         {
-            throw new GaugeTestAssemblyNotFoundException(gaugeBinDir);
+            // If parsing the deps file failed default to returning the app assembly
+            logger.LogWarning("Unable to get list of dependencies, failed with message {message}", ex.Message);
+            return [depsFile.Name.Replace(".deps.json", ".dll")];
         }
     }
 }

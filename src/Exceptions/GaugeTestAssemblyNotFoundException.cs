@@ -5,18 +5,17 @@
  *----------------------------------------------------------------*/
 
 
-using System.IO;
+using Microsoft.Extensions.FileProviders;
 
-namespace Gauge.Dotnet.Exceptions
+namespace Gauge.Dotnet.Exceptions;
+
+public class GaugeTestAssemblyNotFoundException : FileNotFoundException
 {
-    public class GaugeTestAssemblyNotFoundException : FileNotFoundException
-    {
-        private const string TestAssemblyNotFoundMessageFormat 
-            = "Could not locate the target test assembly. Gauge-Dotnet could not find a deps.json file in {0}";
+    private const string TestAssemblyNotFoundMessageFormat
+        = "Could not locate the target test assembly. Gauge-Dotnet could not find a deps.json file in {0}";
 
-        public GaugeTestAssemblyNotFoundException(string path)
-            : base(string.Format(TestAssemblyNotFoundMessageFormat, path))
-        {
-        }
+    public GaugeTestAssemblyNotFoundException(IFileProvider fileProvider)
+        : base(string.Format(TestAssemblyNotFoundMessageFormat, (fileProvider as PhysicalFileProvider)?.Root ?? string.Empty))
+    {
     }
 }

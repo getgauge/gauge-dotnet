@@ -11,7 +11,7 @@ using Gauge.Dotnet.Wrappers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Gauge.Dotnet.UnitTests;
+namespace Gauge.Dotnet.UnitTests.Loaders;
 
 [TestFixture]
 public class StaticLoaderTests

@@ -1,7 +1,11 @@
 ﻿namespace Gauge.Dotnet;
 
+public delegate string GetTestAssembly();
+public delegate IEnumerable<string> GetAssembliesReferencingGaugeLib(ILogger logger);
+
 public static class Constants
 {
+    public static string GaugeLibAssemblyName => "Gauge.CSharp.Lib";
     public static string CSharpLibVersion => "0.12.0";
 
     public enum DataStoreType

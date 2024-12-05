@@ -4,7 +4,6 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace Gauge.Dotnet.Loaders
@@ -12,6 +11,6 @@ namespace Gauge.Dotnet.Loaders
     public interface IGaugeLoadContext
     {
         public Assembly LoadFromAssemblyName(AssemblyName name);
-        public IEnumerable<Assembly> GetAssembliesReferencingGaugeLib();
+        public IEnumerable<Assembly> GetLoadedAssembliesReferencingGaugeLib();
     }
 }

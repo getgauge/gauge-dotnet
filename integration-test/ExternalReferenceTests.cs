@@ -14,6 +14,7 @@ using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet.IntegrationTests;
@@ -31,11 +32,14 @@ public class ExternalReferenceTests
         var builder = new ConfigurationBuilder();
         builder.AddInMemoryCollection(new Dictionary<string, string> { { "GAUGE_PROJECT_ROOT", testProjectPath } });
         var config = builder.Build();
+        var fileProvider = new PhysicalFileProvider(Path.Combine(testProjectPath, "gauge_bin"));
 
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), config);
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()),
-            new ReflectionWrapper(), new ActivatorWrapper(serviceProvider), new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+        var gaugeLoadContext = new GaugeLoadContext(() => { return AssemblyLocater.GetTestAssembly(fileProvider); },
+            _loggerFactory.CreateLogger<GaugeLoadContext>());
+        var assemblyLoader = new AssemblyLoader(gaugeLoadContext, new ReflectionWrapper(),
+            new ActivatorWrapper(serviceProvider), new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(),
+            (logger) => { return AssemblyLocater.GetAssembliesReferencingGaugeLib(fileProvider, logger); });
 
         var stepValidationProcessor = new StepValidationProcessor(assemblyLoader.GetStepRegistry());
         var message = new StepValidateRequest
@@ -59,13 +63,16 @@ public class ExternalReferenceTests
         var builder = new ConfigurationBuilder();
         builder.AddInMemoryCollection(new Dictionary<string, string> { { "GAUGE_PROJECT_ROOT", testProjectPath } });
         var config = builder.Build();
+        var fileProvider = new PhysicalFileProvider(Path.Combine(testProjectPath, "gauge_bin"));
 
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper(serviceProvider);
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), config);
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<StepExecutor>()), reflectionWrapper,
-            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+        var gaugeLoadContext = new GaugeLoadContext(() => { return AssemblyLocater.GetTestAssembly(fileProvider); },
+            _loggerFactory.CreateLogger<GaugeLoadContext>());
+        var assemblyLoader = new AssemblyLoader(gaugeLoadContext, reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(),
+            (logger) => { return AssemblyLocater.GetAssembliesReferencingGaugeLib(fileProvider, logger); });
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
         var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
