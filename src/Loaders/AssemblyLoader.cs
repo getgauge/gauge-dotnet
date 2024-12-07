@@ -26,8 +26,8 @@ public class AssemblyLoader : IAssemblyLoader
     private readonly IStepRegistry _registry;
     private readonly ILogger<AssemblyLoader> _logger;
 
-    public AssemblyLoader(IGaugeLoadContext gaugeLoadContext, IReflectionWrapper reflectionWrapper, IActivatorWrapper activatorWrapper,
-        IStepRegistry registry, ILogger<AssemblyLoader> logger, GetAssembliesReferencingGaugeLib getAssembliesReferencingGaugeLib)
+    public AssemblyLoader(IAssemblyLocater assemblyLocater, IGaugeLoadContext gaugeLoadContext, IReflectionWrapper reflectionWrapper, IActivatorWrapper activatorWrapper,
+        IStepRegistry registry, ILogger<AssemblyLoader> logger)
     {
         _reflectionWrapper = reflectionWrapper;
         _activatorWrapper = activatorWrapper;
@@ -37,7 +37,7 @@ public class AssemblyLoader : IAssemblyLoader
         _gaugeLoadContext = gaugeLoadContext;
         _targetLibAssembly = _gaugeLoadContext.LoadFromAssemblyName(new AssemblyName(GaugeLibAssemblyName));
         VerifyTargetAssemblyVersion();
-        ScanAndLoad(getAssembliesReferencingGaugeLib.Invoke(_logger));
+        ScanAndLoad(assemblyLocater.GetAssembliesReferencingGaugeLib());
         var assembliesReferencingGaugeLib = _gaugeLoadContext.GetLoadedAssembliesReferencingGaugeLib().ToList();
         _logger.LogDebug("Number of AssembliesReferencingGaugeLib : {AssembliesReferencingGaugeLibCount}", assembliesReferencingGaugeLib.Count);
         SetDefaultTypes();

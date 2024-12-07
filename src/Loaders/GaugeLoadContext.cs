@@ -15,10 +15,10 @@ public class GaugeLoadContext : AssemblyLoadContext, IGaugeLoadContext
     protected AssemblyDependencyResolver _resolver;
     private List<Assembly> _assembliesReferencingGaugeLib;
 
-    public GaugeLoadContext(GetTestAssembly getTestAssembly, ILogger logger)
+    public GaugeLoadContext(IAssemblyLocater assemblyLocater, ILogger logger)
     {
         _logger = logger;
-        var assemblyPath = getTestAssembly.Invoke();
+        var assemblyPath = assemblyLocater.GetTestAssembly();
         _logger.LogDebug("Loading assembly from : {AssemblyPath}", assemblyPath);
         _resolver = new AssemblyDependencyResolver(assemblyPath);
     }

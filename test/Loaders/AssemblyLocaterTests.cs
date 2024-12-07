@@ -43,8 +43,10 @@ internal class AssemblyLocaterTests
         directoryContentsMock.Setup(_ => _.GetEnumerator()).Returns((new List<IFileInfo> { fileInfoMock.Object }).GetEnumerator());
         var fileProviderMock = new Mock<IFileProvider>();
         fileProviderMock.Setup(_ => _.GetDirectoryContents(string.Empty)).Returns(directoryContentsMock.Object);
+        var loggerMock = new Mock<ILogger<AssemblyLocater>>();
+        var assemblyLocater = new AssemblyLocater(fileProviderMock.Object, loggerMock.Object);
 
-        var assembly = AssemblyLocater.GetTestAssembly(fileProviderMock.Object);
+        var assembly = assemblyLocater.GetTestAssembly();
 
         Assert.That(assembly, Is.EqualTo($"{expected}.dll"));
     }
@@ -53,9 +55,11 @@ internal class AssemblyLocaterTests
     public void ShouldNotAddAssembliesFromInvalidFile()
     {
         var fileProvider = new PhysicalFileProvider(_gaugeBinDir);
+        var loggerMock = new Mock<ILogger<AssemblyLocater>>();
+        var assemblyLocater = new AssemblyLocater(fileProvider, loggerMock.Object);
 
         var expected = $"Could not locate the target test assembly. Gauge-Dotnet could not find a deps.json file in {_gaugeBinDir}";
-        Assert.Throws<GaugeTestAssemblyNotFoundException>(() => AssemblyLocater.GetTestAssembly(fileProvider), expected);
+        Assert.Throws<GaugeTestAssemblyNotFoundException>(() => assemblyLocater.GetTestAssembly(), expected);
     }
 
     [Test]
@@ -69,9 +73,10 @@ internal class AssemblyLocaterTests
         directoryContentsMock.Setup(_ => _.GetEnumerator()).Returns((new List<IFileInfo> { fileInfoMock.Object }).GetEnumerator());
         var fileProviderMock = new Mock<IFileProvider>();
         fileProviderMock.Setup(_ => _.GetDirectoryContents(string.Empty)).Returns(directoryContentsMock.Object);
-        var loggerMock = new Mock<ILogger>();
+        var loggerMock = new Mock<ILogger<AssemblyLocater>>();
+        var assemblyLocater = new AssemblyLocater(fileProviderMock.Object, loggerMock.Object);
 
-        var assemblies = AssemblyLocater.GetAssembliesReferencingGaugeLib(fileProviderMock.Object, loggerMock.Object).ToList();
+        var assemblies = assemblyLocater.GetAssembliesReferencingGaugeLib().ToList();
 
         Assert.That(assemblies, Has.Count.EqualTo(3));
         Assert.That(assemblies, Does.Contain("Mock.Test.dll"));
@@ -90,9 +95,10 @@ internal class AssemblyLocaterTests
         directoryContentsMock.Setup(_ => _.GetEnumerator()).Returns((new List<IFileInfo> { fileInfoMock.Object }).GetEnumerator());
         var fileProviderMock = new Mock<IFileProvider>();
         fileProviderMock.Setup(_ => _.GetDirectoryContents(string.Empty)).Returns(directoryContentsMock.Object);
-        var loggerMock = new Mock<ILogger>();
+        var loggerMock = new Mock<ILogger<AssemblyLocater>>();
+        var assemblyLocater = new AssemblyLocater(fileProviderMock.Object, loggerMock.Object);
 
-        var assemblies = AssemblyLocater.GetAssembliesReferencingGaugeLib(fileProviderMock.Object, loggerMock.Object).ToList();
+        var assemblies = assemblyLocater.GetAssembliesReferencingGaugeLib().ToList();
 
         Assert.That(assemblies, Has.Count.EqualTo(1));
         Assert.That(assemblies, Does.Contain("Mock.Test.dll"));
@@ -102,8 +108,10 @@ internal class AssemblyLocaterTests
     public void GetAssembliesReferencingGaugeLib_ShouldThrowNotFoundException_WhenDepsFileNotFound()
     {
         var fileProvider = new PhysicalFileProvider(_gaugeBinDir);
+        var loggerMock = new Mock<ILogger<AssemblyLocater>>();
+        var assemblyLocater = new AssemblyLocater(fileProvider, loggerMock.Object);
 
-        var exception = Assert.Throws<GaugeTestAssemblyNotFoundException>(() => AssemblyLocater.GetAssembliesReferencingGaugeLib(fileProvider, null));
+        var exception = Assert.Throws<GaugeTestAssemblyNotFoundException>(() => assemblyLocater.GetAssembliesReferencingGaugeLib());
 
         var expected = $"Could not locate the target test assembly. Gauge-Dotnet could not find a deps.json file in {_gaugeBinDir}";
         Assert.That(exception.Message, Does.Contain(expected));

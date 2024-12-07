@@ -17,8 +17,8 @@ namespace Gauge.Dotnet.Loaders;
 // cause BadImageFormatException at runtime. */
 public class LockFreeGaugeLoadContext : GaugeLoadContext
 {
-    public LockFreeGaugeLoadContext(GetTestAssembly getTestAssembly, ILogger logger)
-        : base(getTestAssembly, logger)
+    public LockFreeGaugeLoadContext(IAssemblyLocater assemblyLocater, ILogger logger)
+        : base(assemblyLocater, logger)
     {
     }
 

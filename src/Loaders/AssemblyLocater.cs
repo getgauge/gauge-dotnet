@@ -11,20 +11,29 @@ using Microsoft.Extensions.FileProviders;
 
 namespace Gauge.Dotnet.Loaders;
 
-public static class AssemblyLocater
+public class AssemblyLocater : IAssemblyLocater
 {
-    public static string GetTestAssembly(IFileProvider fileProvider)
+    public readonly IFileProvider _fileProvider;
+    public readonly ILogger<AssemblyLocater> _logger;
+
+    public AssemblyLocater(IFileProvider fileProvider, ILogger<AssemblyLocater> logger)
     {
-        var depsFile = fileProvider.GetDirectoryContents(string.Empty).FirstOrDefault(x => x.Name.EndsWith(".deps.json"))
-            ?? throw new GaugeTestAssemblyNotFoundException(fileProvider);
+        _fileProvider = fileProvider;
+        _logger = logger;
+    }
+
+    public string GetTestAssembly()
+    {
+        var depsFile = _fileProvider.GetDirectoryContents(string.Empty).FirstOrDefault(x => x.Name.EndsWith(".deps.json"))
+            ?? throw new GaugeTestAssemblyNotFoundException(_fileProvider);
 
         return depsFile.PhysicalPath.Replace(".deps.json", ".dll");
     }
 
-    public static IEnumerable<string> GetAssembliesReferencingGaugeLib(IFileProvider fileProvider, ILogger logger)
+    public IEnumerable<string> GetAssembliesReferencingGaugeLib()
     {
-        var depsFile = fileProvider.GetDirectoryContents(string.Empty).FirstOrDefault(x => x.Name.EndsWith(".deps.json"))
-            ?? throw new GaugeTestAssemblyNotFoundException(fileProvider);
+        var depsFile = _fileProvider.GetDirectoryContents(string.Empty).FirstOrDefault(x => x.Name.EndsWith(".deps.json"))
+            ?? throw new GaugeTestAssemblyNotFoundException(_fileProvider);
 
         try
         {
@@ -49,7 +58,7 @@ public static class AssemblyLocater
         catch (Exception ex)
         {
             // If parsing the deps file failed default to returning the app assembly
-            logger.LogWarning("Unable to get list of dependencies, failed with message {message}", ex.Message);
+            _logger.LogWarning("Unable to get list of dependencies, failed with message {message}", ex.Message);
             return [depsFile.Name.Replace(".deps.json", ".dll")];
         }
     }

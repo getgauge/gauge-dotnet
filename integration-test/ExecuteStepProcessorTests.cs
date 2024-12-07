@@ -27,9 +27,10 @@ public class ExecuteStepProcessorTests : IntegrationTestsBase
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper(serviceProvider);
-        var gaugeLoadContext = new GaugeLoadContext(() => { return AssemblyLocater.GetTestAssembly(_fileProvider); }, _loggerFactory.CreateLogger<GaugeLoadContext>());
-        var assemblyLoader = new AssemblyLoader(gaugeLoadContext, reflectionWrapper, activatorWrapper, new StepRegistry(),
-            _loggerFactory.CreateLogger<AssemblyLoader>(), (logger) => { return AssemblyLocater.GetAssembliesReferencingGaugeLib(_fileProvider, logger); });
+        var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
+        var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
+        var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper, activatorWrapper, new StepRegistry(),
+            _loggerFactory.CreateLogger<AssemblyLoader>());
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
         var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper, dataStoreFactory, tableFormatter);
@@ -84,11 +85,10 @@ public class ExecuteStepProcessorTests : IntegrationTestsBase
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper(serviceProvider);
-        var gaugeLoadContext = new GaugeLoadContext(() => { return AssemblyLocater.GetTestAssembly(_fileProvider); },
-            _loggerFactory.CreateLogger<GaugeLoadContext>());
-        var assemblyLoader = new AssemblyLoader(gaugeLoadContext, reflectionWrapper,
-            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(),
-            (logger) => { return AssemblyLocater.GetAssembliesReferencingGaugeLib(_fileProvider, logger); });
+        var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
+        var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
+        var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
         var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
