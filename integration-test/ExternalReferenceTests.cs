@@ -8,8 +8,8 @@
 using Gauge.Dotnet.DataStore;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Loaders;
-using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
+using Gauge.Dotnet.Registries;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Microsoft.Extensions.Configuration;

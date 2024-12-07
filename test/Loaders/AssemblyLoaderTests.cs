@@ -8,7 +8,7 @@
 using System.Reflection;
 using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Loaders;
-using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Registries;
 using Gauge.Dotnet.Wrappers;
 using Microsoft.Extensions.Logging;
 using static Gauge.Dotnet.Constants;

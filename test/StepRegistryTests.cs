@@ -5,11 +5,8 @@
  *----------------------------------------------------------------*/
 
 
-using System.Collections.Generic;
-using System.Linq;
 using Gauge.Dotnet.Models;
-using NUnit.Framework;
-using NUnit.Framework.Legacy;
+using Gauge.Dotnet.Registries;
 
 namespace Gauge.Dotnet.UnitTests
 {

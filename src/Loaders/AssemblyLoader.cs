@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Registries;
 using Gauge.Dotnet.Wrappers;
 
 namespace Gauge.Dotnet.Loaders;

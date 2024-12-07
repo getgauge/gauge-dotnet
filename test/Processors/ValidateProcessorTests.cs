@@ -4,8 +4,8 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
-using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
+using Gauge.Dotnet.Registries;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.UnitTests.Processors;

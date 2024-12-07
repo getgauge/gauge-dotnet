@@ -5,8 +5,8 @@
  *----------------------------------------------------------------*/
 
 
-using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
+using Gauge.Dotnet.Registries;
 using Gauge.Messages;
 using static Gauge.Messages.StepPositionsResponse.Types;
 

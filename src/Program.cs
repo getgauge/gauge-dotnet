@@ -13,8 +13,8 @@ using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Loaders;
-using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
+using Gauge.Dotnet.Registries;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -115,7 +115,6 @@ internal static class Program
         services.AddGrpc();
         services.AddSingleton<IFileProvider>(new PhysicalFileProvider(config.GetGaugeBinDir()));
         services.AddTransient<IGaugeProjectBuilder, GaugeProjectBuilder>();
-        //services.AddTransient<IAssemblyLocater, AssemblyLocater>();
         services.AddSingleton<IReflectionWrapper, ReflectionWrapper>();
         services.AddSingleton<IActivatorWrapper, ActivatorWrapper>();
         services.AddSingleton<IGaugeLoadContext>((sp) =>

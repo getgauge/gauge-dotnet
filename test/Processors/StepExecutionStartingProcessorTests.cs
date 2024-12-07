@@ -8,6 +8,7 @@
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
+using Gauge.Dotnet.Registries;
 using Gauge.Dotnet.Strategy;
 using Gauge.Messages;
 using Microsoft.Extensions.Configuration;

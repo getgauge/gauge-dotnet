@@ -4,10 +4,11 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
+using Gauge.Dotnet.Models;
 using Gauge.Messages;
 using static Gauge.Messages.StepPositionsResponse.Types;
 
-namespace Gauge.Dotnet.Models;
+namespace Gauge.Dotnet.Registries;
 
 [Serializable]
 public class StepRegistry : IStepRegistry

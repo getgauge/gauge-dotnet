@@ -9,6 +9,7 @@ using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
+using Gauge.Dotnet.Registries;
 using Gauge.Dotnet.Strategy;
 using Gauge.Dotnet.UnitTests.Helpers;
 using Gauge.Messages;

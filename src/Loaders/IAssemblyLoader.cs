@@ -6,7 +6,7 @@
 
 
 using System.Reflection;
-using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Registries;
 
 namespace Gauge.Dotnet.Loaders;
 
