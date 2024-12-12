@@ -37,7 +37,12 @@ public class AssemblyLocater : IAssemblyLocater
 
         try
         {
-            var jsonDoc = JsonDocument.Parse(depsFile.CreateReadStream());
+            JsonDocument jsonDoc;
+            // Dispose of the stream as quickly as possible
+            using (var jsonStream = depsFile.CreateReadStream())
+            {
+                jsonDoc = JsonDocument.Parse(jsonStream);
+            }
             return jsonDoc.RootElement.GetProperty("targets")
                 .EnumerateObject().SelectMany(platform => platform.Value.EnumerateObject())
                 .Where(lib =>
