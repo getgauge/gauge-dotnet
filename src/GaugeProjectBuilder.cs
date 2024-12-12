@@ -15,12 +15,10 @@ namespace Gauge.Dotnet;
 public class GaugeProjectBuilder : IGaugeProjectBuilder
 {
     private readonly IConfiguration _config;
-    private readonly ILogger<GaugeProjectBuilder> _logger;
 
-    public GaugeProjectBuilder(IConfiguration config, ILogger<GaugeProjectBuilder> logger)
+    public GaugeProjectBuilder(IConfiguration config)
     {
         _config = config;
-        _logger = logger;
     }
 
     public bool BuildTargetGaugeProject()
@@ -65,14 +63,20 @@ public class GaugeProjectBuilder : IGaugeProjectBuilder
         }
         catch (NotAValidGaugeProjectException)
         {
-            _logger.LogCritical("Cannot locate a Project File in {ProjectRoot}", _config.GetGaugeProjectRoot());
+            // Logger not available yet, so output log to console.
+            Console.WriteLine($$"""
+                { "logLevel": "fatal", "message": "Cannot locate a Project File in {{_config.GetGaugeProjectRoot()}}"}
+                """);
             throw;
         }
         catch (Exception ex)
         {
             if (!_config.IgnoreBuildFailures())
             {
-                _logger.LogCritical("Unable to build Project in {ProjectRoot}\n{Message}\n{StackTrace}", _config.GetGaugeProjectRoot(), ex.Message, ex.StackTrace);
+                // Logger not available yet, so output log to console.
+                Console.WriteLine($$"""
+                { "logLevel": "fatal", "message": "Unable to build Project in {{_config.GetGaugeProjectRoot()}}\n{{ex.Message}}\n{{ex.StackTrace}}"}
+                """);
                 throw;
             }
             return false;
@@ -88,8 +92,6 @@ public class GaugeProjectBuilder : IGaugeProjectBuilder
             Arguments = args
         };
         var buildProcess = new Process { EnableRaisingEvents = true, StartInfo = startInfo };
-        buildProcess.OutputDataReceived += (sender, e) => { _logger.LogDebug(e.Data); };
-        buildProcess.ErrorDataReceived += (sender, e) => { _logger.LogError(e.Data); };
         buildProcess.Start();
         buildProcess.WaitForExit();
         return buildProcess.ExitCode;

@@ -42,6 +42,10 @@ internal static class Program
             var builder = WebApplication.CreateBuilder(args);
             builder.Configuration.SetupConfiguration();
             builder.Logging.SetupLogging();
+
+            Environment.CurrentDirectory = builder.Configuration.GetGaugeProjectRoot();
+            var buildSucceeded = new GaugeProjectBuilder(builder.Configuration).BuildTargetGaugeProject();
+
             builder.WebHost.ConfigureKestrel(opts =>
             {
                 opts.Listen(IPAddress.Parse("127.0.0.1"), 0, (opt) => { opt.Protocols = HttpProtocols.Http2; });
@@ -50,8 +54,6 @@ internal static class Program
             var app = builder.Build();
             _logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Gauge");
 
-            Environment.CurrentDirectory = app.Configuration.GetGaugeProjectRoot();
-            var buildSucceeded = app.Services.GetRequiredService<IGaugeProjectBuilder>().BuildTargetGaugeProject();
             if (!buildSucceeded && !app.Configuration.IgnoreBuildFailures())
             {
                 return;
@@ -113,7 +115,6 @@ internal static class Program
     {
         services.AddGrpc();
         services.AddSingleton<IFileProvider>(new PhysicalFileProvider(config.GetGaugeBinDir()));
-        services.AddTransient<IGaugeProjectBuilder, GaugeProjectBuilder>();
         services.AddSingleton<IAssemblyLocater, AssemblyLocater>();
         services.AddSingleton<IReflectionWrapper, ReflectionWrapper>();
         services.AddSingleton<IActivatorWrapper, ActivatorWrapper>();
