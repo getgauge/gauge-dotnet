@@ -11,19 +11,21 @@ namespace Gauge.Dotnet.Loaders;
 
 public class GaugeLoadContext : AssemblyLoadContext, IGaugeLoadContext
 {
-    private const string GaugeLibAssemblyName = "Gauge.CSharp.Lib";
     protected readonly ILogger _logger;
     protected AssemblyDependencyResolver _resolver;
+    private List<Assembly> _assembliesReferencingGaugeLib;
 
-    public GaugeLoadContext(IAssemblyLocater locater, ILogger logger)
+    public GaugeLoadContext(IAssemblyLocater assemblyLocater, ILogger logger)
     {
-        _resolver = new AssemblyDependencyResolver(locater.GetTestAssembly());
         _logger = logger;
+        var assemblyPath = assemblyLocater.GetTestAssembly();
+        _logger.LogDebug("Loading assembly from : {AssemblyPath}", assemblyPath);
+        _resolver = new AssemblyDependencyResolver(assemblyPath);
     }
 
-    public IEnumerable<Assembly> GetAssembliesReferencingGaugeLib()
+    public IEnumerable<Assembly> GetLoadedAssembliesReferencingGaugeLib()
     {
-        return Assemblies.Where(a => a.GetReferencedAssemblies().Any(a => a.Name == GaugeLibAssemblyName));
+        return _assembliesReferencingGaugeLib ??= Assemblies.Where(a => a.GetReferencedAssemblies().Any(a => a.Name == GaugeLibAssemblyName)).ToList();
     }
 
     protected override Assembly Load(AssemblyName assemblyName)

@@ -8,8 +8,9 @@
 using System.Reflection;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Loaders;
+using Gauge.Dotnet.Models;
 
-namespace Gauge.Dotnet.Models;
+namespace Gauge.Dotnet.Registries;
 
 [Serializable]
 public class HookRegistry : IHookRegistry

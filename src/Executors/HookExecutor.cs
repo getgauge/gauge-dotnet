@@ -8,6 +8,7 @@
 using System.Reflection;
 using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Registries;
 using Gauge.Dotnet.Strategy;
 using Gauge.Messages;
 

@@ -6,7 +6,7 @@
 
 
 using Gauge.Dotnet.Executors;
-using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Registries;
 using Gauge.Messages;
 using Grpc.Core;
 

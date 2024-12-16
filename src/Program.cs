@@ -13,11 +13,12 @@ using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Loaders;
-using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
+using Gauge.Dotnet.Registries;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging.Console;
 
 namespace Gauge.Dotnet;
@@ -41,6 +42,10 @@ internal static class Program
             var builder = WebApplication.CreateBuilder(args);
             builder.Configuration.SetupConfiguration();
             builder.Logging.SetupLogging();
+
+            Environment.CurrentDirectory = builder.Configuration.GetGaugeProjectRoot();
+            var buildSucceeded = new GaugeProjectBuilder(builder.Configuration).BuildTargetGaugeProject();
+
             builder.WebHost.ConfigureKestrel(opts =>
             {
                 opts.Listen(IPAddress.Parse("127.0.0.1"), 0, (opt) => { opt.Protocols = HttpProtocols.Http2; });
@@ -49,8 +54,6 @@ internal static class Program
             var app = builder.Build();
             _logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Gauge");
 
-            Environment.CurrentDirectory = app.Configuration.GetGaugeProjectRoot();
-            var buildSucceeded = app.Services.GetRequiredService<IGaugeProjectBuilder>().BuildTargetGaugeProject();
             if (!buildSucceeded && !app.Configuration.IgnoreBuildFailures())
             {
                 return;
@@ -111,8 +114,8 @@ internal static class Program
     private static IServiceCollection ConfigureServices(this IServiceCollection services, IConfiguration config)
     {
         services.AddGrpc();
-        services.AddTransient<IGaugeProjectBuilder, GaugeProjectBuilder>();
-        services.AddTransient<IAssemblyLocater, AssemblyLocater>();
+        services.AddSingleton<IFileProvider>(new PhysicalFileProvider(config.GetGaugeBinDir()));
+        services.AddSingleton<IAssemblyLocater, AssemblyLocater>();
         services.AddSingleton<IReflectionWrapper, ReflectionWrapper>();
         services.AddSingleton<IActivatorWrapper, ActivatorWrapper>();
         services.AddSingleton<IGaugeLoadContext>((sp) =>
@@ -158,7 +161,6 @@ internal static class Program
         services.AddTransient<IGaugeProcessor<StepExecutionStartingRequest, ExecutionStatusResponse>, StepExecutionStartingProcessor>();
         services.AddTransient<IGaugeProcessor<ConceptExecutionStartingRequest, ExecutionStatusResponse>, ConceptExecutionStartingProcessor>();
         services.AddTransient<IGaugeProcessor<ConceptExecutionEndingRequest, ExecutionStatusResponse>, ConceptExecutionEndingProcessor>();
-
         return services;
     }
 }

@@ -9,8 +9,8 @@ using Gauge.CSharp.Lib;
 using Gauge.Dotnet.DataStore;
 using Gauge.Dotnet.Executors;
 using Gauge.Dotnet.Loaders;
-using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
+using Gauge.Dotnet.Registries;
 using Gauge.Dotnet.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -26,8 +26,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper(serviceProvider);
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+        var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
+        var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
+        var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
@@ -50,8 +51,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper(serviceProvider);
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+        var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
+        var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
+        var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
@@ -76,8 +78,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper(serviceProvider);
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+        var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
+        var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
+        var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
@@ -101,8 +104,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper(serviceProvider);
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+        var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
+        var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
+        var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
@@ -127,8 +131,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper(serviceProvider);
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+        var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
+        var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
+        var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
@@ -153,8 +158,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper(serviceProvider);
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+        var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
+        var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
+        var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var registry = assemblyLoader.GetStepRegistry();
         var gaugeMethod = registry.MethodFor("and an alias");
@@ -171,8 +177,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         const string expectedMessage = "I am a custom serializable exception";
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper(serviceProvider);
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+        var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
+        var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
+        var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
@@ -199,8 +206,9 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         const string expectedMessage = "I am a custom exception";
         var reflectionWrapper = new ReflectionWrapper();
         var activatorWrapper = new ActivatorWrapper(serviceProvider);
-        var assemblyLocator = new AssemblyLocater(new DirectoryWrapper(), _configuration);
-        var assemblyLoader = new AssemblyLoader(assemblyLocator, new GaugeLoadContext(assemblyLocator, _loggerFactory.CreateLogger<GaugeLoadContext>()), reflectionWrapper,
+        var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
+        var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
+        var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);

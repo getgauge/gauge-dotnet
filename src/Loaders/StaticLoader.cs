@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Helpers;
 using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Registries;
 using Gauge.Dotnet.Wrappers;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

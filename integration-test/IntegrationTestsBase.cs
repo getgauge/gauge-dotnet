@@ -9,6 +9,7 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using Gauge.CSharp.Lib;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet.IntegrationTests;
@@ -17,6 +18,7 @@ public class IntegrationTestsBase
 {
     protected readonly ILoggerFactory _loggerFactory = new LoggerFactory();
     protected IConfiguration _configuration;
+    protected IFileProvider _fileProvider;
     protected string _testProjectPath = TestUtils.GetIntegrationTestSampleDirectory();
 
     [SetUp]
@@ -25,6 +27,7 @@ public class IntegrationTestsBase
         var builder = new ConfigurationBuilder();
         builder.AddInMemoryCollection(new Dictionary<string, string> { { "GAUGE_PROJECT_ROOT", _testProjectPath } });
         _configuration = builder.Build();
+        _fileProvider = new PhysicalFileProvider(Path.Combine(_testProjectPath, "gauge_bin"));
     }
 
     public static string SerializeTable(Table table)

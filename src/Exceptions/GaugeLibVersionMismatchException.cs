@@ -10,7 +10,7 @@ namespace Gauge.Dotnet.Exceptions;
 public class GaugeLibVersionMismatchException : Exception
 {
     public GaugeLibVersionMismatchException(Version expectedLibVersion)
-        : base("The version of Gauge.CSharp.Lib in the project is incompatible with the version of Gauge CSharp plugin.\n" +
+        : base($"The version of {GaugeLibAssemblyName} in the project is incompatible with the version of Gauge CSharp plugin.\n" +
               $"Expecting minimum version: {expectedLibVersion.Major}.{expectedLibVersion.Minor}.0, " +
               $"and less than {expectedLibVersion.Major}.{expectedLibVersion.Minor + 1}.0")
 

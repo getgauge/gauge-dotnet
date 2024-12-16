@@ -7,7 +7,7 @@
 
 using System.Diagnostics;
 using Gauge.Dotnet.Executors;
-using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Registries;
 using Gauge.Messages;
 
 namespace Gauge.Dotnet.Processors;

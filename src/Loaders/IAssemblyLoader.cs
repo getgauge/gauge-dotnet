@@ -6,13 +6,12 @@
 
 
 using System.Reflection;
-using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Registries;
 
 namespace Gauge.Dotnet.Loaders;
 
 public interface IAssemblyLoader
 {
-    List<Assembly> AssembliesReferencingGaugeLib { get; }
     Type ScreenshotWriter { get; }
     Type ClassInstanceManagerType { get; }
     IEnumerable<MethodInfo> GetMethods(LibType type);

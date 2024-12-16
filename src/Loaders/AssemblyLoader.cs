@@ -10,44 +10,40 @@ using System.Text.RegularExpressions;
 using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Models;
+using Gauge.Dotnet.Registries;
 using Gauge.Dotnet.Wrappers;
 
 namespace Gauge.Dotnet.Loaders;
 
 public class AssemblyLoader : IAssemblyLoader
 {
-    private const string GaugeLibAssemblyName = "Gauge.CSharp.Lib";
     private readonly IReflectionWrapper _reflectionWrapper;
     private readonly IGaugeLoadContext _gaugeLoadContext;
-    private Assembly _targetLibAssembly;
+    private readonly Assembly _targetLibAssembly;
     private object _classInstanceManager;
 
     private readonly IActivatorWrapper _activatorWrapper;
     private readonly IStepRegistry _registry;
     private readonly ILogger<AssemblyLoader> _logger;
 
-    public AssemblyLoader(IAssemblyLocater locater, IGaugeLoadContext gaugeLoadContext, IReflectionWrapper reflectionWrapper,
-        IActivatorWrapper activatorWrapper, IStepRegistry registry, ILogger<AssemblyLoader> logger)
+    public AssemblyLoader(IAssemblyLocater assemblyLocater, IGaugeLoadContext gaugeLoadContext, IReflectionWrapper reflectionWrapper, IActivatorWrapper activatorWrapper,
+        IStepRegistry registry, ILogger<AssemblyLoader> logger)
     {
-        var assemblyPath = locater.GetTestAssembly();
         _reflectionWrapper = reflectionWrapper;
         _activatorWrapper = activatorWrapper;
-        AssembliesReferencingGaugeLib = new List<Assembly>();
         _registry = registry;
         _logger = logger;
 
-        _logger.LogDebug("Loading assembly from : {AssemblyPath}", assemblyPath);
         _gaugeLoadContext = gaugeLoadContext;
         _targetLibAssembly = _gaugeLoadContext.LoadFromAssemblyName(new AssemblyName(GaugeLibAssemblyName));
         VerifyTargetAssemblyVersion();
-        ScanAndLoad(assemblyPath);
-        AssembliesReferencingGaugeLib = _gaugeLoadContext.GetAssembliesReferencingGaugeLib().ToList();
-        _logger.LogDebug("Number of AssembliesReferencingGaugeLib : {AssembliesReferencingGaugeLibCount}", AssembliesReferencingGaugeLib.Count);
+        ScanAndLoad(assemblyLocater.GetAssembliesReferencingGaugeLib());
+        var assembliesReferencingGaugeLib = _gaugeLoadContext.GetLoadedAssembliesReferencingGaugeLib().ToList();
+        _logger.LogDebug("Number of AssembliesReferencingGaugeLib : {AssembliesReferencingGaugeLibCount}", assembliesReferencingGaugeLib.Count);
         SetDefaultTypes();
         _registry = GetStepRegistry();
     }
 
-    public List<Assembly> AssembliesReferencingGaugeLib { get; }
     public Type ScreenshotWriter { get; private set; }
     public Type ClassInstanceManagerType { get; private set; }
 
@@ -60,7 +56,8 @@ public class AssemblyLoader : IAssemblyLoader
             return _reflectionWrapper.GetMethods(t)
                 .Where(info => info.GetCustomAttributes(false).Any(attributeType.IsInstanceOfType));
         }
-        return AssembliesReferencingGaugeLib.SelectMany(assembly => assembly.ExportedTypes.SelectMany(MethodSelector));
+        return _gaugeLoadContext.GetLoadedAssembliesReferencingGaugeLib()
+            .SelectMany(assembly => assembly.ExportedTypes.SelectMany(MethodSelector));
     }
 
     public Type GetLibType(LibType type)
@@ -71,7 +68,7 @@ public class AssemblyLoader : IAssemblyLoader
         }
         catch (InvalidOperationException ex)
         {
-            throw new InvalidOperationException($"Cannot locate {type.FullName()} in Gauge.CSharp.Lib", ex);
+            throw new InvalidOperationException($"Cannot locate {type.FullName()} in {GaugeLibAssemblyName}", ex);
         }
     }
 
@@ -124,7 +121,7 @@ public class AssemblyLoader : IAssemblyLoader
         if (ClassInstanceManagerType == null) return null;
         _classInstanceManager = _activatorWrapper.CreateInstance(ClassInstanceManagerType);
         _logger.LogDebug("Loaded Instance Manager of Type: {ClassInstanceManagerType}", _classInstanceManager.GetType().FullName);
-        _reflectionWrapper.InvokeMethod(ClassInstanceManagerType, _classInstanceManager, "Initialize", AssembliesReferencingGaugeLib);
+        _reflectionWrapper.InvokeMethod(ClassInstanceManagerType, _classInstanceManager, "Initialize", _gaugeLoadContext.GetLoadedAssembliesReferencingGaugeLib());
         return _classInstanceManager;
     }
 
@@ -133,16 +130,19 @@ public class AssemblyLoader : IAssemblyLoader
         return Regex.Replace(stepText, @"(<.*?>)", @"{}");
     }
 
-    private void ScanAndLoad(string path)
+    private void ScanAndLoad(IEnumerable<string> assemblies)
     {
-        var assembly = _gaugeLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(path)));
-        foreach (var reference in assembly.GetReferencedAssemblies())
+        foreach (var assemblyName in assemblies)
         {
-            _gaugeLoadContext.LoadFromAssemblyName(reference);
+            var assembly = _gaugeLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(assemblyName)));
+            foreach (var refAssembly in assembly.GetReferencedAssemblies())
+            {
+                _gaugeLoadContext.LoadFromAssemblyName(refAssembly);
+            }
         }
         try
         {
-            var exportedTypes = _gaugeLoadContext.GetAssembliesReferencingGaugeLib().SelectMany(x => x.ExportedTypes).ToList();
+            var exportedTypes = _gaugeLoadContext.GetLoadedAssembliesReferencingGaugeLib().SelectMany(x => x.ExportedTypes).ToList();
             if (ScreenshotWriter is null)
                 ScanForCustomScreenshotWriter(exportedTypes);
 

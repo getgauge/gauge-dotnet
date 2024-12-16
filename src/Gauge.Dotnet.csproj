@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<PackageId>Runner.NetCore30</PackageId>
 		<Authors>The Gauge Team</Authors>
-		<Version>0.7.3</Version>
+		<Version>0.7.4</Version>
 		<Company>ThoughtWorks Inc.</Company>
 		<Product>Gauge</Product>
 		<Description>C# runner for Gauge. https://gauge.org</Description>

@@ -5,10 +5,10 @@
  *----------------------------------------------------------------*/
 
 
-using System.Collections.Generic;
 using System.Reflection;
+using Gauge.Dotnet.Models;
 
-namespace Gauge.Dotnet.Models
+namespace Gauge.Dotnet.Registries
 {
     public interface IHookRegistry
     {
