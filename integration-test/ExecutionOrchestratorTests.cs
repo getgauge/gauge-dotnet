@@ -29,7 +29,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
         var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
-            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(), _configuration);
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
         var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
@@ -54,7 +54,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
         var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
-            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(), _configuration);
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
         var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
@@ -81,7 +81,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
         var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
-            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(), _configuration);
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
         var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
@@ -107,7 +107,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
         var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
-            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(), _configuration);
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
         var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
@@ -134,7 +134,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
         var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
-            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(), _configuration);
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
         var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
@@ -161,7 +161,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
         var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
-            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(), _configuration);
         var registry = assemblyLoader.GetStepRegistry();
         var gaugeMethod = registry.MethodFor("and an alias");
         var stepTexts = gaugeMethod.Aliases.ToList();
@@ -180,7 +180,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
         var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
-            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(), _configuration);
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
         var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
@@ -209,7 +209,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
         var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
-            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(), _configuration);
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
         var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);

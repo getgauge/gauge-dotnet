@@ -12,6 +12,7 @@ using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Registries;
 using Gauge.Dotnet.Wrappers;
 using Gauge.Messages;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -30,7 +31,7 @@ public class ExecuteStepProcessorTests : IntegrationTestsBase
         var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
         var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper, activatorWrapper, new StepRegistry(),
-            _loggerFactory.CreateLogger<AssemblyLoader>());
+            _loggerFactory.CreateLogger<AssemblyLoader>(), _configuration);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
         var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);
         var executionInfoMapper = new ExecutionInfoMapper(assemblyLoader, activatorWrapper, dataStoreFactory, tableFormatter);
@@ -88,7 +89,7 @@ public class ExecuteStepProcessorTests : IntegrationTestsBase
         var assemblyLocater = new AssemblyLocater(_fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
         var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
-            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(), _configuration);
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
         var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);

@@ -44,6 +44,11 @@ public static class ConfigurationExtensions
     public static string GetGaugeExcludeDirs(this IConfiguration config) =>
         config.GetValue<string>("GAUGE_EXCLUDE_DIRS");
 
+    // Controls if assemblies referenced by the test project should be loaded into Gauge context
+    // NOTE: If not needed, disabling this may decrease the time it takes to initialize Gauge
+    public static string GetGaugeCSharpLoadReferencedAssemblies(this IConfiguration config) =>
+        config.GetValue<string>("GAUGE_CSHARP_LOAD_REFERENCED_ASSEMBLIES") ?? "true";
+
     public static string GetGaugeBinDir(this IConfiguration config)
     {
         var customBuildPath = config.GetValue<string>("GAUGE_CUSTOM_BUILD_PATH");
