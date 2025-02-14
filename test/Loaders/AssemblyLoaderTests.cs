@@ -10,6 +10,7 @@ using Gauge.Dotnet.Exceptions;
 using Gauge.Dotnet.Loaders;
 using Gauge.Dotnet.Registries;
 using Gauge.Dotnet.Wrappers;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static Gauge.Dotnet.Constants;
 
@@ -18,6 +19,9 @@ namespace Gauge.Dotnet.UnitTests.Loaders;
 [TestFixture]
 public class AssemblyLoaderTests
 {
+    protected Mock<IConfiguration> _mockConfig;
+    protected Mock<IConfigurationSection> _mockConfigLoadReferencedAssebliesSection;
+
     [SetUp]
     public void Setup()
     {
@@ -86,8 +90,12 @@ public class AssemblyLoaderTests
         _mockAssemblyLocater = new Mock<IAssemblyLocater>();
         _mockAssemblyLocater.Setup(_ => _.GetAssembliesReferencingGaugeLib()).Returns(["Mock.Test.Assembly.dll"]);
         _mockLogger = new Mock<ILogger<AssemblyLoader>>();
+        _mockConfig = new Mock<IConfiguration>();
+        _mockConfigLoadReferencedAssebliesSection = new Mock<IConfigurationSection>();
+        _mockConfigLoadReferencedAssebliesSection.Setup(s => s.Value).Returns("true");
+        _mockConfig.Setup(c => c.GetSection("GAUGE_CSHARP_LOAD_REFERENCED_ASSEMBLIES")).Returns(_mockConfigLoadReferencedAssebliesSection.Object);
         _assemblyLoader = new AssemblyLoader(_mockAssemblyLocater.Object, _mockGaugeLoadContext.Object, _mockReflectionWrapper.Object,
-            _mockActivationWrapper.Object, new StepRegistry(), _mockLogger.Object);
+            _mockActivationWrapper.Object, new StepRegistry(), _mockLogger.Object, _mockConfig.Object);
     }
 
     private AssemblyName _assemblyName;
@@ -139,7 +147,7 @@ public class AssemblyLoaderTests
         var assemblyLocater = new Mock<IAssemblyLocater>();
         assemblyLocater.Setup(_ => _.GetAssembliesReferencingGaugeLib()).Returns([]);
         Assert.Throws<FileLoadException>(() => new AssemblyLoader(assemblyLocater.Object, mockGaugeLoadContext.Object, mockReflectionWrapper.Object,
-            mockActivationWrapper.Object, new StepRegistry(), mockLogger.Object));
+            mockActivationWrapper.Object, new StepRegistry(), mockLogger.Object, _mockConfig.Object));
     }
 
     [Test]
@@ -156,7 +164,7 @@ public class AssemblyLoaderTests
         assemblyLocater.Setup(_ => _.GetAssembliesReferencingGaugeLib()).Returns([]);
 
         var exception = Assert.Throws<GaugeLibVersionMismatchException>(() => new AssemblyLoader(assemblyLocater.Object, _mockGaugeLoadContext.Object,
-            _mockReflectionWrapper.Object, _mockActivationWrapper.Object, new StepRegistry(), _mockLogger.Object));
+            _mockReflectionWrapper.Object, _mockActivationWrapper.Object, new StepRegistry(), _mockLogger.Object, _mockConfig.Object));
 
         Assert.That(exception.Message, Contains.Substring($"Expecting minimum version: {testVersion.Major}.{testVersion.Minor}.0"));
         Assert.That(exception.Message, Contains.Substring($"and less than {testVersion.Major}.{testVersion.Minor + 1}.0"));
@@ -176,7 +184,7 @@ public class AssemblyLoaderTests
         assemblyLocater.Setup(_ => _.GetAssembliesReferencingGaugeLib()).Returns([]);
 
         var exception = Assert.Throws<GaugeLibVersionMismatchException>(() => new AssemblyLoader(assemblyLocater.Object, _mockGaugeLoadContext.Object,
-            _mockReflectionWrapper.Object, _mockActivationWrapper.Object, new StepRegistry(), _mockLogger.Object));
+            _mockReflectionWrapper.Object, _mockActivationWrapper.Object, new StepRegistry(), _mockLogger.Object, _mockConfig.Object));
 
         Assert.That(exception.Message, Contains.Substring($"Expecting minimum version: {testVersion.Major}.{testVersion.Minor}.0"));
         Assert.That(exception.Message, Contains.Substring($"and less than {testVersion.Major}.{testVersion.Minor + 1}.0"));

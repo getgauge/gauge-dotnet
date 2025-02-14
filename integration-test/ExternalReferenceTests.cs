@@ -38,7 +38,7 @@ public class ExternalReferenceTests
         var assemblyLocater = new AssemblyLocater(fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
         var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, new ReflectionWrapper(),
-            new ActivatorWrapper(serviceProvider), new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+            new ActivatorWrapper(serviceProvider), new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(), config);
 
         var stepValidationProcessor = new StepValidationProcessor(assemblyLoader.GetStepRegistry());
         var message = new StepValidateRequest
@@ -70,7 +70,7 @@ public class ExternalReferenceTests
         var assemblyLocater = new AssemblyLocater(fileProvider, _loggerFactory.CreateLogger<AssemblyLocater>());
         var gaugeLoadContext = new GaugeLoadContext(assemblyLocater, _loggerFactory.CreateLogger<GaugeLoadContext>());
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
-            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>());
+            activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(), config);
         var hookRegistry = new HookRegistry(assemblyLoader);
         var dataStoreFactory = new DataStoreFactory(assemblyLoader, activatorWrapper);
         var tableFormatter = new TableFormatter(assemblyLoader, activatorWrapper);

@@ -25,14 +25,16 @@ public class AssemblyLoader : IAssemblyLoader
     private readonly IActivatorWrapper _activatorWrapper;
     private readonly IStepRegistry _registry;
     private readonly ILogger<AssemblyLoader> _logger;
+    private readonly IConfiguration _config;
 
     public AssemblyLoader(IAssemblyLocater assemblyLocater, IGaugeLoadContext gaugeLoadContext, IReflectionWrapper reflectionWrapper, IActivatorWrapper activatorWrapper,
-        IStepRegistry registry, ILogger<AssemblyLoader> logger)
+        IStepRegistry registry, ILogger<AssemblyLoader> logger, IConfiguration config)
     {
         _reflectionWrapper = reflectionWrapper;
         _activatorWrapper = activatorWrapper;
         _registry = registry;
         _logger = logger;
+        _config = config;
 
         _gaugeLoadContext = gaugeLoadContext;
         _targetLibAssembly = _gaugeLoadContext.LoadFromAssemblyName(new AssemblyName(GaugeLibAssemblyName));
@@ -135,9 +137,12 @@ public class AssemblyLoader : IAssemblyLoader
         foreach (var assemblyName in assemblies)
         {
             var assembly = _gaugeLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(assemblyName)));
-            foreach (var refAssembly in assembly.GetReferencedAssemblies())
+            if (bool.TryParse(_config.GetGaugeCSharpLoadReferencedAssemblies(), out bool isTrue) && isTrue)
             {
-                _gaugeLoadContext.LoadFromAssemblyName(refAssembly);
+                foreach (var refAssembly in assembly.GetReferencedAssemblies())
+                {
+                    _gaugeLoadContext.LoadFromAssemblyName(refAssembly);
+                }
             }
         }
         try
