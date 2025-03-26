@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
 using Gauge.CSharp.Lib;
 using Gauge.CSharp.Lib.Attribute;
+using Shouldly;
 
 namespace ReferenceDll
 {
@@ -25,7 +25,7 @@ namespace ReferenceDll
         public void VerifyVowelsCountInWord(string word, int expectedCount)
         {
             var actualCount = CountVowels(word);
-            actualCount.Should().Be(expectedCount);
+            actualCount.ShouldBe(expectedCount);
         }
 
         [Step("Dll Reference: Almost all words have vowels <wordsTable>")]
@@ -38,7 +38,7 @@ namespace ReferenceDll
                 var expectedCount = Convert.ToInt32(row.GetCell("Vowel Count"));
                 var actualCount = CountVowels(word);
 
-                actualCount.Should().Be(expectedCount);
+                actualCount.ShouldBe(expectedCount);
             }
         }
 
