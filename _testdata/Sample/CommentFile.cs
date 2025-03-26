@@ -1,2 +1,2 @@
-// Integratation test for stub implementation
+// Integration test for stub implementation
 // File does not have any class
