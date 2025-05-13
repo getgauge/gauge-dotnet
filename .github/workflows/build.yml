@@ -149,10 +149,10 @@ jobs:
         run: |
           ./run.sh install
 
-      - name: Use NodeJS 20
+      - name: Set up NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Prep LSP tests
         run: |
