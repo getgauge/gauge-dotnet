@@ -20,14 +20,14 @@ jobs:
       fail-fast: false
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
         
     - name: Setup .NET Core 
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
 
     - name: Dotnet unit test on windows
       if: matrix.os == 'windows-latest'
@@ -52,26 +52,26 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Setup go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: '1.24'
           cache: false
 
       - name: Setup java 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: 17
 
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: 10.0.x
 
       - uses: getgauge/setup-gauge@master
         with:
@@ -104,7 +104,7 @@ jobs:
           cd gauge-tests
           .\gradlew.bat -Pnodes=2 clean dotnetFT
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: ft-logs-${{ matrix.os }}
@@ -120,20 +120,20 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Setup go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: '1.24'
           cache: false
 
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: 10.0.x
 
       - uses: getgauge/setup-gauge@master
         with:
@@ -149,10 +149,10 @@ jobs:
         run: |
           ./run.sh install
 
-      - name: Set up NodeJS
-        uses: actions/setup-node@v6
+      - name: Use NodeJS 20
+        uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
 
       - name: Prep LSP tests
         run: |
@@ -167,7 +167,7 @@ jobs:
         run: |
           cd gauge-lsp-tests
           gauge run --tags="!knownIssue & (actions_on_project_load | actions_on_file_edit)" --env=dotnet-wd
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: lsp-logs-${{ matrix.os }}
