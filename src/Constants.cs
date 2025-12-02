@@ -3,7 +3,7 @@
 public static class Constants
 {
     public static string GaugeLibAssemblyName => "Gauge.CSharp.Lib";
-    public static string CSharpLibVersion => "0.12.0";
+    public static string CSharpLibVersion => "0.12.1";
 
     public enum DataStoreType
     {
