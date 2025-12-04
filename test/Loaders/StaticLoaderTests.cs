@@ -54,6 +54,7 @@ public class StaticLoaderTests
         ClassicAssert.True(registry.ContainsStep("goodbye"));
         ClassicAssert.True(registry.ContainsStep("adieu"));
         ClassicAssert.True(registry.ContainsStep("sayonara"));
+        ClassicAssert.AreEqual(3, registry.Count);
     }
 
     [Test]
@@ -79,6 +80,7 @@ public class StaticLoaderTests
         const string fileName = @"foo.cs";
         loader.LoadStepsFromText(text, fileName);
         ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
+        ClassicAssert.AreEqual(1, loader.GetStepRegistry().Count);
     }
 
     [Test]
@@ -155,6 +157,7 @@ public class StaticLoaderTests
         var filePath = Path.Combine(currentDirectory, fileName);
         loader.ReloadSteps(text, filePath);
         ClassicAssert.False(loader.GetStepRegistry().ContainsStep("hello"));
+        ClassicAssert.AreEqual(0, loader.GetStepRegistry().Count);
     }
 
     [Test]
@@ -179,6 +182,7 @@ public class StaticLoaderTests
         const string fileName = @"foo.cs";
         loader.LoadStepsFromText(text, fileName);
         ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
+        ClassicAssert.AreEqual(1, loader.GetStepRegistry().Count);
 
         const string newText = "using Gauge.CSharp.Lib.Attributes;\n" +
                                "namespace foobar\n" +
@@ -199,6 +203,7 @@ public class StaticLoaderTests
         loader.ReloadSteps(newText, fileName);
 
         ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hola"));
+        ClassicAssert.AreEqual(2, loader.GetStepRegistry().Count);
     }
 
     [Test]
@@ -242,10 +247,12 @@ public class StaticLoaderTests
 
         ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
         ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hola"));
+        ClassicAssert.AreEqual(2, loader.GetStepRegistry().Count);
 
         loader.RemoveSteps(file2);
 
         ClassicAssert.False(loader.GetStepRegistry().ContainsStep("hola"));
+        ClassicAssert.AreEqual(1, loader.GetStepRegistry().Count);
     }
 
     [Test]
@@ -272,6 +279,7 @@ public class StaticLoaderTests
         const string fileName = @"foo.cs";
         loader.LoadStepsFromText(text, fileName);
         ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
+        ClassicAssert.AreEqual(1, loader.GetStepRegistry().Count);
     }
 
     [Test]
@@ -297,6 +305,7 @@ public class StaticLoaderTests
         const string fileName = @"foo.cs";
         loader.LoadStepsFromText(text, fileName);
         ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
+        ClassicAssert.AreEqual(1, loader.GetStepRegistry().Count);
     }
 
     [Test]
@@ -324,6 +333,7 @@ public class StaticLoaderTests
         const string fileName = @"foo.cs";
         loader.LoadStepsFromText(text, fileName);
         ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
+        ClassicAssert.AreEqual(1, loader.GetStepRegistry().Count);
     }
 
     [Test]
@@ -352,6 +362,7 @@ public class StaticLoaderTests
         const string fileName = @"foo.cs";
         loader.LoadStepsFromText(text, fileName);
         ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
+        ClassicAssert.AreEqual(1, loader.GetStepRegistry().Count);
     }
 
     [Test]
