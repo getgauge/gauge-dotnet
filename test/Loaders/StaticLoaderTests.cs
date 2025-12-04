@@ -248,6 +248,178 @@ public class StaticLoaderTests
         ClassicAssert.False(loader.GetStepRegistry().ContainsStep("hola"));
     }
 
+    [Test]
+    public void ShouldFindStepAttribute_WhenUsingQualifiedName()
+    {
+        var mockAttributesLoader = new Mock<IAttributesLoader>();
+        mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+        var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+        mockDirectoryWrapper.Setup(x => x.EnumerateFiles(dummyProjectRoot, "*.cs", SearchOption.AllDirectories)).Returns(Enumerable.Empty<string>);
+        var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object, _config, _logger.Object);
+
+        const string text = "using Gauge.CSharp.Lib;\n" +
+                            "using System;\n" +
+                            "namespace foobar\n" +
+                            "{\n" +
+                            "    public class FooBar\n" +
+                            "    {\n" +
+                            "        [Attribute.Step(\"hello\")]\n" +
+                            "        public void hello()\n" +
+                            "        {\n" +
+                            "        }\n" +
+                            "    }\n" +
+                            "}\n";
+        const string fileName = @"foo.cs";
+        loader.LoadStepsFromText(text, fileName);
+        ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
+    }
+
+    [Test]
+    public void ShouldFindStepAttribute_WhenUsingFullTypeName()
+    {
+        var mockAttributesLoader = new Mock<IAttributesLoader>();
+        mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+        var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+        mockDirectoryWrapper.Setup(x => x.EnumerateFiles(dummyProjectRoot, "*.cs", SearchOption.AllDirectories)).Returns(Enumerable.Empty<string>);
+        var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object, _config, _logger.Object);
+
+        const string text = "using System;\n" +
+                            "namespace foobar\n" +
+                            "{\n" +
+                            "    public class FooBar\n" +
+                            "    {\n" +
+                            "        [Gauge.CSharp.Lib.Attribute.Step(\"hello\")]\n" +
+                            "        public void hello()\n" +
+                            "        {\n" +
+                            "        }\n" +
+                            "    }\n" +
+                            "}\n";
+        const string fileName = @"foo.cs";
+        loader.LoadStepsFromText(text, fileName);
+        ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
+    }
+
+    [Test]
+    public void ShouldFindStepAttribute_WhenStepIsNotFirst()
+    {
+        var mockAttributesLoader = new Mock<IAttributesLoader>();
+        mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+        var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+        mockDirectoryWrapper.Setup(x => x.EnumerateFiles(dummyProjectRoot, "*.cs", SearchOption.AllDirectories)).Returns(Enumerable.Empty<string>);
+        var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object, _config, _logger.Object);
+
+        const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
+                            "using System;\n" +
+                            "namespace foobar\n" +
+                            "{\n" +
+                            "    public class FooBar\n" +
+                            "    {\n" +
+                            "        [Obsolete]\n" +
+                            "        [Step(\"hello\")]\n" +
+                            "        public void hello()\n" +
+                            "        {\n" +
+                            "        }\n" +
+                            "    }\n" +
+                            "}\n";
+        const string fileName = @"foo.cs";
+        loader.LoadStepsFromText(text, fileName);
+        ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
+    }
+
+    [Test]
+    public void ShouldFindStepAttribute_WhenStepIsAfterMultipleAttributes()
+    {
+        var mockAttributesLoader = new Mock<IAttributesLoader>();
+        mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+        var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+        mockDirectoryWrapper.Setup(x => x.EnumerateFiles(dummyProjectRoot, "*.cs", SearchOption.AllDirectories)).Returns(Enumerable.Empty<string>());
+        var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object, _config, _logger.Object);
+
+        const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
+                            "using System;\n" +
+                            "namespace foobar\n" +
+                            "{\n" +
+                            "    public class FooBar\n" +
+                            "    {\n" +
+                            "        [Obsolete]\n" +
+                            "        [Test]\n" +
+                            "        [Step(\"hello\")]\n" +
+                            "        public void hello()\n" +
+                            "        {\n" +
+                            "        }\n" +
+                            "    }\n" +
+                            "}\n";
+        const string fileName = @"foo.cs";
+        loader.LoadStepsFromText(text, fileName);
+        ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
+    }
+
+    [Test]
+    public void ShouldIgnoreMethodsWithoutStepAttribute_InFileWithStepAttributes()
+    {
+        var mockAttributesLoader = new Mock<IAttributesLoader>();
+        mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+        var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+        mockDirectoryWrapper.Setup(x => x.EnumerateFiles(dummyProjectRoot, "*.cs", SearchOption.AllDirectories)).Returns(Enumerable.Empty<string>());
+        var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object, _config, _logger.Object);
+
+        const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
+                            "using System;\n" +
+                            "namespace foobar\n" +
+                            "{\n" +
+                            "    public class FooBar\n" +
+                            "    {\n" +
+                            "        [Step(\"hello\")]\n" +
+                            "        public void hello()\n" +
+                            "        {\n" +
+                            "        }\n" +
+                            "        [Obsolete]\n" +
+                            "        public void nonStepMethod()\n" +
+                            "        {\n" +
+                            "        }\n" +
+                            "    }\n" +
+                            "}\n";
+        const string fileName = @"foo.cs";
+        loader.LoadStepsFromText(text, fileName);
+        ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
+        ClassicAssert.AreEqual(1, loader.GetStepRegistry().Count);
+    }
+
+    [Test]
+    public void ShouldHandleMethodsWithOtherAttributesButNoStep_InFileWithStepAttributes()
+    {
+        var mockAttributesLoader = new Mock<IAttributesLoader>();
+        mockAttributesLoader.Setup(x => x.GetRemovedAttributes()).Returns(new List<XAttribute>());
+        var mockDirectoryWrapper = new Mock<IDirectoryWrapper>();
+        mockDirectoryWrapper.Setup(x => x.EnumerateFiles(dummyProjectRoot, "*.cs", SearchOption.AllDirectories)).Returns(Enumerable.Empty<string>());
+        var loader = new StaticLoader(mockAttributesLoader.Object, mockDirectoryWrapper.Object, _config, _logger.Object);
+
+        const string text = "using Gauge.CSharp.Lib.Attributes;\n" +
+                            "using System;\n" +
+                            "namespace foobar\n" +
+                            "{\n" +
+                            "    public class FooBar\n" +
+                            "    {\n" +
+                            "        [Step(\"hello\")]\n" +
+                            "        public void hello()\n" +
+                            "        {\n" +
+                            "        }\n" +
+                            "        [Obsolete]\n" +
+                            "        [Test]\n" +
+                            "        public void methodWithOtherAttributes()\n" +
+                            "        {\n" +
+                            "        }\n" +
+                            "        public void methodWithNoAttributes()\n" +
+                            "        {\n" +
+                            "        }\n" +
+                            "    }\n" +
+                            "}\n";
+        const string fileName = @"foo.cs";
+        loader.LoadStepsFromText(text, fileName);
+        ClassicAssert.True(loader.GetStepRegistry().ContainsStep("hello"));
+        ClassicAssert.AreEqual(1, loader.GetStepRegistry().Count);
+    }
+
     public class LoadImplementationsTest
     {
         private IConfiguration _config;
