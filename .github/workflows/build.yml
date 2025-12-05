@@ -62,7 +62,7 @@ jobs:
           go-version: '1.25'
           cache: false
 
-      - name: Setup java 17
+      - name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
