@@ -25,8 +25,7 @@ public static class RefactorHelper
                           let classDef = node.Parent as ClassDeclarationSyntax
                           where string.CompareOrdinal(node.Identifier.ValueText, method.Name) == 0
                                 && string.CompareOrdinal(classDef.Identifier.ValueText, method.ClassName) == 0
-                                && attributeSyntaxes.Any(syntax =>
-                                    string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
+                                && attributeSyntaxes.Any(AttributeExtensions.IsStepAttribute)
                           select node;
 
         var stepMethod = stepMethods.First();
