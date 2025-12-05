@@ -4,7 +4,7 @@
 		<OutputType>Exe</OutputType>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<PackageId>Runner.NetCore30</PackageId>
+		<PackageId>Gauge.Runner</PackageId>
 		<Authors>The Gauge Team</Authors>
 		<Version>0.7.6</Version>
 		<Company>ThoughtWorks Inc.</Company>
