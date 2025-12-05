@@ -4,5 +4,6 @@ command -v $dotnet >/dev/null 2>&1 || { echo >&2 "dotnet is not installed, abort
 
 case "$(dotnet --version)" in
   8.*) dotnet bin/net8.0/Gauge.Dotnet.dll $@ ;;
-  *) dotnet bin/net9.0/Gauge.Dotnet.dll $@ ;;
+  9.*) dotnet bin/net9.0/Gauge.Dotnet.dll $@ ;;
+  *) dotnet bin/net10.0/Gauge.Dotnet.dll $@ ;;
 esac

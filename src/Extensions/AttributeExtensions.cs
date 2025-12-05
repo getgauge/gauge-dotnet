@@ -20,8 +20,25 @@ namespace Gauge.Dotnet.Extensions
 
         public static AttributeSyntax GetStepAttribute(this SeparatedSyntaxList<AttributeSyntax> list)
         {
-            return list.FirstOrDefault(argumentSyntax =>
-                string.CompareOrdinal(argumentSyntax.ToFullString(), LibType.Step.FullName()) > 0);
+            return list.FirstOrDefault(attributeSyntax => IsStepAttribute(attributeSyntax));
+        }
+
+        /// <summary>
+        /// Checks if the attribute is a Step attribute.
+        /// Accepts "Step" or ends with ".Step" (handles qualified names) or the full type name.
+        /// </summary>
+        /// <param name="attributeSyntax">The attribute to check.</param>
+        /// <returns>True if the attribute is a Step attribute, false otherwise.</returns>
+        public static bool IsStepAttribute(AttributeSyntax attributeSyntax)
+        {
+            if (attributeSyntax?.Name == null)
+                return false;
+
+            var nameString = attributeSyntax.Name.ToString();
+            return nameString == "Step"
+                || nameString.EndsWith(".Step", System.StringComparison.Ordinal)
+                || nameString == LibType.Step.FullName()
+                || nameString.EndsWith("." + LibType.Step.FullName(), System.StringComparison.Ordinal);
         }
     }
 }

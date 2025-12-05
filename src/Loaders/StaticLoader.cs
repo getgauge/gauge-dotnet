@@ -132,8 +132,7 @@ public sealed class StaticLoader : IStaticLoader
 
         var stepMethods = from node in root.DescendantNodes().OfType<MethodDeclarationSyntax>()
                           let attributeSyntaxes = node.AttributeLists.SelectMany(syntax => syntax.Attributes)
-                          where attributeSyntaxes.Any(syntax =>
-                              string.CompareOrdinal(syntax.ToFullString(), LibType.Step.FullName()) > 0)
+                          where attributeSyntaxes.Any(AttributeExtensions.IsStepAttribute)
                           select node;
         return stepMethods;
     }
