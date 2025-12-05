@@ -6,7 +6,7 @@
 
 dotnet restore
 
-$grpc_tools_version = "2.65.0"
+$grpc_tools_version = "2.71.0"
 $grpc_tools = Join-Path $HOME ".nuget\packages\grpc.tools\$grpc_tools_version\tools"
 
 $protoc = $null
