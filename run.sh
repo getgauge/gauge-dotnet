@@ -31,6 +31,7 @@ function package() {
     rm -rf deploy artifacts
     dotnet publish -c release -o ./deploy/bin/net8.0 src/Gauge.Dotnet.csproj -f net8.0
     dotnet publish -c release -o ./deploy/bin/net9.0 src/Gauge.Dotnet.csproj -f net9.0
+    dotnet publish -c release -o ./deploy/bin/net10.0 src/Gauge.Dotnet.csproj -f net10.0
     cp src/launcher.sh deploy
     cp src/launcher.cmd deploy
     cp src/dotnet.json deploy

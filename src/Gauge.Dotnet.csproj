@@ -1,12 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<PackageId>Runner.NetCore30</PackageId>
 		<Authors>The Gauge Team</Authors>
-		<Version>0.7.5</Version>
+		<Version>0.7.6</Version>
 		<Company>ThoughtWorks Inc.</Company>
 		<Product>Gauge</Product>
 		<Description>C# runner for Gauge. https://gauge.org</Description>
