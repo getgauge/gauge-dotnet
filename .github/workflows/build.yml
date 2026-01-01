@@ -104,7 +104,7 @@ jobs:
           cd gauge-tests
           .\gradlew.bat -Pnodes=2 clean dotnetFT
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: ft-logs-${{ matrix.os }}
@@ -167,7 +167,7 @@ jobs:
         run: |
           cd gauge-lsp-tests
           gauge run --tags="!knownIssue & (actions_on_project_load | actions_on_file_edit)" --env=dotnet-wd
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: lsp-logs-${{ matrix.os }}
