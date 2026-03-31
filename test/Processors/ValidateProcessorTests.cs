@@ -4,9 +4,11 @@
  *  See LICENSE.txt in the project root for license information.
  *----------------------------------------------------------------*/
 
+using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Registries;
 using Gauge.Messages;
+
 
 namespace Gauge.Dotnet.UnitTests.Processors;
 
@@ -33,14 +35,20 @@ public class ValidateProcessorTests
 
         _mockStepRegistry.Setup(registry => registry.ContainsStep("step_text_1")).Returns(true);
         _mockStepRegistry.Setup(registry => registry.HasMultipleImplementations("step_text_1")).Returns(true);
+        _mockStepRegistry.Setup(registry => registry.MethodsFor("step_text_1")).Returns(new[]
+        {
+            new GaugeMethod { Name = "StepImpl", ClassName = "StepsA", FileName = "StepsA.cs",  },
+            new GaugeMethod { Name = "StepImpl", ClassName = "StepsB", FileName = "StepsB.cs",  }
+        });
         var processor = new StepValidationProcessor(_mockStepRegistry.Object);
         var response = await processor.Process(1, request);
 
         ClassicAssert.AreEqual(false, response.IsValid);
         ClassicAssert.AreEqual(StepValidateResponse.Types.ErrorType.DuplicateStepImplementation,
             response.ErrorType);
-        ClassicAssert.AreEqual("Multiple step implementations found for : step_text_1",
-            response.ErrorMessage);
+        StringAssert.Contains("Multiple step implementations found for : step_text_1", response.ErrorMessage);
+        StringAssert.Contains("StepsA.StepImpl in StepsA.cs:1", response.ErrorMessage);
+        StringAssert.Contains("StepsB.StepImpl in StepsB.cs:1", response.ErrorMessage);
         ClassicAssert.IsEmpty(response.Suggestion);
     }
 

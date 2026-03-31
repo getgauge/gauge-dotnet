@@ -178,6 +178,19 @@ namespace Gauge.Dotnet.UnitTests
         }
 
         [Test]
+        public void ShouldDetectGenuineDuplicateSteps()
+        {
+            var stepRegistry = new StepRegistry();
+            var method1 = new GaugeMethod { Name = "Click", ClassName = "ActionsA", StepText = "Click <element>", FileName = "ActionsA.cs" };
+            var method2 = new GaugeMethod { Name = "Click", ClassName = "ActionsB", StepText = "Click <element>", FileName = "ActionsB.cs" };
+
+            stepRegistry.AddStep("Click {}", method1);
+            stepRegistry.AddStep("Click {}", method2);
+
+            ClassicAssert.True(stepRegistry.HasMultipleImplementations("Click {}"));
+        }
+
+        [Test]
         public void ShouldNotContainStepPositionForExternalSteps()
         {
             var stepRegistry = new StepRegistry();

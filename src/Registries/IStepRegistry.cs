@@ -13,6 +13,7 @@ public interface IStepRegistry
 {
     bool ContainsStep(string parsedStepText);
     GaugeMethod MethodFor(string parsedStepText);
+    IEnumerable<GaugeMethod> MethodsFor(string parsedStepText);
     bool HasAlias(string stepText);
     string GetStepText(string parameterizedStepText);
     IEnumerable<string> GetStepTexts();
