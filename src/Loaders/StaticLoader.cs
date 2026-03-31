@@ -24,6 +24,12 @@ public sealed class StaticLoader : IStaticLoader
     private readonly IConfiguration _config;
     private readonly ILogger<StaticLoader> _logger;
 
+    // Guards all StepRegistry mutations. gRPC dispatches CacheFileRequest messages concurrently on separate threads,
+    // all sharing this singleton. Without synchronization, concurrent ReloadSteps calls can interleave their
+    // RemoveSteps/AddStep operations — one thread's dictionary rebuild overwrites another's, leaving stale entries
+    // that cause false "duplicate step implementation" warnings in the IDE.
+    private readonly object _registryLock = new object();
+
 
     public StaticLoader(IAttributesLoader attributesLoader, IDirectoryWrapper directoryWrapper, IConfiguration config, ILogger<StaticLoader> logger)
     {
@@ -44,20 +50,29 @@ public sealed class StaticLoader : IStaticLoader
 
     public void LoadStepsFromText(string content, string filepath)
     {
-        var steps = GetStepsFrom(content);
-        AddStepsToRegistry(filepath, steps);
+        lock (_registryLock)
+        {
+            var steps = GetStepsFrom(content);
+            AddStepsToRegistry(filepath, steps);
+        }
     }
 
     public void ReloadSteps(string content, string filepath)
     {
         if (IsFileRemoved(filepath)) return;
-        _stepRegistry.RemoveSteps(filepath);
-        LoadStepsFromText(content, filepath);
+        lock (_registryLock)
+        {
+            _stepRegistry.RemoveSteps(filepath);
+            LoadStepsFromText(content, filepath);
+        }
     }
 
     public void RemoveSteps(string file)
     {
-        _stepRegistry.RemoveSteps(file);
+        lock (_registryLock)
+        {
+            _stepRegistry.RemoveSteps(file);
+        }
     }
 
     private bool IsFileRemoved(string file)

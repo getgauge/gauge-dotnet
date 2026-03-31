@@ -89,6 +89,11 @@ public class StepRegistry : IStepRegistry
         return _registry[parsedStepText][0];
     }
 
+    public IEnumerable<GaugeMethod> MethodsFor(string parsedStepText)
+    {
+        return _registry.TryGetValue(parsedStepText, out var methods) ? methods : Enumerable.Empty<GaugeMethod>();
+    }
+
     public bool HasAlias(string stepValue)
     {
         return _registry.ContainsKey(stepValue) && _registry.GetValueOrDefault(stepValue).FirstOrDefault().HasAlias;

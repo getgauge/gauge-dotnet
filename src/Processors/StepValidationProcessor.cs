@@ -37,7 +37,10 @@ public class StepValidationProcessor : IGaugeProcessor<StepValidateRequest, Step
         {
             isValid = false;
             errorType = StepValidateResponse.Types.ErrorType.DuplicateStepImplementation;
-            errorMessage = string.Format("Multiple step implementations found for : {0}", stepToValidate);
+            var implementations = _stepRegistry.MethodsFor(stepToValidate);
+            var locations = string.Join("\n", implementations.Select(m =>
+                $"  {m.ClassName}.{m.Name} in {m.FileName}:{m.Span.StartLinePosition.Line + 1}"));
+            errorMessage = $"Step: {stepToValidate}\n{locations}";
         }
         return Task.FromResult(GetStepValidateResponseMessage(isValid, errorType, errorMessage, suggestion));
     }
