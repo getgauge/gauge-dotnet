@@ -46,7 +46,7 @@ public class ValidateProcessorTests
         ClassicAssert.AreEqual(false, response.IsValid);
         ClassicAssert.AreEqual(StepValidateResponse.Types.ErrorType.DuplicateStepImplementation,
             response.ErrorType);
-        StringAssert.Contains("Multiple step implementations found for : step_text_1", response.ErrorMessage);
+        StringAssert.Contains("Step: step_text_1", response.ErrorMessage);
         StringAssert.Contains("StepsA.StepImpl in StepsA.cs:1", response.ErrorMessage);
         StringAssert.Contains("StepsB.StepImpl in StepsB.cs:1", response.ErrorMessage);
         ClassicAssert.IsEmpty(response.Suggestion);
