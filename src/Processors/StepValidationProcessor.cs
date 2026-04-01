@@ -8,16 +8,19 @@
 using Gauge.Dotnet.Extensions;
 using Gauge.Dotnet.Registries;
 using Gauge.Messages;
+using Microsoft.Extensions.Logging;
 
 namespace Gauge.Dotnet.Processors;
 
 public class StepValidationProcessor : IGaugeProcessor<StepValidateRequest, StepValidateResponse>
 {
     private readonly IStepRegistry _stepRegistry;
+    private readonly ILogger<StepValidationProcessor> _logger;
 
-    public StepValidationProcessor(IStepRegistry stepRegistry)
+    public StepValidationProcessor(IStepRegistry stepRegistry, ILogger<StepValidationProcessor> logger)
     {
         _stepRegistry = stepRegistry;
+        _logger = logger;
     }
 
     public Task<StepValidateResponse> Process(int stream, StepValidateRequest request)
@@ -42,6 +45,12 @@ public class StepValidationProcessor : IGaugeProcessor<StepValidateRequest, Step
             var locations = string.Join("\n", lookup.Methods.Select(m =>
                 $"  {m.ClassName}.{m.Name} in {m.FileName}:{m.Span.StartLinePosition.Line + 1}"));
             errorMessage = $"Step: {stepToValidate}\n{locations}";
+            _logger.LogDebug("Duplicate step implementation found for: {StepText}", stepToValidate);
+            foreach (var m in lookup.Methods)
+            {
+                _logger.LogDebug("Duplicate: {ClassName}.{MethodName} in {FileName}:{Line}",
+                    m.ClassName, m.Name, m.FileName, m.Span.StartLinePosition.Line + 1);
+            }
         }
         return Task.FromResult(GetStepValidateResponseMessage(isValid, errorType, errorMessage, suggestion));
     }

@@ -8,6 +8,7 @@ using Gauge.Dotnet.Models;
 using Gauge.Dotnet.Processors;
 using Gauge.Dotnet.Registries;
 using Gauge.Messages;
+using Microsoft.Extensions.Logging;
 
 
 namespace Gauge.Dotnet.UnitTests.Processors;
@@ -39,7 +40,7 @@ public class ValidateProcessorTests
                 new GaugeMethod { Name = "StepImpl", ClassName = "StepsA", FileName = "StepsA.cs" },
                 new GaugeMethod { Name = "StepImpl", ClassName = "StepsB", FileName = "StepsB.cs" }
             }));
-        var processor = new StepValidationProcessor(_mockStepRegistry.Object);
+        var processor = new StepValidationProcessor(_mockStepRegistry.Object, Mock.Of<ILogger<StepValidationProcessor>>());
         var response = await processor.Process(1, request);
 
         ClassicAssert.AreEqual(false, response.IsValid);
@@ -66,7 +67,7 @@ public class ValidateProcessorTests
         };
         _mockStepRegistry.Setup(registry => registry.LookupStep("step_text_1")).Returns(
             new StepLookupResult(false, false, Array.Empty<GaugeMethod>()));
-        var processor = new StepValidationProcessor(_mockStepRegistry.Object);
+        var processor = new StepValidationProcessor(_mockStepRegistry.Object, Mock.Of<ILogger<StepValidationProcessor>>());
         var response = await processor.Process(1, request);
 
         ClassicAssert.AreEqual(false, response.IsValid);
@@ -90,7 +91,7 @@ public class ValidateProcessorTests
         _mockStepRegistry.Setup(registry => registry.LookupStep("step_text_1")).Returns(
             new StepLookupResult(true, false, new[] { new GaugeMethod { Name = "StepImpl" } }));
 
-        var processor = new StepValidationProcessor(_mockStepRegistry.Object);
+        var processor = new StepValidationProcessor(_mockStepRegistry.Object, Mock.Of<ILogger<StepValidationProcessor>>());
         var response = await processor.Process(1, request);
 
         ClassicAssert.AreEqual(true, response.IsValid);
