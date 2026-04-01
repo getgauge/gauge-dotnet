@@ -27,18 +27,19 @@ public class StepValidationProcessor : IGaugeProcessor<StepValidateRequest, Step
         var errorMessage = "";
         var suggestion = "";
         var errorType = StepValidateResponse.Types.ErrorType.StepImplementationNotFound;
-        if (!_stepRegistry.ContainsStep(stepToValidate))
+
+        var lookup = _stepRegistry.LookupStep(stepToValidate);
+        if (!lookup.Exists)
         {
             isValid = false;
             errorMessage = string.Format("No implementation found for : {0}. Full Step Text :", stepToValidate);
             suggestion = GetSuggestion(request.StepValue);
         }
-        else if (_stepRegistry.HasMultipleImplementations(stepToValidate))
+        else if (lookup.HasMultipleImplementations)
         {
             isValid = false;
             errorType = StepValidateResponse.Types.ErrorType.DuplicateStepImplementation;
-            var implementations = _stepRegistry.MethodsFor(stepToValidate);
-            var locations = string.Join("\n", implementations.Select(m =>
+            var locations = string.Join("\n", lookup.Methods.Select(m =>
                 $"  {m.ClassName}.{m.Name} in {m.FileName}:{m.Span.StartLinePosition.Line + 1}"));
             errorMessage = $"Step: {stepToValidate}\n{locations}";
         }

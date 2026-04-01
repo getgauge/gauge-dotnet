@@ -33,13 +33,12 @@ public class ValidateProcessorTests
             NumberOfParameters = 0
         };
 
-        _mockStepRegistry.Setup(registry => registry.ContainsStep("step_text_1")).Returns(true);
-        _mockStepRegistry.Setup(registry => registry.HasMultipleImplementations("step_text_1")).Returns(true);
-        _mockStepRegistry.Setup(registry => registry.MethodsFor("step_text_1")).Returns(new[]
-        {
-            new GaugeMethod { Name = "StepImpl", ClassName = "StepsA", FileName = "StepsA.cs",  },
-            new GaugeMethod { Name = "StepImpl", ClassName = "StepsB", FileName = "StepsB.cs",  }
-        });
+        _mockStepRegistry.Setup(registry => registry.LookupStep("step_text_1")).Returns(
+            new StepLookupResult(true, true, new[]
+            {
+                new GaugeMethod { Name = "StepImpl", ClassName = "StepsA", FileName = "StepsA.cs" },
+                new GaugeMethod { Name = "StepImpl", ClassName = "StepsB", FileName = "StepsB.cs" }
+            }));
         var processor = new StepValidationProcessor(_mockStepRegistry.Object);
         var response = await processor.Process(1, request);
 
@@ -65,6 +64,8 @@ public class ValidateProcessorTests
                 StepValue = "step_text_1"
             }
         };
+        _mockStepRegistry.Setup(registry => registry.LookupStep("step_text_1")).Returns(
+            new StepLookupResult(false, false, Array.Empty<GaugeMethod>()));
         var processor = new StepValidationProcessor(_mockStepRegistry.Object);
         var response = await processor.Process(1, request);
 
@@ -86,8 +87,8 @@ public class ValidateProcessorTests
             NumberOfParameters = 0
         };
 
-        _mockStepRegistry.Setup(registry => registry.ContainsStep("step_text_1")).Returns(true);
-        _mockStepRegistry.Setup(registry => registry.HasMultipleImplementations("step_text_1")).Returns(false);
+        _mockStepRegistry.Setup(registry => registry.LookupStep("step_text_1")).Returns(
+            new StepLookupResult(true, false, new[] { new GaugeMethod { Name = "StepImpl" } }));
 
         var processor = new StepValidationProcessor(_mockStepRegistry.Object);
         var response = await processor.Process(1, request);
