@@ -24,12 +24,6 @@ public sealed class StaticLoader : IStaticLoader
     private readonly IConfiguration _config;
     private readonly ILogger<StaticLoader> _logger;
 
-    // Guards all StepRegistry mutations. gRPC dispatches CacheFileRequest messages concurrently on separate threads,
-    // all sharing this singleton. Without synchronization, concurrent ReloadSteps calls can interleave their
-    // RemoveSteps/AddStep operations — one thread's dictionary rebuild overwrites another's, leaving stale entries
-    // that cause false "duplicate step implementation" warnings in the IDE.
-    private readonly object _registryLock = new object();
-
 
     public StaticLoader(IAttributesLoader attributesLoader, IDirectoryWrapper directoryWrapper, IConfiguration config, ILogger<StaticLoader> logger)
     {
@@ -50,29 +44,20 @@ public sealed class StaticLoader : IStaticLoader
 
     public void LoadStepsFromText(string content, string filepath)
     {
-        lock (_registryLock)
-        {
-            var steps = GetStepsFrom(content);
-            AddStepsToRegistry(filepath, steps);
-        }
+        var steps = GetStepsFrom(content);
+        var entries = BuildStepEntries(filepath, steps);
+        _stepRegistry.ReplaceSteps(filepath, entries);
     }
 
     public void ReloadSteps(string content, string filepath)
     {
         if (IsFileRemoved(filepath)) return;
-        lock (_registryLock)
-        {
-            _stepRegistry.RemoveSteps(filepath);
-            LoadStepsFromText(content, filepath);
-        }
+        LoadStepsFromText(content, filepath);
     }
 
     public void RemoveSteps(string file)
     {
-        lock (_registryLock)
-        {
-            _stepRegistry.RemoveSteps(file);
-        }
+        _stepRegistry.RemoveSteps(file);
     }
 
     private bool IsFileRemoved(string file)
@@ -109,8 +94,10 @@ public sealed class StaticLoader : IStaticLoader
         }
     }
 
-    private void AddStepsToRegistry(string fileName, IEnumerable<MethodDeclarationSyntax> stepMethods)
+    private static IReadOnlyList<(string stepValue, GaugeMethod method)> BuildStepEntries(
+        string fileName, IEnumerable<MethodDeclarationSyntax> stepMethods)
     {
+        var entries = new List<(string, GaugeMethod)>();
         foreach (var stepMethod in stepMethods)
         {
             var attributeListSyntax = stepMethod.AttributeLists.WithStepAttribute();
@@ -135,9 +122,10 @@ public sealed class StaticLoader : IStaticLoader
                     FileName = fileName,
                     IsExternal = false
                 };
-                _stepRegistry.AddStep(stepValue, entry);
+                entries.Add((stepValue, entry));
             }
         }
+        return entries;
     }
 
     private static IEnumerable<MethodDeclarationSyntax> GetStepsFrom(string content)

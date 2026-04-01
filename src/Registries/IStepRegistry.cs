@@ -11,14 +11,12 @@ namespace Gauge.Dotnet.Registries;
 
 public interface IStepRegistry
 {
-    bool ContainsStep(string parsedStepText);
-    GaugeMethod MethodFor(string parsedStepText);
-    IEnumerable<GaugeMethod> MethodsFor(string parsedStepText);
     bool HasAlias(string stepText);
     string GetStepText(string parameterizedStepText);
     IEnumerable<string> GetStepTexts();
-    bool HasMultipleImplementations(string parsedStepText);
+    StepLookupResult LookupStep(string parsedStepText);
     void AddStep(string stepValue, GaugeMethod stepMethod);
+    void ReplaceSteps(string filepath, IReadOnlyList<(string stepValue, GaugeMethod method)> newSteps);
     void RemoveSteps(string filepath);
     IEnumerable<StepPosition> GetStepPositions(string filePath);
     bool IsFileCached(string file);
