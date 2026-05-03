@@ -24,19 +24,17 @@ public class StepNameProcessor : IGaugeProcessor<StepNameRequest, StepNameRespon
     {
 
         var parsedStepText = request.StepValue;
-        var isStepPresent = _stepRegistry.ContainsStep(parsedStepText);
+        var lookup = _stepRegistry.LookupStep(parsedStepText);
         var response = new StepNameResponse
         {
-            IsStepPresent = isStepPresent
+            IsStepPresent = lookup.Exists
         };
 
-        if (!isStepPresent) return Task.FromResult(response);
+        if (!lookup.Exists) return Task.FromResult(response);
 
-        var stepText = _stepRegistry.GetStepText(parsedStepText);
-        var hasAlias = _stepRegistry.HasAlias(stepText);
-        var info = _stepRegistry.MethodFor(parsedStepText);
+        var info = lookup.Methods[0];
         response.IsExternal = info.IsExternal;
-        response.HasAlias = hasAlias;
+        response.HasAlias = info.HasAlias;
         if (!response.IsExternal)
         {
             response.FileName = info.FileName;
@@ -49,10 +47,10 @@ public class StepNameProcessor : IGaugeProcessor<StepNameRequest, StepNameRespon
             };
         }
 
-        if (hasAlias)
+        if (info.HasAlias)
             response.StepName.AddRange(info.Aliases);
         else
-            response.StepName.Add(stepText);
+            response.StepName.Add(info.StepText);
 
         return Task.FromResult(response);
     }
