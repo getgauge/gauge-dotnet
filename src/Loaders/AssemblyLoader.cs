@@ -87,11 +87,13 @@ public class AssemblyLoader : IAssemblyLoader
             foreach (var stepText in stepTexts)
             {
                 var stepValue = GetStepValue(stepText);
-                if (_registry.ContainsStep(stepValue))
+                var lookup = _registry.LookupStep(stepValue);
+                if (lookup.Exists)
                 {
                     _logger.LogDebug("'{StepValue}': implementation found in StepRegistry, setting reflected methodInfo", stepValue);
-                    _registry.MethodFor(stepValue).MethodInfo = info;
-                    _registry.MethodFor(stepValue).ContinueOnFailure = info.IsRecoverableStep(this);
+                    var existing = lookup.Methods[0];
+                    existing.MethodInfo = info;
+                    existing.ContinueOnFailure = info.IsRecoverableStep(this);
                 }
                 else
                 {
