@@ -150,7 +150,7 @@ jobs:
           ./run.sh install
 
       - name: Set up NodeJS
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 24
 
