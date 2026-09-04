@@ -40,7 +40,7 @@ public class ExternalReferenceTests
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, new ReflectionWrapper(),
             new ActivatorWrapper(serviceProvider), new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(), config);
 
-        var stepValidationProcessor = new StepValidationProcessor(assemblyLoader.GetStepRegistry());
+        var stepValidationProcessor = new StepValidationProcessor(assemblyLoader.GetStepRegistry(), _loggerFactory.CreateLogger<StepValidationProcessor>());
         var message = new StepValidateRequest
         {
             StepText = stepText,

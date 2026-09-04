@@ -19,15 +19,13 @@ public class StepNameProcessorTest
             };
 
             var parsedStepText = request.StepValue;
-            const string stepText = "step1";
-            mockStepRegistry.Setup(r => r.ContainsStep(parsedStepText)).Returns(true);
-            mockStepRegistry.Setup(r => r.GetStepText(parsedStepText)).Returns(stepText);
             var gaugeMethod = new GaugeMethod
             {
-                FileName = "foo"
+                FileName = "foo",
+                StepText = "step1"
             };
-            mockStepRegistry.Setup(r => r.MethodFor(parsedStepText)).Returns(gaugeMethod);
-            mockStepRegistry.Setup(r => r.HasAlias(stepText)).Returns(false);
+            mockStepRegistry.Setup(r => r.LookupStep(parsedStepText))
+                .Returns(new StepLookupResult(true, false, new[] { gaugeMethod }));
             var stepNameProcessor = new StepNameProcessor(mockStepRegistry.Object);
 
             var response = await stepNameProcessor.Process(1, request);
@@ -46,18 +44,16 @@ public class StepNameProcessorTest
                 StepValue = "step1"
             };
             var parsedStepText = request.StepValue;
-            const string stepText = "step1";
-            mockStepRegistry.Setup(r => r.ContainsStep(parsedStepText)).Returns(true);
-            mockStepRegistry.Setup(r => r.GetStepText(parsedStepText)).Returns(stepText);
 
             var gaugeMethod = new GaugeMethod
             {
                 FileName = "foo",
+                StepText = "step1",
                 HasAlias = true,
                 Aliases = new List<string> { "step2", "step3" }
             };
-            mockStepRegistry.Setup(r => r.MethodFor(parsedStepText)).Returns(gaugeMethod);
-            mockStepRegistry.Setup(r => r.HasAlias(stepText)).Returns(true);
+            mockStepRegistry.Setup(r => r.LookupStep(parsedStepText))
+                .Returns(new StepLookupResult(true, false, new[] { gaugeMethod }));
             var stepNameProcessor = new StepNameProcessor(mockStepRegistry.Object);
 
             var response = await stepNameProcessor.Process(1, request);
@@ -77,16 +73,15 @@ public class StepNameProcessorTest
                 StepValue = "step1"
             };
             var parsedStepText = request.StepValue;
-            const string stepText = "step1";
-            mockStepRegistry.Setup(r => r.ContainsStep(parsedStepText)).Returns(true);
-            mockStepRegistry.Setup(r => r.GetStepText(parsedStepText)).Returns(stepText);
 
             var gaugeMethod = new GaugeMethod
             {
                 FileName = "foo",
+                StepText = "step1",
                 IsExternal = true
             };
-            mockStepRegistry.Setup(r => r.MethodFor(parsedStepText)).Returns(gaugeMethod);
+            mockStepRegistry.Setup(r => r.LookupStep(parsedStepText))
+                .Returns(new StepLookupResult(true, false, new[] { gaugeMethod }));
             var stepNameProcessor = new StepNameProcessor(mockStepRegistry.Object);
 
             var response = await stepNameProcessor.Process(1, request);

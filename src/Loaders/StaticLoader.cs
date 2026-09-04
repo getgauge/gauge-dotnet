@@ -45,13 +45,13 @@ public sealed class StaticLoader : IStaticLoader
     public void LoadStepsFromText(string content, string filepath)
     {
         var steps = GetStepsFrom(content);
-        AddStepsToRegistry(filepath, steps);
+        var entries = BuildStepEntries(filepath, steps);
+        _stepRegistry.ReplaceSteps(filepath, entries);
     }
 
     public void ReloadSteps(string content, string filepath)
     {
         if (IsFileRemoved(filepath)) return;
-        _stepRegistry.RemoveSteps(filepath);
         LoadStepsFromText(content, filepath);
     }
 
@@ -94,8 +94,10 @@ public sealed class StaticLoader : IStaticLoader
         }
     }
 
-    private void AddStepsToRegistry(string fileName, IEnumerable<MethodDeclarationSyntax> stepMethods)
+    private static IReadOnlyList<(string stepValue, GaugeMethod method)> BuildStepEntries(
+        string fileName, IEnumerable<MethodDeclarationSyntax> stepMethods)
     {
+        var entries = new List<(string, GaugeMethod)>();
         foreach (var stepMethod in stepMethods)
         {
             var attributeListSyntax = stepMethod.AttributeLists.WithStepAttribute();
@@ -120,9 +122,10 @@ public sealed class StaticLoader : IStaticLoader
                     FileName = fileName,
                     IsExternal = false
                 };
-                _stepRegistry.AddStep(stepValue, entry);
+                entries.Add((stepValue, entry));
             }
         }
+        return entries;
     }
 
     private static IEnumerable<MethodDeclarationSyntax> GetStepsFrom(string content)

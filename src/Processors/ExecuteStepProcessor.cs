@@ -29,10 +29,11 @@ public class ExecuteStepProcessor : IGaugeProcessor<ExecuteStepRequest, Executio
     [DebuggerHidden]
     public async Task<ExecutionStatusResponse> Process(int streamId, ExecuteStepRequest request)
     {
-        if (!_stepRegistry.ContainsStep(request.ParsedStepText))
+        var lookup = _stepRegistry.LookupStep(request.ParsedStepText);
+        if (!lookup.Exists)
             return ExecutionError("Step Implementation not found");
 
-        var method = _stepRegistry.MethodFor(request.ParsedStepText);
+        var method = lookup.Methods[0];
 
         var parameters = method.ParameterCount;
         var args = new string[parameters];

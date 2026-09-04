@@ -41,9 +41,9 @@ public class ExecuteStepProcessorTests
                 }
         };
         var mockStepRegistry = new Mock<IStepRegistry>();
-        mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(true);
         var fooMethodInfo = new GaugeMethod { Name = "Foo", ParameterCount = 1 };
-        mockStepRegistry.Setup(x => x.MethodFor(parsedStepText)).Returns(fooMethodInfo);
+        mockStepRegistry.Setup(x => x.LookupStep(parsedStepText))
+            .Returns(new StepLookupResult(true, false, new[] { fooMethodInfo }));
         var mockOrchestrator = new Mock<IExecutionOrchestrator>();
         mockOrchestrator.Setup(e => e.ExecuteStep(fooMethodInfo, It.IsAny<int>(), It.IsAny<string[]>()))
             .ReturnsAsync(() => new ProtoExecutionResult { ExecutionTime = 1, Failed = false });
@@ -79,9 +79,9 @@ public class ExecuteStepProcessorTests
         };
 
         var mockStepRegistry = new Mock<IStepRegistry>();
-        mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(true);
         var fooMethodInfo = new GaugeMethod { Name = "Foo", ParameterCount = 1 };
-        mockStepRegistry.Setup(x => x.MethodFor(parsedStepText)).Returns(fooMethodInfo);
+        mockStepRegistry.Setup(x => x.LookupStep(parsedStepText))
+            .Returns(new StepLookupResult(true, false, new[] { fooMethodInfo }));
         var mockOrchestrator = new Mock<IExecutionOrchestrator>();
         mockOrchestrator.Setup(e => e.ExecuteStep(fooMethodInfo, It.IsAny<int>(), It.IsAny<string[]>())).ReturnsAsync(() =>
             new ProtoExecutionResult
@@ -113,9 +113,9 @@ public class ExecuteStepProcessorTests
             ParsedStepText = parsedStepText
         };
         var mockStepRegistry = new Mock<IStepRegistry>();
-        mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(true);
         var fooMethod = new GaugeMethod { Name = "Foo", ParameterCount = 1 };
-        mockStepRegistry.Setup(x => x.MethodFor(parsedStepText)).Returns(fooMethod);
+        mockStepRegistry.Setup(x => x.LookupStep(parsedStepText))
+            .Returns(new StepLookupResult(true, false, new[] { fooMethod }));
         var mockOrchestrator = new Mock<IExecutionOrchestrator>();
 
         var mockTableFormatter = new Mock<ITableFormatter>();
@@ -138,7 +138,8 @@ public class ExecuteStepProcessorTests
             ParsedStepText = parsedStepText
         };
         var mockStepRegistry = new Mock<IStepRegistry>();
-        mockStepRegistry.Setup(x => x.ContainsStep(parsedStepText)).Returns(false);
+        mockStepRegistry.Setup(x => x.LookupStep(parsedStepText))
+            .Returns(new StepLookupResult(false, false, Array.Empty<GaugeMethod>()));
         var mockOrchestrator = new Mock<IExecutionOrchestrator>();
         var mockTableFormatter = new Mock<ITableFormatter>();
 
