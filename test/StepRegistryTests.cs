@@ -25,8 +25,8 @@ namespace Gauge.Dotnet.UnitTests
             foreach (var pair in methods)
                 stepRegistry.AddStep(pair.Key, pair.Value);
 
-            ClassicAssert.True(stepRegistry.ContainsStep("Foo"));
-            ClassicAssert.True(stepRegistry.ContainsStep("Bar"));
+            ClassicAssert.True(stepRegistry.LookupStep("Foo").Exists);
+            ClassicAssert.True(stepRegistry.LookupStep("Bar").Exists);
         }
 
         [Test]
@@ -104,7 +104,7 @@ namespace Gauge.Dotnet.UnitTests
             foreach (var pair in methods)
                 stepRegistry.AddStep(pair.Key, pair.Value);
 
-            var method = stepRegistry.MethodFor("Foo");
+            var method = stepRegistry.LookupStep("Foo").Methods[0];
 
             ClassicAssert.AreEqual(method.Name, "Foo");
         }
@@ -164,7 +164,7 @@ namespace Gauge.Dotnet.UnitTests
                 stepRegistry.AddStep(pair.Key, pair.Value);
 
             stepRegistry.RemoveSteps("Foo.cs");
-            ClassicAssert.False(stepRegistry.ContainsStep("Foo"));
+            ClassicAssert.False(stepRegistry.LookupStep("Foo").Exists);
         }
 
         [Test]
@@ -175,6 +175,19 @@ namespace Gauge.Dotnet.UnitTests
 
             ClassicAssert.True(stepRegistry.IsFileCached("Foo.cs"));
             ClassicAssert.False(stepRegistry.IsFileCached("Bar.cs"));
+        }
+
+        [Test]
+        public void ShouldDetectGenuineDuplicateSteps()
+        {
+            var stepRegistry = new StepRegistry();
+            var method1 = new GaugeMethod { Name = "Click", ClassName = "ActionsA", StepText = "Click <element>", FileName = "ActionsA.cs" };
+            var method2 = new GaugeMethod { Name = "Click", ClassName = "ActionsB", StepText = "Click <element>", FileName = "ActionsB.cs" };
+
+            stepRegistry.AddStep("Click {}", method1);
+            stepRegistry.AddStep("Click {}", method2);
+
+            ClassicAssert.True(stepRegistry.LookupStep("Click {}").HasMultipleImplementations);
         }
 
         [Test]

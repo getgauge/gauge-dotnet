@@ -39,7 +39,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
             new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>(), executionInfoMapper), _configuration,
             _loggerFactory.CreateLogger<ExecutionOrchestrator>(), dataStoreFactory);
         var gaugeMethod = assemblyLoader.GetStepRegistry()
-            .MethodFor("I throw a serializable exception and continue");
+            .LookupStep("I throw a serializable exception and continue").Methods[0];
         var executionResult = await orchestrator.ExecuteStep(gaugeMethod, 1);
         ClassicAssert.IsTrue(executionResult.Failed);
         ClassicAssert.IsTrue(executionResult.RecoverableError);
@@ -63,7 +63,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
             new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
             new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>(), executionInfoMapper), _configuration,
             _loggerFactory.CreateLogger<ExecutionOrchestrator>(), dataStoreFactory);
-        var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("Step that takes a table {}");
+        var gaugeMethod = assemblyLoader.GetStepRegistry().LookupStep("Step that takes a table {}").Methods[0];
         var table = new Table(new List<string> { "foo", "bar" });
         table.AddRow(new List<string> { "foorow1", "barrow1" });
         table.AddRow(new List<string> { "foorow2", "barrow2" });
@@ -91,7 +91,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
             new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>(), executionInfoMapper), _configuration,
             _loggerFactory.CreateLogger<ExecutionOrchestrator>(), dataStoreFactory);
         var gaugeMethod = assemblyLoader.GetStepRegistry()
-            .MethodFor("A context step which gets executed before every scenario");
+            .LookupStep("A context step which gets executed before every scenario").Methods[0];
 
         var executionResult = await orchestrator.ExecuteStep(gaugeMethod, 1);
         ClassicAssert.False(executionResult.Failed);
@@ -117,7 +117,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
             new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>(), executionInfoMapper), _configuration,
             _loggerFactory.CreateLogger<ExecutionOrchestrator>(), dataStoreFactory);
 
-        var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("Say {} to {}");
+        var gaugeMethod = assemblyLoader.GetStepRegistry().LookupStep("Say {} to {}").Methods[0];
 
         var executionResult = await executionOrchestrator.ExecuteStep(gaugeMethod, 1, "hello", "world");
 
@@ -144,7 +144,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
             new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>(), executionInfoMapper), _configuration,
             _loggerFactory.CreateLogger<ExecutionOrchestrator>(), dataStoreFactory);
 
-        var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an AggregateException");
+        var gaugeMethod = assemblyLoader.GetStepRegistry().LookupStep("I throw an AggregateException").Methods[0];
         var executionResult = await executionOrchestrator.ExecuteStep(gaugeMethod, 1);
 
         ClassicAssert.True(executionResult.Failed);
@@ -163,7 +163,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
         var assemblyLoader = new AssemblyLoader(assemblyLocater, gaugeLoadContext, reflectionWrapper,
             activatorWrapper, new StepRegistry(), _loggerFactory.CreateLogger<AssemblyLoader>(), _configuration);
         var registry = assemblyLoader.GetStepRegistry();
-        var gaugeMethod = registry.MethodFor("and an alias");
+        var gaugeMethod = registry.LookupStep("and an alias").Methods[0];
         var stepTexts = gaugeMethod.Aliases.ToList();
 
         ClassicAssert.Contains("Step with text", stepTexts);
@@ -189,7 +189,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
             new HookExecutor(assemblyLoader, executionInfoMapper, hookRegistry, _loggerFactory.CreateLogger<HookExecutor>()),
             new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>(), executionInfoMapper), _configuration,
             _loggerFactory.CreateLogger<ExecutionOrchestrator>(), dataStoreFactory);
-        var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw a serializable exception");
+        var gaugeMethod = assemblyLoader.GetStepRegistry().LookupStep("I throw a serializable exception").Methods[0];
 
         var executionResult = await executionOrchestrator.ExecuteStep(gaugeMethod, 1);
 
@@ -219,7 +219,7 @@ public class ExecutionOrchestratorTests : IntegrationTestsBase
             new StepExecutor(assemblyLoader, _loggerFactory.CreateLogger<StepExecutor>(), executionInfoMapper), _configuration,
             _loggerFactory.CreateLogger<ExecutionOrchestrator>(), dataStoreFactory);
 
-        var gaugeMethod = assemblyLoader.GetStepRegistry().MethodFor("I throw an unserializable exception");
+        var gaugeMethod = assemblyLoader.GetStepRegistry().LookupStep("I throw an unserializable exception").Methods[0];
         var executionResult = await executionOrchestrator.ExecuteStep(gaugeMethod, 1);
         ClassicAssert.True(executionResult.Failed);
         ClassicAssert.AreEqual(expectedMessage, executionResult.ErrorMessage);
