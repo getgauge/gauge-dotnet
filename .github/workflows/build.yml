@@ -59,8 +59,8 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v7
         with:
-          go-version: '1.26'
-          cache: false
+          check-latest: true
+          go-version-file: .tool-versions
 
       - name: Setup Java
         uses: actions/setup-java@v6.0.1
@@ -127,8 +127,8 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v7
         with:
-          go-version: '1.26'
-          cache: false
+          check-latest: true
+          go-version-file: .tool-versions
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v6
