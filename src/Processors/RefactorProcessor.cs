@@ -85,9 +85,13 @@ public class RefactorProcessor : IGaugeProcessor<RefactorRequest, RefactorRespon
 
     private GaugeMethod GetGaugeMethod(ProtoStepValue stepValue)
     {
-        if (_stepRegistry.HasMultipleImplementations(stepValue.StepValue))
+        var lookup = _stepRegistry.LookupStep(stepValue.StepValue);
+        if (!lookup.Exists)
+            throw new Exception(string.Format("Step implementation not found for : {0}",
+                stepValue.ParameterizedStepValue));
+        if (lookup.HasMultipleImplementations)
             throw new Exception(string.Format("Multiple step implementations found for : {0}",
                 stepValue.ParameterizedStepValue));
-        return _stepRegistry.MethodFor(stepValue.StepValue);
+        return lookup.Methods[0];
     }
 }
